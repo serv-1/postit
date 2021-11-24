@@ -7,6 +7,7 @@ import Joi from 'joi'
 import axios, { AxiosError } from 'axios'
 import { ChangeEvent, useState } from 'react'
 const zxcvbn = require('zxcvbn')
+import { useRouter } from 'next/router'
 
 const schema = Joi.object({
   email: Joi.string()
@@ -59,6 +60,7 @@ const Signup = () => {
     handleSubmit,
     setError,
   } = useForm<FormInput>({ resolver: joiResolver(schema) })
+  const router = useRouter()
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
     try {
@@ -67,6 +69,7 @@ const Signup = () => {
         password: data.password,
         validateStatus: (status: number) => status >= 200 && status <= 301,
       })
+      router.push('/')
     } catch (e) {
       const err = e as AxiosError
       if (!err.response) return

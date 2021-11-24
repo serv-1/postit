@@ -49,6 +49,7 @@ describe('Sign up form', () => {
     ).toBeInTheDocument()
   })
 
+  // TODO: ↓
   it('should redirect to `/` (home) when form data are valid', async () => {
     userEvent.type(screen.getByLabelText(/email/i), email)
     userEvent.type(screen.getByLabelText(/^password$/i), password)

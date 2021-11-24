@@ -50,7 +50,7 @@ export default async function handler(
 
       await user.save()
 
-      return res.redirect(301, 'http://localhost:3000/').end()
+      res.status(200).end()
     } catch (e) {
       if (e instanceof ValidationError) {
         return res
