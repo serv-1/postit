@@ -5,7 +5,8 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 const { joiResolver } = require('@hookform/resolvers/joi')
 import Joi from 'joi'
 import axios, { AxiosError } from 'axios'
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
+const zxcvbn = require('zxcvbn')
 
 const schema = Joi.object({
   email: Joi.string()
@@ -43,8 +44,14 @@ type TechnicalError = {
   message: string
 }
 
+type PasswordStrength = {
+  estimated_time: string
+  score: number
+}
+
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false)
+  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>()
   const [technicalError, setTechnicalError] = useState<TechnicalError>()
   const {
     register,
@@ -73,6 +80,15 @@ const Signup = () => {
         setTechnicalError(err.response.data.message)
       }
     }
+  }
+
+  const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const result = zxcvbn(e.target.value)
+    setPasswordStrength({
+      estimated_time:
+        result.crack_times_display.offline_slow_hashing_1e4_per_second,
+      score: result.score,
+    })
   }
 
   return (
@@ -129,6 +145,7 @@ const Signup = () => {
           </div>
           <div className="input-group">
             <button
+              id="visibilityBtn"
               className="btn btn-outline-secondary"
               type="button"
               onClick={() => setShowPassword(!showPassword)}
@@ -136,14 +153,29 @@ const Signup = () => {
               {showPassword ? 'hide' : 'show'}
             </button>
             <input
-              {...register('password')}
+              {...register('password', { onChange: onPasswordChange })}
               type={showPassword ? 'text' : 'password'}
               id="password"
               className={`form-control ${
                 isSubmitted && (errors.password ? 'is-invalid' : 'is-valid')
               }`}
-              aria-describedby="passwordRules"
+              aria-describedby="passwordRules passwordStrength passwordFeedback visibilityBtn"
             />
+            {passwordStrength && (
+              <span
+                className={`input-group-text text-white ${
+                  passwordStrength.score <= 2
+                    ? 'bg-danger'
+                    : passwordStrength.score === 3
+                    ? 'bg-warning'
+                    : 'bg-success'
+                }`}
+                id="passwordStrength"
+                role="status"
+              >
+                Need {passwordStrength.estimated_time} to crack
+              </span>
+            )}
           </div>
           {errors.password && (
             <div

@@ -202,6 +202,26 @@ describe('Sign up form', () => {
       userEvent.click(screen.getByRole('button', { name: 'hide' }))
       expect(screen.getByRole('button', { name: 'show' })).toBeInTheDocument()
     })
+
+    it('should show the estimated time to crack it', async () => {
+      userEvent.type(screen.getByLabelText(/^password/i), password)
+      expect(await screen.findByRole('status')).toBeInTheDocument()
+    })
+
+    it('should have className `bg-danger` when the password strength score <= 2', async () => {
+      userEvent.type(screen.getByLabelText(/^password/i), password)
+      expect(await screen.findByRole('status')).toHaveClass('bg-danger')
+    })
+
+    it('should have className `bg-warning` when the password strength score = 3', async () => {
+      userEvent.type(screen.getByLabelText(/^password/i), 'epsilon utopy')
+      expect(await screen.findByRole('status')).toHaveClass('bg-warning')
+    })
+
+    it('should have className `bg-success` when the password strength score = 4', async () => {
+      userEvent.type(screen.getByLabelText(/^password/i), 'epsilon utopy dead')
+      expect(await screen.findByRole('status')).toHaveClass('bg-success')
+    })
   })
 
   describe('Confirm your password', () => {
