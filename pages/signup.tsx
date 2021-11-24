@@ -1,15 +1,35 @@
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
-// commonJS needed because of a bug
+// commonJS needed
 // https://github.com/react-hook-form/resolvers/issues/271
 const { joiResolver } = require('@hookform/resolvers/joi')
 import Joi from 'joi'
+import axios, { AxiosError } from 'axios'
+import { useState } from 'react'
 
 const schema = Joi.object({
   email: Joi.string()
+    .required()
     .email({ tlds: { allow: false } })
-    .required(),
-  password: Joi.string().min(10).max(20).invalid(Joi.ref('email')).required(),
+    .messages({
+      'string.base': 'The email is not valid.',
+      'string.empty': 'The email cannot be empty.',
+      'string.email': 'The email is not valid.',
+      'any.required': 'The email is required.',
+    }),
+  password: Joi.string()
+    .required()
+    .invalid(Joi.ref('email'))
+    .min(10)
+    .max(20)
+    .messages({
+      'string.base': 'The password is not valid.',
+      'string.empty': 'The password cannot be empty.',
+      'any.invalid': 'The password cannot be the same as email.',
+      'string.min': 'The password must have 10 characters.',
+      'string.max': 'The password cannot exceed 20 characters.',
+      'any.required': 'The password is required.',
+    }),
   confirm_password: Joi.ref('password'),
 })
 
@@ -19,15 +39,39 @@ type FormInput = {
   confirm_password: string
 }
 
+type TechnicalError = {
+  message: string
+}
+
 const Signup = () => {
+  const [technicalError, setTechnicalError] = useState<TechnicalError>()
   const {
     register,
     formState: { errors, isSubmitted },
     handleSubmit,
+    setError,
   } = useForm<FormInput>({ resolver: joiResolver(schema) })
 
-  const onSubmit: SubmitHandler<FormInput> = (data) => {
-    console.log(data)
+  const onSubmit: SubmitHandler<FormInput> = async (data) => {
+    try {
+      await axios.post('http://localhost:3000/api/users', {
+        email: data.email,
+        password: data.password,
+        validateStatus: (status: number) => status >= 200 && status <= 301,
+      })
+    } catch (e) {
+      const err = e as AxiosError
+      if (!err.response) return
+      if (err.response.status === 422) {
+        setError(
+          err.response.data.name,
+          { type: '', message: err.response.data.message },
+          { shouldFocus: true }
+        )
+      } else {
+        setTechnicalError(err.response.data.message)
+      }
+    }
   }
 
   return (
@@ -35,15 +79,26 @@ const Signup = () => {
       <Head>
         <title>Filanad - Sign up!</title>
       </Head>
-      <h1 className="bg-primary text-light rounded-top p-2">Sign up !</h1>
+      <h1 className="bg-primary text-light rounded-top p-2 m-0">Sign up !</h1>
+      {technicalError && (
+        <div
+          className="fw-bold p-2 m-2 text-light bg-danger rounded-3"
+          role="alert"
+        >
+          {technicalError}
+        </div>
+      )}
       <form
-        className="p-2"
-        method="POST"
+        name="signup"
+        id="signup"
+        className="p-2 text-end"
+        method="post"
         action=""
+        encType="application/json"
         noValidate
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="mb-3">
+        <div className="mb-3 text-start">
           <label htmlFor="email" className="form-label">
             Email
           </label>
@@ -58,11 +113,11 @@ const Signup = () => {
           />
           {errors.email && (
             <div className="invalid-feedback" id="emailFeedback" role="alert">
-              This email address is invalid.
+              {errors.email.message}
             </div>
           )}
         </div>
-        <div className="mb-3">
+        <div className="mb-3 text-start">
           <label htmlFor="password" className="form-label">
             Password
           </label>
@@ -86,11 +141,11 @@ const Signup = () => {
               id="passwordFeedback"
               role="alert"
             >
-              This password is invalid.
+              {errors.password.message}
             </div>
           )}
         </div>
-        <div className="mb-3">
+        <div className="mb-3 text-start">
           <label htmlFor="confirm_password" className="form-label">
             Confirm your password
           </label>
@@ -114,9 +169,7 @@ const Signup = () => {
             </div>
           )}
         </div>
-        <button type="submit" className="btn btn-primary">
-          Sign up
-        </button>
+        <input type="submit" value="Sign up" className="btn btn-primary" />
       </form>
     </>
   )
