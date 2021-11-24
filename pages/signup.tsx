@@ -44,6 +44,7 @@ type TechnicalError = {
 }
 
 const Signup = () => {
+  const [showPassword, setShowPassword] = useState(false)
   const [technicalError, setTechnicalError] = useState<TechnicalError>()
   const {
     register,
@@ -126,15 +127,24 @@ const Signup = () => {
             email. There is no characters restriction so you can use emojis,
             cyrillic, etc. 😎
           </div>
-          <input
-            {...register('password')}
-            type="password"
-            id="password"
-            className={`form-control ${
-              isSubmitted && (errors.password ? 'is-invalid' : 'is-valid')
-            }`}
-            aria-describedby="passwordRules"
-          />
+          <div className="input-group">
+            <button
+              className="btn btn-outline-secondary"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? 'hide' : 'show'}
+            </button>
+            <input
+              {...register('password')}
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              className={`form-control ${
+                isSubmitted && (errors.password ? 'is-invalid' : 'is-valid')
+              }`}
+              aria-describedby="passwordRules"
+            />
+          </div>
           {errors.password && (
             <div
               className="invalid-feedback"

@@ -28,7 +28,7 @@ describe('Sign up form', () => {
     userEvent.type(screen.getByLabelText(/email/i), 'alreadyUsed@email.com')
     userEvent.type(screen.getByLabelText(/^password$/i), password)
     userEvent.type(screen.getByLabelText(/^confirm/i), password)
-    userEvent.click(screen.getByRole('button'))
+    userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
     expect(
       await screen.findByText('The email is already used.')
     ).toBeInTheDocument()
@@ -41,7 +41,7 @@ describe('Sign up form', () => {
 
     userEvent.type(screen.getByLabelText(/^password$/i), password)
     userEvent.type(screen.getByLabelText(/^confirm/i), password)
-    userEvent.click(screen.getByRole('button'))
+    userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
     expect(
       await screen.findByText(
         'Request go brrr! Try to refresh the page and submit the form again.'
@@ -53,21 +53,21 @@ describe('Sign up form', () => {
     userEvent.type(screen.getByLabelText(/email/i), email)
     userEvent.type(screen.getByLabelText(/^password$/i), password)
     userEvent.type(screen.getByLabelText(/^confirm/i), password)
-    userEvent.click(screen.getByRole('button'))
+    userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
     await waitFor(() => expect(document.location.pathname).toBe('/'))
   })
 
   describe('Email', () => {
     it('should show an error message when it is invalid', async () => {
       userEvent.type(screen.getByLabelText(/email/i), 'bad email')
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       expect(
         await screen.findByText('The email is not valid.')
       ).toBeInTheDocument()
     })
 
     it('should show an error message when it is empty', async () => {
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       expect(
         await screen.findByText('The email cannot be empty.')
       ).toBeInTheDocument()
@@ -78,18 +78,18 @@ describe('Sign up form', () => {
     })
 
     it('should have className `is-invalid` when it is invalid', async () => {
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       expect(await screen.findByLabelText(/email/i)).toHaveClass('is-invalid')
     })
 
     it('should have className `is-valid` when it is not invalid anymore', async () => {
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       userEvent.type(await screen.findByLabelText(/email/i), email)
       expect(await screen.findByLabelText(/email/i)).toHaveClass('is-valid')
     })
 
     it('should not show the error message when it is not invalid anymore', async () => {
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
 
       // We wait until the email feedback appear
       // NOTE: Do not remove it or waitFor...Removed will not work
@@ -111,7 +111,7 @@ describe('Sign up form', () => {
   describe('Password', () => {
     it('should show an error message when it is smaller than 10 chars.', async () => {
       userEvent.type(screen.getByLabelText(/^password/i), 'azerty')
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       expect(await screen.findByText('The password must have 10 characters.'))
     })
 
@@ -120,7 +120,7 @@ describe('Sign up form', () => {
         screen.getByLabelText(/^password/i),
         'azerty123456qwerty123456'
       )
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       expect(
         await screen.findByText('The password cannot exceed 20 characters.')
       )
@@ -129,7 +129,7 @@ describe('Sign up form', () => {
     it('should show an error message when it is equal to the email', async () => {
       userEvent.type(screen.getByLabelText(/email/i), email)
       userEvent.type(screen.getByLabelText(/^password/i), email)
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       expect(
         await screen.findByText('The password cannot be the same as email.')
       )
@@ -137,7 +137,7 @@ describe('Sign up form', () => {
 
     it('should show an error message when it is empty', async () => {
       userEvent.type(screen.getByLabelText(/email/i), email)
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       expect(await screen.findByText('The password cannot be empty.'))
     })
 
@@ -146,21 +146,21 @@ describe('Sign up form', () => {
     })
 
     it('should have className `is-invalid` when it is invalid', async () => {
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       expect(await screen.findByLabelText(/^password/i)).toHaveClass(
         'is-invalid'
       )
     })
 
     it('should have className `is-valid` when it is not invalid anymore', async () => {
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       userEvent.type(await screen.findByLabelText(/^password/i), password)
       expect(await screen.findByLabelText(/^password/i)).toHaveClass('is-valid')
     })
 
     it('should not show the error message when it is not invalid anymore', async () => {
       userEvent.type(screen.getByLabelText(/email/i), email)
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
 
       // We wait until password feedback appear.
       // NOTE: Do not remove it or waitFor...Removed will not work
@@ -176,13 +176,39 @@ describe('Sign up form', () => {
         screen.queryByText('The password cannot be empty.')
       ).not.toBeInTheDocument()
     })
+
+    it('should be shown when the show button is clicked', () => {
+      userEvent.click(screen.getByRole('button', { name: 'show' }))
+      expect(
+        (screen.getByLabelText(/^password/i) as HTMLInputElement).type
+      ).toBe('text')
+    })
+
+    test('show button should have text `hide` when clicked', () => {
+      userEvent.click(screen.getByRole('button', { name: 'show' }))
+      expect(screen.getByRole('button', { name: 'hide' })).toBeInTheDocument()
+    })
+
+    it('should be hidden when the hide button is clicked', () => {
+      userEvent.click(screen.getByRole('button', { name: 'show' }))
+      userEvent.click(screen.getByRole('button', { name: 'hide' }))
+      expect(
+        (screen.getByLabelText(/^password/i) as HTMLInputElement).type
+      ).toBe('password')
+    })
+
+    test('hide button should have text `show` when clicked', () => {
+      userEvent.click(screen.getByRole('button', { name: 'show' }))
+      userEvent.click(screen.getByRole('button', { name: 'hide' }))
+      expect(screen.getByRole('button', { name: 'show' })).toBeInTheDocument()
+    })
   })
 
   describe('Confirm your password', () => {
     it('should show an error message when it is not equal to the password', async () => {
       userEvent.type(screen.getByLabelText(/^password/i), password)
       userEvent.type(screen.getByLabelText(/^confirm/i), '012')
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       expect(
         await screen.findByText('Those passwords must be identical.')
       ).toBeInTheDocument()
@@ -194,7 +220,7 @@ describe('Sign up form', () => {
 
     it('should have className `is-invalid` when it is invalid', async () => {
       userEvent.type(screen.getByLabelText(/^confirm/i), '123')
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       expect(await screen.findByLabelText(/^confirm/i)).toHaveClass(
         'is-invalid'
       )
@@ -202,14 +228,14 @@ describe('Sign up form', () => {
 
     it('should have className `is-valid` when it is not invalid anymore', async () => {
       userEvent.type(screen.getByLabelText(/^password/i), password)
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       userEvent.type(await screen.findByLabelText(/^confirm/i), password)
       expect(await screen.findByLabelText(/^confirm/i)).toHaveClass('is-valid')
     })
 
     it('should not show the error message when it is not invalid anymore', async () => {
       userEvent.type(screen.getByLabelText(/^password/i), password)
-      userEvent.click(screen.getByRole('button'))
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
 
       // We wait until confirm_password appear.
       // NOTE: Do not remove it or waitFor...Removed will not work.
