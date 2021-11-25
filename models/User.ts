@@ -1,11 +1,11 @@
-import mongoose from 'mongoose'
+import { Document, models, model, Schema } from 'mongoose'
 
-type User = {
+export interface User extends Document {
   email: string
   password: string
 }
 
-const userSchema = new mongoose.Schema<User>({
+const userSchema = new Schema<User>({
   email: {
     type: String,
     required: [true, 'The email is required.'],
@@ -17,4 +17,4 @@ const userSchema = new mongoose.Schema<User>({
   },
 })
 
-export default mongoose.models.User || mongoose.model<User>('User', userSchema)
+export default models.User || model<User>('User', userSchema)

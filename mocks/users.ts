@@ -19,7 +19,7 @@ const usersHandlers = [
       )
     }
 
-    return res(ctx.status(301), ctx.set('Location', 'http://localhost:3000/'))
+    return res(ctx.status(302), ctx.set('Location', 'http://localhost:3000/'))
   }),
 ]
 

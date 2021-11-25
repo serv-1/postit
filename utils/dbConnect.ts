@@ -1,15 +1,13 @@
-import mongoose from 'mongoose'
+import { connect, connection } from 'mongoose'
 
 const dbConnect = async () => {
-  if (mongoose.connection.readyState === 1) return
+  if (connection.readyState === 1) return connection
 
-  try {
-    await mongoose.connect(
-      `mongodb+srv://serv-1:7p1KlewcQLzCr2Us@cluster0.trffm.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
-    )
-  } catch (e) {
-    throw e
-  }
+  await connect(
+    `mongodb+srv://serv-1:7p1KlewcQLzCr2Us@cluster0.trffm.mongodb.net/FilanadDev?retryWrites=true&w=majority`
+  )
+
+  return connection
 }
 
 export default dbConnect
