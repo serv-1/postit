@@ -16,7 +16,7 @@ const App = ({ Component, props }: AppProps) => (
         </Link>
       </h1>
       <div>
-        <Link href="/">
+        <Link href="/login">
           <a className="btn text-decoration-none text-dark fs-5">Log in</a>
         </Link>
         <Link href="/signup">
