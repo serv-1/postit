@@ -22,6 +22,7 @@ const password = 'password123456'
 describe('Sign up form', () => {
   beforeEach(() => render(<Signup />))
 
+  // Do these with cypress...
   test('server-side validation error should be displayed when there is error', async () => {
     // alreadyUsed@email.com trigger 422 response (msw) to simulate
     // an already used email
@@ -57,6 +58,7 @@ describe('Sign up form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
     await waitFor(() => expect(document.location.pathname).toBe('/'))
   })
+  //...//
 
   describe('Email', () => {
     it('should show an error message when it is invalid', async () => {

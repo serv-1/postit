@@ -70,8 +70,7 @@ export default async function handler(
     }
   } else {
     return res.status(405).send({
-      message:
-        'Request go brrr! Try to refresh the page and submit the form again.',
+      message: 'Request go brrr! Try to refresh the page and sign up again.',
     })
   }
 }
