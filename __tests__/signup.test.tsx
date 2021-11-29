@@ -3,62 +3,29 @@ import {
   screen,
   render,
   waitForElementToBeRemoved,
-  waitFor,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import server from '../mocks/server'
 
-beforeAll(() => server.listen())
+beforeEach(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const email = 'example@test.com'
 const password = 'password123456'
 
-/**
- * Can't find a way to test `required` validation.
- */
-
 describe('Sign up form', () => {
   beforeEach(() => render(<Signup />))
 
-  // Do these with cypress...
-  test('server-side validation error should be displayed when there is error', async () => {
-    // alreadyUsed@email.com trigger 422 response (msw) to simulate
-    // an already used email
-    userEvent.type(screen.getByLabelText(/email/i), 'alreadyUsed@email.com')
-    userEvent.type(screen.getByLabelText(/^password$/i), password)
-    userEvent.type(screen.getByLabelText(/^confirm/i), password)
-    userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
-    expect(
-      await screen.findByText('The email is already used.')
-    ).toBeInTheDocument()
-    expect(await screen.findByLabelText(/email/i)).toHaveFocus()
-  })
-
-  test('server-side request error should not be displayed when there is no error', async () => {
-    // axios@405.com trigger 405 response (msw) to simulate an unhandled method
-    userEvent.type(screen.getByLabelText(/email/i), 'axios@405.com')
-
-    userEvent.type(screen.getByLabelText(/^password$/i), password)
-    userEvent.type(screen.getByLabelText(/^confirm/i), password)
-    userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
-    expect(
-      await screen.findByText(
-        'Request go brrr! Try to refresh the page and submit the form again.'
-      )
-    ).toBeInTheDocument()
-  })
-
-  // TODO: ↓
-  it('should redirect to `/` (home) when form data are valid', async () => {
+  it('should show server-side validation error if any', async () => {
     userEvent.type(screen.getByLabelText(/email/i), email)
-    userEvent.type(screen.getByLabelText(/^password$/i), password)
+    userEvent.type(screen.getByLabelText(/^password/i), password)
     userEvent.type(screen.getByLabelText(/^confirm/i), password)
     userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
-    await waitFor(() => expect(document.location.pathname).toBe('/'))
+    expect(
+      await screen.findByText('This email is not registered.')
+    ).toBeInTheDocument()
   })
-  //...//
 
   describe('Email', () => {
     it('should show an error message when it is invalid', async () => {
@@ -89,6 +56,13 @@ describe('Sign up form', () => {
       userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       userEvent.type(await screen.findByLabelText(/email/i), email)
       expect(await screen.findByLabelText(/email/i)).toHaveClass('is-valid')
+    })
+
+    it('should have className `is-invalid` when it is not valid anymore', async () => {
+      userEvent.type(screen.getByLabelText(/email/i), email)
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+      userEvent.clear(await screen.findByLabelText(/email/i))
+      expect(await screen.findByLabelText(/email/i)).toHaveClass('is-invalid')
     })
 
     it('should not show the error message when it is not invalid anymore', async () => {
@@ -159,6 +133,15 @@ describe('Sign up form', () => {
       userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       userEvent.type(await screen.findByLabelText(/^password/i), password)
       expect(await screen.findByLabelText(/^password/i)).toHaveClass('is-valid')
+    })
+
+    it('should have className `is-invalid` when it is not valid anymore', async () => {
+      userEvent.type(screen.getByLabelText(/^password/i), password)
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+      userEvent.clear(await screen.findByLabelText(/^password/i))
+      expect(await screen.findByLabelText(/^password/i)).toHaveClass(
+        'is-invalid'
+      )
     })
 
     it('should not show the error message when it is not invalid anymore', async () => {
@@ -254,6 +237,16 @@ describe('Sign up form', () => {
       userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
       userEvent.type(await screen.findByLabelText(/^confirm/i), password)
       expect(await screen.findByLabelText(/^confirm/i)).toHaveClass('is-valid')
+    })
+
+    it('should have className `is-invalid` when it is not valid anymore', async () => {
+      userEvent.type(screen.getByLabelText(/^password/i), password)
+      userEvent.type(screen.getByLabelText(/^confirm/i), password)
+      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+      userEvent.clear(await screen.findByLabelText(/^confirm/i))
+      expect(await screen.findByLabelText(/^confirm/i)).toHaveClass(
+        'is-invalid'
+      )
     })
 
     it('should not show the error message when it is not invalid anymore', async () => {
