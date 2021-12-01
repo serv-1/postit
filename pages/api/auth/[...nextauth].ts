@@ -11,10 +11,10 @@ export default NextAuth({
       },
       async authorize(credentials, req) {
         try {
-          const res = await axios.post(
-            'http://localhost:3000/api/login',
-            credentials
-          )
+          const res = await axios.post('http://localhost:3000/api/login', {
+            email: credentials.email,
+            password: credentials.password,
+          })
           return res.data
         } catch (e) {
           const err = e as AxiosError

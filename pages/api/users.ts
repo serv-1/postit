@@ -35,6 +35,11 @@ export default async function handler(
           'any.required': 'The password is required.',
         }),
     })
+      .required()
+      .messages({
+        'object.base': 'The given data are invalid.',
+        'object.required': 'The given data are invalid.',
+      })
 
     try {
       Joi.assert(req.body, schema)
@@ -53,9 +58,14 @@ export default async function handler(
       res.status(200).end()
     } catch (e) {
       if (e instanceof ValidationError) {
-        return res
-          .status(422)
-          .send({ message: e.details[0].message, name: e.details[0].path[0] })
+        const name = e.details[0].path[0]
+        const message = e.details[0].message
+
+        let resErr: { message: string; name?: string } = { message }
+
+        if (name === 'email' || name === 'password') resErr.name = name
+
+        return res.status(422).send(resErr)
       } else if (
         (e as NativeError).name === 'MongoServerError' &&
         (e as MongoServerError).code === 11000
@@ -64,12 +74,12 @@ export default async function handler(
           .status(422)
           .send({ message: 'This email is already used.', name: 'email' })
       }
-      return res.status(500).send({
+      res.status(500).send({
         message: 'Server go brrr! Try to refresh the page or just come later.',
       })
     }
   } else {
-    return res.status(405).send({
+    res.status(405).send({
       message: 'Request go brrr! Try to refresh the page and sign up again.',
     })
   }

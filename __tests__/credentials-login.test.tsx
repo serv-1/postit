@@ -100,7 +100,7 @@ describe('Log in form', () => {
       expect(await screen.findByLabelText(/^password/i)).toHaveClass('is-valid')
     })
 
-    it.only('should have className `is-invalid` when it is not valid anymore', async () => {
+    it('should have className `is-invalid` when it is not valid anymore', async () => {
       userEvent.type(screen.getByLabelText(/^password/i), password)
       userEvent.click(screen.getByRole('button', { name: 'Log in' }))
       userEvent.clear(await screen.findByLabelText(/^password/i))

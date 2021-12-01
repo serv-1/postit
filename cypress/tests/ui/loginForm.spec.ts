@@ -3,7 +3,7 @@ describe('Log in form', () => {
     cy.task('db:reset')
     cy.fixture('user').as('user')
     cy.visit('/')
-    cy.get('a[href="/api/auth/login"]').click()
+    cy.contains('Log in').click()
   })
 
   it('should show server-side error if any', function () {
