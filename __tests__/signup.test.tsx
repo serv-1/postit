@@ -7,7 +7,7 @@ import {
 import userEvent from '@testing-library/user-event'
 import server from '../mocks/server'
 
-beforeEach(() => server.listen())
+beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 

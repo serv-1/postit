@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import { signIn, signOut, useSession } from 'next-auth/client'
+import { signIn, signOut, useSession } from 'next-auth/react'
 
 const Header = () => {
-  const [session] = useSession()
+  const { data } = useSession()
 
   return (
     <header className="container-fluid d-flex justify-content-between align-items-center mb-4 p-2 shadow-sm">
@@ -12,7 +12,7 @@ const Header = () => {
         </Link>
       </h1>
       <div>
-        {session ? (
+        {data ? (
           <a
             href={'/api/auth/logout'}
             className="btn text-decoration-none text-dark fs-5"

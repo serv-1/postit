@@ -1,10 +1,15 @@
 import axios, { AxiosError } from 'axios'
-import NextAuth, { User } from 'next-auth'
-import Providers from 'next-auth/providers'
+import NextAuth from 'next-auth'
+import Credentials from 'next-auth/providers/credentials'
+
+type User = {
+  id: number
+  email: string
+}
 
 export default NextAuth({
   providers: [
-    Providers.Credentials({
+    Credentials({
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
@@ -12,8 +17,8 @@ export default NextAuth({
       async authorize(credentials, req) {
         try {
           const res = await axios.post('http://localhost:3000/api/login', {
-            email: credentials.email,
-            password: credentials.password,
+            email: credentials?.email,
+            password: credentials?.password,
           })
           return res.data
         } catch (e) {
@@ -34,14 +39,14 @@ export default NextAuth({
     error: '/auth/error',
   },
   callbacks: {
-    async jwt(token, user) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id
         token.user = user
       }
       return token
     },
-    async session(session, token) {
+    async session({ session, token }) {
       if (token) {
         session.accessToken = token.id
         session.user = token.user as User

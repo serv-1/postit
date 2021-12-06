@@ -98,7 +98,7 @@ const Signup = () => {
       <Head>
         <title>Filanad - Sign up!</title>
       </Head>
-      <h1 className="bg-primary text-light rounded-top p-2 m-0">Sign up !</h1>
+      <h1 className="bg-primary text-light rounded-top p-2 m-0">Sign up!</h1>
       {technicalError && (
         <div
           className="fw-bold p-2 m-2 text-light bg-danger rounded-3"
