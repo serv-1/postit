@@ -13,10 +13,10 @@ const schema = Joi.object({
     .required()
     .email({ tlds: { allow: false } })
     .messages({
-      'string.base': 'The email is not valid.',
-      'string.empty': 'The email cannot be empty.',
-      'string.email': 'The email is not valid.',
+      'string.base': 'The email is invalid.',
+      'string.empty': 'The email is required.',
       'any.required': 'The email is required.',
+      'string.email': 'The email is invalid.',
     }),
   password: Joi.string()
     .required()
@@ -24,14 +24,13 @@ const schema = Joi.object({
     .min(10)
     .max(20)
     .messages({
-      'string.base': 'The password is not valid.',
-      'string.empty': 'The password cannot be empty.',
-      'any.invalid': 'The password cannot be the same as email.',
+      'string.base': 'The password is invalid.',
+      'string.empty': 'The password is required.',
+      'any.required': 'The password is required.',
+      'any.invalid': 'The password cannot be the same as the email.',
       'string.min': 'The password must have 10 characters.',
       'string.max': 'The password cannot exceed 20 characters.',
-      'any.required': 'The password is required.',
     }),
-  confirm_password: Joi.ref('password'),
 })
 
 type FormInput = {
@@ -186,30 +185,6 @@ const Signup = () => {
               role="alert"
             >
               {errors.password.message}
-            </div>
-          )}
-        </div>
-        <div className="mb-3 text-start">
-          <label htmlFor="confirm_password" className="form-label">
-            Confirm your password
-          </label>
-          <input
-            {...register('confirm_password')}
-            type="password"
-            id="confirm_password"
-            className={`form-control ${
-              isSubmitted &&
-              (errors.confirm_password ? 'is-invalid' : 'is-valid')
-            }`}
-            aria-describedby="confirmPasswordFeedback"
-          />
-          {errors.confirm_password && (
-            <div
-              className="invalid-feedback"
-              id="confirmPasswordFeedback"
-              role="alert"
-            >
-              Those passwords must be identical.
             </div>
           )}
         </div>
