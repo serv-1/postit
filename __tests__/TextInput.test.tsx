@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react'
-import { FieldError, RegisterOptions } from 'react-hook-form'
+import { FieldError } from 'react-hook-form'
 import TextInput from '../components/TextInput'
 
 type Props = {
   email?: boolean
-  isSubmitted?: boolean
+  isFormSubmitted?: boolean
   error?: FieldError
 }
 
@@ -14,21 +14,18 @@ const error = {
   type: 'required',
   message: 'This field is required.',
 }
-const mockRegister = (name: string, opts?: RegisterOptions) => ({
-  onChange: jest.fn(),
-  onBlur: jest.fn(),
-  ref: jest.fn(),
-  name,
-})
 
-const factory = ({ email = false, isSubmitted = false, error }: Props = {}) => {
+const factory = ({
+  email = false,
+  isFormSubmitted = false,
+  error,
+}: Props = {}) => {
   render(
     <TextInput
       labelName={labelName}
       email={email}
       name={name}
-      register={mockRegister}
-      isSubmitted={isSubmitted}
+      isFormSubmitted={isFormSubmitted}
       error={error}
     />
   )
@@ -36,7 +33,7 @@ const factory = ({ email = false, isSubmitted = false, error }: Props = {}) => {
 
 describe('TextInput', () => {
   it('should use the name for html attributes', () => {
-    factory({ isSubmitted: true, error })
+    factory({ isFormSubmitted: true, error })
     const input = screen.getByRole('textbox')
     expect(screen.getByText(labelName)).toHaveAttribute('for', name)
     expect(input).toHaveAttribute('name', name)
@@ -70,30 +67,30 @@ describe('TextInput', () => {
     })
 
     it('should have is-valid class when the form is submitted and there is no error', () => {
-      factory({ isSubmitted: true })
+      factory({ isFormSubmitted: true })
       expect(screen.getByRole('textbox')).toHaveClass('is-valid')
     })
 
     it('should have is-invalid class when the form is submitted and there is an error', () => {
-      factory({ isSubmitted: true, error })
+      factory({ isFormSubmitted: true, error })
       expect(screen.getByRole('textbox')).toHaveClass('is-invalid')
     })
   })
 
   describe('Error feedback', () => {
     it('should be rendered when the form is submitted and there is an error', () => {
-      factory({ isSubmitted: true, error })
+      factory({ isFormSubmitted: true, error })
       const alert = screen.getByRole('alert')
       expect(alert).toBeInTheDocument()
       expect(alert).toHaveTextContent(error.message)
     })
 
     it('should not be rendered when the form is submitted and there is no error', () => {
-      factory({ isSubmitted: true })
+      factory({ isFormSubmitted: true })
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })
 
-    it('should not be rendered when the form is not submitted and there is an error', () => {
+    it('should not be rendered when the form is not submitted even if there is an error', () => {
       factory({ error })
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })

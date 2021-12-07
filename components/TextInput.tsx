@@ -1,22 +1,17 @@
-import {
-  FieldError,
-  RegisterOptions,
-  UseFormRegisterReturn,
-} from 'react-hook-form'
+import { FieldError } from 'react-hook-form'
 
 type Props = {
   labelName: string
   email: boolean
   name: string
-  register: (name: string, opts?: RegisterOptions) => UseFormRegisterReturn
-  isSubmitted: boolean
+  isFormSubmitted: boolean
   error?: FieldError
 }
 
 const TextInput = (props: Props) => {
-  const { labelName, email, name, register, isSubmitted, error } = props
+  const { labelName, email, name, isFormSubmitted, error } = props
   const type = email ? 'email' : 'text'
-  const className = isSubmitted && (error ? 'is-invalid' : 'is-valid')
+  const className = isFormSubmitted && (error ? 'is-invalid' : 'is-valid')
   const feedbackName = name + 'Feedback'
 
   return (
@@ -25,13 +20,13 @@ const TextInput = (props: Props) => {
         {labelName}
       </label>
       <input
-        {...register(name)}
         type={type}
         id={name}
+        name={name}
         className={`form-control ${className || undefined}`}
         aria-describedby={feedbackName}
       />
-      {isSubmitted && error && (
+      {isFormSubmitted && error && (
         <div className="invalid-feedback" id={feedbackName} role="alert">
           {error.message}
         </div>
