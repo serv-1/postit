@@ -1,6 +1,6 @@
 import PasswordInput from '../components/PasswordInput'
 import { render, screen } from '@testing-library/react'
-import { FieldError } from 'react-hook-form'
+import { FieldError, UseFormRegister } from 'react-hook-form'
 import userEvent from '@testing-library/user-event'
 
 type Props = {
@@ -17,6 +17,12 @@ const error = {
   type: 'required',
   message: 'The password is required.',
 }
+const register: UseFormRegister<any> = (name: string) => ({
+  onChange: jest.fn(),
+  onBlur: jest.fn(),
+  ref: jest.fn(),
+  name,
+})
 
 const factory = ({
   rules = false,
@@ -34,6 +40,7 @@ const factory = ({
       name={name}
       isFormSubmitted={isFormSubmitted}
       error={error}
+      register={register}
     />
   )
 }

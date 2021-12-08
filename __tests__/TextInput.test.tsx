@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { FieldError } from 'react-hook-form'
+import { FieldError, UseFormRegister } from 'react-hook-form'
 import TextInput from '../components/TextInput'
 
 type Props = {
@@ -14,6 +14,12 @@ const error = {
   type: 'required',
   message: 'This field is required.',
 }
+const register: UseFormRegister<any> = (name: string) => ({
+  onChange: jest.fn(),
+  onBlur: jest.fn(),
+  ref: jest.fn(),
+  name,
+})
 
 const factory = ({
   email = false,
@@ -27,6 +33,7 @@ const factory = ({
       name={name}
       isFormSubmitted={isFormSubmitted}
       error={error}
+      register={register}
     />
   )
 }

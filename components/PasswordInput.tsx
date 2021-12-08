@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from 'react'
-import { FieldError } from 'react-hook-form'
+import { FieldError, UseFormRegister } from 'react-hook-form'
 const zxcvbn = require('zxcvbn')
 
 type Props = {
@@ -10,6 +10,7 @@ type Props = {
   name: string
   isFormSubmitted: boolean
   error?: FieldError
+  register: UseFormRegister<any>
 }
 
 type PasswordStrength = {
@@ -18,8 +19,16 @@ type PasswordStrength = {
 }
 
 const PasswordInput = (props: Props) => {
-  const { labelName, rules, showBtn, strength, name, isFormSubmitted, error } =
-    props
+  const {
+    labelName,
+    rules,
+    showBtn,
+    strength,
+    name,
+    isFormSubmitted,
+    error,
+    register,
+  } = props
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>()
 
@@ -60,10 +69,10 @@ const PasswordInput = (props: Props) => {
           </button>
         )}
         <input
+          {...register(name)}
           onChange={onPasswordChange}
           type={showPassword ? 'text' : 'password'}
           id={name}
-          name={name}
           className={`form-control ${
             isFormSubmitted && (error ? 'is-invalid' : 'is-valid')
           }`}
