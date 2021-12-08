@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { FieldError, UseFormRegister } from 'react-hook-form'
-import TextInput from '../components/TextInput'
+import TextInput from '../../components/TextInput'
 
 type Props = {
   email?: boolean

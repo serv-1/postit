@@ -1,4 +1,4 @@
-import Login from '../pages/auth/credentials-login'
+import Login from '../../pages/auth/credentials-login'
 import {
   render,
   screen,

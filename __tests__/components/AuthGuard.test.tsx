@@ -1,8 +1,8 @@
 import { render as renderRTL, screen, waitFor } from '@testing-library/react'
 import { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
-import AuthGuard from '../components/AuthGuard'
-import { mockSession } from '../mocks/nextAuth'
+import AuthGuard from '../../components/AuthGuard'
+import { mockSession } from '../../mocks/nextAuth'
 
 const Child = () => <div>Welcome!</div>
 

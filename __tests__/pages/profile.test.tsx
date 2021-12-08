@@ -1,6 +1,6 @@
-import Profile from '../pages/profile'
+import Profile from '../../pages/profile'
 import { render, screen } from '@testing-library/react'
-import { mockSession } from '../mocks/nextAuth'
+import { mockSession } from '../../mocks/nextAuth'
 import { SessionProvider } from 'next-auth/react'
 
 describe('Profile page', () => {

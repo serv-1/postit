@@ -4,9 +4,9 @@ const zxcvbn = require('zxcvbn')
 
 type Props = {
   labelName: string
-  rules: boolean
-  showBtn: boolean
-  strength: boolean
+  rules?: boolean
+  showBtn?: boolean
+  strength?: boolean
   name: string
   isFormSubmitted: boolean
   error?: FieldError
@@ -15,7 +15,7 @@ type Props = {
 
 type PasswordStrength = {
   estimated_time: string
-  score: number
+  bgClass: string
 }
 
 const PasswordInput = (props: Props) => {
@@ -33,14 +33,17 @@ const PasswordInput = (props: Props) => {
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>()
 
   const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const result = zxcvbn(e.target.value)
+    const { crack_times_display, score } = zxcvbn(e.target.value)
+    let bg = 'bg-success'
+    if (score <= 2) bg = 'bg-danger'
+    else if (score === 3) bg = 'bg-warning'
     setPasswordStrength({
-      estimated_time:
-        result.crack_times_display.offline_slow_hashing_1e4_per_second,
-      score: result.score,
+      estimated_time: crack_times_display.offline_slow_hashing_1e4_per_second,
+      bgClass: bg,
     })
   }
 
+  const inputClass = isFormSubmitted && (error ? 'is-invalid' : 'is-valid')
   const pwFeedbackId = name + 'Feedback'
   const pwStrengthId = name + 'Strength'
   const pwRulesId = name + 'Rules'
@@ -73,20 +76,12 @@ const PasswordInput = (props: Props) => {
           onChange={onPasswordChange}
           type={showPassword ? 'text' : 'password'}
           id={name}
-          className={`form-control ${
-            isFormSubmitted && (error ? 'is-invalid' : 'is-valid')
-          }`}
+          className={`form-control ${inputClass || ''}`}
           aria-describedby={`${pwFeedbackId} ${pwRulesId} ${pwStrengthId} visibilityBtn`}
         />
         {strength && passwordStrength && (
           <span
-            className={`input-group-text text-white ${
-              passwordStrength.score <= 2
-                ? 'bg-danger'
-                : passwordStrength.score === 3
-                ? 'bg-warning'
-                : 'bg-success'
-            }`}
+            className={`input-group-text text-white ${passwordStrength.bgClass}`}
             id={pwStrengthId}
             role="status"
           >

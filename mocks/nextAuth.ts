@@ -4,6 +4,7 @@ import { Session } from 'next-auth'
 
 export const mockSession: Session = {
   user: {
+    username: 'jotarokujo',
     id: 1,
     email: 'jotarokujo@speedwagon.com',
   },

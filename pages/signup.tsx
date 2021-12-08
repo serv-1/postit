@@ -2,39 +2,15 @@ import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
 // commonJS needed https://github.com/react-hook-form/resolvers/issues/271
 const { joiResolver } = require('@hookform/resolvers/joi')
-import Joi from 'joi'
 import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
 import TextInput from '../components/TextInput'
 import PasswordInput from '../components/PasswordInput'
 import { useState } from 'react'
-
-const schema = Joi.object({
-  email: Joi.string()
-    .required()
-    .email({ tlds: { allow: false } })
-    .messages({
-      'string.base': 'The email is invalid.',
-      'string.empty': 'The email is required.',
-      'any.required': 'The email is required.',
-      'string.email': 'The email is invalid.',
-    }),
-  password: Joi.string()
-    .required()
-    .invalid(Joi.ref('email'))
-    .min(10)
-    .max(20)
-    .messages({
-      'string.base': 'The password is invalid.',
-      'string.empty': 'The password is required.',
-      'any.required': 'The password is required.',
-      'any.invalid': 'The password cannot be the same as the email.',
-      'string.min': 'The password must have 10 characters.',
-      'string.max': 'The password cannot exceed 20 characters.',
-    }),
-})
+import { signupSchema } from '../utils/joiSchemas'
 
 type FormInput = {
+  username: string
   email: string
   password: string
 }
@@ -50,12 +26,13 @@ const Signup = () => {
     formState: { errors, isSubmitted },
     handleSubmit,
     setError,
-  } = useForm<FormInput>({ resolver: joiResolver(schema) })
+  } = useForm<FormInput>({ resolver: joiResolver(signupSchema) })
   const router = useRouter()
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/users', {
+        username: data.username,
         email: data.email,
         password: data.password,
       })
@@ -99,6 +76,13 @@ const Signup = () => {
         noValidate
         onSubmit={handleSubmit(onSubmit)}
       >
+        <TextInput
+          labelName="Username"
+          name="username"
+          isFormSubmitted={isSubmitted}
+          error={errors.username}
+          register={register}
+        />
         <TextInput
           labelName="Email"
           email

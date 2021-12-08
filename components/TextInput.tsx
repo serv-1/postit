@@ -2,7 +2,7 @@ import { FieldError, UseFormRegister } from 'react-hook-form'
 
 type Props = {
   labelName: string
-  email: boolean
+  email?: boolean
   name: string
   isFormSubmitted: boolean
   error?: FieldError
@@ -12,7 +12,7 @@ type Props = {
 const TextInput = (props: Props) => {
   const { labelName, email, name, isFormSubmitted, error, register } = props
   const type = email ? 'email' : 'text'
-  const className = isFormSubmitted && (error ? ' is-invalid' : ' is-valid')
+  const inputClass = isFormSubmitted && (error ? ' is-invalid' : ' is-valid')
   const feedbackName = name + 'Feedback'
 
   return (
@@ -24,7 +24,7 @@ const TextInput = (props: Props) => {
         {...register(name)}
         type={type}
         id={name}
-        className={`form-control${className || ''}`}
+        className={`form-control${inputClass || ''}`}
         aria-describedby={feedbackName}
       />
       {isFormSubmitted && error && (

@@ -1,4 +1,4 @@
-import PasswordInput from '../components/PasswordInput'
+import PasswordInput from '../../components/PasswordInput'
 import { render, screen } from '@testing-library/react'
 import { FieldError, UseFormRegister } from 'react-hook-form'
 import userEvent from '@testing-library/user-event'

@@ -5,50 +5,27 @@ import dbConnect from '../../utils/dbConnect'
 import User from '../../models/User'
 import { NativeError } from 'mongoose'
 import { MongoServerError } from 'mongodb'
+import { signupSchema } from '../../utils/joiSchemas'
+import {
+  emailUsed,
+  internalServerError,
+  methodNotAllowed,
+} from '../../utils/errors'
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method === 'POST') {
-    const schema = Joi.object({
-      email: Joi.string()
-        .email({ tlds: { allow: false } })
-        .required()
-        .messages({
-          'string.base': 'The email is not valid.',
-          'string.empty': 'The email cannot be empty.',
-          'string.email': 'The email is not valid.',
-          'any.required': 'The email is required.',
-        }),
-      password: Joi.string()
-        .invalid(Joi.ref('email'))
-        .min(10)
-        .max(20)
-        .required()
-        .messages({
-          'string.base': 'The password is not valid.',
-          'string.empty': 'The password cannot be empty.',
-          'any.invalid': 'The password cannot be the same as email.',
-          'string.min': 'The password must have 10 characters.',
-          'string.max': 'The password cannot exceed 20 characters.',
-          'any.required': 'The password is required.',
-        }),
-    })
-      .required()
-      .messages({
-        'object.base': 'The given data are invalid.',
-        'object.required': 'The given data are invalid.',
-      })
-
     try {
-      Joi.assert(req.body, schema)
+      Joi.assert(req.body, signupSchema)
       const salt = crypto.randomBytes(16).toString('hex')
       const derivedKey = crypto.scryptSync(req.body.password, salt, 64)
       const hash = derivedKey.toString('hex')
 
       await dbConnect()
       const user = new User({
+        username: req.body.username,
         email: req.body.email,
         password: `${salt}:${hash}`,
       })
@@ -61,26 +38,25 @@ export default async function handler(
         const name = e.details[0].path[0]
         const message = e.details[0].message
 
-        let resErr: { message: string; name?: string } = { message }
+        // let resErr: { message: string; name?: string } = { message }
 
-        if (name === 'email' || name === 'password') resErr.name = name
+        // if (name === 'email' || name === 'password') resErr.name = name
 
-        return res.status(422).send(resErr)
+        // return res.status(422).send(resErr)
+        return res.status(422).send({ message, name })
       } else if (
         (e as NativeError).name === 'MongoServerError' &&
         (e as MongoServerError).code === 11000
       ) {
-        return res
-          .status(422)
-          .send({ message: 'This email is already used.', name: 'email' })
+        return res.status(422).send({ message: emailUsed, name: 'email' })
       }
       res.status(500).send({
-        message: 'Server go brrr! Try to refresh the page or just come later.',
+        message: internalServerError,
       })
     }
   } else {
     res.status(405).send({
-      message: 'Request go brrr! Try to refresh the page and sign up again.',
+      message: methodNotAllowed,
     })
   }
 }
