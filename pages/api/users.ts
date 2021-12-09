@@ -50,13 +50,9 @@ export default async function handler(
       ) {
         return res.status(422).send({ message: emailUsed, name: 'email' })
       }
-      res.status(500).send({
-        message: internalServerError,
-      })
+      res.status(500).send({ message: internalServerError })
     }
   } else {
-    res.status(405).send({
-      message: methodNotAllowed,
-    })
+    res.status(405).send({ message: methodNotAllowed })
   }
 }

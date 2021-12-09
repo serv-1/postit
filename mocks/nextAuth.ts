@@ -28,7 +28,7 @@ export const mockCSRFToken = {
 export const mockCredentialsResponse = {
   ok: true,
   status: 200,
-  url: 'http://localhost/auth/credentials-login',
+  url: 'http://localhost/auth/login',
 }
 
 export const mockSignOutResponse = {

@@ -37,7 +37,7 @@ export default NextAuth({
     }),
   ],
   pages: {
-    signIn: '/auth/credentials-login',
+    signIn: '/auth/login',
     signOut: '/auth/logout',
     error: '/auth/error',
   },

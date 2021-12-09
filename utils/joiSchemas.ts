@@ -48,3 +48,25 @@ export const signupSchema = Joi.object({
     'object.base': dataInvalid,
     'object.required': dataInvalid,
   })
+
+export const loginSchema = Joi.object({
+  email: Joi.string()
+    .required()
+    .email({ tlds: { allow: false } })
+    .messages({
+      'string.base': emailInvalid,
+      'string.empty': emailRequired,
+      'string.email': emailInvalid,
+      'any.required': emailRequired,
+    }),
+  password: Joi.string().required().messages({
+    'string.base': passwordInvalid,
+    'string.empty': passwordRequired,
+    'any.required': passwordRequired,
+  }),
+})
+  .required()
+  .messages({
+    'object.base': dataInvalid,
+    'object.required': dataInvalid,
+  })
