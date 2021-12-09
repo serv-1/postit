@@ -6,8 +6,8 @@ const handlers = [
     return res(
       ctx.status(422),
       ctx.json({
-        message: emailUsed,
         name: 'email',
+        message: emailUsed,
       })
     )
   }),

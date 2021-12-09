@@ -1,6 +1,7 @@
 import { rest } from 'msw'
 import { randomBytes } from 'crypto'
 import { Session } from 'next-auth'
+import { SignInResponse, SignOutResponse } from 'next-auth/react'
 
 export const mockSession: Session = {
   user: {
@@ -25,15 +26,14 @@ export const mockCSRFToken = {
   csrfToken: randomBytes(32).toString('hex'),
 }
 
-export const mockCredentialsResponse = {
+export const mockCredentialsResponse: SignInResponse = {
+  error: undefined,
   ok: true,
   status: 200,
   url: 'http://localhost/auth/login',
 }
 
-export const mockSignOutResponse = {
-  ok: true,
-  status: 200,
+export const mockSignOutResponse: SignOutResponse = {
   url: 'http://localhost/api/auth/logout',
 }
 

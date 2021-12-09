@@ -8,6 +8,7 @@ import TextInput from '../components/TextInput'
 import PasswordInput from '../components/PasswordInput'
 import { useState } from 'react'
 import { signupSchema } from '../utils/joiSchemas'
+import { signIn } from 'next-auth/react'
 
 type FormInput = {
   username: string
@@ -36,7 +37,16 @@ const Signup = () => {
         email: data.email,
         password: data.password,
       })
-      router.push('/')
+      const res = await signIn<'credentials'>('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      })
+      if (res && res.error) {
+        router.push('/')
+        return
+      }
+      router.push('/profile')
     } catch (e) {
       const err = e as AxiosError
       if (!err.response) return
