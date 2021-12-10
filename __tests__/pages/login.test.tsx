@@ -2,9 +2,9 @@ import Login from '../../pages/auth/login'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
-  emailInvalid,
-  emailRequired,
-  passwordRequired,
+  EMAIL_INVALID,
+  EMAIL_REQUIRED,
+  PASSWORD_REQUIRED,
 } from '../../utils/errors'
 
 const useRouter = jest.spyOn<any, 'useRouter'>(
@@ -33,6 +33,17 @@ describe('Log in form', () => {
     })
   })
 
+  it('should focus the first field at first render', () => {
+    expect(screen.getByLabelText(/email/i)).toHaveFocus()
+  })
+
+  it('should not focus the first field after the first render', async () => {
+    userEvent.click(screen.getByRole('button', { name: 'Log in' }))
+    await waitFor(() =>
+      expect(screen.getByLabelText(/email/i)).not.toHaveFocus()
+    )
+  })
+
   describe('CSRF token', () => {
     it('should be an input type hidden with the CSRF token as value', () => {
       const input = screen.getByDisplayValue(csrfToken)
@@ -51,12 +62,12 @@ describe('Log in form', () => {
       const btn = screen.getByRole('button', { name: 'Log in' })
       userEvent.click(btn)
 
-      expect(await screen.findByText(emailRequired)).toBeInTheDocument()
+      expect(await screen.findByText(EMAIL_REQUIRED)).toBeInTheDocument()
 
       // avoid the passwordEmail error (utils/errors.ts)
       userEvent.type(screen.getByLabelText(/email/i), 'a')
 
-      expect(await screen.findByText(passwordRequired)).toBeInTheDocument()
+      expect(await screen.findByText(PASSWORD_REQUIRED)).toBeInTheDocument()
     })
   })
 
@@ -64,7 +75,7 @@ describe('Log in form', () => {
     it('should display an error when it is not an email', async () => {
       userEvent.type(screen.getByLabelText(/email/i), 'bad email')
       userEvent.click(screen.getByRole('button', { name: 'Log in' }))
-      expect(await screen.findByText(emailInvalid)).toBeInTheDocument()
+      expect(await screen.findByText(EMAIL_INVALID)).toBeInTheDocument()
     })
   })
 })

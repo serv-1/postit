@@ -27,6 +27,7 @@ const Signup = () => {
     formState: { errors, isSubmitted },
     handleSubmit,
     setError,
+    setFocus,
   } = useForm<FormInput>({ resolver: joiResolver(signupSchema) })
   const router = useRouter()
 
@@ -92,6 +93,7 @@ const Signup = () => {
           isFormSubmitted={isSubmitted}
           error={errors.username}
           register={register}
+          setFocus={setFocus}
         />
         <TextInput
           labelName="Email"

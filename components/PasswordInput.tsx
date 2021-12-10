@@ -1,5 +1,5 @@
-import { ChangeEvent, useState } from 'react'
-import { FieldError, UseFormRegister } from 'react-hook-form'
+import { ChangeEvent, useEffect, useState } from 'react'
+import { FieldError, UseFormRegister, UseFormSetFocus } from 'react-hook-form'
 const zxcvbn = require('zxcvbn')
 
 type Props = {
@@ -11,6 +11,7 @@ type Props = {
   isFormSubmitted: boolean
   error?: FieldError
   register: UseFormRegister<any>
+  setFocus?: UseFormSetFocus<any>
 }
 
 type PasswordStrength = {
@@ -28,9 +29,15 @@ const PasswordInput = (props: Props) => {
     isFormSubmitted,
     error,
     register,
+    setFocus,
   } = props
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>()
+
+  useEffect(() => {
+    if (!setFocus) return
+    setFocus(name)
+  }, [setFocus, name])
 
   const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { crack_times_display, score } = zxcvbn(e.target.value)

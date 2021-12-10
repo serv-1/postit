@@ -1,6 +1,6 @@
 import PasswordInput from '../../components/PasswordInput'
 import { render, screen } from '@testing-library/react'
-import { FieldError, UseFormRegister } from 'react-hook-form'
+import { FieldError, UseFormRegister, UseFormSetFocus } from 'react-hook-form'
 import userEvent from '@testing-library/user-event'
 
 type Props = {
@@ -9,6 +9,7 @@ type Props = {
   strength?: boolean
   isFormSubmitted?: boolean
   error?: FieldError
+  setFocus?: UseFormSetFocus<any>
 }
 
 const labelName = 'Password'
@@ -23,6 +24,7 @@ const register: UseFormRegister<any> = (name: string) => ({
   ref: jest.fn(),
   name,
 })
+const setFocus = jest.fn()
 
 const factory = ({
   rules = false,
@@ -30,6 +32,7 @@ const factory = ({
   strength = false,
   isFormSubmitted = false,
   error,
+  setFocus,
 }: Props = {}) => {
   render(
     <PasswordInput
@@ -41,9 +44,12 @@ const factory = ({
       isFormSubmitted={isFormSubmitted}
       error={error}
       register={register}
+      setFocus={setFocus}
     />
   )
 }
+
+afterEach(() => jest.resetAllMocks())
 
 describe('PasswordInput', () => {
   it('should use the name for html attributes', () => {
@@ -114,6 +120,17 @@ describe('PasswordInput', () => {
   })
 
   describe('Input', () => {
+    it('should be focused if setFocus is defined', () => {
+      factory({ setFocus })
+      expect(setFocus).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not be focused if setFocus is undefined', () => {
+      factory()
+      expect(setFocus).not.toHaveBeenCalled()
+      expect(screen.getByLabelText(labelName)).not.toHaveFocus()
+    })
+
     it('should have password type at the first render', () => {
       factory()
       expect(screen.getByLabelText(labelName)).toHaveAttribute(

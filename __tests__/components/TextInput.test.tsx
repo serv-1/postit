@@ -1,11 +1,12 @@
 import { render, screen } from '@testing-library/react'
-import { FieldError, UseFormRegister } from 'react-hook-form'
+import { FieldError, UseFormRegister, UseFormSetFocus } from 'react-hook-form'
 import TextInput from '../../components/TextInput'
 
 type Props = {
   email?: boolean
   isFormSubmitted?: boolean
   error?: FieldError
+  setFocus?: UseFormSetFocus<any>
 }
 
 const labelName = 'Test'
@@ -21,10 +22,13 @@ const register: UseFormRegister<any> = (name: string) => ({
   name,
 })
 
+const setFocus = jest.fn()
+
 const factory = ({
   email = false,
   isFormSubmitted = false,
   error,
+  setFocus,
 }: Props = {}) => {
   render(
     <TextInput
@@ -34,9 +38,12 @@ const factory = ({
       isFormSubmitted={isFormSubmitted}
       error={error}
       register={register}
+      setFocus={setFocus}
     />
   )
 }
+
+afterEach(() => jest.resetAllMocks())
 
 describe('TextInput', () => {
   it('should use the name for html attributes', () => {
@@ -64,6 +71,17 @@ describe('TextInput', () => {
     it('should render an input of type email if email is true', () => {
       factory({ email: true })
       expect(screen.getByRole('textbox')).toHaveAttribute('type', 'email')
+    })
+
+    it('should be focused if setFocus is defined', () => {
+      factory({ setFocus })
+      expect(setFocus).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not be focused if setFocus is undefined', () => {
+      factory()
+      expect(setFocus).not.toHaveBeenCalled()
+      expect(screen.getByRole('textbox')).not.toHaveFocus()
     })
 
     it('should not have is-valid and is-invalid class when the form has not been submitted yet', () => {

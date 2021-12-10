@@ -1,4 +1,5 @@
-import { FieldError, UseFormRegister } from 'react-hook-form'
+import { useEffect } from 'react'
+import { FieldError, UseFormRegister, UseFormSetFocus } from 'react-hook-form'
 
 type Props = {
   labelName: string
@@ -7,13 +8,20 @@ type Props = {
   isFormSubmitted: boolean
   error?: FieldError
   register: UseFormRegister<any>
+  setFocus?: UseFormSetFocus<any>
 }
 
 const TextInput = (props: Props) => {
-  const { labelName, email, name, isFormSubmitted, error, register } = props
+  const { labelName, email, name, isFormSubmitted, error, register, setFocus } =
+    props
   const type = email ? 'email' : 'text'
   const inputClass = isFormSubmitted && (error ? ' is-invalid' : ' is-valid')
   const feedbackName = name + 'Feedback'
+
+  useEffect(() => {
+    if (!setFocus) return
+    setFocus(name)
+  }, [setFocus, name])
 
   return (
     <div className="mb-3 text-start">

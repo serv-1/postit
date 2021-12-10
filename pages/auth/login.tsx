@@ -30,6 +30,7 @@ const Login = ({ csrfToken }: { csrfToken: string | null }) => {
     register,
     handleSubmit,
     formState: { errors, isSubmitted },
+    setFocus,
   } = useForm<FormInput>({
     resolver: joiResolver(loginSchema),
   })
@@ -85,6 +86,7 @@ const Login = ({ csrfToken }: { csrfToken: string | null }) => {
           register={register}
           error={errors.email}
           isFormSubmitted={isSubmitted}
+          setFocus={setFocus}
         />
         <PasswordInput
           name="password"

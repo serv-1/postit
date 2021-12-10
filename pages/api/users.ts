@@ -7,9 +7,9 @@ import { NativeError } from 'mongoose'
 import { MongoServerError } from 'mongodb'
 import { signupSchema } from '../../utils/joiSchemas'
 import {
-  emailUsed,
-  internalServerError,
-  methodNotAllowed,
+  EMAIL_USED,
+  INTERNAL_SERVER_ERROR,
+  METHOD_NOT_ALLOWED,
 } from '../../utils/errors'
 
 export default async function handler(
@@ -48,11 +48,11 @@ export default async function handler(
         (e as NativeError).name === 'MongoServerError' &&
         (e as MongoServerError).code === 11000
       ) {
-        return res.status(422).send({ message: emailUsed, name: 'email' })
+        return res.status(422).send({ message: EMAIL_USED, name: 'email' })
       }
-      res.status(500).send({ message: internalServerError })
+      res.status(500).send({ message: INTERNAL_SERVER_ERROR })
     }
   } else {
-    res.status(405).send({ message: methodNotAllowed })
+    res.status(405).send({ message: METHOD_NOT_ALLOWED })
   }
 }
