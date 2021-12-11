@@ -37,12 +37,6 @@ export default async function handler(
       if (e instanceof ValidationError) {
         const name = e.details[0].path[0]
         const message = e.details[0].message
-
-        // let resErr: { message: string; name?: string } = { message }
-
-        // if (name === 'email' || name === 'password') resErr.name = name
-
-        // return res.status(422).send(resErr)
         return res.status(422).send({ message, name })
       } else if (
         (e as NativeError).name === 'MongoServerError' &&

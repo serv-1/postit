@@ -6,7 +6,7 @@ import { Buffer } from 'buffer'
 import Joi, { ValidationError } from 'joi'
 import { loginSchema } from '../../utils/joiSchemas'
 import {
-  EMAIL_USED,
+  EMAIL_UNKNOWN,
   INTERNAL_SERVER_ERROR,
   METHOD_NOT_ALLOWED,
   PASSWORD_INVALID,
@@ -29,7 +29,7 @@ export default async function handler(
     const user = await User.findOne({ email }).exec()
 
     if (!user) {
-      return res.status(422).send({ message: EMAIL_USED })
+      return res.status(422).send({ message: EMAIL_UNKNOWN })
     }
 
     const [salt, key] = user.password.split(':')

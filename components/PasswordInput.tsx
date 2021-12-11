@@ -16,7 +16,7 @@ type Props = {
 
 type PasswordStrength = {
   estimated_time: string
-  bgClass: string
+  color: string
 }
 
 const PasswordInput = (props: Props) => {
@@ -41,12 +41,12 @@ const PasswordInput = (props: Props) => {
 
   const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { crack_times_display, score } = zxcvbn(e.target.value)
-    let bg = 'bg-success'
-    if (score <= 2) bg = 'bg-danger'
-    else if (score === 3) bg = 'bg-warning'
+    let c = 'success'
+    if (score <= 2) c = 'danger'
+    else if (score === 3) c = 'warning'
     setPasswordStrength({
       estimated_time: crack_times_display.offline_slow_hashing_1e4_per_second,
-      bgClass: bg,
+      color: c,
     })
   }
 
@@ -88,7 +88,7 @@ const PasswordInput = (props: Props) => {
         />
         {strength && passwordStrength && (
           <span
-            className={`input-group-text text-white ${passwordStrength.bgClass}`}
+            className={`input-group-text text-white border-1 border-${passwordStrength.color} bg-${passwordStrength.color}`}
             id={pwStrengthId}
             role="status"
           >

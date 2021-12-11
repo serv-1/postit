@@ -20,12 +20,6 @@ const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const router = { push: jest.fn() }
 
 beforeEach(() => useRouter.mockReturnValue(router))
-beforeAll(() => server.listen())
-afterEach(() => {
-  server.resetHandlers()
-  jest.resetAllMocks()
-})
-afterAll(() => server.close())
 
 const email = 'example@test.com'
 const password = 'password123456'

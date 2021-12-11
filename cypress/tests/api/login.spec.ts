@@ -1,8 +1,12 @@
-const signup = (email: string, password: string) => {
+function signup(user: { username: string; email: string; password: string }) {
   cy.request({
     method: 'POST',
     url: '/api/users',
-    body: { email, password },
+    body: {
+      username: user.username,
+      email: user.email,
+      password: user.password,
+    },
   })
 }
 
@@ -29,7 +33,7 @@ describe('/api/login', () => {
     })
 
     it('422 - Password invalid', function () {
-      signup(this.user.email, this.user.password)
+      signup(this.user)
 
       cy.request({
         url: '/api/login',
@@ -58,7 +62,7 @@ describe('/api/login', () => {
     })
 
     it('200 - Should log in a user', function () {
-      signup(this.user.email, this.user.password)
+      signup(this.user)
 
       cy.request({
         method: 'POST',

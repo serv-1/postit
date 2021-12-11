@@ -7,9 +7,7 @@ const AuthGuard = ({ children }: { children: JSX.Element }) => {
   useEffect(() => {
     if (status === 'loading') return
     if (status === 'unauthenticated') {
-      signIn(undefined, {
-        callbackUrl: 'http://localhost:3000/api/auth/signin',
-      })
+      signIn()
     }
   }, [status])
 

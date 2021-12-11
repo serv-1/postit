@@ -7,14 +7,12 @@ import {
   PASSWORD_REQUIRED,
 } from '../../utils/errors'
 
-const useRouter = jest.spyOn<any, 'useRouter'>(
-  require('next/router'),
-  'useRouter'
-)
+jest.mock('next/link', () => {
+  return ({ children }: { children: JSX.Element }) => children
+})
+const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const router = { push: jest.fn() }
 useRouter.mockReturnValue(router)
-
-afterEach(() => jest.resetAllMocks())
 
 const csrfToken = 'csrfToken'
 const email = 'example@test.com'
@@ -64,7 +62,7 @@ describe('Log in form', () => {
 
       expect(await screen.findByText(EMAIL_REQUIRED)).toBeInTheDocument()
 
-      // avoid the passwordEmail error (utils/errors.ts)
+      // avoid the PASSWORD_SAME error
       userEvent.type(screen.getByLabelText(/email/i), 'a')
 
       expect(await screen.findByText(PASSWORD_REQUIRED)).toBeInTheDocument()

@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import { loginSchema } from '../../utils/joiSchemas'
 import TextInput from '../../components/TextInput'
 import PasswordInput from '../../components/PasswordInput'
+import Link from 'next/link'
 
 type FormInput = {
   csrfToken: string
@@ -97,6 +98,9 @@ const Login = ({ csrfToken }: { csrfToken: string | null }) => {
         />
         <input type="submit" value="Log in" className="btn btn-primary" />
       </form>
+      <Link href="/signup">
+        <a className="ps-2 text-decoration-none">Create an account</a>
+      </Link>
     </>
   )
 }

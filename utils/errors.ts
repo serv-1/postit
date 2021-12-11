@@ -2,6 +2,7 @@
 export const EMAIL_REQUIRED = 'The email is required.'
 export const EMAIL_INVALID = 'The email is invalid.'
 export const EMAIL_USED = 'The email is already used.'
+export const EMAIL_UNKNOWN = 'The email is not registered.'
 /* Username */
 export const USERNAME_REQUIRED = 'The username is required.'
 export const USERNAME_INVALID = 'The username is invalid.'
@@ -22,6 +23,7 @@ const errors = {
   EMAIL_REQUIRED,
   EMAIL_INVALID,
 	EMAIL_USED,
+	EMAIL_UNKNOWN,
   USERNAME_REQUIRED,
   USERNAME_INVALID,
   USERNAME_MAX,
