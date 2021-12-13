@@ -4,7 +4,7 @@ import dbConnect from '../../utils/dbConnect'
 import crypto from 'crypto'
 import { Buffer } from 'buffer'
 import Joi, { ValidationError } from 'joi'
-import { loginSchema } from '../../utils/joiSchemas'
+import { signInSchema } from '../../utils/joiSchemas'
 import {
   EMAIL_UNKNOWN,
   INTERNAL_SERVER_ERROR,
@@ -21,7 +21,7 @@ export default async function handler(
   }
 
   try {
-    Joi.assert(req.body, loginSchema)
+    Joi.assert(req.body, signInSchema)
     const email = req.body.email
     const password = req.body.password
 
@@ -42,6 +42,7 @@ export default async function handler(
 
     res.status(200).send({
       id: user._id,
+      username: user.username,
       email: user.email,
     })
   } catch (e) {

@@ -13,7 +13,7 @@ import {
   USERNAME_REQUIRED,
 } from './errors'
 
-export const signupSchema = Joi.object({
+export const registerSchema = Joi.object({
   username: Joi.string().required().max(90).messages({
     'string.base': USERNAME_INVALID,
     'string.empty': USERNAME_REQUIRED,
@@ -49,7 +49,7 @@ export const signupSchema = Joi.object({
     'object.required': DATA_INVALID,
   })
 
-export const loginSchema = Joi.object({
+export const signInSchema = Joi.object({
   email: Joi.string()
     .required()
     .email({ tlds: { allow: false } })

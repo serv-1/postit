@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import TextInput from '../components/TextInput'
 import PasswordInput from '../components/PasswordInput'
 import { useState } from 'react'
-import { signupSchema } from '../utils/joiSchemas'
+import { registerSchema } from '../utils/joiSchemas'
 import { signIn } from 'next-auth/react'
 
 type FormInput = {
@@ -20,7 +20,7 @@ type ServerError = {
   message: string
 }
 
-const Signup = () => {
+const Register = () => {
   const [serverError, setServerError] = useState<ServerError>()
   const {
     register,
@@ -28,7 +28,7 @@ const Signup = () => {
     handleSubmit,
     setError,
     setFocus,
-  } = useForm<FormInput>({ resolver: joiResolver(signupSchema) })
+  } = useForm<FormInput>({ resolver: joiResolver(registerSchema) })
   const router = useRouter()
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
@@ -66,57 +66,59 @@ const Signup = () => {
   return (
     <>
       <Head>
-        <title>Filanad - Sign up!</title>
+        <title>Filanad - Register</title>
       </Head>
-      <h1 className="bg-primary text-light rounded-top p-2 m-0">Sign up!</h1>
-      {serverError && (
-        <div
-          className="fw-bold p-2 m-2 text-light bg-danger rounded-3"
-          role="alert"
+      <main className="w-75 m-auto shadow rounded">
+        <h1 className="bg-primary text-light rounded-top p-2 m-0">Register</h1>
+        {serverError && (
+          <div
+            className="fw-bold p-2 m-2 text-light bg-danger rounded-3"
+            role="alert"
+          >
+            {serverError}
+          </div>
+        )}
+        <form
+          name="signup"
+          id="signup"
+          className="p-2 text-end"
+          method="post"
+          action=""
+          encType="application/json"
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
         >
-          {serverError}
-        </div>
-      )}
-      <form
-        name="signup"
-        id="signup"
-        className="p-2 text-end"
-        method="post"
-        action=""
-        encType="application/json"
-        noValidate
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <TextInput
-          labelName="Username"
-          name="username"
-          isFormSubmitted={isSubmitted}
-          error={errors.username}
-          register={register}
-          setFocus={setFocus}
-        />
-        <TextInput
-          labelName="Email"
-          email
-          name="email"
-          isFormSubmitted={isSubmitted}
-          error={errors.email}
-          register={register}
-        />
-        <PasswordInput
-          labelName="Password"
-          rules
-          showBtn
-          strength
-          name="password"
-          isFormSubmitted={isSubmitted}
-          error={errors.password}
-          register={register}
-        />
-        <input type="submit" value="Sign up" className="btn btn-primary" />
-      </form>
+          <TextInput
+            labelName="Username"
+            name="username"
+            isFormSubmitted={isSubmitted}
+            error={errors.username}
+            register={register}
+            setFocus={setFocus}
+          />
+          <TextInput
+            labelName="Email"
+            email
+            name="email"
+            isFormSubmitted={isSubmitted}
+            error={errors.email}
+            register={register}
+          />
+          <PasswordInput
+            labelName="Password"
+            rules
+            showBtn
+            strength
+            name="password"
+            isFormSubmitted={isSubmitted}
+            error={errors.password}
+            register={register}
+          />
+          <input type="submit" value="Register" className="btn btn-primary" />
+        </form>
+      </main>
     </>
   )
 }
 
-export default Signup
+export default Register

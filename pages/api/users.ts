@@ -5,7 +5,7 @@ import dbConnect from '../../utils/dbConnect'
 import User from '../../models/User'
 import { NativeError } from 'mongoose'
 import { MongoServerError } from 'mongodb'
-import { signupSchema } from '../../utils/joiSchemas'
+import { registerSchema } from '../../utils/joiSchemas'
 import {
   EMAIL_USED,
   INTERNAL_SERVER_ERROR,
@@ -18,7 +18,7 @@ export default async function handler(
 ) {
   if (req.method === 'POST') {
     try {
-      Joi.assert(req.body, signupSchema)
+      Joi.assert(req.body, registerSchema)
       const salt = crypto.randomBytes(16).toString('hex')
       const derivedKey = crypto.scryptSync(req.body.password, salt, 64)
       const hash = derivedKey.toString('hex')

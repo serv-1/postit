@@ -5,8 +5,8 @@ import { SignInResponse, SignOutResponse } from 'next-auth/react'
 
 export const mockSession: Session = {
   user: {
-    username: 'jotarokujo',
     id: 1,
+    username: 'jotarokujo',
     email: 'jotarokujo@speedwagon.com',
   },
   expires: '123213139',
@@ -30,11 +30,11 @@ export const mockCredentialsResponse: SignInResponse = {
   error: undefined,
   ok: true,
   status: 200,
-  url: 'http://localhost/auth/login',
+  url: 'http://localhost/auth/signin',
 }
 
 export const mockSignOutResponse: SignOutResponse = {
-  url: 'http://localhost/api/auth/logout',
+  url: 'http://localhost/api/auth/signout',
 }
 
 const handlers = [

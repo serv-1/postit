@@ -14,29 +14,29 @@ const Header = () => {
       <div>
         {data ? (
           <a
-            href={'/api/auth/logout'}
+            href={'/api/auth/signout'}
             className="btn text-decoration-none text-dark fs-5"
             onClick={(e) => {
               e.preventDefault()
               signOut()
             }}
           >
-            Log out
+            Sign out
           </a>
         ) : (
           <>
             <a
-              href={'/api/auth/login'}
+              href={'/api/auth/signin'}
               className="btn text-decoration-none text-dark fs-5"
               onClick={(e) => {
                 e.preventDefault()
                 signIn()
               }}
             >
-              Log in
+              Sign in
             </a>
-            <Link href="/signup">
-              <a className="ms-3 btn btn-primary border-3 fs-5">Sign up</a>
+            <Link href="/register">
+              <a className="ms-3 btn btn-primary border-3 fs-5">Register</a>
             </Link>
           </>
         )}

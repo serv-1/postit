@@ -20,15 +20,13 @@ const App = ({ Component, pageProps }: NextAppProps) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <Header />
-      <main className="w-75 m-auto shadow rounded">
-        {Component.needAuth ? (
-          <AuthGuard>
-            <Component {...pageProps} />
-          </AuthGuard>
-        ) : (
+      {Component.needAuth ? (
+        <AuthGuard>
           <Component {...pageProps} />
-        )}
-      </main>
+        </AuthGuard>
+      ) : (
+        <Component {...pageProps} />
+      )}
       <footer className="bg-dark mt-4 p-2">
         <p className="text-light m-0">
           Copyright © {new Date().getFullYear()} Filanad, Inc. All rights

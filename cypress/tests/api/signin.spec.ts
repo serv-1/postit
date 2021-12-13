@@ -1,4 +1,4 @@
-function signup(user: { username: string; email: string; password: string }) {
+function register(user: { username: string; email: string; password: string }) {
   cy.request({
     method: 'POST',
     url: '/api/users',
@@ -10,7 +10,7 @@ function signup(user: { username: string; email: string; password: string }) {
   })
 }
 
-describe('/api/login', () => {
+describe('/api/signIn', () => {
   beforeEach(() => {
     cy.task('db:reset')
     cy.fixture('user').as('user')
@@ -20,7 +20,7 @@ describe('/api/login', () => {
     it('422 - Email not registered', function () {
       cy.request({
         method: 'POST',
-        url: '/api/login',
+        url: '/api/signIn',
         body: {
           email: this.user.email,
           password: this.user.password,
@@ -33,10 +33,10 @@ describe('/api/login', () => {
     })
 
     it('422 - Password invalid', function () {
-      signup(this.user)
+      register(this.user)
 
       cy.request({
-        url: '/api/login',
+        url: '/api/signIn',
         method: 'POST',
         body: {
           email: this.user.email,
@@ -52,7 +52,7 @@ describe('/api/login', () => {
     it('422 - Joi validation error', () => {
       cy.request({
         method: 'POST',
-        url: '/api/login',
+        url: '/api/signIn',
         body: 'my mind tell noooo but my body, my body tell yeeees!',
         failOnStatusCode: false,
       }).then((res) => {
@@ -61,12 +61,12 @@ describe('/api/login', () => {
       })
     })
 
-    it('200 - Should log in a user', function () {
-      signup(this.user)
+    it('200 - Should sign in a user', function () {
+      register(this.user)
 
       cy.request({
         method: 'POST',
-        url: '/api/login',
+        url: '/api/signIn',
         body: {
           email: this.user.email,
           password: this.user.password,
@@ -81,7 +81,7 @@ describe('/api/login', () => {
     it('405 - Method not allowed', () => {
       cy.request({
         method: 'GET',
-        url: '/api/login',
+        url: '/api/signIn',
         failOnStatusCode: false,
       }).then((res) => {
         expect(res.status).to.eq(405)

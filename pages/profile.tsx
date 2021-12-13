@@ -3,9 +3,13 @@ import { useSession } from 'next-auth/react'
 
 const Profile = () => {
   const { data } = useSession()
-  const user = (data as Session).user
+  const { username } = (data as Session).user
 
-  return <div>Welcome {user.email}!</div>
+  return (
+    <main className="w-75 m-auto shadow rounded">
+      <div>Welcome {username}</div>
+    </main>
+  )
 }
 
 Profile.needAuth = true

@@ -5,7 +5,9 @@ const Home = () => (
     <Head>
       <title>Filanad - Home</title>
     </Head>
-    <h1>Home</h1>
+    <main className="w-75 m-auto shadow rounded">
+      <h1>Home</h1>
+    </main>
   </>
 )
 

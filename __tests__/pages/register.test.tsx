@@ -1,4 +1,4 @@
-import Signup from '../../pages/signup'
+import Register from '../../pages/register'
 import { screen, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import server from '../../mocks/server'
@@ -25,8 +25,8 @@ const email = 'example@test.com'
 const password = 'password123456'
 const username = 'Bobby Tables'
 
-describe('Sign up form', () => {
-  beforeEach(() => render(<Signup />))
+describe('Register form', () => {
+  beforeEach(() => render(<Register />))
 
   it('should log in the user and redirect to the profile page after a successful submission', async () => {
     server.use(
@@ -37,7 +37,7 @@ describe('Sign up form', () => {
     userEvent.type(screen.getByLabelText(/username/i), username)
     userEvent.type(screen.getByLabelText(/email/i), email)
     userEvent.type(screen.getByLabelText(/^password/i), password)
-    userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+    userEvent.click(screen.getByRole('button', { name: 'Register' }))
     await waitFor(() => {
       expect(router.push).toHaveBeenCalledWith('/profile')
       expect(router.push).toHaveBeenCalledTimes(1)
@@ -59,7 +59,7 @@ describe('Sign up form', () => {
     userEvent.type(screen.getByLabelText(/username/i), username)
     userEvent.type(screen.getByLabelText(/email/i), email)
     userEvent.type(screen.getByLabelText(/^password/i), password)
-    userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+    userEvent.click(screen.getByRole('button', { name: 'Register' }))
     await waitFor(() => {
       expect(router.push).toHaveBeenCalledWith('/')
       expect(router.push).toHaveBeenCalledTimes(1)
@@ -70,7 +70,7 @@ describe('Sign up form', () => {
     userEvent.type(screen.getByLabelText(/username/i), username)
     userEvent.type(screen.getByLabelText(/email/i), email)
     userEvent.type(screen.getByLabelText(/^password/i), password)
-    userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+    userEvent.click(screen.getByRole('button', { name: 'Register' }))
     expect(await screen.findByText(EMAIL_USED)).toBeInTheDocument()
   })
 
@@ -79,7 +79,7 @@ describe('Sign up form', () => {
   })
 
   it('should not focus the first field after the first render', async () => {
-    userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+    userEvent.click(screen.getByRole('button', { name: 'Register' }))
     await waitFor(() =>
       expect(screen.getByLabelText(/username/i)).not.toHaveFocus()
     )
@@ -93,7 +93,7 @@ describe('Sign up form', () => {
     })
 
     it('should display an error when it is empty', async () => {
-      const btn = screen.getByRole('button', { name: 'Sign up' })
+      const btn = screen.getByRole('button', { name: 'Register' })
       userEvent.click(btn)
 
       expect(await screen.findByText(USERNAME_REQUIRED)).toBeInTheDocument()
@@ -113,7 +113,7 @@ describe('Sign up form', () => {
       let username = ''
       for (let i = 0; i < 91; i++) username += '.'
       userEvent.type(screen.getByLabelText(/username/i), username)
-      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+      userEvent.click(screen.getByRole('button', { name: 'Register' }))
       expect(await screen.findByText(USERNAME_MAX)).toBeInTheDocument()
     })
   })
@@ -121,7 +121,7 @@ describe('Sign up form', () => {
   describe('Email', () => {
     it('should display an error when it is not an email', async () => {
       userEvent.type(screen.getByLabelText(/email/i), 'bad email')
-      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+      userEvent.click(screen.getByRole('button', { name: 'Register' }))
       expect(await screen.findByText(EMAIL_INVALID)).toBeInTheDocument()
     })
   })
@@ -129,28 +129,28 @@ describe('Sign up form', () => {
   describe('Password', () => {
     it('should display an error when it is smaller than 10 characters', async () => {
       userEvent.type(screen.getByLabelText(/^password/i), 'abc')
-      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+      userEvent.click(screen.getByRole('button', { name: 'Register' }))
       expect(await screen.findByText(PASSWORD_MIN)).toBeInTheDocument()
     })
 
     it('should display an error when it is greater than 20 characters', async () => {
       const pw = '012345678901234567890'
       userEvent.type(screen.getByLabelText(/^password/i), pw)
-      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+      userEvent.click(screen.getByRole('button', { name: 'Register' }))
       expect(await screen.findByText(PASSWORD_MAX)).toBeInTheDocument()
     })
 
     it('should display an error when it is equal to the email', async () => {
       userEvent.type(screen.getByLabelText(/email/i), email)
       userEvent.type(screen.getByLabelText(/^password/i), email)
-      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+      userEvent.click(screen.getByRole('button', { name: 'Register' }))
       expect(await screen.findByText(PASSWORD_SAME)).toBeInTheDocument()
     })
 
     it('should display an error when it is equal to the username', async () => {
       userEvent.type(screen.getByLabelText(/username/i), username)
       userEvent.type(screen.getByLabelText(/^password/i), username)
-      userEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+      userEvent.click(screen.getByRole('button', { name: 'Register' }))
       expect(await screen.findByText(PASSWORD_SAME)).toBeInTheDocument()
     })
   })
