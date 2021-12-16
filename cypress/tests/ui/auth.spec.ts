@@ -17,47 +17,59 @@ describe('User sign in and register', () => {
     cy.location('pathname').should('equal', '/auth/signIn')
   })
 
-  it('should redirect the user to his profile after sign in with Google', () => {
-    cy.task('GoogleSocialLogin', {
-      username,
-      password,
-      loginUrl,
-      loginSelector: 'button',
-      postLoginSelector: '[data-cy="profile"]',
-      headless: true,
-    }).then(({ cookies }: any) => {
-      const cookie = cookies.filter(
-        (cookie: any) => cookie.name === cookieName
-      )[0]
-      if (cookie) {
-        cy.setCookie(cookieName, cookie.value, {
-          domain: cookie.domain,
-          expiry: cookie.expiry,
-          httpOnly: cookie.httpOnly,
-          path: cookie.path,
-          secure: cookie.secure,
-        })
-      }
+  context('Register, sign in and sign out', () => {
+    it('with Google', () => {
+      cy.task('GoogleSocialLogin', {
+        username,
+        password,
+        loginUrl,
+        loginSelector: 'button',
+        postLoginSelector: '[data-cy="profile"]',
+        headless: true,
+      }).then(({ cookies }: any) => {
+        const cookie = cookies.filter(
+          (cookie: any) => cookie.name === cookieName
+        )[0]
+        if (cookie) {
+          cy.setCookie(cookieName, cookie.value, {
+            domain: cookie.domain,
+            expiry: cookie.expiry,
+            httpOnly: cookie.httpOnly,
+            path: cookie.path,
+            secure: cookie.secure,
+          })
+        }
+      })
+
+      cy.visit('/profile')
+      cy.contains(username).should('exist')
+
+      cy.contains('Sign out').click()
+
+      cy.get('[data-cy="signin"]').should('exist')
+      cy.contains('Sign out').should('not.exist')
     })
 
-    cy.visit('/profile')
-    cy.contains(username).should('exist')
-  })
+    it("with it's credentials", function () {
+      register({
+        name: this.user.name,
+        email: this.user.email,
+        password: this.user.password,
+      })
 
-  it("should redirect the user to his profile after sign in with it's credentials", function () {
-    register({
-      name: this.user.name,
-      email: this.user.email,
-      password: this.user.password,
+      cy.visit('/auth/signIn')
+
+      cy.get('#email').type(this.user.email)
+      cy.get('#password').type(this.user.password)
+      cy.get('[type="submit"]').click()
+
+      cy.contains(this.user.email).should('exist')
+
+      cy.contains('Sign out').click()
+
+      cy.get('[data-cy="signin"]').should('exist')
+      cy.contains('Sign out').should('not.exist')
     })
-
-    cy.visit('/auth/signIn')
-
-    cy.get('#email').type(this.user.email)
-    cy.get('#password').type(this.user.password)
-    cy.get('[type="submit"]').click()
-
-    cy.contains(this.user.email).should('exist')
   })
 })
 

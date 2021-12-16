@@ -71,7 +71,7 @@ const SignIn = ({ csrfToken, providers }: Props) => {
       <Head>
         <title>Filanad - Sign in</title>
       </Head>
-      <main>
+      <main data-cy="signin">
         <section className="w-25 m-auto shadow rounded">
           <h2 className="bg-primary text-light rounded-top p-2 m-0">Sign in</h2>
           {error && (
