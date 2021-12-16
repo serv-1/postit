@@ -4,10 +4,11 @@ import userEvent from '@testing-library/user-event'
 import {
   EMAIL_INVALID,
   EMAIL_REQUIRED,
+  EMAIL_UNKNOWN,
+  INTERNAL_SERVER_ERROR,
   PASSWORD_REQUIRED,
 } from '../../utils/errors'
 import { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
-
 const csrfToken = 'csrfToken'
 const email = 'example@test.com'
 const password = '0123456789'
@@ -50,6 +51,25 @@ describe('Sign in', () => {
         expect(router.push).toHaveBeenCalledWith('/profile')
         expect(router.push).toHaveBeenCalledTimes(1)
       })
+    })
+
+    it('should render server-side error', async () => {
+      signIn.mockResolvedValue({ error: INTERNAL_SERVER_ERROR })
+      factory()
+      userEvent.type(screen.getByLabelText(/email/i), email)
+      userEvent.type(screen.getByLabelText(/^password/i), password)
+      userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+      expect(await screen.findByText(INTERNAL_SERVER_ERROR)).toBeInTheDocument()
+    })
+
+    it('should render server-side validation error and focus the field that goes with', async () => {
+      signIn.mockResolvedValue({ error: EMAIL_UNKNOWN })
+      factory()
+      userEvent.type(screen.getByLabelText(/email/i), email)
+      userEvent.type(screen.getByLabelText(/^password/i), password)
+      userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+      expect(await screen.findByText(EMAIL_UNKNOWN)).toBeInTheDocument()
+      expect(screen.getByLabelText(/email/i)).toHaveFocus()
     })
 
     it('should focus the first field at first render', () => {

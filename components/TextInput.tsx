@@ -11,9 +11,15 @@ type Props = {
   setFocus?: UseFormSetFocus<any>
 }
 
-const TextInput = (props: Props) => {
-  const { labelName, email, name, isFormSubmitted, error, register, setFocus } =
-    props
+const TextInput = ({
+  labelName,
+  email,
+  name,
+  isFormSubmitted,
+  error,
+  register,
+  setFocus,
+}: Props) => {
   const type = email ? 'email' : 'text'
   const inputClass = isFormSubmitted && (error ? ' is-invalid' : ' is-valid')
   const feedbackName = name + 'Feedback'

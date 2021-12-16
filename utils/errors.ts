@@ -13,7 +13,7 @@ export const PASSWORD_INVALID = 'The password is invalid.'
 export const PASSWORD_REQUIRED = 'The password is required.'
 export const PASSWORD_MIN = 'The password must have 10 characters.'
 export const PASSWORD_MAX = 'The password cannot exceed 20 characters.'
-export const PASSWORD_SAME = 'The password cannot be the same as the other fields\' values.'
+export const PASSWORD_SAME = 'The password cannot be the same as the other fields\' value.'
 /* Data */
 export const DATA_INVALID = 'The given data are invalid.'
 /* Server */

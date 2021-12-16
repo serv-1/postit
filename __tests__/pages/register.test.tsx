@@ -66,12 +66,13 @@ describe('Register form', () => {
     })
   })
 
-  it('should render server-side error', async () => {
+  it('should render server-side error and focus the field that goes with', async () => {
     userEvent.type(screen.getByLabelText(/name/i), name)
     userEvent.type(screen.getByLabelText(/email/i), email)
     userEvent.type(screen.getByLabelText(/^password/i), password)
     userEvent.click(screen.getByRole('button', { name: 'Register' }))
     expect(await screen.findByText(EMAIL_USED)).toBeInTheDocument()
+    expect(screen.getByLabelText(/email/i)).toHaveFocus()
   })
 
   it('should focus the first field at first render', () => {

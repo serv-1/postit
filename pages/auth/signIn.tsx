@@ -42,12 +42,13 @@ type Props = {
 }
 
 const SignIn = ({ csrfToken, providers }: Props) => {
-  const [error, setError] = useState<string>()
+  const [serverError, setServerError] = useState<string>()
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitted },
     setFocus,
+    setError,
   } = useForm<FormInput>({
     resolver: joiResolver(signInSchema),
   })
@@ -60,7 +61,14 @@ const SignIn = ({ csrfToken, providers }: Props) => {
       redirect: false,
     })
     if (res && res.error) {
-      setError(res.error)
+      const err = res.error
+      if (new RegExp(/email/i).test(err)) {
+        setError('email', { message: err }, { shouldFocus: true })
+      } else if (new RegExp(/password/i).test(err)) {
+        setError('password', { message: err }, { shouldFocus: true })
+      } else {
+        setServerError(err)
+      }
       return
     }
     router.push('/profile')
@@ -74,13 +82,13 @@ const SignIn = ({ csrfToken, providers }: Props) => {
       <main data-cy="signin">
         <section className="w-25 m-auto shadow rounded">
           <h2 className="bg-primary text-light rounded-top p-2 m-0">Sign in</h2>
-          {error && (
+          {serverError && (
             <div
               className="fw-bold p-2 pb-0 text-danger"
               id="globalFeedback"
               role="alert"
             >
-              {error}
+              {serverError}
             </div>
           )}
           <form

@@ -19,18 +19,17 @@ type PasswordStrength = {
   color: string
 }
 
-const PasswordInput = (props: Props) => {
-  const {
-    labelName,
-    rules,
-    showBtn,
-    strength,
-    name,
-    isFormSubmitted,
-    error,
-    register,
-    setFocus,
-  } = props
+const PasswordInput = ({
+  labelName,
+  rules,
+  showBtn,
+  strength,
+  name,
+  isFormSubmitted,
+  error,
+  register,
+  setFocus,
+}: Props) => {
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>()
 
@@ -95,12 +94,12 @@ const PasswordInput = (props: Props) => {
             Need {passwordStrength.estimated_time} to crack
           </span>
         )}
+        {isFormSubmitted && error && (
+          <div className="invalid-feedback" id={pwFeedbackId} role="alert">
+            {error.message}
+          </div>
+        )}
       </div>
-      {isFormSubmitted && error && (
-        <div className="invalid-feedback" id={pwFeedbackId} role="alert">
-          {error.message}
-        </div>
-      )}
     </div>
   )
 }
