@@ -10,8 +10,8 @@ import {
   PASSWORD_MAX,
   PASSWORD_MIN,
   PASSWORD_REQUIRED,
-  USERNAME_MAX,
-  USERNAME_REQUIRED,
+  NAME_MAX,
+  NAME_REQUIRED,
 } from '../../utils/errors'
 import { rest } from 'msw'
 
@@ -23,7 +23,7 @@ beforeEach(() => useRouter.mockReturnValue(router))
 
 const email = 'example@test.com'
 const password = 'password123456'
-const username = 'Bobby Tables'
+const name = 'Bobby Tables'
 
 describe('Register form', () => {
   beforeEach(() => render(<Register />))
@@ -34,7 +34,7 @@ describe('Register form', () => {
         return res(ctx.status(200))
       })
     )
-    userEvent.type(screen.getByLabelText(/username/i), username)
+    userEvent.type(screen.getByLabelText(/name/i), name)
     userEvent.type(screen.getByLabelText(/email/i), email)
     userEvent.type(screen.getByLabelText(/^password/i), password)
     userEvent.click(screen.getByRole('button', { name: 'Register' }))
@@ -56,7 +56,7 @@ describe('Register form', () => {
       status: 500,
       url: null,
     })
-    userEvent.type(screen.getByLabelText(/username/i), username)
+    userEvent.type(screen.getByLabelText(/name/i), name)
     userEvent.type(screen.getByLabelText(/email/i), email)
     userEvent.type(screen.getByLabelText(/^password/i), password)
     userEvent.click(screen.getByRole('button', { name: 'Register' }))
@@ -67,7 +67,7 @@ describe('Register form', () => {
   })
 
   it('should render server-side error', async () => {
-    userEvent.type(screen.getByLabelText(/username/i), username)
+    userEvent.type(screen.getByLabelText(/name/i), name)
     userEvent.type(screen.getByLabelText(/email/i), email)
     userEvent.type(screen.getByLabelText(/^password/i), password)
     userEvent.click(screen.getByRole('button', { name: 'Register' }))
@@ -75,19 +75,19 @@ describe('Register form', () => {
   })
 
   it('should focus the first field at first render', () => {
-    expect(screen.getByLabelText(/username/i)).toHaveFocus()
+    expect(screen.getByLabelText(/name/i)).toHaveFocus()
   })
 
   it('should not focus the first field after the first render', async () => {
     userEvent.click(screen.getByRole('button', { name: 'Register' }))
     await waitFor(() =>
-      expect(screen.getByLabelText(/username/i)).not.toHaveFocus()
+      expect(screen.getByLabelText(/name/i)).not.toHaveFocus()
     )
   })
 
   describe('All fields', () => {
     it('should be rendered correctly', () => {
-      expect(screen.getByLabelText(/username/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
       expect(screen.getByLabelText(/^password/i)).toBeInTheDocument()
     })
@@ -96,11 +96,11 @@ describe('Register form', () => {
       const btn = screen.getByRole('button', { name: 'Register' })
       userEvent.click(btn)
 
-      expect(await screen.findByText(USERNAME_REQUIRED)).toBeInTheDocument()
+      expect(await screen.findByText(NAME_REQUIRED)).toBeInTheDocument()
       expect(await screen.findByText(EMAIL_REQUIRED)).toBeInTheDocument()
 
       // forced to do that to trigger the password required validation
-      userEvent.type(screen.getByLabelText(/username/i), username)
+      userEvent.type(screen.getByLabelText(/name/i), name)
       userEvent.type(screen.getByLabelText(/email/i), email)
       userEvent.click(btn)
 
@@ -108,13 +108,13 @@ describe('Register form', () => {
     })
   })
 
-  describe('Username', () => {
+  describe('Name', () => {
     it('should display an error when it is greater than 90 characters.', async () => {
-      let username = ''
-      for (let i = 0; i < 91; i++) username += '.'
-      userEvent.type(screen.getByLabelText(/username/i), username)
+      let name = ''
+      for (let i = 0; i < 91; i++) name += '.'
+      userEvent.type(screen.getByLabelText(/name/i), name)
       userEvent.click(screen.getByRole('button', { name: 'Register' }))
-      expect(await screen.findByText(USERNAME_MAX)).toBeInTheDocument()
+      expect(await screen.findByText(NAME_MAX)).toBeInTheDocument()
     })
   })
 
@@ -147,9 +147,9 @@ describe('Register form', () => {
       expect(await screen.findByText(PASSWORD_SAME)).toBeInTheDocument()
     })
 
-    it('should display an error when it is equal to the username', async () => {
-      userEvent.type(screen.getByLabelText(/username/i), username)
-      userEvent.type(screen.getByLabelText(/^password/i), username)
+    it('should display an error when it is equal to the name', async () => {
+      userEvent.type(screen.getByLabelText(/name/i), name)
+      userEvent.type(screen.getByLabelText(/^password/i), name)
       userEvent.click(screen.getByRole('button', { name: 'Register' }))
       expect(await screen.findByText(PASSWORD_SAME)).toBeInTheDocument()
     })

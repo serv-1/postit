@@ -1,14 +1,11 @@
-function register(user: { username: string; email: string; password: string }) {
-  cy.request({
-    method: 'POST',
-    url: '/api/users',
-    body: {
-      username: user.username,
-      email: user.email,
-      password: user.password,
-    },
-  })
-}
+import {
+  DATA_INVALID,
+  EMAIL_GOOGLE,
+  EMAIL_UNKNOWN,
+  METHOD_NOT_ALLOWED,
+  PASSWORD_INVALID,
+} from '../../../utils/errors'
+import { register } from '../../support/functions'
 
 describe('/api/signIn', () => {
   beforeEach(() => {
@@ -28,7 +25,23 @@ describe('/api/signIn', () => {
         failOnStatusCode: false,
       }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.ownProperty('message')
+        expect(res.body).to.have.property('message', EMAIL_UNKNOWN)
+      })
+    })
+
+    it('422 - Email is linked to a Google account', async function () {
+      cy.task('addUserToDb', {
+        name: this.user.name,
+        email: this.user.email,
+      })
+      cy.request({
+        method: 'POST',
+        url: '/api/signIn',
+        body: { email: this.user.email },
+        failOnStatusCode: false,
+      }).then((res) => {
+        expect(res.status).to.eq(422)
+        expect(res.body).to.have.property('message', EMAIL_GOOGLE)
       })
     })
 
@@ -45,7 +58,7 @@ describe('/api/signIn', () => {
         failOnStatusCode: false,
       }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.ownProperty('message')
+        expect(res.body).to.have.property('message', PASSWORD_INVALID)
       })
     })
 
@@ -53,11 +66,11 @@ describe('/api/signIn', () => {
       cy.request({
         method: 'POST',
         url: '/api/signIn',
-        body: 'my mind tell noooo but my body, my body tell yeeees!',
+        body: 'not json',
         failOnStatusCode: false,
       }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.ownProperty('message')
+        expect(res.body).to.have.ownProperty('message', DATA_INVALID)
       })
     })
 
@@ -85,10 +98,8 @@ describe('/api/signIn', () => {
         failOnStatusCode: false,
       }).then((res) => {
         expect(res.status).to.eq(405)
-        expect(res.body).to.have.ownProperty('message')
+        expect(res.body).to.have.ownProperty('message', METHOD_NOT_ALLOWED)
       })
     })
   })
 })
-
-export {}

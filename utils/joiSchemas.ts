@@ -8,17 +8,17 @@ import {
   PASSWORD_MAX,
   PASSWORD_MIN,
   PASSWORD_REQUIRED,
-  USERNAME_INVALID,
-  USERNAME_MAX,
-  USERNAME_REQUIRED,
+  NAME_INVALID,
+  NAME_MAX,
+  NAME_REQUIRED,
 } from './errors'
 
 export const registerSchema = Joi.object({
-  username: Joi.string().required().max(90).messages({
-    'string.base': USERNAME_INVALID,
-    'string.empty': USERNAME_REQUIRED,
-    'any.required': USERNAME_REQUIRED,
-    'string.max': USERNAME_MAX,
+  name: Joi.string().required().max(90).messages({
+    'string.base': NAME_INVALID,
+    'string.empty': NAME_REQUIRED,
+    'any.required': NAME_REQUIRED,
+    'string.max': NAME_MAX,
   }),
   email: Joi.string()
     .email({ tlds: { allow: false } })
@@ -30,7 +30,7 @@ export const registerSchema = Joi.object({
       'any.required': EMAIL_REQUIRED,
     }),
   password: Joi.string()
-    .invalid(Joi.ref('email'), Joi.ref('username'))
+    .invalid(Joi.ref('email'), Joi.ref('name'))
     .min(10)
     .max(20)
     .required()

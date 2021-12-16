@@ -5,10 +5,12 @@ declare module 'next-auth' {
    * Returned by `useSession`, `getSession` and received as a prop on the `Provider` React Context
    */
   interface Session {
-    user: {
-      id: number
-      username: string
-      email: string
-    }
+    user: User
+  }
+
+  interface User {
+    id: number
+    email: string
+    name: string
   }
 }

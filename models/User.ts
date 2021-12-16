@@ -1,28 +1,34 @@
-import { Document, models, model, Schema } from 'mongoose'
+import { Document, models, model, Schema, Model } from 'mongoose'
+import {
+  EMAIL_REQUIRED,
+  NAME_MAX,
+  NAME_REQUIRED,
+  PASSWORD_MAX,
+  PASSWORD_MIN,
+} from '../utils/errors'
 
 export interface User extends Document {
-  username: string
+  name: string
   email: string
-  password: string
+  password?: string
 }
 
 const userSchema = new Schema<User>({
-  username: {
+  name: {
     type: String,
-    required: [true, 'The username is required.'],
-    maxLength: [90, 'The username cannot exceed 90 characters.'],
+    required: [true, NAME_REQUIRED],
+    maxLength: [90, NAME_MAX],
   },
   email: {
     type: String,
-    required: [true, 'The email is required.'],
+    required: [true, EMAIL_REQUIRED],
     unique: true,
   },
   password: {
     type: String,
-    required: [true, 'The password is required.'],
-    min: [10, 'The password must have 10 characters.'],
-    max: [20, 'The password cannot exceed 20 characters.'],
+    min: [10, PASSWORD_MIN],
+    max: [20, PASSWORD_MAX],
   },
 })
 
-export default models.User || model<User>('User', userSchema)
+export default (models.User as Model<User>) || model<User>('User', userSchema)

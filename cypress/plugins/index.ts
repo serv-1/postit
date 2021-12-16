@@ -1,4 +1,12 @@
+import User from '../../models/User'
 import dbConnect from '../../utils/dbConnect'
+const { GoogleSocialLogin } = require('cypress-social-logins').plugins
+
+type User = {
+  name: string
+  email: string
+  password?: string
+}
 
 const pluginConfig: Cypress.PluginConfig = (on, config) => {
   on('task', {
@@ -12,6 +20,13 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
       return null
     },
+    async addUserToDb(user: User) {
+      await dbConnect()
+      const u = new User(user)
+      await u.save()
+      return null
+    },
+    GoogleSocialLogin: GoogleSocialLogin,
   })
 }
 

@@ -3,14 +3,20 @@ import { render, screen } from '@testing-library/react'
 import { mockSession } from '../../mocks/nextAuth'
 import { SessionProvider } from 'next-auth/react'
 
-describe('Profile page', () => {
-  it('should display the username', () => {
-    render(
-      <SessionProvider session={mockSession}>
-        <Profile />
-      </SessionProvider>
-    )
-    const username = new RegExp(mockSession.user.username, 'i')
-    expect(screen.getByText(username)).toBeInTheDocument()
+const factory = () => {
+  render(
+    <SessionProvider session={mockSession}>
+      <Profile />
+    </SessionProvider>
+  )
+}
+
+describe('Profile', () => {
+  it('should display the user informations', () => {
+    factory()
+    const name = new RegExp(mockSession.user.name, 'i')
+    const email = new RegExp(mockSession.user.email, 'i')
+    expect(screen.getByText(name)).toBeInTheDocument()
+    expect(screen.getByText(email)).toBeInTheDocument()
   })
 })

@@ -11,7 +11,7 @@ import { registerSchema } from '../utils/joiSchemas'
 import { signIn } from 'next-auth/react'
 
 type FormInput = {
-  username: string
+  name: string
   email: string
   password: string
 }
@@ -34,7 +34,7 @@ const Register = () => {
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/users', {
-        username: data.username,
+        name: data.name,
         email: data.email,
         password: data.password,
       })
@@ -89,10 +89,10 @@ const Register = () => {
           onSubmit={handleSubmit(onSubmit)}
         >
           <TextInput
-            labelName="Username"
-            name="username"
+            labelName="Name"
+            name="name"
             isFormSubmitted={isSubmitted}
-            error={errors.username}
+            error={errors.name}
             register={register}
             setFocus={setFocus}
           />

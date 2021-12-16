@@ -1,18 +1,5 @@
-const signup = (user: {
-  username: string
-  email: string
-  password: string
-}) => {
-  cy.request({
-    method: 'POST',
-    url: '/api/users',
-    body: {
-      username: user.username,
-      email: user.email,
-      password: user.password,
-    },
-  })
-}
+import { EMAIL_USED, METHOD_NOT_ALLOWED } from '../../../utils/errors'
+import { register } from '../../support/functions'
 
 describe('/api/users', () => {
   beforeEach(() => {
@@ -48,20 +35,20 @@ describe('/api/users', () => {
     })
 
     it('422 - Email already used', function () {
-      signup(this.user)
+      register(this.user)
       cy.request({
         method: 'POST',
         url: '/api/users',
         body: {
-          username: this.user.username,
+          name: this.user.name,
           email: this.user.email,
           password: this.user.password,
         },
         failOnStatusCode: false,
       }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.ownProperty('message')
-        expect(res.body).to.have.ownProperty('name')
+        expect(res.body).to.have.ownProperty('message', EMAIL_USED)
+        expect(res.body).to.have.ownProperty('name', 'email')
       })
     })
 
@@ -72,10 +59,8 @@ describe('/api/users', () => {
         failOnStatusCode: false,
       }).then((res) => {
         expect(res.status).to.eq(405)
-        expect(res.body).to.have.ownProperty('message')
+        expect(res.body).to.have.ownProperty('message', METHOD_NOT_ALLOWED)
       })
     })
   })
 })
-
-export {}

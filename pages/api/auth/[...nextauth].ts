@@ -1,32 +1,25 @@
 import axios, { AxiosError } from 'axios'
-import NextAuth from 'next-auth'
+import NextAuth, { User as U } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
+import User from '../../../models/User'
+import dbConnect from '../../../utils/dbConnect'
 import { GOOGLE_ID, GOOGLE_SECRET, SECRET } from '../../../utils/env'
 import { INTERNAL_SERVER_ERROR } from '../../../utils/errors'
-
-type User = {
-  username: string
-  id: number
-  email: string
-}
 
 export default NextAuth({
   providers: [
     Credentials({
       credentials: {
-        username: { label: 'Username', type: 'text' },
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials, req) {
         try {
           const res = await axios.post('http://localhost:3000/api/signIn', {
-            username: credentials?.username,
             email: credentials?.email,
             password: credentials?.password,
           })
-          console.log(res.data)
           return res.data
         } catch (e) {
           const err = e as AxiosError
@@ -50,24 +43,24 @@ export default NextAuth({
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
-        switch (account.provider) {
-          case 'credentials':
-            token.user = user
-            break
-          case 'google':
-            token.user = {
-              id: user.id,
-              username: user.name,
-              email: user.email,
-            }
-            break
+        token.user = user
+
+        if (account.provider === 'google') {
+          await dbConnect()
+
+          const isRegistered = await User.findOne({ email: user.email }).exec()
+
+          if (!isRegistered) {
+            const u = new User(user)
+            await u.save()
+          }
         }
       }
       return token
     },
     async session({ session, token }) {
       if (token) {
-        session.user = token.user as User
+        session.user = token.user as U
       }
       return session
     },

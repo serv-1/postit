@@ -3,10 +3,11 @@ export const EMAIL_REQUIRED = 'The email is required.'
 export const EMAIL_INVALID = 'The email is invalid.'
 export const EMAIL_USED = 'The email is already used.'
 export const EMAIL_UNKNOWN = 'The email is not registered.'
-/* Username */
-export const USERNAME_REQUIRED = 'The username is required.'
-export const USERNAME_INVALID = 'The username is invalid.'
-export const USERNAME_MAX = 'The username cannot exceed 90 characters.'
+export const EMAIL_GOOGLE = 'The email is linked to a Google account. (sign in with Google)'
+/* Name */
+export const NAME_REQUIRED = 'The name is required.'
+export const NAME_INVALID = 'The name is invalid.'
+export const NAME_MAX = 'The name cannot exceed 90 characters.'
 /* Password */
 export const PASSWORD_INVALID = 'The password is invalid.'
 export const PASSWORD_REQUIRED = 'The password is required.'
@@ -24,9 +25,10 @@ const errors = {
   EMAIL_INVALID,
 	EMAIL_USED,
 	EMAIL_UNKNOWN,
-  USERNAME_REQUIRED,
-  USERNAME_INVALID,
-  USERNAME_MAX,
+	EMAIL_GOOGLE,
+  NAME_REQUIRED,
+  NAME_INVALID,
+  NAME_MAX,
   PASSWORD_INVALID,
   PASSWORD_REQUIRED,
   PASSWORD_MIN,

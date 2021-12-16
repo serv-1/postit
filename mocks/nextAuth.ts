@@ -6,7 +6,7 @@ import { SignInResponse, SignOutResponse } from 'next-auth/react'
 export const mockSession: Session = {
   user: {
     id: 1,
-    username: 'jotarokujo',
+    name: 'Jotaro Kujo',
     email: 'jotarokujo@speedwagon.com',
   },
   expires: '123213139',

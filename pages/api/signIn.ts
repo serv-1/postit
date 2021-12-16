@@ -6,6 +6,7 @@ import { Buffer } from 'buffer'
 import Joi, { ValidationError } from 'joi'
 import { signInSchema } from '../../utils/joiSchemas'
 import {
+  EMAIL_GOOGLE,
   EMAIL_UNKNOWN,
   INTERNAL_SERVER_ERROR,
   METHOD_NOT_ALLOWED,
@@ -28,9 +29,8 @@ export default async function handler(
     await dbConnect()
     const user = await User.findOne({ email }).exec()
 
-    if (!user) {
-      return res.status(422).send({ message: EMAIL_UNKNOWN })
-    }
+    if (!user) return res.status(422).send({ message: EMAIL_UNKNOWN })
+    if (!user.password) return res.status(422).send({ message: EMAIL_GOOGLE })
 
     const [salt, key] = user.password.split(':')
     const keyBuffer = Buffer.from(key, 'hex')
@@ -42,12 +42,11 @@ export default async function handler(
 
     res.status(200).send({
       id: user._id,
-      username: user.username,
+      name: user.name,
       email: user.email,
     })
   } catch (e) {
     if (e instanceof ValidationError) {
-      console.log(e)
       return res.status(422).send({ message: e.details[0].message })
     }
     res.status(500).send({ message: INTERNAL_SERVER_ERROR })

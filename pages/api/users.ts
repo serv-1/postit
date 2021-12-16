@@ -25,7 +25,7 @@ export default async function handler(
 
       await dbConnect()
       const user = new User({
-        username: req.body.username,
+        name: req.body.name,
         email: req.body.email,
         password: `${salt}:${hash}`,
       })
