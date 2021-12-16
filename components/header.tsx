@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { signIn, signOut, useSession } from 'next-auth/react'
 
 const Header = () => {
-  const { data } = useSession()
+  const { status } = useSession()
 
   return (
     <header className="container-fluid d-flex justify-content-between align-items-center mb-4 p-2 shadow-sm">
@@ -11,8 +11,8 @@ const Header = () => {
           <a className="text-decoration-none text-dark">Filanad</a>
         </Link>
       </h1>
-      <div>
-        {data ? (
+      <nav>
+        {status === 'authenticated' ? (
           <a
             href={'/api/auth/signout'}
             className="btn text-decoration-none text-dark fs-5"
@@ -40,7 +40,7 @@ const Header = () => {
             </Link>
           </>
         )}
-      </div>
+      </nav>
     </header>
   )
 }
