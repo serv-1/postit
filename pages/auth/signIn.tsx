@@ -115,7 +115,7 @@ const SignIn = ({ csrfToken, providers }: Props) => {
               isFormSubmitted={isSubmitted}
             />
             <div className="d-flex justify-content-between align-items-end">
-              <Link href="/signup">
+              <Link href="/register">
                 <a className="text-decoration-none">Create an account</a>
               </Link>
               <input

@@ -68,13 +68,10 @@ const Register = () => {
       <Head>
         <title>Filanad - Register</title>
       </Head>
-      <main className="w-75 m-auto shadow rounded">
+      <main className="w-25 m-auto shadow rounded">
         <h1 className="bg-primary text-light rounded-top p-2 m-0">Register</h1>
         {serverError && (
-          <div
-            className="fw-bold p-2 m-2 text-light bg-danger rounded-3"
-            role="alert"
-          >
+          <div className="fw-bold p-2 pb-0 text-danger" role="alert">
             {serverError}
           </div>
         )}
