@@ -7,6 +7,7 @@ type Props = {
   rules?: boolean
   showBtn?: boolean
   strength?: boolean
+  forgotPassword?: boolean
   isFormSubmitted?: boolean
   error?: FieldError
   setFocus?: UseFormSetFocus<any>
@@ -30,6 +31,7 @@ const factory = ({
   rules = false,
   showBtn = false,
   strength = false,
+  forgotPassword = false,
   isFormSubmitted = false,
   error,
   setFocus,
@@ -40,6 +42,7 @@ const factory = ({
       rules={rules}
       showBtn={showBtn}
       strength={strength}
+      forgotPassword={forgotPassword}
       name={name}
       isFormSubmitted={isFormSubmitted}
       error={error}
@@ -102,7 +105,7 @@ describe('PasswordInput', () => {
       factory({ showBtn: true })
       const btn = screen.getByRole('button')
       userEvent.click(btn)
-      expect(btn).toHaveTextContent('hide')
+      expect(btn).toHaveAccessibleName(/hide/i)
       expect(screen.getByLabelText(labelName)).toHaveAttribute('type', 'text')
     })
 
@@ -111,7 +114,7 @@ describe('PasswordInput', () => {
       const btn = screen.getByRole('button')
       userEvent.click(btn)
       userEvent.click(btn)
-      expect(btn).toHaveTextContent('show')
+      expect(btn).toHaveAccessibleName(/show/i)
       expect(screen.getByLabelText(labelName)).toHaveAttribute(
         'type',
         'password'
@@ -199,6 +202,22 @@ describe('PasswordInput', () => {
       factory({ strength: true })
       userEvent.type(screen.getByLabelText(labelName), 'tire bridge rainbow')
       expect(screen.getByRole('status')).toHaveClass('bg-success')
+    })
+  })
+
+  describe('Forgot password', () => {
+    it('should be rendered if forgotPassword is true', () => {
+      factory({ forgotPassword: true })
+      expect(
+        screen.getByRole('link', { name: 'Forgot password?' })
+      ).toBeInTheDocument()
+    })
+
+    it('should not be rendered if forgotPassword is false', () => {
+      factory()
+      expect(
+        screen.queryByRole('link', { name: 'Forgot password?' })
+      ).not.toBeInTheDocument()
     })
   })
 

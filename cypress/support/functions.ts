@@ -1,8 +1,5 @@
-type User = {
-  name: string
-  email: string
-  password: string
-}
+import user from '../fixtures/user.json'
+type User = typeof user
 
 export function register(user: User) {
   cy.request({

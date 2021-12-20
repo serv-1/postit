@@ -2,19 +2,24 @@ import { register } from '../../support/functions'
 
 const username = Cypress.env('googleUsername')
 const password = Cypress.env('googlePassword')
-const cookieName = Cypress.env('cookieName')
-const loginUrl = Cypress.env('loginUrl')
+const cookieName = Cypress.env('sessionCookieName')
+const smtpBaseUrl = Cypress.env('smtpBaseUrl')
+const smtpToken = Cypress.env('smtpToken')
+
+const cleanInboxUrl = `${smtpBaseUrl}/api/v1/inboxes/1577170/clean?api_token=${smtpToken}`
+const getInboxMsgUrl = `${smtpBaseUrl}/api/v1/inboxes/1577170/messages?api_token=${smtpToken}`
 
 describe('User sign in and register', () => {
   beforeEach(() => {
     cy.task('db:reset')
     cy.fixture('user').as('user')
+    cy.request('PATCH', cleanInboxUrl)
   })
 
   it('should redirect unauthenticated user to the sign in page', () => {
     cy.visit('/profile')
     cy.contains(/loading/i).should('exist')
-    cy.location('pathname').should('equal', '/auth/signIn')
+    cy.location('pathname').should('equal', '/auth/sign-in')
   })
 
   context('Register, sign in and sign out', () => {
@@ -22,10 +27,9 @@ describe('User sign in and register', () => {
       cy.task('GoogleSocialLogin', {
         username,
         password,
-        loginUrl,
+        loginUrl: 'http://localhost:3000/auth/sign-in',
         loginSelector: 'button',
         postLoginSelector: '[data-cy="profile"]',
-        headless: true,
       }).then(({ cookies }: any) => {
         const cookie = cookies.filter(
           (cookie: any) => cookie.name === cookieName
@@ -46,31 +50,51 @@ describe('User sign in and register', () => {
 
       cy.contains('Sign out').click()
 
-      cy.get('[data-cy="signin"]').should('exist')
+      cy.get('[data-cy="sign-in"]').should('exist')
       cy.contains('Sign out').should('not.exist')
     })
 
-    it("with it's credentials", function () {
-      register({
-        name: this.user.name,
-        email: this.user.email,
-        password: this.user.password,
-      })
+    it('with credentials', function () {
+      register(this.user)
 
-      cy.visit('/auth/signIn')
+      cy.visit('/auth/sign-in')
 
       cy.get('#email').type(this.user.email)
       cy.get('#password').type(this.user.password)
-      cy.get('[type="submit"]').click()
+      cy.get('input[type="submit"]').click()
 
       cy.contains(this.user.email).should('exist')
 
       cy.contains('Sign out').click()
 
-      cy.get('[data-cy="signin"]').should('exist')
+      cy.get('[data-cy="sign-in"]').should('exist')
       cy.contains('Sign out').should('not.exist')
     })
   })
-})
 
-export {}
+  specify('Forgot password', function () {
+    register(this.user)
+
+    cy.visit('/auth/forgot-password')
+
+    cy.get('#email').type(this.user.email)
+    cy.get('input[type="submit"]').click()
+
+    cy.location('pathname').should('equal', '/auth/email-sent')
+    cy.get('[data-cy="email-sent"]').should('exist')
+
+    cy.request(getInboxMsgUrl).then((res) => {
+      cy.request(
+        `${smtpBaseUrl + res.body[0].html_path}?api_token=${smtpToken}`
+      ).then((res) => {
+        cy.document().invoke('write', res.body)
+      })
+    })
+
+    cy.get('a').invoke('removeAttr', 'target')
+    cy.get('a').click()
+
+    cy.location('pathname').should('equal', '/profile')
+    cy.contains(this.user.email).should('exist')
+  })
+})

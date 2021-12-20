@@ -11,6 +11,7 @@ export interface User extends Document {
   name: string
   email: string
   password?: string
+  emailVerified?: string
 }
 
 const userSchema = new Schema<User>({
@@ -28,6 +29,9 @@ const userSchema = new Schema<User>({
     type: String,
     min: [10, PASSWORD_MIN],
     max: [20, PASSWORD_MAX],
+  },
+  emailVerified: {
+    type: Date,
   },
 })
 

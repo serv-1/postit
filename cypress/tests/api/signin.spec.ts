@@ -14,7 +14,7 @@ describe('/api/signIn', () => {
   })
 
   context('POST', () => {
-    it('422 - Email not registered', function () {
+    specify('422 - Email not registered', function () {
       cy.request({
         method: 'POST',
         url: '/api/signIn',
@@ -29,7 +29,7 @@ describe('/api/signIn', () => {
       })
     })
 
-    it('422 - Email is linked to a Google account', async function () {
+    specify('422 - Email is linked to a Google account', async function () {
       cy.task('addUserToDb', {
         name: this.user.name,
         email: this.user.email,
@@ -45,7 +45,7 @@ describe('/api/signIn', () => {
       })
     })
 
-    it('422 - Password invalid', function () {
+    specify('422 - Password invalid', function () {
       register(this.user)
 
       cy.request({
@@ -62,7 +62,7 @@ describe('/api/signIn', () => {
       })
     })
 
-    it('422 - Joi validation error', () => {
+    specify('422 - Joi validation error', () => {
       cy.request({
         method: 'POST',
         url: '/api/signIn',
@@ -74,7 +74,7 @@ describe('/api/signIn', () => {
       })
     })
 
-    it('200 - Should sign in a user', function () {
+    specify('200 - Should sign in a user', function () {
       register(this.user)
 
       cy.request({
@@ -90,16 +90,16 @@ describe('/api/signIn', () => {
         expect(res.body).to.have.property('email', this.user.email)
       })
     })
+  })
 
-    it('405 - Method not allowed', () => {
-      cy.request({
-        method: 'GET',
-        url: '/api/signIn',
-        failOnStatusCode: false,
-      }).then((res) => {
-        expect(res.status).to.eq(405)
-        expect(res.body).to.have.ownProperty('message', METHOD_NOT_ALLOWED)
-      })
+  specify('405 - Method not allowed', () => {
+    cy.request({
+      method: 'GET',
+      url: '/api/signIn',
+      failOnStatusCode: false,
+    }).then((res) => {
+      expect(res.status).to.eq(405)
+      expect(res.body).to.have.ownProperty('message', METHOD_NOT_ALLOWED)
     })
   })
 })

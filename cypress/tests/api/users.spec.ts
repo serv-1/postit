@@ -8,7 +8,7 @@ describe('/api/users', () => {
   })
 
   context('POST', () => {
-    it('422 - Joi validation error (request body data)', function () {
+    specify('422 - Joi validation error (request body data)', function () {
       cy.request({
         method: 'POST',
         url: '/api/users',
@@ -21,7 +21,7 @@ describe('/api/users', () => {
       })
     })
 
-    it('422 - Joi validation error (request body)', () => {
+    specify('422 - Joi validation error (request body)', () => {
       cy.request({
         method: 'POST',
         url: '/api/users',
@@ -34,7 +34,7 @@ describe('/api/users', () => {
       })
     })
 
-    it('422 - Email already used', function () {
+    specify('422 - Email already used', function () {
       register(this.user)
       cy.request({
         method: 'POST',
@@ -51,16 +51,16 @@ describe('/api/users', () => {
         expect(res.body).to.have.ownProperty('name', 'email')
       })
     })
+  })
 
-    it('405 - Method not allowed', () => {
-      cy.request({
-        method: 'GET',
-        url: '/api/users',
-        failOnStatusCode: false,
-      }).then((res) => {
-        expect(res.status).to.eq(405)
-        expect(res.body).to.have.ownProperty('message', METHOD_NOT_ALLOWED)
-      })
+  specify('405 - Method not allowed', () => {
+    cy.request({
+      method: 'GET',
+      url: '/api/users',
+      failOnStatusCode: false,
+    }).then((res) => {
+      expect(res.status).to.eq(405)
+      expect(res.body).to.have.ownProperty('message', METHOD_NOT_ALLOWED)
     })
   })
 })

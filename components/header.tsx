@@ -6,11 +6,11 @@ const Header = () => {
 
   return (
     <header className="container-fluid d-flex justify-content-between align-items-center mb-4 p-2 shadow-sm">
-      <h1 className="m-0">
+      <div className="m-0 fs-1">
         <Link href="/">
           <a className="text-decoration-none text-dark">Filanad</a>
         </Link>
-      </h1>
+      </div>
       <nav>
         {status === 'authenticated' ? (
           <a

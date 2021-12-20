@@ -1,12 +1,16 @@
 import { ChangeEvent, useEffect, useState } from 'react'
 import { FieldError, UseFormRegister, UseFormSetFocus } from 'react-hook-form'
 const zxcvbn = require('zxcvbn')
+import Link from 'next/link'
+import Eye from '../public/static/images/eye-fill.svg'
+import EyeSlash from '../public/static/images/eye-slash-fill.svg'
 
 type Props = {
   labelName: string
   rules?: boolean
   showBtn?: boolean
   strength?: boolean
+  forgotPassword?: boolean
   name: string
   isFormSubmitted: boolean
   error?: FieldError
@@ -24,6 +28,7 @@ const PasswordInput = ({
   rules,
   showBtn,
   strength,
+  forgotPassword,
   name,
   isFormSubmitted,
   error,
@@ -74,7 +79,11 @@ const PasswordInput = ({
             type="button"
             onClick={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? 'hide' : 'show'}
+            {showPassword ? (
+              <Eye width="20" height="20" aria-label="Hide password" />
+            ) : (
+              <EyeSlash width="20" height="20" aria-label="Show password" />
+            )}
           </button>
         )}
         <input
@@ -100,6 +109,13 @@ const PasswordInput = ({
           </div>
         )}
       </div>
+      {forgotPassword && (
+        <Link href="/auth/forgot-password">
+          <a className="form-text d-block text-decoration-none text-dark text-end">
+            Forgot password?
+          </a>
+        </Link>
+      )}
     </div>
   )
 }

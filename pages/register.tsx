@@ -33,11 +33,7 @@ const Register = () => {
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
     try {
-      await axios.post('http://localhost:3000/api/users', {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      })
+      await axios.post('http://localhost:3000/api/users', data)
       const res = await signIn<'credentials'>('credentials', {
         email: data.email,
         password: data.password,
@@ -49,16 +45,16 @@ const Register = () => {
       }
       router.push('/profile')
     } catch (e) {
-      const err = e as AxiosError
-      if (!err.response) return
-      if (err.response.status === 422) {
+      const res = (e as AxiosError).response
+      if (!res) return
+      if (res.status === 422) {
         setError(
-          err.response.data.name,
-          { message: err.response.data.message },
+          res.data.name,
+          { message: res.data.message },
           { shouldFocus: true }
         )
       } else {
-        setServerError(err.response.data.message)
+        setServerError(res.data.message)
       }
     }
   }

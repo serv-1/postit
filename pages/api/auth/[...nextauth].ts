@@ -2,9 +2,21 @@ import axios, { AxiosError } from 'axios'
 import NextAuth, { User as U } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
+import EmailProvider from 'next-auth/providers/email'
+import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
+import clientPromise from '../../../lib/mongodb'
 import User from '../../../models/User'
 import dbConnect from '../../../utils/dbConnect'
-import { GOOGLE_ID, GOOGLE_SECRET, SECRET } from '../../../utils/env'
+import {
+  EMAIL_FROM,
+  EMAIL_HOST,
+  EMAIL_PASS,
+  EMAIL_PORT,
+  EMAIL_USER,
+  GOOGLE_ID,
+  GOOGLE_SECRET,
+  SECRET,
+} from '../../../utils/env'
 import { INTERNAL_SERVER_ERROR } from '../../../utils/errors'
 
 export default NextAuth({
@@ -34,16 +46,27 @@ export default NextAuth({
       clientId: GOOGLE_ID,
       clientSecret: GOOGLE_SECRET,
     }),
+    EmailProvider({
+      server: {
+        host: EMAIL_HOST,
+        port: EMAIL_PORT,
+        auth: {
+          user: EMAIL_USER,
+          pass: EMAIL_PASS,
+        },
+      },
+      from: EMAIL_FROM,
+      maxAge: 3600,
+    }),
   ],
   pages: {
-    signIn: '/auth/signIn',
-    signOut: '/auth/signout',
-    error: '/auth/error',
+    signIn: '/auth/sign-in',
+    verifyRequest: '/auth/email-sent',
   },
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
-        token.user = user
+        token.user = { name: user.name, email: user.email }
 
         if (account.provider === 'google') {
           await dbConnect()
@@ -66,4 +89,8 @@ export default NextAuth({
     },
   },
   secret: SECRET,
+  session: {
+    strategy: 'jwt',
+  },
+  adapter: MongoDBAdapter(clientPromise),
 })

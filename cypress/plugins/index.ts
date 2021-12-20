@@ -1,6 +1,8 @@
+import { connect, connection as conn } from 'mongoose'
 import User from '../../models/User'
-import dbConnect from '../../utils/dbConnect'
 const { GoogleSocialLogin } = require('cypress-social-logins').plugins
+require('dotenv').config()
+import { MONGODB_URI } from '../../utils/env'
 
 type User = {
   name: string
@@ -11,7 +13,7 @@ type User = {
 const pluginConfig: Cypress.PluginConfig = (on, config) => {
   on('task', {
     async 'db:reset'() {
-      const conn = await dbConnect()
+      await connect(MONGODB_URI)
       const colls = await conn.db.collections()
 
       for (const coll of colls) {
@@ -21,7 +23,7 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
       return null
     },
     async addUserToDb(user: User) {
-      await dbConnect()
+      await connect(MONGODB_URI)
       const u = new User(user)
       await u.save()
       return null

@@ -13,6 +13,16 @@ import {
   NAME_REQUIRED,
 } from './errors'
 
+export const emailRules = Joi.string()
+  .required()
+  .email({ tlds: { allow: false } })
+  .messages({
+    'string.base': EMAIL_INVALID,
+    'string.empty': EMAIL_REQUIRED,
+    'string.email': EMAIL_INVALID,
+    'any.required': EMAIL_REQUIRED,
+  })
+
 export const registerSchema = Joi.object({
   name: Joi.string().required().max(90).messages({
     'string.base': NAME_INVALID,
@@ -20,15 +30,7 @@ export const registerSchema = Joi.object({
     'any.required': NAME_REQUIRED,
     'string.max': NAME_MAX,
   }),
-  email: Joi.string()
-    .email({ tlds: { allow: false } })
-    .required()
-    .messages({
-      'string.base': EMAIL_INVALID,
-      'string.empty': EMAIL_REQUIRED,
-      'string.email': EMAIL_INVALID,
-      'any.required': EMAIL_REQUIRED,
-    }),
+  email: emailRules,
   password: Joi.string()
     .invalid(Joi.ref('email'), Joi.ref('name'))
     .min(10)
@@ -50,20 +52,21 @@ export const registerSchema = Joi.object({
   })
 
 export const signInSchema = Joi.object({
-  email: Joi.string()
-    .required()
-    .email({ tlds: { allow: false } })
-    .messages({
-      'string.base': EMAIL_INVALID,
-      'string.empty': EMAIL_REQUIRED,
-      'string.email': EMAIL_INVALID,
-      'any.required': EMAIL_REQUIRED,
-    }),
+  email: emailRules,
   password: Joi.string().required().messages({
     'string.base': PASSWORD_INVALID,
     'string.empty': PASSWORD_REQUIRED,
     'any.required': PASSWORD_REQUIRED,
   }),
+})
+  .required()
+  .messages({
+    'object.base': DATA_INVALID,
+    'object.required': DATA_INVALID,
+  })
+
+export const emailSchema = Joi.object({
+  email: emailRules,
 })
   .required()
   .messages({

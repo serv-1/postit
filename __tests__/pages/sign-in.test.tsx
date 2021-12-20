@@ -1,4 +1,4 @@
-import SignIn from '../../pages/auth/signIn'
+import SignIn from '../../pages/auth/sign-in'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
@@ -14,15 +14,29 @@ const email = 'example@test.com'
 const password = '0123456789'
 
 type MockProvider = Record<
-  LiteralUnion<'mockProvider', string>,
+  LiteralUnion<'google' | 'email', string>,
   ClientSafeProvider
 > | null
-const providers: MockProvider = {
-  mockProvider: {
-    id: 'mockProvider',
-    callbackUrl: 'http://localhost:3000/api/auth/callback/mockProvider',
-    name: 'MockProvider',
-    signinUrl: 'http://localhost:3000/api/auth/signin/mockProvider',
+const mockProviders: MockProvider = {
+  google: {
+    id: 'google',
+    callbackUrl: 'http://localhost:3000/api/auth/callback/google',
+    name: 'Google',
+    signinUrl: 'http://localhost:3000/api/auth/signin/google',
+    type: 'oauth',
+  },
+  email: {
+    id: 'email',
+    callbackUrl: 'http://localhost:3000/api/auth/callback/email',
+    name: 'Email',
+    signinUrl: 'http://localhost:3000/api/auth/signin/email',
+    type: 'oauth',
+  },
+  credentials: {
+    id: 'credentials',
+    callbackUrl: 'http://localhost:3000/api/auth/callback/credentials',
+    name: 'Credentials',
+    signinUrl: 'http://localhost:3000/api/auth/signin/credentials',
     type: 'oauth',
   },
 }
@@ -127,9 +141,9 @@ describe('Sign in', () => {
 
   describe('Providers buttons', () => {
     it('should be rendered if providers is not null', () => {
-      factory(providers)
-      const btn = screen.getByRole('button', { name: /sign in with/i })
-      expect(btn).toBeInTheDocument()
+      factory(mockProviders)
+      const btn = screen.getAllByRole('button', { name: /sign in with/i })
+      expect(btn).not.toHaveLength(0)
     })
 
     it('should not be rendered if providers is null', () => {
@@ -139,20 +153,32 @@ describe('Sign in', () => {
     })
 
     it('should display the provider name', () => {
-      factory(providers)
-      const btn = screen.getByRole('button', { name: /sign in with/i })
-      expect(btn).toHaveTextContent(/MockProvider/i)
+      factory(mockProviders)
+      const btn = screen.getByRole('button', { name: /google/i })
+      expect(btn).toBeInTheDocument()
     })
 
     it('should call signIn with the provider id and the callback url', async () => {
-      factory(providers)
-      userEvent.click(screen.getByRole('button', { name: /mockprovider/i }))
+      factory(mockProviders)
+      userEvent.click(screen.getByRole('button', { name: /google/i }))
       await waitFor(() => {
-        expect(signIn).toHaveBeenCalledWith('mockProvider', {
+        expect(signIn).toHaveBeenCalledWith('google', {
           callbackUrl: 'http://localhost:3000/profile',
         })
         expect(signIn).toHaveBeenCalledTimes(1)
       })
+    })
+
+    it('should not render the credentials provider', () => {
+      factory(mockProviders)
+      const btn = screen.queryByRole('button', { name: /credentials/i })
+      expect(btn).not.toBeInTheDocument()
+    })
+
+    it('should not render the email provider', () => {
+      factory(mockProviders)
+      const btn = screen.queryByRole('button', { name: /email/i })
+      expect(btn).not.toBeInTheDocument()
     })
   })
 })

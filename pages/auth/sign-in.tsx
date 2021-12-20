@@ -56,8 +56,7 @@ const SignIn = ({ csrfToken, providers }: Props) => {
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
     const res = await signIn<'credentials'>('credentials', {
-      email: data.email,
-      password: data.password,
+      ...data,
       redirect: false,
     })
     if (res && res.error) {
@@ -79,9 +78,9 @@ const SignIn = ({ csrfToken, providers }: Props) => {
       <Head>
         <title>Filanad - Sign in</title>
       </Head>
-      <main data-cy="signin">
+      <main data-cy="sign-in">
         <section className="w-25 m-auto shadow rounded">
-          <h2 className="bg-primary text-light rounded-top p-2 m-0">Sign in</h2>
+          <h1 className="bg-primary text-light rounded-top p-2 m-0">Sign in</h1>
           {serverError && (
             <div
               className="fw-bold p-2 pb-0 text-danger"
@@ -94,7 +93,7 @@ const SignIn = ({ csrfToken, providers }: Props) => {
           <form
             name="login"
             id="login"
-            method="get"
+            method="post"
             action=""
             encType="application/json"
             noValidate
@@ -121,6 +120,7 @@ const SignIn = ({ csrfToken, providers }: Props) => {
               labelName="Password"
               error={errors.password}
               isFormSubmitted={isSubmitted}
+              forgotPassword
             />
             <div className="d-flex justify-content-between align-items-end">
               <Link href="/register">
@@ -137,7 +137,8 @@ const SignIn = ({ csrfToken, providers }: Props) => {
         {providers &&
           Object.values(providers).map(
             (provider) =>
-              provider.id === 'credentials' || (
+              provider.id === 'credentials' ||
+              provider.id === 'email' || (
                 <button
                   key={provider.id}
                   className="btn btn-primary d-block m-auto w-25 mt-4"
