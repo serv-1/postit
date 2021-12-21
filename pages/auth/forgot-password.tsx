@@ -10,9 +10,7 @@ import TextInput from '../../components/TextInput'
 import { emailSchema } from '../../utils/joiSchemas'
 import Send from '../../public/static/images/send.svg'
 
-type FormInput = {
-  email: string
-}
+type FormFields = { email: string }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
@@ -30,9 +28,9 @@ const ForgotPassword = ({ csrfToken }: { csrfToken?: string }) => {
     formState: { errors, isSubmitted },
     setFocus,
     setError,
-  } = useForm<FormInput>({ resolver: joiResolver(emailSchema) })
+  } = useForm<FormFields>({ resolver: joiResolver(emailSchema) })
 
-  const onSubmit: SubmitHandler<FormInput> = async (data) => {
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/verifyEmail', data)
       await signIn('email', {

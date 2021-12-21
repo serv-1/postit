@@ -10,28 +10,27 @@ import { useState } from 'react'
 import { registerSchema } from '../utils/joiSchemas'
 import { signIn } from 'next-auth/react'
 
-type FormInput = {
+type FormFields = {
   name: string
   email: string
   password: string
 }
-
-type ServerError = {
-  message: string
-}
+type ServerError = { message: string }
 
 const Register = () => {
   const [serverError, setServerError] = useState<ServerError>()
+  const [nameValue, setNameValue] = useState<string>()
+  const [emailValue, setEmailValue] = useState<string>()
   const {
     register,
     formState: { errors, isSubmitted },
     handleSubmit,
     setError,
     setFocus,
-  } = useForm<FormInput>({ resolver: joiResolver(registerSchema) })
+  } = useForm<FormFields>({ resolver: joiResolver(registerSchema) })
   const router = useRouter()
 
-  const onSubmit: SubmitHandler<FormInput> = async (data) => {
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/users', data)
       const res = await signIn<'credentials'>('credentials', {
@@ -58,6 +57,11 @@ const Register = () => {
       }
     }
   }
+
+  const userInputs: string[] = []
+
+  if (nameValue) userInputs.push(nameValue)
+  if (emailValue) userInputs.push(emailValue)
 
   return (
     <>
@@ -88,6 +92,7 @@ const Register = () => {
             error={errors.name}
             register={register}
             setFocus={setFocus}
+            setValue={setNameValue}
           />
           <TextInput
             labelName="Email"
@@ -96,6 +101,7 @@ const Register = () => {
             isFormSubmitted={isSubmitted}
             error={errors.email}
             register={register}
+            setValue={setEmailValue}
           />
           <PasswordInput
             labelName="Password"
@@ -106,6 +112,7 @@ const Register = () => {
             isFormSubmitted={isSubmitted}
             error={errors.password}
             register={register}
+            userInputs={userInputs}
           />
           <input type="submit" value="Register" className="btn btn-primary" />
         </form>

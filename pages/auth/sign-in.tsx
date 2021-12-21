@@ -18,8 +18,7 @@ import PasswordInput from '../../components/PasswordInput'
 import Link from 'next/link'
 import { BuiltInProviderType } from 'next-auth/providers'
 
-type FormInput = {
-  csrfToken: string
+type FormFields = {
   email: string
   password: string
 }
@@ -49,12 +48,12 @@ const SignIn = ({ csrfToken, providers }: Props) => {
     formState: { errors, isSubmitted },
     setFocus,
     setError,
-  } = useForm<FormInput>({
+  } = useForm<FormFields>({
     resolver: joiResolver(signInSchema),
   })
   const router = useRouter()
 
-  const onSubmit: SubmitHandler<FormInput> = async (data) => {
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
     const res = await signIn<'credentials'>('credentials', {
       ...data,
       redirect: false,

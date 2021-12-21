@@ -1,8 +1,10 @@
 import PasswordInput from '../../components/PasswordInput'
 import { render, screen } from '@testing-library/react'
-import { FieldError, UseFormRegister, UseFormSetFocus } from 'react-hook-form'
+import { FieldError, useForm, UseFormSetFocus } from 'react-hook-form'
 import userEvent from '@testing-library/user-event'
+import { PASSWORD_REQUIRED } from '../../utils/errors'
 
+type FormFields = { password: string }
 type Props = {
   rules?: boolean
   showBtn?: boolean
@@ -10,22 +12,14 @@ type Props = {
   forgotPassword?: boolean
   isFormSubmitted?: boolean
   error?: FieldError
-  setFocus?: UseFormSetFocus<any>
+  setFocus?: UseFormSetFocus<FormFields>
 }
 
+const setFocus = jest.fn()
+const strongPassword = 'aeronautic flyby'
 const labelName = 'Password'
 const name = 'password'
-const error = {
-  type: 'required',
-  message: 'The password is required.',
-}
-const register: UseFormRegister<any> = (name: string) => ({
-  onChange: jest.fn(),
-  onBlur: jest.fn(),
-  ref: jest.fn(),
-  name,
-})
-const setFocus = jest.fn()
+const error = { type: 'required', message: PASSWORD_REQUIRED }
 
 const factory = ({
   rules = false,
@@ -36,20 +30,25 @@ const factory = ({
   error,
   setFocus,
 }: Props = {}) => {
-  render(
-    <PasswordInput
-      labelName={labelName}
-      rules={rules}
-      showBtn={showBtn}
-      strength={strength}
-      forgotPassword={forgotPassword}
-      name={name}
-      isFormSubmitted={isFormSubmitted}
-      error={error}
-      register={register}
-      setFocus={setFocus}
-    />
-  )
+  const Form = () => {
+    const { register } = useForm<FormFields>()
+    return (
+      <PasswordInput
+        labelName={labelName}
+        rules={rules}
+        showBtn={showBtn}
+        strength={strength}
+        forgotPassword={forgotPassword}
+        name={name}
+        isFormSubmitted={isFormSubmitted}
+        error={error}
+        register={register}
+        setFocus={setFocus}
+        userInputs={[strongPassword]}
+      />
+    )
+  }
+  render(<Form />)
 }
 
 afterEach(() => jest.resetAllMocks())
@@ -202,6 +201,12 @@ describe('PasswordInput', () => {
       factory({ strength: true })
       userEvent.type(screen.getByLabelText(labelName), 'tire bridge rainbow')
       expect(screen.getByRole('status')).toHaveClass('bg-success')
+    })
+
+    it('should take userInputs into account', () => {
+      factory({ strength: true })
+      userEvent.type(screen.getByLabelText(labelName), strongPassword)
+      expect(screen.getByRole('status')).toHaveClass('bg-danger')
     })
   })
 

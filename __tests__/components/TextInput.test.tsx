@@ -1,46 +1,48 @@
 import { render, screen } from '@testing-library/react'
-import { FieldError, UseFormRegister, UseFormSetFocus } from 'react-hook-form'
+import userEvent from '@testing-library/user-event'
+import { Dispatch, SetStateAction } from 'react'
+import { useForm } from 'react-hook-form'
+import { FieldError, UseFormSetFocus } from 'react-hook-form'
 import TextInput from '../../components/TextInput'
 
+type FormFields = { test: string }
 type Props = {
   email?: boolean
   isFormSubmitted?: boolean
   error?: FieldError
-  setFocus?: UseFormSetFocus<any>
+  setFocus?: UseFormSetFocus<FormFields>
+  setValue?: Dispatch<SetStateAction<string | undefined>>
 }
-
-const labelName = 'Test'
-const name = 'test'
-const error = {
-  type: 'required',
-  message: 'This field is required.',
-}
-const register: UseFormRegister<any> = (name: string) => ({
-  onChange: jest.fn(),
-  onBlur: jest.fn(),
-  ref: jest.fn(),
-  name,
-})
 
 const setFocus = jest.fn()
+const setValue = jest.fn()
+const labelName = 'Test'
+const name = 'test'
+const error = { type: 'required', message: 'This field is required.' }
 
 const factory = ({
   email = false,
   isFormSubmitted = false,
   error,
   setFocus,
+  setValue,
 }: Props = {}) => {
-  render(
-    <TextInput
-      labelName={labelName}
-      email={email}
-      name={name}
-      isFormSubmitted={isFormSubmitted}
-      error={error}
-      register={register}
-      setFocus={setFocus}
-    />
-  )
+  const Form = () => {
+    const { register } = useForm<FormFields>()
+    return (
+      <TextInput
+        labelName={labelName}
+        email={email}
+        name={name}
+        isFormSubmitted={isFormSubmitted}
+        error={error}
+        register={register}
+        setFocus={setFocus}
+        setValue={setValue}
+      />
+    )
+  }
+  render(<Form />)
 }
 
 afterEach(() => jest.resetAllMocks())
@@ -99,6 +101,19 @@ describe('TextInput', () => {
     it('should have is-invalid class when the form is submitted and there is an error', () => {
       factory({ isFormSubmitted: true, error })
       expect(screen.getByRole('textbox')).toHaveClass('is-invalid')
+    })
+
+    it('should call setValue on change', async () => {
+      factory({ setValue })
+      userEvent.type(screen.getByRole('textbox'), 'a')
+      expect(setValue).toHaveBeenCalledWith('a')
+      expect(setValue).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not call setValue on change if it is undefined', () => {
+      factory()
+      userEvent.type(screen.getByRole('textbox'), 'a')
+      expect(setValue).not.toHaveBeenCalled()
     })
   })
 

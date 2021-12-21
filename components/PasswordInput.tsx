@@ -1,29 +1,35 @@
 import { ChangeEvent, useEffect, useState } from 'react'
-import { FieldError, UseFormRegister, UseFormSetFocus } from 'react-hook-form'
-const zxcvbn = require('zxcvbn')
+import {
+  FieldPath,
+  FieldError,
+  UseFormRegister,
+  UseFormSetFocus,
+} from 'react-hook-form'
+import zxcvbn from 'zxcvbn'
 import Link from 'next/link'
 import Eye from '../public/static/images/eye-fill.svg'
 import EyeSlash from '../public/static/images/eye-slash-fill.svg'
 
-type Props = {
+type Props<TFieldValues> = {
   labelName: string
   rules?: boolean
   showBtn?: boolean
   strength?: boolean
   forgotPassword?: boolean
-  name: string
+  name: FieldPath<TFieldValues>
   isFormSubmitted: boolean
   error?: FieldError
-  register: UseFormRegister<any>
-  setFocus?: UseFormSetFocus<any>
+  register: UseFormRegister<TFieldValues>
+  setFocus?: UseFormSetFocus<TFieldValues>
+  userInputs?: string[]
 }
 
 type PasswordStrength = {
-  estimated_time: string
+  estimated_time: string | number
   color: string
 }
 
-const PasswordInput = ({
+const PasswordInput = <TFieldValues,>({
   labelName,
   rules,
   showBtn,
@@ -34,7 +40,8 @@ const PasswordInput = ({
   error,
   register,
   setFocus,
-}: Props) => {
+  userInputs,
+}: Props<TFieldValues>) => {
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>()
 
@@ -44,7 +51,7 @@ const PasswordInput = ({
   }, [setFocus, name])
 
   const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { crack_times_display, score } = zxcvbn(e.target.value)
+    const { crack_times_display, score } = zxcvbn(e.target.value, userInputs)
     let c = 'success'
     if (score <= 2) c = 'danger'
     else if (score === 3) c = 'warning'
@@ -66,9 +73,9 @@ const PasswordInput = ({
       </label>
       {rules && (
         <div className="form-text m-0" id={pwRulesId} role="note">
-          Your password must be 10-20 characters long. It must not equal the
-          email. There is no characters restriction so you can use emojis,
-          cyrillic, etc. 😎
+          It must be 10-20 characters long. It must not equal the others
+          fields&apos; value. There is no characters restriction so you can use
+          emojis, cyrillic, etc.
         </div>
       )}
       <div className="input-group">

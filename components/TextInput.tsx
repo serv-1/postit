@@ -1,17 +1,23 @@
-import { useEffect } from 'react'
-import { FieldError, UseFormRegister, UseFormSetFocus } from 'react-hook-form'
+import { ChangeEvent, Dispatch, SetStateAction, useEffect } from 'react'
+import {
+  FieldPath,
+  FieldError,
+  UseFormRegister,
+  UseFormSetFocus,
+} from 'react-hook-form'
 
-type Props = {
+type Props<TFieldValues> = {
   labelName: string
   email?: boolean
-  name: string
+  name: FieldPath<TFieldValues>
   isFormSubmitted: boolean
   error?: FieldError
-  register: UseFormRegister<any>
-  setFocus?: UseFormSetFocus<any>
+  register: UseFormRegister<TFieldValues>
+  setFocus?: UseFormSetFocus<TFieldValues>
+  setValue?: Dispatch<SetStateAction<string | undefined>>
 }
 
-const TextInput = ({
+const TextInput = <TFieldValues,>({
   labelName,
   email,
   name,
@@ -19,7 +25,8 @@ const TextInput = ({
   error,
   register,
   setFocus,
-}: Props) => {
+  setValue,
+}: Props<TFieldValues>) => {
   const type = email ? 'email' : 'text'
   const inputClass = isFormSubmitted && (error ? ' is-invalid' : ' is-valid')
   const feedbackName = name + 'Feedback'
@@ -35,7 +42,13 @@ const TextInput = ({
         {labelName}
       </label>
       <input
-        {...register(name)}
+        {...register(
+          name,
+          setValue && {
+            onChange: (e: ChangeEvent<HTMLInputElement>) =>
+              setValue(e.target.value),
+          }
+        )}
         type={type}
         id={name}
         className={`form-control${inputClass || ''}`}
