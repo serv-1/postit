@@ -7,8 +7,7 @@ import {
   LiteralUnion,
   ClientSafeProvider,
 } from 'next-auth/react'
-// commonJS needed https://github.com/react-hook-form/resolvers/issues/271
-const { joiResolver } = require('@hookform/resolvers/joi')
+import { joiResolver } from '@hookform/resolvers/joi'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { useRouter } from 'next/router'

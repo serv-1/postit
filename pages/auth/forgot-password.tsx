@@ -4,8 +4,7 @@ import { getCsrfToken, signIn } from 'next-auth/react'
 import Head from 'next/head'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-// commonJS needed https://github.com/react-hook-form/resolvers/issues/271
-const { joiResolver } = require('@hookform/resolvers/joi')
+import { joiResolver } from '@hookform/resolvers/joi'
 import TextInput from '../../components/TextInput'
 import { emailSchema } from '../../utils/joiSchemas'
 import Send from '../../public/static/images/send.svg'

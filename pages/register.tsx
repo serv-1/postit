@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
-// commonJS needed https://github.com/react-hook-form/resolvers/issues/271
-const { joiResolver } = require('@hookform/resolvers/joi')
+import { joiResolver } from '@hookform/resolvers/joi'
 import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
 import TextInput from '../components/TextInput'
