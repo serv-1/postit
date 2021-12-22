@@ -49,7 +49,7 @@ export default NextAuth({
     EmailProvider({
       server: {
         host: EMAIL_HOST,
-        port: EMAIL_PORT,
+        port: Number(EMAIL_PORT),
         auth: {
           user: EMAIL_USER,
           pass: EMAIL_PASS,
@@ -70,13 +70,10 @@ export default NextAuth({
 
         if (account.provider === 'google') {
           await dbConnect()
-
-          const isRegistered = await User.findOne({ email: user.email }).exec()
-
-          if (!isRegistered) {
-            const u = new User(user)
-            await u.save()
-          }
+          await User.updateOne(
+            { email: user.email },
+            { emailVerified: new Date() }
+          )
         }
       }
       return token

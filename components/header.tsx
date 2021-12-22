@@ -24,21 +24,16 @@ const Header = () => {
             Sign out
           </a>
         ) : (
-          <>
-            <a
-              href={'/api/auth/signin'}
-              className="btn text-decoration-none text-dark fs-5"
-              onClick={(e) => {
-                e.preventDefault()
-                signIn()
-              }}
-            >
-              Sign in
-            </a>
-            <Link href="/register">
-              <a className="ms-3 btn btn-primary border-3 fs-5">Register</a>
-            </Link>
-          </>
+          <a
+            href={'/api/auth/signin'}
+            className="btn btn-primary text-decoration-none fs-5"
+            onClick={(e) => {
+              e.preventDefault()
+              signIn()
+            }}
+          >
+            Sign in
+          </a>
         )}
       </nav>
     </header>

@@ -12,6 +12,7 @@ import {
   PASSWORD_REQUIRED,
   NAME_MAX,
   NAME_REQUIRED,
+  METHOD_NOT_ALLOWED,
 } from '../../utils/errors'
 import { rest } from 'msw'
 
@@ -19,7 +20,10 @@ const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const router = { push: jest.fn() }
 
-beforeEach(() => useRouter.mockReturnValue(router))
+beforeEach(() => {
+  signIn.mockResolvedValue({ error: '', ok: true, status: 200, url: null })
+  useRouter.mockReturnValue(router)
+})
 
 const email = 'example@test.com'
 const password = 'password123456'
@@ -28,49 +32,47 @@ const name = 'Bobby Tables'
 describe('Register form', () => {
   beforeEach(() => render(<Register />))
 
-  it('should log in the user and redirect to the profile page after a successful submission', async () => {
+  it('should sign in the user and redirect to the profile page after a successful submission', async () => {
     server.use(
       rest.post('http://localhost:3000/api/users', (req, res, ctx) => {
         return res(ctx.status(200))
       })
     )
-    userEvent.type(screen.getByLabelText(/name/i), name)
-    userEvent.type(screen.getByLabelText(/email/i), email)
-    userEvent.type(screen.getByLabelText(/^password/i), password)
-    userEvent.click(screen.getByRole('button', { name: 'Register' }))
+    validSubmission()
     await waitFor(() => {
       expect(router.push).toHaveBeenCalledWith('/profile')
       expect(router.push).toHaveBeenCalledTimes(1)
     })
   })
 
-  it('should redirect to the home page after a successful submission if something bad happen with the user log in', async () => {
+  it('should redirect to the sign in page if an error occured while trying to sign in the user', async () => {
     server.use(
       rest.post('http://localhost:3000/api/users', (req, res, ctx) => {
         return res(ctx.status(200))
       })
     )
-    signIn.mockResolvedValue({
-      error: 'Error',
-      ok: false,
-      status: 500,
-      url: null,
-    })
-    userEvent.type(screen.getByLabelText(/name/i), name)
-    userEvent.type(screen.getByLabelText(/email/i), email)
-    userEvent.type(screen.getByLabelText(/^password/i), password)
-    userEvent.click(screen.getByRole('button', { name: 'Register' }))
+    signIn.mockResolvedValue({ error: 'err', ok: true, status: 200, url: null })
+    validSubmission()
     await waitFor(() => {
-      expect(router.push).toHaveBeenCalledWith('/')
+      expect(router.push).toHaveBeenCalledWith('/auth/sign-in')
       expect(router.push).toHaveBeenCalledTimes(1)
     })
   })
 
-  it('should render server-side error and focus the field that goes with', async () => {
-    userEvent.type(screen.getByLabelText(/name/i), name)
-    userEvent.type(screen.getByLabelText(/email/i), email)
-    userEvent.type(screen.getByLabelText(/^password/i), password)
-    userEvent.click(screen.getByRole('button', { name: 'Register' }))
+  it('should render server-side error not related to the fields', async () => {
+    server.use(
+      rest.post('http://localhost:3000/api/users', (req, res, ctx) => {
+        return res(ctx.status(405), ctx.json({ message: METHOD_NOT_ALLOWED }))
+      })
+    )
+    validSubmission()
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      METHOD_NOT_ALLOWED
+    )
+  })
+
+  it('should render server-side validation error and focus the field that goes with', async () => {
+    validSubmission()
     expect(await screen.findByText(EMAIL_USED)).toBeInTheDocument()
     expect(screen.getByLabelText(/email/i)).toHaveFocus()
   })
@@ -156,3 +158,10 @@ describe('Register form', () => {
     })
   })
 })
+
+function validSubmission() {
+  userEvent.type(screen.getByLabelText(/name/i), name)
+  userEvent.type(screen.getByLabelText(/email/i), email)
+  userEvent.type(screen.getByLabelText(/^password/i), password)
+  userEvent.click(screen.getByRole('button', { name: 'Register' }))
+}

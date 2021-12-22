@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import { useRouter } from 'next/router'
 import TextInput from '../components/TextInput'
 import PasswordInput from '../components/PasswordInput'
@@ -14,10 +14,9 @@ type FormFields = {
   email: string
   password: string
 }
-type ServerError = { message: string }
 
 const Register = () => {
-  const [serverError, setServerError] = useState<ServerError>()
+  const [serverError, setServerError] = useState<string>()
   const [nameValue, setNameValue] = useState<string>()
   const [emailValue, setEmailValue] = useState<string>()
   const {
@@ -32,19 +31,20 @@ const Register = () => {
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/users', data)
+      await signIn('email', {
+        email: data.email,
+        callbackUrl: 'http://localhost:3000/profile',
+        redirect: false,
+      })
       const res = await signIn<'credentials'>('credentials', {
         email: data.email,
         password: data.password,
         redirect: false,
       })
-      if (res && res.error) {
-        router.push('/')
-        return
-      }
+      if (res && res.error) return router.push('/auth/sign-in')
       router.push('/profile')
     } catch (e) {
-      const res = (e as AxiosError).response
-      if (!res) return
+      const res = (e as AxiosError).response as AxiosResponse
       if (res.status === 422) {
         setError(
           res.data.name,
@@ -75,8 +75,8 @@ const Register = () => {
           </div>
         )}
         <form
-          name="signup"
-          id="signup"
+          name="register"
+          id="register"
           className="p-2 text-end"
           method="post"
           action=""

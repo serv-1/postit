@@ -33,6 +33,7 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/node": "16.11.7",
+    "@types/nodemailer": "^6.4.4",
     "@types/react": "17.0.34",
     "@types/zxcvbn": "^4.4.1",
     "babel-jest": "^27.3.1",

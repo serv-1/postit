@@ -16,72 +16,74 @@ describe('User sign in and register', () => {
     cy.request('PATCH', cleanInboxUrl)
   })
 
-  it('should redirect unauthenticated user to the sign in page', () => {
+  it('Unauthenticated user should be redirected to the sign in page', () => {
     cy.visit('/profile')
     cy.contains(/loading/i).should('exist')
     cy.location('pathname').should('equal', '/auth/sign-in')
   })
 
-  context('Register, sign in and sign out', () => {
-    it('with Google', () => {
-      cy.task('GoogleSocialLogin', {
-        username,
-        password,
-        loginUrl: 'http://localhost:3000/auth/sign-in',
-        loginSelector: 'button',
-        postLoginSelector: '[data-cy="profile"]',
-      }).then(({ cookies }: any) => {
-        const cookie = cookies.filter(
-          (cookie: any) => cookie.name === cookieName
-        )[0]
-        if (cookie) {
-          cy.setCookie(cookieName, cookie.value, {
-            domain: cookie.domain,
-            expiry: cookie.expiry,
-            httpOnly: cookie.httpOnly,
-            path: cookie.path,
-            secure: cookie.secure,
-          })
-        }
-      })
-
-      cy.visit('/profile')
-      cy.contains(username).should('exist')
-
-      cy.contains('Sign out').click()
-
-      cy.get('[data-cy="sign-in"]').should('exist')
-      cy.contains('Sign out').should('not.exist')
+  it('Sign in with Google and sign out', () => {
+    cy.task('GoogleSocialLogin', {
+      username,
+      password,
+      loginUrl: 'http://localhost:3000/auth/sign-in',
+      loginSelector: 'button',
+      postLoginSelector: '[data-cy="profile"]',
+    }).then(({ cookies }: any) => {
+      const cookie = cookies.filter(
+        (cookie: any) => cookie.name === cookieName
+      )[0]
+      if (cookie) {
+        cy.setCookie(cookieName, cookie.value, {
+          domain: cookie.domain,
+          expiry: cookie.expiry,
+          httpOnly: cookie.httpOnly,
+          path: cookie.path,
+          secure: cookie.secure,
+        })
+      }
     })
 
-    it('with credentials', function () {
-      register(this.user)
+    cy.visit('/profile')
+    cy.contains(username).should('exist')
 
-      cy.visit('/auth/sign-in')
+    cy.contains('Sign out').click()
 
-      cy.get('#email').type(this.user.email)
-      cy.get('#password').type(this.user.password)
-      cy.get('input[type="submit"]').click()
+    cy.location('pathname').should('equal', '/auth/sign-in')
+    cy.contains('Sign out').should('not.exist')
+  })
 
-      cy.contains(this.user.email).should('exist')
+  it('Register, send a verification mail with credentials and sign out', function () {
+    cy.visit('/register')
 
-      cy.contains('Sign out').click()
+    cy.get('#name').type(this.user.name)
+    cy.get('#email').type(this.user.email)
+    cy.get('#password').type(this.user.password)
+    cy.get('input[type="submit"]').click()
 
-      cy.get('[data-cy="sign-in"]').should('exist')
-      cy.contains('Sign out').should('not.exist')
+    cy.location('pathname').should('equal', '/profile')
+    cy.contains(this.user.email).should('exist')
+
+    cy.contains('Sign out').click()
+
+    cy.location('pathname').should('equal', '/auth/sign-in')
+    cy.contains('Sign out').should('not.exist')
+
+    // verify that a mail has been sent
+    cy.request(getInboxMsgUrl).then((res) => {
+      expect(res.body).to.have.length(1)
     })
   })
 
-  specify('Forgot password', function () {
+  it('Forgot password', function () {
     register(this.user)
 
     cy.visit('/auth/forgot-password')
 
     cy.get('#email').type(this.user.email)
-    cy.get('input[type="submit"]').click()
+    cy.get('button[type="submit"]').click()
 
     cy.location('pathname').should('equal', '/auth/email-sent')
-    cy.get('[data-cy="email-sent"]').should('exist')
 
     cy.request(getInboxMsgUrl).then((res) => {
       cy.request(
@@ -91,6 +93,7 @@ describe('User sign in and register', () => {
       })
     })
 
+    // remove target html attribute to stay on the actual tab
     cy.get('a').invoke('removeAttr', 'target')
     cy.get('a').click()
 

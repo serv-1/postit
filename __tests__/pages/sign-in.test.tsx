@@ -58,30 +58,24 @@ describe('Sign in', () => {
   describe('Form', () => {
     it('should redirect to the profile page after a successful submission', async () => {
       factory()
-      userEvent.type(screen.getByLabelText(/email/i), email)
-      userEvent.type(screen.getByLabelText(/^password/i), password)
-      userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+      validSubmission()
       await waitFor(() => {
         expect(router.push).toHaveBeenCalledWith('/profile')
         expect(router.push).toHaveBeenCalledTimes(1)
       })
     })
 
-    it('should render server-side error', async () => {
+    it('should render server-side error not related to the fields', async () => {
       signIn.mockResolvedValue({ error: INTERNAL_SERVER_ERROR })
       factory()
-      userEvent.type(screen.getByLabelText(/email/i), email)
-      userEvent.type(screen.getByLabelText(/^password/i), password)
-      userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+      validSubmission()
       expect(await screen.findByText(INTERNAL_SERVER_ERROR)).toBeInTheDocument()
     })
 
     it('should render server-side validation error and focus the field that goes with', async () => {
       signIn.mockResolvedValue({ error: EMAIL_UNKNOWN })
       factory()
-      userEvent.type(screen.getByLabelText(/email/i), email)
-      userEvent.type(screen.getByLabelText(/^password/i), password)
-      userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+      validSubmission()
       expect(await screen.findByText(EMAIL_UNKNOWN)).toBeInTheDocument()
       expect(screen.getByLabelText(/email/i)).toHaveFocus()
     })
@@ -182,3 +176,9 @@ describe('Sign in', () => {
     })
   })
 })
+
+function validSubmission() {
+  userEvent.type(screen.getByLabelText(/email/i), email)
+  userEvent.type(screen.getByLabelText(/^password/i), password)
+  userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+}

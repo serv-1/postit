@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import { GetServerSideProps } from 'next'
 import { getCsrfToken, signIn } from 'next-auth/react'
 import Head from 'next/head'
@@ -37,8 +37,7 @@ const ForgotPassword = ({ csrfToken }: { csrfToken?: string }) => {
         callbackUrl: 'http://localhost:3000/profile',
       })
     } catch (e) {
-      const res = (e as AxiosError).response
-      if (!res) return
+      const res = (e as AxiosError).response as AxiosResponse
       if (res.status === 422) {
         setError('email', { message: res.data.message }, { shouldFocus: true })
         return

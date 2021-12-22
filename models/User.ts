@@ -11,7 +11,7 @@ export interface User extends Document {
   name: string
   email: string
   password?: string
-  emailVerified?: string
+  emailVerified?: Date
 }
 
 const userSchema = new Schema<User>({
@@ -30,9 +30,7 @@ const userSchema = new Schema<User>({
     min: [10, PASSWORD_MIN],
     max: [20, PASSWORD_MAX],
   },
-  emailVerified: {
-    type: Date,
-  },
+  emailVerified: Date,
 })
 
 export default (models.User as Model<User>) || model<User>('User', userSchema)

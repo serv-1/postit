@@ -17,10 +17,9 @@ const factory = (session: Session | null = mockSession) => {
 }
 
 describe('Header', () => {
-  it('should render the sign in and the register link if the user is unauthenticated', () => {
+  it('should render the sign in link if the user is unauthenticated', () => {
     factory(null)
     expect(screen.getByRole('link', { name: 'Sign in' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Register' })).toBeInTheDocument()
   })
 
   it('should render the sign out link if the user is authenticated', () => {
