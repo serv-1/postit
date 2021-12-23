@@ -70,10 +70,7 @@ export default NextAuth({
 
         if (account.provider === 'google') {
           await dbConnect()
-          await User.updateOne(
-            { email: user.email },
-            { emailVerified: new Date() }
-          )
+          await User.updateOne({ _id: user.id }, { emailVerified: new Date() })
         }
       }
       return token
