@@ -5,11 +5,11 @@ import { SignInResponse, SignOutResponse } from 'next-auth/react'
 
 export const mockSession: Session = {
   user: {
-    id: 1,
-    name: 'Jotaro Kujo',
-    email: 'jotarokujo@speedwagon.com',
+    id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
+    name: 'John Doe',
+    email: 'johndoe@test.com',
   },
-  expires: '123213139',
+  expires: '0123456789',
 }
 
 export const mockProviders = {

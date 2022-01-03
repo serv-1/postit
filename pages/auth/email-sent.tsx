@@ -7,7 +7,7 @@ const EmailSent = () => {
       <Head>
         <title>Filanad - Email sent!</title>
       </Head>
-      <main className="w-50 m-auto p-4 shadow border border-success border-2 rounded text-center">
+      <main className="w-50 m-auto my-4 p-4 shadow border border-success border-2 rounded text-center">
         <div
           className="rounded-circle d-inline-block mb-4"
           style={{ backgroundColor: '#cfe' }}

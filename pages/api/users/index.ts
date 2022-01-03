@@ -1,16 +1,16 @@
 import Joi, { ValidationError } from 'joi'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import crypto from 'crypto'
-import dbConnect from '../../utils/dbConnect'
-import User from '../../models/User'
+import dbConnect from '../../../utils/dbConnect'
+import User from '../../../models/User'
 import { NativeError } from 'mongoose'
 import { MongoServerError } from 'mongodb'
-import { registerSchema } from '../../utils/joiSchemas'
+import { registerSchema } from '../../../utils/joiSchemas'
 import {
   EMAIL_USED,
   INTERNAL_SERVER_ERROR,
   METHOD_NOT_ALLOWED,
-} from '../../utils/errors'
+} from '../../../utils/errors'
 
 export default async function handler(
   req: NextApiRequest,

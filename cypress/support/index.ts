@@ -12,9 +12,30 @@
 // You can read more here:
 // https://on.cypress.io/configuration
 // ***********************************************************
+import user from '../fixtures/user.json'
+type User = typeof user
 
 // Import commands.js using ES2015 syntax:
 import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+///<reference types="cypress" />
+
+export type ReqParams = {
+  method?: string
+  url?: string
+  body?: Record<string, unknown>
+  failOnStatusCode?: boolean
+}
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      register(user: User): void
+      signIn(email: string, password: string): void
+      req<T extends unknown>(options?: ReqParams): Chainable<Response<T>>
+    }
+  }
+}

@@ -1,5 +1,5 @@
-import { EMAIL_USED, METHOD_NOT_ALLOWED } from '../../../utils/errors'
-import { register } from '../../support/functions'
+import { EMAIL_USED, METHOD_NOT_ALLOWED } from '../../../../utils/errors'
+import { register } from '../../../support/functions'
 
 describe('/api/users', () => {
   beforeEach(() => {

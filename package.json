@@ -2,7 +2,7 @@
   "name": "filanad",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env NODE_OPTIONS='--max-http-header-size=1500000' next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -37,6 +37,7 @@
     "@types/react": "17.0.34",
     "@types/zxcvbn": "^4.4.1",
     "babel-jest": "^27.3.1",
+    "cross-env": "^7.0.3",
     "cypress": "^9.1.0",
     "cypress-social-logins": "^1.13.0",
     "eslint": "7.32.0",

@@ -1,5 +1,5 @@
 import { rest } from 'msw'
-import { EMAIL_USED } from '../utils/errors'
+import { EMAIL_USED } from '../../utils/errors'
 
 const handlers = [
   rest.post('http://localhost:3000/api/users', (req, res, ctx) => {

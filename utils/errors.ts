@@ -14,11 +14,22 @@ export const PASSWORD_REQUIRED = 'The password is required.'
 export const PASSWORD_MIN = 'The password must have 10 characters.'
 export const PASSWORD_MAX = 'The password cannot exceed 20 characters.'
 export const PASSWORD_SAME = 'The password cannot be the same as the other fields\' value.'
+/* User Image */
+export const USER_IMAGE_INVALID = 'An image is expected. (.jpeg, .jpg, .png, .gif)'
+export const USER_IMAGE_TOO_LARGE = 'The image size cannot exceed 1 megabytes.'
 /* Data */
 export const DATA_INVALID = 'The given data are invalid.'
+/* Request */
+export const PARAMS_INVALID = 'One or many parameters are invalid.'
 /* Server */
+export const DEFAULT_SERVER_ERROR = 'Something go boom! Be sure to have read the rules (if any) before sending your request again.'
 export const INTERNAL_SERVER_ERROR = 'Server go boom! Try to refresh the page or come back later.'
-export const METHOD_NOT_ALLOWED = 'Request go boom! Try to refresh the page or retry your action.'
+export const METHOD_NOT_ALLOWED = 'Request go boom! This method is not handled.'
+export const FORBIDDEN = 'You are not authorized.'
+export const NO_RESPONSE = 'The server didn\'t respond.'
+/* Resource Not Found */
+export const USER_NOT_FOUND = 'User not found.'
+export const IMAGE_NOT_FOUND = 'Image not found.'
 
 const errors = {
   EMAIL_REQUIRED,
@@ -34,9 +45,15 @@ const errors = {
   PASSWORD_MIN,
   PASSWORD_MAX,
   PASSWORD_SAME,
+	USER_IMAGE_INVALID,
+	USER_IMAGE_TOO_LARGE,
   DATA_INVALID,
+	PARAMS_INVALID,
 	INTERNAL_SERVER_ERROR,
-	METHOD_NOT_ALLOWED
+	METHOD_NOT_ALLOWED,
+	FORBIDDEN,
+	USER_NOT_FOUND,
+	IMAGE_NOT_FOUND
 }
 
 export default errors

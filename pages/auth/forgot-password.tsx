@@ -51,7 +51,7 @@ const ForgotPassword = ({ csrfToken }: { csrfToken?: string }) => {
       <Head>
         <title>Filanad - Forgot password</title>
       </Head>
-      <main className="w-25 m-auto shadow rounded">
+      <main className="w-25 my-4 m-auto shadow rounded">
         <h1 className="bg-primary text-light rounded-top p-2 m-0">
           Sign in with your email
         </h1>

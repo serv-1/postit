@@ -1,13 +1,14 @@
 import { connect, connection as conn } from 'mongoose'
-import User from '../../models/User'
+import User, { IUser } from '../../models/User'
+import user from '../fixtures/user.json'
 const { GoogleSocialLogin } = require('cypress-social-logins').plugins
 require('dotenv').config()
 import { MONGODB_URI } from '../../utils/env'
+import { randomBytes, scryptSync } from 'crypto'
 
-type User = {
-  name: string
-  email: string
-  password?: string
+export type dbSeedResult = {
+  u1Id: string
+  u2Id: string
 }
 
 const pluginConfig: Cypress.PluginConfig = (on, config) => {
@@ -22,11 +23,25 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
       return null
     },
-    async addUserToDb(user: User) {
+    async 'db:seed'(): Promise<dbSeedResult> {
       await connect(MONGODB_URI)
-      const u = new User(user)
+
+      const salt = randomBytes(16).toString('hex')
+      const hash = scryptSync(user.password, salt, 64).toString('hex')
+
+      const u = new User({ ...user, password: `${salt}:${hash}` })
       await u.save()
-      return null
+
+      const newUser = { name: 'Jane Doe', email: 'janedoe@test.com' }
+      const u2 = new User({ ...user, ...newUser, password: `${salt}:${hash}` })
+      await u2.save()
+
+      return { u1Id: u.id, u2Id: u2.id }
+    },
+    async 'db:getUserById'(id: string): Promise<IUser | null> {
+      await connect(MONGODB_URI)
+      const user = await User.findOne({ _id: id }).exec()
+      return user
     },
     GoogleSocialLogin: GoogleSocialLogin,
   })

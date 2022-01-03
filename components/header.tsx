@@ -5,7 +5,7 @@ const Header = () => {
   const { status } = useSession()
 
   return (
-    <header className="container-fluid d-flex justify-content-between align-items-center mb-4 p-2 shadow-sm">
+    <header className="container-fluid d-flex justify-content-between align-items-center p-2 shadow-sm">
       <div className="m-0 fs-1">
         <Link href="/">
           <a className="text-decoration-none text-dark">Filanad</a>

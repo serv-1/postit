@@ -1,6 +1,9 @@
 {
-  "id": 18,
   "name": "Teapot",
   "email": "teapot@tea.pot",
-  "password": "english tile rigole"
+  "password": "english tile rigole",
+  "image": {
+    "data": "54e4s6E5d=",
+    "contentType": "image/jpeg"
+  }
 }

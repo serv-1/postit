@@ -1,11 +1,11 @@
 import axios, { AxiosError } from 'axios'
-import NextAuth, { User as U } from 'next-auth'
+import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/email'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from '../../../lib/mongodb'
-import User from '../../../models/User'
+import User, { defaultImage } from '../../../models/User'
 import dbConnect from '../../../utils/dbConnect'
 import {
   EMAIL_FROM,
@@ -66,25 +66,32 @@ export default NextAuth({
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
-        token.user = { name: user.name, email: user.email }
+        token.user = {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        }
 
-        if (account.provider === 'google') {
+        if (account.provider === 'google' && typeof user.image === 'string') {
           await dbConnect()
-          await User.updateOne({ _id: user.id }, { emailVerified: new Date() })
+          await User.updateOne(
+            { _id: user.id },
+            { emailVerified: new Date(), defaultImage }
+          ).exec()
         }
       }
       return token
     },
     async session({ session, token }) {
       if (token) {
-        session.user = token.user as U
+        session.user = token.user
       }
       return session
     },
   },
-  secret: SECRET,
   session: {
     strategy: 'jwt',
   },
+  secret: SECRET,
   adapter: MongoDBAdapter(clientPromise),
 })

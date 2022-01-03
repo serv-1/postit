@@ -8,3 +8,11 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 afterAll(() => server.close())
+
+jest.mock(
+  'next/image',
+  () =>
+    function Image(props: { src: string; alt: string; title: string }) {
+      return <img {...props} />
+    }
+)
