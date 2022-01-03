@@ -3,7 +3,8 @@ import {
   EMAIL_UNKNOWN,
   METHOD_NOT_ALLOWED,
 } from '../../../utils/errors'
-import { register } from '../../support/functions'
+
+const url = '/api/verifyEmail'
 
 describe('/api/verifyEmail', () => {
   beforeEach(() => {
@@ -11,51 +12,38 @@ describe('/api/verifyEmail', () => {
     cy.fixture('user').as('user')
   })
 
-  context('POST', () => {
-    specify('422 - Email unknown', function () {
-      cy.request({
-        method: 'POST',
-        url: '/api/verifyEmail',
-        body: { email: this.user.email },
-        failOnStatusCode: false,
-      }).then((res) => {
+  describe('POST', () => {
+    const method = 'POST'
+
+    it('422 - Email unknown', function () {
+      const body = { email: this.user.email }
+      cy.req({ url, method, body }).then((res) => {
         expect(res.status).to.eq(422)
         expect(res.body).to.have.property('message', EMAIL_UNKNOWN)
       })
     })
 
-    specify('422 - Joi validation error', function () {
-      cy.request({
-        method: 'POST',
-        url: '/api/verifyEmail',
-        body: { email: 'not an email' },
-        failOnStatusCode: false,
-      }).then((res) => {
+    it('422 - Joi validation error', function () {
+      const body = { email: 'not an email' }
+      cy.req({ url, method, body }).then((res) => {
         expect(res.status).to.eq(422)
         expect(res.body).to.have.property('message', EMAIL_INVALID)
       })
     })
 
-    specify('200 - Email verified', function () {
-      register(this.user)
-      cy.request({
-        method: 'POST',
-        url: '/api/verifyEmail',
-        body: { email: this.user.email },
-      }).then((res) => {
+    it('200 - Email verified', function () {
+      cy.task('db:seed')
+      const body = { email: this.user.email }
+      cy.req({ url, method, body }).then((res) => {
         expect(res.status).to.eq(200)
       })
     })
   })
 
-  specify('405 - Method not allowed', () => {
-    cy.request({
-      method: 'GET',
-      url: '/api/verifyEmail',
-      failOnStatusCode: false,
-    }).then((res) => {
+  it('405 - Method not allowed', function () {
+    cy.req({ url, method: 'PATCH' }).then((res) => {
       expect(res.status).to.eq(405)
-      expect(res.body).to.have.ownProperty('message', METHOD_NOT_ALLOWED)
+      expect(res.body).to.have.property('message', METHOD_NOT_ALLOWED)
     })
   })
 })

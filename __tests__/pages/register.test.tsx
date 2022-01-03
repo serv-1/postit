@@ -34,7 +34,7 @@ describe('Register form', () => {
 
   it('should sign in the user and redirect to the profile page after a successful submission', async () => {
     server.use(
-      rest.post('http://localhost:3000/api/users', (req, res, ctx) => {
+      rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
         return res(ctx.status(200))
       })
     )
@@ -47,7 +47,7 @@ describe('Register form', () => {
 
   it('should redirect to the sign in page if an error occured while trying to sign in the user', async () => {
     server.use(
-      rest.post('http://localhost:3000/api/users', (req, res, ctx) => {
+      rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
         return res(ctx.status(200))
       })
     )
@@ -61,7 +61,7 @@ describe('Register form', () => {
 
   it('should render server-side error not related to the fields', async () => {
     server.use(
-      rest.post('http://localhost:3000/api/users', (req, res, ctx) => {
+      rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
         return res(ctx.status(405), ctx.json({ message: METHOD_NOT_ALLOWED }))
       })
     )

@@ -1,5 +1,3 @@
-import { register } from '../../support/functions'
-
 const username = Cypress.env('googleUsername')
 const password = Cypress.env('googlePassword')
 const cookieName = Cypress.env('sessionCookieName')
@@ -76,8 +74,7 @@ describe('User sign in and register', () => {
   })
 
   it('Forgot password', function () {
-    register(this.user)
-
+    cy.task('db:seed')
     cy.visit('/auth/forgot-password')
 
     cy.get('#email').type(this.user.email)
@@ -101,3 +98,5 @@ describe('User sign in and register', () => {
     cy.contains(this.user.email).should('exist')
   })
 })
+
+export {}

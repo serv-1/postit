@@ -18,13 +18,11 @@ export default async function handler(
 
   try {
     Joi.assert(req.body, emailSchema)
-    const email = req.body.email
+    const { email } = req.body
 
     const user = await User.findOne({ email }).exec()
 
-    if (!user) {
-      return res.status(422).send({ message: EMAIL_UNKNOWN })
-    }
+    if (!user) return res.status(422).send({ message: EMAIL_UNKNOWN })
 
     res.status(200).end()
   } catch (e) {

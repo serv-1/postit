@@ -23,8 +23,7 @@ export default async function handler(
 
   try {
     Joi.assert(req.body, signInSchema)
-    const email = req.body.email
-    const password = req.body.password
+    const { email, password } = req.body
 
     await dbConnect()
     const user = await User.findOne({ email }).exec()
@@ -32,11 +31,11 @@ export default async function handler(
     if (!user) return res.status(422).send({ message: EMAIL_UNKNOWN })
     if (!user.password) return res.status(422).send({ message: EMAIL_GOOGLE })
 
-    const [salt, key] = user.password.split(':')
-    const keyBuffer = Buffer.from(key, 'hex')
-    const derivedKey = crypto.scryptSync(password, salt, 64)
+    const [salt, hash] = user.password.split(':')
+    const dbHash = Buffer.from(hash, 'hex')
+    const givenHash = crypto.scryptSync(password, salt, 64)
 
-    if (!crypto.timingSafeEqual(keyBuffer, derivedKey)) {
+    if (!crypto.timingSafeEqual(dbHash, givenHash)) {
       return res.status(422).send({ message: PASSWORD_INVALID })
     }
 

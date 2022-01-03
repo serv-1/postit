@@ -1,103 +1,69 @@
 import {
-  DATA_INVALID,
   EMAIL_GOOGLE,
+  EMAIL_INVALID,
   EMAIL_UNKNOWN,
   METHOD_NOT_ALLOWED,
   PASSWORD_INVALID,
 } from '../../../utils/errors'
-import { register } from '../../support/functions'
+import { dbSeedResult } from '../../plugins'
+
+const url = '/api/signIn'
 
 describe('/api/signIn', () => {
   beforeEach(() => {
     cy.task('db:reset')
+    cy.task<dbSeedResult>('db:seed').then((result) => {
+      cy.wrap(result.u1Id).as('userId')
+    })
     cy.fixture('user').as('user')
   })
 
-  context('POST', () => {
-    specify('422 - Email not registered', function () {
-      cy.request({
-        method: 'POST',
-        url: '/api/signIn',
-        body: {
-          email: this.user.email,
-          password: this.user.password,
-        },
-        failOnStatusCode: false,
-      }).then((res) => {
+  describe('POST', () => {
+    const method = 'POST'
+
+    it('422 - Email not registered', function () {
+      const body = { email: 'bobdoe@test.com', password: this.user.password }
+      cy.req({ url, method, body }).then((res) => {
         expect(res.status).to.eq(422)
         expect(res.body).to.have.property('message', EMAIL_UNKNOWN)
       })
     })
 
-    specify('422 - Email is linked to a Google account', async function () {
-      cy.task('addUserToDb', {
-        name: this.user.name,
-        email: this.user.email,
-      })
-      cy.request({
-        method: 'POST',
-        url: '/api/signIn',
-        body: { email: this.user.email },
-        failOnStatusCode: false,
-      }).then((res) => {
+    it('422 - Email is linked to a Google account', async function () {
+      cy.req({ url, method, body: { email: this.user.email } }).then((res) => {
         expect(res.status).to.eq(422)
         expect(res.body).to.have.property('message', EMAIL_GOOGLE)
       })
     })
 
-    specify('422 - Password invalid', function () {
-      register(this.user)
-
-      cy.request({
-        url: '/api/signIn',
-        method: 'POST',
-        body: {
-          email: this.user.email,
-          password: 'wrong password',
-        },
-        failOnStatusCode: false,
-      }).then((res) => {
+    it('422 - Password invalid', function () {
+      const body = { email: this.user.email, password: 'wrong password' }
+      cy.req({ url, method, body }).then((res) => {
         expect(res.status).to.eq(422)
         expect(res.body).to.have.property('message', PASSWORD_INVALID)
       })
     })
 
-    specify('422 - Joi validation error', () => {
-      cy.request({
-        method: 'POST',
-        url: '/api/signIn',
-        body: 'not json',
-        failOnStatusCode: false,
-      }).then((res) => {
+    it('422 - Joi validation error', function () {
+      cy.req({ url, method, body: { email: 'not an email' } }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.ownProperty('message', DATA_INVALID)
+        expect(res.body).to.have.ownProperty('message', EMAIL_INVALID)
       })
     })
 
-    specify('200 - Should sign in a user', function () {
-      register(this.user)
-
-      cy.request({
-        method: 'POST',
-        url: '/api/signIn',
-        body: {
-          email: this.user.email,
-          password: this.user.password,
-        },
-      }).then((res) => {
+    it('200 - Should sign in a user', function () {
+      const body = { email: this.user.email, password: this.user.password }
+      cy.req({ url, method, body }).then((res) => {
         expect(res.status).to.eq(200)
-        expect(res.body).to.have.ownProperty('id')
+        expect(res.body).to.have.property('id', this.userId)
+        expect(res.body).to.have.property('name', this.user.name)
         expect(res.body).to.have.property('email', this.user.email)
       })
     })
   })
 
-  specify('405 - Method not allowed', () => {
-    cy.request({
-      method: 'GET',
-      url: '/api/signIn',
-      failOnStatusCode: false,
-    }).then((res) => {
+  it('405 - Method not allowed', function () {
+    cy.req({ url, method: 'PATCH' }).then((res) => {
       expect(res.status).to.eq(405)
       expect(res.body).to.have.ownProperty('message', METHOD_NOT_ALLOWED)
     })

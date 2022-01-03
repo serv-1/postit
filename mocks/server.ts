@@ -1,11 +1,11 @@
 import { setupServer } from 'msw/node'
-import usersHandlers from './users'
+import userHandlers from './user'
 import usersIdHandlers from './users/[id]'
 import nextAuthHandlers from './nextAuth'
 import verifyEmailHandlers from './verifyEmail'
 
 const server = setupServer(
-  ...usersHandlers,
+  ...userHandlers,
   ...usersIdHandlers,
   ...nextAuthHandlers,
   ...verifyEmailHandlers

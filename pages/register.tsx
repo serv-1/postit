@@ -30,7 +30,7 @@ const Register = () => {
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
-      await axios.post('http://localhost:3000/api/users', data)
+      await axios.post('http://localhost:3000/api/user', data)
       await signIn('email', {
         email: data.email,
         callbackUrl: 'http://localhost:3000/profile',
