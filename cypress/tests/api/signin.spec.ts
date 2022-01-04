@@ -1,10 +1,4 @@
-import {
-  EMAIL_GOOGLE,
-  EMAIL_INVALID,
-  EMAIL_UNKNOWN,
-  METHOD_NOT_ALLOWED,
-  PASSWORD_INVALID,
-} from '../../../utils/errors'
+import err from '../../../utils/errors'
 import { dbSeedResult } from '../../plugins'
 
 const url = '/api/signIn'
@@ -25,14 +19,14 @@ describe('/api/signIn', () => {
       const body = { email: 'bobdoe@test.com', password: this.user.password }
       cy.req({ url, method, body }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', EMAIL_UNKNOWN)
+        expect(res.body).to.have.property('message', err.EMAIL_UNKNOWN)
       })
     })
 
     it('422 - Email is linked to a Google account', async function () {
       cy.req({ url, method, body: { email: this.user.email } }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', EMAIL_GOOGLE)
+        expect(res.body).to.have.property('message', err.EMAIL_GOOGLE)
       })
     })
 
@@ -40,14 +34,14 @@ describe('/api/signIn', () => {
       const body = { email: this.user.email, password: 'wrong password' }
       cy.req({ url, method, body }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', PASSWORD_INVALID)
+        expect(res.body).to.have.property('message', err.PASSWORD_INVALID)
       })
     })
 
     it('422 - Joi validation error', function () {
       cy.req({ url, method, body: { email: 'not an email' } }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.ownProperty('message', EMAIL_INVALID)
+        expect(res.body).to.have.ownProperty('message', err.EMAIL_INVALID)
       })
     })
 
@@ -65,7 +59,7 @@ describe('/api/signIn', () => {
   it('405 - Method not allowed', function () {
     cy.req({ url, method: 'PATCH' }).then((res) => {
       expect(res.status).to.eq(405)
-      expect(res.body).to.have.ownProperty('message', METHOD_NOT_ALLOWED)
+      expect(res.body).to.have.ownProperty('message', err.METHOD_NOT_ALLOWED)
     })
   })
 })

@@ -1,15 +1,4 @@
-import {
-  DATA_INVALID,
-  FORBIDDEN,
-  METHOD_NOT_ALLOWED,
-  PARAMS_INVALID,
-  USER_IMAGE_INVALID,
-  USER_IMAGE_TOO_LARGE,
-  USER_NOT_FOUND,
-  PASSWORD_INVALID,
-  EMAIL_INVALID,
-  NAME_INVALID,
-} from '../../../../utils/errors'
+import err from '../../../../utils/errors'
 import { Buffer } from 'buffer'
 import { dbSeedResult } from '../../../plugins'
 import { IUser } from '../../../../models/User'
@@ -28,14 +17,14 @@ describe('/api/users/:id', () => {
   it('405 - Method not allowed', function () {
     cy.req({ url: this.url, method: 'PATCH' }).then((res) => {
       expect(res.status).to.eq(405)
-      expect(res.body).to.have.property('message', METHOD_NOT_ALLOWED)
+      expect(res.body).to.have.property('message', err.METHOD_NOT_ALLOWED)
     })
   })
 
   it('422 - Invalid :id', function () {
     cy.req({ url: `/api/users/ohNooo!` }).then((res) => {
       expect(res.status).to.eq(422)
-      expect(res.body).to.have.property('message', PARAMS_INVALID)
+      expect(res.body).to.have.property('message', err.PARAMS_INVALID)
     })
   })
 
@@ -43,7 +32,7 @@ describe('/api/users/:id', () => {
     it('404 - User not found', () => {
       cy.req({ url: `/api/users/f0f0f0f0f0f0f0f0f0f0f0f0` }).then((res) => {
         expect(res.status).to.eq(404)
-        expect(res.body).to.have.property('message', USER_NOT_FOUND)
+        expect(res.body).to.have.property('message', err.USER_NOT_FOUND)
       })
     })
 
@@ -64,7 +53,7 @@ describe('/api/users/:id', () => {
     it('403 - Forbidden', function () {
       cy.req({ url: this.url, method }).then((res) => {
         expect(res.status).to.eq(403)
-        expect(res.body).to.have.property('message', FORBIDDEN)
+        expect(res.body).to.have.property('message', err.FORBIDDEN)
       })
     })
 
@@ -83,7 +72,7 @@ describe('/api/users/:id', () => {
       cy.signIn(this.user.email, this.user.password)
       cy.req({ url: this.url, method, body: { oh: 'nooo!' } }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', DATA_INVALID)
+        expect(res.body).to.have.property('message', err.DATA_INVALID)
       })
     })
 
@@ -96,7 +85,7 @@ describe('/api/users/:id', () => {
         const name = { oh: 'nooo!' }
         cy.req({ url: this.url, method, body: { name } }).then((res) => {
           expect(res.status).to.eq(422)
-          expect(res.body).to.have.property('message', NAME_INVALID)
+          expect(res.body).to.have.property('message', err.NAME_INVALID)
         })
       })
 
@@ -120,7 +109,7 @@ describe('/api/users/:id', () => {
         const email = { oh: 'nooo!' }
         cy.req({ url: this.url, method, body: { email } }).then((res) => {
           expect(res.status).to.eq(422)
-          expect(res.body).to.have.property('message', EMAIL_INVALID)
+          expect(res.body).to.have.property('message', err.EMAIL_INVALID)
         })
       })
 
@@ -144,7 +133,7 @@ describe('/api/users/:id', () => {
         const password = { oh: 'nooo!' }
         cy.req({ url: this.url, method, body: { password } }).then((res) => {
           expect(res.status).to.eq(422)
-          expect(res.body).to.have.property('message', PASSWORD_INVALID)
+          expect(res.body).to.have.property('message', err.PASSWORD_INVALID)
         })
       })
 
@@ -172,7 +161,7 @@ describe('/api/users/:id', () => {
         const image = { base64Uri: 'text', type: 'text/plain' }
         cy.req({ url: this.url, method, body: { image } }).then((res) => {
           expect(res.status).to.eq(422)
-          expect(res.body).to.have.property('message', USER_IMAGE_INVALID)
+          expect(res.body).to.have.property('message', err.USER_IMAGE_INVALID)
         })
       })
 
@@ -180,7 +169,7 @@ describe('/api/users/:id', () => {
         const image = { base64Uri: 'not base 64 uri', type: 'image/jpeg' }
         cy.req({ url: this.url, method, body: { image } }).then((res) => {
           expect(res.status).to.eq(422)
-          expect(res.body).to.have.property('message', DATA_INVALID)
+          expect(res.body).to.have.property('message', err.DATA_INVALID)
         })
       })
 
@@ -190,7 +179,7 @@ describe('/api/users/:id', () => {
         const image = { base64Uri: `data:${type};base64,${base64}`, type }
         cy.req({ url: this.url, method, body: { image } }).then((res) => {
           expect(res.status).to.eq(413)
-          expect(res.body).to.have.property('message', USER_IMAGE_TOO_LARGE)
+          expect(res.body).to.have.property('message', err.USER_IMAGE_TOO_LARGE)
         })
       })
 
@@ -216,7 +205,7 @@ describe('/api/users/:id', () => {
     it('403 - Forbidden', function () {
       cy.req({ url: this.url, method }).then((res) => {
         expect(res.status).to.eq(403)
-        expect(res.body).to.have.property('message', FORBIDDEN)
+        expect(res.body).to.have.property('message', err.FORBIDDEN)
       })
     })
 

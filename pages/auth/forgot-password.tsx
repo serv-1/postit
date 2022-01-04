@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from 'axios'
+import axios, { AxiosError } from 'axios'
 import { GetServerSideProps } from 'next'
 import { getCsrfToken, signIn } from 'next-auth/react'
 import Head from 'next/head'
@@ -8,6 +8,7 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import TextInput from '../../components/TextInput'
 import { emailSchema } from '../../utils/joiSchemas'
 import Send from '../../public/static/images/send.svg'
+import err from '../../utils/errors'
 
 type FormFields = { email: string }
 
@@ -37,12 +38,13 @@ const ForgotPassword = ({ csrfToken }: { csrfToken?: string }) => {
         callbackUrl: 'http://localhost:3000/profile',
       })
     } catch (e) {
-      const res = (e as AxiosError).response as AxiosResponse
+      const res = (e as AxiosError).response
+      if (!res) return setServerError(err.NO_RESPONSE)
+      const { message } = res.data
       if (res.status === 422) {
-        setError('email', { message: res.data.message }, { shouldFocus: true })
-        return
+        return setError('email', { message }, { shouldFocus: true })
       }
-      setServerError(res.data.message)
+      setServerError(message)
     }
   }
 

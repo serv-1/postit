@@ -2,18 +2,7 @@ import Register from '../../pages/register'
 import { screen, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import server from '../../mocks/server'
-import {
-  EMAIL_INVALID,
-  EMAIL_REQUIRED,
-  EMAIL_USED,
-  PASSWORD_SAME,
-  PASSWORD_MAX,
-  PASSWORD_MIN,
-  PASSWORD_REQUIRED,
-  NAME_MAX,
-  NAME_REQUIRED,
-  METHOD_NOT_ALLOWED,
-} from '../../utils/errors'
+import err from '../../utils/errors'
 import { rest } from 'msw'
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
@@ -62,18 +51,21 @@ describe('Register form', () => {
   it('should render server-side error not related to the fields', async () => {
     server.use(
       rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
-        return res(ctx.status(405), ctx.json({ message: METHOD_NOT_ALLOWED }))
+        return res(
+          ctx.status(405),
+          ctx.json({ message: err.METHOD_NOT_ALLOWED })
+        )
       })
     )
     validSubmission()
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      METHOD_NOT_ALLOWED
+      err.METHOD_NOT_ALLOWED
     )
   })
 
   it('should render server-side validation error and focus the field that goes with', async () => {
     validSubmission()
-    expect(await screen.findByText(EMAIL_USED)).toBeInTheDocument()
+    expect(await screen.findByText(err.EMAIL_USED)).toBeInTheDocument()
     expect(screen.getByLabelText(/email/i)).toHaveFocus()
   })
 
@@ -99,15 +91,15 @@ describe('Register form', () => {
       const btn = screen.getByRole('button', { name: 'Register' })
       userEvent.click(btn)
 
-      expect(await screen.findByText(NAME_REQUIRED)).toBeInTheDocument()
-      expect(await screen.findByText(EMAIL_REQUIRED)).toBeInTheDocument()
+      expect(await screen.findByText(err.NAME_REQUIRED)).toBeInTheDocument()
+      expect(await screen.findByText(err.EMAIL_REQUIRED)).toBeInTheDocument()
 
       // forced to do that to trigger the password required validation
       userEvent.type(screen.getByLabelText(/name/i), name)
       userEvent.type(screen.getByLabelText(/email/i), email)
       userEvent.click(btn)
 
-      expect(await screen.findByText(PASSWORD_REQUIRED)).toBeInTheDocument()
+      expect(await screen.findByText(err.PASSWORD_REQUIRED)).toBeInTheDocument()
     })
   })
 
@@ -117,7 +109,7 @@ describe('Register form', () => {
       for (let i = 0; i < 91; i++) name += '.'
       userEvent.type(screen.getByLabelText(/name/i), name)
       userEvent.click(screen.getByRole('button', { name: 'Register' }))
-      expect(await screen.findByText(NAME_MAX)).toBeInTheDocument()
+      expect(await screen.findByText(err.NAME_MAX)).toBeInTheDocument()
     })
   })
 
@@ -125,7 +117,7 @@ describe('Register form', () => {
     it('should display an error when it is not an email', async () => {
       userEvent.type(screen.getByLabelText(/email/i), 'bad email')
       userEvent.click(screen.getByRole('button', { name: 'Register' }))
-      expect(await screen.findByText(EMAIL_INVALID)).toBeInTheDocument()
+      expect(await screen.findByText(err.EMAIL_INVALID)).toBeInTheDocument()
     })
   })
 
@@ -133,28 +125,28 @@ describe('Register form', () => {
     it('should display an error when it is smaller than 10 characters', async () => {
       userEvent.type(screen.getByLabelText(/^password/i), 'abc')
       userEvent.click(screen.getByRole('button', { name: 'Register' }))
-      expect(await screen.findByText(PASSWORD_MIN)).toBeInTheDocument()
+      expect(await screen.findByText(err.PASSWORD_MIN)).toBeInTheDocument()
     })
 
     it('should display an error when it is greater than 20 characters', async () => {
       const pw = '012345678901234567890'
       userEvent.type(screen.getByLabelText(/^password/i), pw)
       userEvent.click(screen.getByRole('button', { name: 'Register' }))
-      expect(await screen.findByText(PASSWORD_MAX)).toBeInTheDocument()
+      expect(await screen.findByText(err.PASSWORD_MAX)).toBeInTheDocument()
     })
 
     it('should display an error when it is equal to the email', async () => {
       userEvent.type(screen.getByLabelText(/email/i), email)
       userEvent.type(screen.getByLabelText(/^password/i), email)
       userEvent.click(screen.getByRole('button', { name: 'Register' }))
-      expect(await screen.findByText(PASSWORD_SAME)).toBeInTheDocument()
+      expect(await screen.findByText(err.PASSWORD_SAME)).toBeInTheDocument()
     })
 
     it('should display an error when it is equal to the name', async () => {
       userEvent.type(screen.getByLabelText(/name/i), name)
       userEvent.type(screen.getByLabelText(/^password/i), name)
       userEvent.click(screen.getByRole('button', { name: 'Register' }))
-      expect(await screen.findByText(PASSWORD_SAME)).toBeInTheDocument()
+      expect(await screen.findByText(err.PASSWORD_SAME)).toBeInTheDocument()
     })
   })
 })

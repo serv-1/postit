@@ -7,16 +7,7 @@ import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from '../../../lib/mongodb'
 import User, { defaultImage } from '../../../models/User'
 import dbConnect from '../../../utils/dbConnect'
-import {
-  EMAIL_FROM,
-  EMAIL_HOST,
-  EMAIL_PASS,
-  EMAIL_PORT,
-  EMAIL_USER,
-  GOOGLE_ID,
-  GOOGLE_SECRET,
-  SECRET,
-} from '../../../utils/env'
+import env from '../../../utils/env'
 import { INTERNAL_SERVER_ERROR } from '../../../utils/errors'
 
 export default NextAuth({
@@ -43,19 +34,19 @@ export default NextAuth({
       },
     }),
     GoogleProvider({
-      clientId: GOOGLE_ID,
-      clientSecret: GOOGLE_SECRET,
+      clientId: env.GOOGLE_ID,
+      clientSecret: env.GOOGLE_SECRET,
     }),
     EmailProvider({
       server: {
-        host: EMAIL_HOST,
-        port: Number(EMAIL_PORT),
+        host: env.EMAIL_HOST,
+        port: Number(env.EMAIL_PORT),
         auth: {
-          user: EMAIL_USER,
-          pass: EMAIL_PASS,
+          user: env.EMAIL_USER,
+          pass: env.EMAIL_PASS,
         },
       },
-      from: EMAIL_FROM,
+      from: env.EMAIL_FROM,
       maxAge: 3600,
     }),
   ],
@@ -92,6 +83,6 @@ export default NextAuth({
   session: {
     strategy: 'jwt',
   },
-  secret: SECRET,
+  secret: env.SECRET,
   adapter: MongoDBAdapter(clientPromise),
 })

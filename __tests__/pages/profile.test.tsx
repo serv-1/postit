@@ -5,12 +5,7 @@ import { SessionProvider } from 'next-auth/react'
 import userEvent from '@testing-library/user-event'
 import server from '../../mocks/server'
 import { rest } from 'msw'
-import {
-  IMAGE_NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
-  USER_IMAGE_INVALID,
-  USER_IMAGE_TOO_LARGE,
-} from '../../utils/errors'
+import err from '../../utils/errors'
 
 const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
 
@@ -34,13 +29,13 @@ describe('Profile', () => {
     it('should render a server-side error', async () => {
       server.use(
         rest.put('http://localhost:3000/api/users/:id', (req, res, ctx) =>
-          res(ctx.status(500), ctx.json({ message: INTERNAL_SERVER_ERROR }))
+          res(ctx.status(500), ctx.json({ message: err.INTERNAL_SERVER_ERROR }))
         )
       )
       factory()
       userEvent.upload(screen.getByTestId('fileInput'), file)
       expect(await screen.findByRole('alert')).toHaveTextContent(
-        INTERNAL_SERVER_ERROR
+        err.INTERNAL_SERVER_ERROR
       )
     })
 
@@ -57,12 +52,12 @@ describe('Profile', () => {
     it('should render an error if the image cannot be obtained', async () => {
       server.use(
         rest.get('http://localhost:3000/api/users/:id', (req, res, ctx) =>
-          res(ctx.status(404), ctx.json({ message: IMAGE_NOT_FOUND }))
+          res(ctx.status(404), ctx.json({ message: err.IMAGE_NOT_FOUND }))
         )
       )
       factory()
       expect(await screen.findByRole('alert')).toHaveTextContent(
-        IMAGE_NOT_FOUND
+        err.IMAGE_NOT_FOUND
       )
     })
 
@@ -99,7 +94,7 @@ describe('Profile', () => {
         const textFile = new File(['text'], 'text.txt', { type: 'text/plain' })
         userEvent.upload(screen.getByTestId('fileInput'), textFile)
         expect(await screen.findByRole('alert')).toHaveTextContent(
-          USER_IMAGE_INVALID
+          err.USER_IMAGE_INVALID
         )
       })
 
@@ -110,7 +105,7 @@ describe('Profile', () => {
         const f = new File([buffer], file.name, { type: file.type })
         userEvent.upload(screen.getByTestId('fileInput'), f)
         expect(await screen.findByRole('alert')).toHaveTextContent(
-          USER_IMAGE_TOO_LARGE
+          err.USER_IMAGE_TOO_LARGE
         )
       })
     })

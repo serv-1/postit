@@ -23,7 +23,7 @@ const Header = () => {
           >
             Sign out
           </a>
-        ) : (
+        ) : status === 'unauthenticated' ? (
           <a
             href={'/api/auth/signin'}
             className="btn btn-primary text-decoration-none fs-5"
@@ -34,7 +34,7 @@ const Header = () => {
           >
             Sign in
           </a>
-        )}
+        ) : undefined}
       </nav>
     </header>
   )

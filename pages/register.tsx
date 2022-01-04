@@ -1,13 +1,14 @@
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
-import axios, { AxiosError, AxiosResponse } from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
 import TextInput from '../components/TextInput'
 import PasswordInput from '../components/PasswordInput'
 import { useState } from 'react'
 import { registerSchema } from '../utils/joiSchemas'
 import { signIn } from 'next-auth/react'
+import { DEFAULT_SERVER_ERROR, NO_RESPONSE } from '../utils/errors'
 
 type FormFields = {
   name: string
@@ -44,16 +45,13 @@ const Register = () => {
       if (res && res.error) return router.push('/auth/sign-in')
       router.push('/profile')
     } catch (e) {
-      const res = (e as AxiosError).response as AxiosResponse
+      const res = (e as AxiosError).response
+      if (!res) return setServerError(NO_RESPONSE)
+      const { name, message } = res.data
       if (res.status === 422) {
-        setError(
-          res.data.name,
-          { message: res.data.message },
-          { shouldFocus: true }
-        )
-      } else {
-        setServerError(res.data.message)
+        return setError(name, { message }, { shouldFocus: true })
       }
+      setServerError(message || DEFAULT_SERVER_ERROR)
     }
   }
 

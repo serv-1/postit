@@ -1,13 +1,7 @@
 import SignIn from '../../pages/auth/sign-in'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {
-  EMAIL_INVALID,
-  EMAIL_REQUIRED,
-  EMAIL_UNKNOWN,
-  INTERNAL_SERVER_ERROR,
-  PASSWORD_REQUIRED,
-} from '../../utils/errors'
+import err from '../../utils/errors'
 import { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
 const csrfToken = 'csrfToken'
 const email = 'example@test.com'
@@ -66,17 +60,19 @@ describe('Sign in', () => {
     })
 
     it('should render server-side error not related to the fields', async () => {
-      signIn.mockResolvedValue({ error: INTERNAL_SERVER_ERROR })
+      signIn.mockResolvedValue({ error: err.INTERNAL_SERVER_ERROR })
       factory()
       validSubmission()
-      expect(await screen.findByText(INTERNAL_SERVER_ERROR)).toBeInTheDocument()
+      expect(
+        await screen.findByText(err.INTERNAL_SERVER_ERROR)
+      ).toBeInTheDocument()
     })
 
     it('should render server-side validation error and focus the field that goes with', async () => {
-      signIn.mockResolvedValue({ error: EMAIL_UNKNOWN })
+      signIn.mockResolvedValue({ error: err.EMAIL_UNKNOWN })
       factory()
       validSubmission()
-      expect(await screen.findByText(EMAIL_UNKNOWN)).toBeInTheDocument()
+      expect(await screen.findByText(err.EMAIL_UNKNOWN)).toBeInTheDocument()
       expect(screen.getByLabelText(/email/i)).toHaveFocus()
     })
 
@@ -114,12 +110,14 @@ describe('Sign in', () => {
         const btn = screen.getByRole('button', { name: 'Sign in' })
         userEvent.click(btn)
 
-        expect(await screen.findByText(EMAIL_REQUIRED)).toBeInTheDocument()
+        expect(await screen.findByText(err.EMAIL_REQUIRED)).toBeInTheDocument()
 
         // avoid the PASSWORD_SAME error
         userEvent.type(screen.getByLabelText(/email/i), 'a')
 
-        expect(await screen.findByText(PASSWORD_REQUIRED)).toBeInTheDocument()
+        expect(
+          await screen.findByText(err.PASSWORD_REQUIRED)
+        ).toBeInTheDocument()
       })
     })
 
@@ -128,7 +126,7 @@ describe('Sign in', () => {
         factory()
         userEvent.type(screen.getByLabelText(/email/i), 'bad email')
         userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
-        expect(await screen.findByText(EMAIL_INVALID)).toBeInTheDocument()
+        expect(await screen.findByText(err.EMAIL_INVALID)).toBeInTheDocument()
       })
     })
   })

@@ -1,8 +1,4 @@
-import {
-  EMAIL_INVALID,
-  EMAIL_UNKNOWN,
-  METHOD_NOT_ALLOWED,
-} from '../../../utils/errors'
+import err from '../../../utils/errors'
 
 const url = '/api/verifyEmail'
 
@@ -19,7 +15,7 @@ describe('/api/verifyEmail', () => {
       const body = { email: this.user.email }
       cy.req({ url, method, body }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', EMAIL_UNKNOWN)
+        expect(res.body).to.have.property('message', err.EMAIL_UNKNOWN)
       })
     })
 
@@ -27,7 +23,7 @@ describe('/api/verifyEmail', () => {
       const body = { email: 'not an email' }
       cy.req({ url, method, body }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', EMAIL_INVALID)
+        expect(res.body).to.have.property('message', err.EMAIL_INVALID)
       })
     })
 
@@ -43,7 +39,7 @@ describe('/api/verifyEmail', () => {
   it('405 - Method not allowed', function () {
     cy.req({ url, method: 'PATCH' }).then((res) => {
       expect(res.status).to.eq(405)
-      expect(res.body).to.have.property('message', METHOD_NOT_ALLOWED)
+      expect(res.body).to.have.property('message', err.METHOD_NOT_ALLOWED)
     })
   })
 })

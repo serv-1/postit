@@ -51,6 +51,23 @@ describe('User sign in and register', () => {
     cy.contains('Sign out').should('not.exist')
   })
 
+  it('Sign in with credentials and sign out', function () {
+    cy.task('db:seed')
+    cy.visit('/auth/sign-in')
+
+    cy.get('#email').type(this.user.email)
+    cy.get('#password').type(this.user.password)
+    cy.get('input[type="submit"]').click()
+
+    cy.location('pathname').should('equal', '/profile')
+    cy.contains(this.user.email).should('exist')
+
+    cy.contains('Sign out').click()
+
+    cy.location('pathname').should('equal', '/auth/sign-in')
+    cy.contains('Sign out').should('not.exist')
+  })
+
   it('Register, send a verification mail with credentials and sign out', function () {
     cy.visit('/register')
 

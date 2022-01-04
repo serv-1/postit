@@ -5,18 +5,14 @@ import dbConnect from '../../utils/dbConnect'
 import User from '../../models/User'
 import { MongoError } from 'mongodb'
 import { registerSchema } from '../../utils/joiSchemas'
-import {
-  EMAIL_USED,
-  INTERNAL_SERVER_ERROR,
-  METHOD_NOT_ALLOWED,
-} from '../../utils/errors'
+import err from '../../utils/errors'
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method !== 'POST') {
-    return res.status(405).send({ message: METHOD_NOT_ALLOWED })
+    return res.status(405).send({ message: err.METHOD_NOT_ALLOWED })
   }
 
   try {
@@ -36,8 +32,8 @@ export default async function handler(
       const { message, path } = e.details[0]
       return res.status(422).send({ message, name: path[0] })
     } else if ((e as MongoError).code === 11000) {
-      return res.status(422).send({ message: EMAIL_USED, name: 'email' })
+      return res.status(422).send({ message: err.EMAIL_USED, name: 'email' })
     }
-    res.status(500).send({ message: INTERNAL_SERVER_ERROR })
+    res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
   }
 }

@@ -1,11 +1,5 @@
 import { models, model, Schema, Model } from 'mongoose'
-import {
-  EMAIL_REQUIRED,
-  NAME_MAX,
-  NAME_REQUIRED,
-  PASSWORD_MAX,
-  PASSWORD_MIN,
-} from '../utils/errors'
+import err from '../utils/errors'
 import { readFileSync } from 'fs'
 import { Buffer } from 'buffer'
 import { join } from 'path'
@@ -32,18 +26,18 @@ export interface IUser {
 const userSchema = new Schema<IUser>({
   name: {
     type: String,
-    required: [true, NAME_REQUIRED],
-    maxLength: [90, NAME_MAX],
+    required: [true, err.NAME_REQUIRED],
+    maxLength: [90, err.NAME_MAX],
   },
   email: {
     type: String,
-    required: [true, EMAIL_REQUIRED],
+    required: [true, err.EMAIL_REQUIRED],
     unique: true,
   },
   password: {
     type: String,
-    min: [10, PASSWORD_MIN],
-    max: [20, PASSWORD_MAX],
+    min: [10, err.PASSWORD_MIN],
+    max: [20, err.PASSWORD_MAX],
   },
   emailVerified: Date,
   image: {

@@ -3,13 +3,7 @@ import { useSession } from 'next-auth/react'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import axios, { AxiosError } from 'axios'
-import {
-  DEFAULT_SERVER_ERROR,
-  IMAGE_NOT_FOUND,
-  NO_RESPONSE,
-  USER_IMAGE_INVALID,
-  USER_IMAGE_TOO_LARGE,
-} from '../utils/errors'
+import err from '../utils/errors'
 
 const Profile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -25,8 +19,8 @@ const Profile = () => {
         setImage(res.data.image)
       } catch (e) {
         const res = (e as AxiosError).response
-        if (!res) return setError(NO_RESPONSE)
-        setError(IMAGE_NOT_FOUND)
+        if (!res) return setError(err.NO_RESPONSE)
+        setError(err.IMAGE_NOT_FOUND)
       }
     }
     getImage()
@@ -38,9 +32,9 @@ const Profile = () => {
     if (!files || files.length === 0) return
 
     if (!['image/jpeg', 'image/png', 'image/gif'].includes(files[0].type)) {
-      return setError(USER_IMAGE_INVALID)
+      return setError(err.USER_IMAGE_INVALID)
     } else if (files[0].size > 1000000) {
-      return setError(USER_IMAGE_TOO_LARGE)
+      return setError(err.USER_IMAGE_TOO_LARGE)
     }
 
     const reader = new FileReader()
@@ -54,8 +48,8 @@ const Profile = () => {
         setImage(e.target.result as string)
       } catch (e) {
         const res = (e as AxiosError).response
-        if (!res) return setError(NO_RESPONSE)
-        setError(res.data.message || DEFAULT_SERVER_ERROR)
+        if (!res) return setError(err.NO_RESPONSE)
+        setError(res.data.message || err.DEFAULT_SERVER_ERROR)
       }
     }
 

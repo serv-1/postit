@@ -1,12 +1,7 @@
 import ForgotPassword from '../../pages/auth/forgot-password'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {
-  EMAIL_INVALID,
-  EMAIL_REQUIRED,
-  EMAIL_UNKNOWN,
-  METHOD_NOT_ALLOWED,
-} from '../../utils/errors'
+import err from '../../utils/errors'
 import { rest } from 'msw'
 import server from '../../mocks/server'
 
@@ -29,11 +24,11 @@ const mockResponse = (code: number, message: string) => {
 
 describe('ForgotPassword', () => {
   it('should render server-side error', async () => {
-    mockResponse(405, METHOD_NOT_ALLOWED)
+    mockResponse(405, err.METHOD_NOT_ALLOWED)
     factory()
     userEvent.type(screen.getByRole('textbox'), email)
     userEvent.click(screen.getByRole('button'))
-    expect(await screen.findByText(METHOD_NOT_ALLOWED)).toBeInTheDocument()
+    expect(await screen.findByText(err.METHOD_NOT_ALLOWED)).toBeInTheDocument()
   })
 
   describe('Form', () => {
@@ -51,11 +46,11 @@ describe('ForgotPassword', () => {
     })
 
     it('should render server-side validation error and focus the field that goes with', async () => {
-      mockResponse(422, EMAIL_UNKNOWN)
+      mockResponse(422, err.EMAIL_UNKNOWN)
       factory()
       userEvent.type(screen.getByRole('textbox'), email)
       userEvent.click(screen.getByRole('button'))
-      expect(await screen.findByText(EMAIL_UNKNOWN)).toBeInTheDocument()
+      expect(await screen.findByText(err.EMAIL_UNKNOWN)).toBeInTheDocument()
       expect(screen.getByRole('textbox')).toHaveFocus()
     })
 
@@ -88,14 +83,14 @@ describe('ForgotPassword', () => {
       it('should display an error when it is empty', async () => {
         factory()
         userEvent.click(screen.getByRole('button'))
-        expect(await screen.findByText(EMAIL_REQUIRED)).toBeInTheDocument()
+        expect(await screen.findByText(err.EMAIL_REQUIRED)).toBeInTheDocument()
       })
 
       it('should display an error when it is not an email', async () => {
         factory()
         userEvent.type(screen.getByRole('textbox'), 'bad email')
         userEvent.click(screen.getByRole('button'))
-        expect(await screen.findByText(EMAIL_INVALID)).toBeInTheDocument()
+        expect(await screen.findByText(err.EMAIL_INVALID)).toBeInTheDocument()
       })
     })
   })

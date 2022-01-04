@@ -4,18 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import User from '../../../models/User'
 import { authCheck } from '../../../utils'
 import dbConnect from '../../../utils/dbConnect'
-import {
-  DATA_INVALID,
-  EMAIL_INVALID,
-  INTERNAL_SERVER_ERROR,
-  METHOD_NOT_ALLOWED,
-  NAME_INVALID,
-  PARAMS_INVALID,
-  PASSWORD_INVALID,
-  USER_IMAGE_INVALID,
-  USER_IMAGE_TOO_LARGE,
-  USER_NOT_FOUND,
-} from '../../../utils/errors'
+import errors from '../../../utils/errors'
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,7 +12,7 @@ export default async function handler(
 ) {
   const id = req.query.id as string
   if (!isValidObjectId(id)) {
-    return res.status(422).send({ message: PARAMS_INVALID })
+    return res.status(422).send({ message: errors.PARAMS_INVALID })
   }
 
   switch (req.method) {
@@ -31,7 +20,7 @@ export default async function handler(
       const user = await User.findOne({ _id: id }).exec()
 
       if (!user) {
-        return res.status(404).send({ message: USER_NOT_FOUND })
+        return res.status(404).send({ message: errors.USER_NOT_FOUND })
       }
 
       const base64 = user.image.data.toString('base64')
@@ -55,7 +44,7 @@ export default async function handler(
           const name = req.body.name
 
           if (typeof name !== 'string') {
-            return res.status(422).send({ message: NAME_INVALID })
+            return res.status(422).send({ message: errors.NAME_INVALID })
           }
 
           update = req.body
@@ -64,7 +53,7 @@ export default async function handler(
           const email = req.body.email
 
           if (typeof email !== 'string') {
-            return res.status(422).send({ message: EMAIL_INVALID })
+            return res.status(422).send({ message: errors.EMAIL_INVALID })
           }
 
           update = req.body
@@ -73,7 +62,7 @@ export default async function handler(
           const password = req.body.password
 
           if (typeof password !== 'string') {
-            return res.status(422).send({ message: PASSWORD_INVALID })
+            return res.status(422).send({ message: errors.PASSWORD_INVALID })
           }
 
           const salt = randomBytes(16).toString('hex')
@@ -86,22 +75,24 @@ export default async function handler(
           const { type, base64Uri }: Image = req.body.image
 
           if (!base64Uri || !type) {
-            return res.status(422).send({ message: DATA_INVALID })
+            return res.status(422).send({ message: errors.DATA_INVALID })
           }
 
           if (!['image/jpeg', 'image/png', 'image/gif'].includes(type)) {
-            return res.status(422).send({ message: USER_IMAGE_INVALID })
+            return res.status(422).send({ message: errors.USER_IMAGE_INVALID })
           }
 
           if (base64Uri.search(/^data:image\/(jpeg|png|gif);base64,/) === -1) {
-            return res.status(422).send({ message: DATA_INVALID })
+            return res.status(422).send({ message: errors.DATA_INVALID })
           }
 
           const b64: string = base64Uri.split(',')[1]
           const pad =
             b64.slice(-1) == '=' ? 1 : 0 + b64.slice(-2) == '=' ? 1 : 0
           if (b64.length * (3 / 4) - pad > 1000000) {
-            return res.status(413).send({ message: USER_IMAGE_TOO_LARGE })
+            return res
+              .status(413)
+              .send({ message: errors.USER_IMAGE_TOO_LARGE })
           }
 
           update = {
@@ -109,14 +100,14 @@ export default async function handler(
           }
           break
         default:
-          return res.status(422).send({ message: DATA_INVALID })
+          return res.status(422).send({ message: errors.DATA_INVALID })
       }
 
       try {
         await dbConnect()
         await User.updateOne({ _id: id }, update).exec()
       } catch (e) {
-        res.status(500).send({ message: INTERNAL_SERVER_ERROR })
+        res.status(500).send({ message: errors.INTERNAL_SERVER_ERROR })
       }
 
       res.status(200).end()
@@ -129,14 +120,14 @@ export default async function handler(
         await dbConnect()
         await User.deleteOne({ _id: id }).exec()
       } catch (e) {
-        res.status(500).send({ message: INTERNAL_SERVER_ERROR })
+        res.status(500).send({ message: errors.INTERNAL_SERVER_ERROR })
       }
 
       res.status(200).end()
       break
     }
     default:
-      res.status(405).send({ message: METHOD_NOT_ALLOWED })
+      res.status(405).send({ message: errors.METHOD_NOT_ALLOWED })
   }
 }
 
