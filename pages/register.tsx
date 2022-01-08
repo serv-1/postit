@@ -8,7 +8,7 @@ import PasswordInput from '../components/PasswordInput'
 import { useState } from 'react'
 import { registerSchema } from '../utils/joiSchemas'
 import { signIn } from 'next-auth/react'
-import { DEFAULT_SERVER_ERROR, NO_RESPONSE } from '../utils/errors'
+import err from '../utils/errors'
 
 type FormFields = {
   name: string
@@ -46,12 +46,12 @@ const Register = () => {
       router.push('/profile')
     } catch (e) {
       const res = (e as AxiosError).response
-      if (!res) return setServerError(NO_RESPONSE)
+      if (!res) return setServerError(err.NO_RESPONSE)
       const { name, message } = res.data
       if (res.status === 422) {
         return setError(name, { message }, { shouldFocus: true })
       }
-      setServerError(message || DEFAULT_SERVER_ERROR)
+      setServerError(message || err.DEFAULT_SERVER_ERROR)
     }
   }
 

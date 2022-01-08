@@ -2,7 +2,7 @@ import PasswordInput from '../../components/PasswordInput'
 import { render, screen } from '@testing-library/react'
 import { FieldError, useForm, UseFormSetFocus } from 'react-hook-form'
 import userEvent from '@testing-library/user-event'
-import { PASSWORD_REQUIRED } from '../../utils/errors'
+import err from '../../utils/errors'
 
 type FormFields = { password: string }
 type Props = {
@@ -19,7 +19,7 @@ const setFocus = jest.fn()
 const strongPassword = 'aeronautic flyby'
 const labelName = 'Password'
 const name = 'password'
-const error = { type: 'required', message: PASSWORD_REQUIRED }
+const error = { type: 'required', message: err.PASSWORD_REQUIRED }
 
 const factory = ({
   rules = false,
@@ -50,8 +50,6 @@ const factory = ({
   }
   render(<Form />)
 }
-
-afterEach(() => jest.resetAllMocks())
 
 describe('PasswordInput', () => {
   it('should use the name for html attributes', () => {

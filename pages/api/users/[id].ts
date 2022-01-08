@@ -17,6 +17,7 @@ export default async function handler(
 
   switch (req.method) {
     case 'GET':
+      await dbConnect()
       const user = await User.findOne({ _id: id }).exec()
 
       if (!user) {

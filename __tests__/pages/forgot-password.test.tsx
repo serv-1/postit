@@ -2,8 +2,7 @@ import ForgotPassword from '../../pages/auth/forgot-password'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/errors'
-import { rest } from 'msw'
-import server from '../../mocks/server'
+import { mockResponse } from '../../utils/msw'
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 
@@ -14,17 +13,11 @@ const factory = () => {
   render(<ForgotPassword csrfToken={csrfToken} />)
 }
 
-const mockResponse = (code: number, message: string) => {
-  server.use(
-    rest.post('http://localhost:3000/api/verifyEmail', (req, res, ctx) => {
-      return res(ctx.status(code), ctx.json({ message }))
-    })
-  )
-}
-
 describe('ForgotPassword', () => {
   it('should render server-side error', async () => {
-    mockResponse(405, err.METHOD_NOT_ALLOWED)
+    mockResponse('post', '/api/verifyEmail', 405, {
+      message: err.METHOD_NOT_ALLOWED,
+    })
     factory()
     userEvent.type(screen.getByRole('textbox'), email)
     userEvent.click(screen.getByRole('button'))
@@ -46,7 +39,9 @@ describe('ForgotPassword', () => {
     })
 
     it('should render server-side validation error and focus the field that goes with', async () => {
-      mockResponse(422, err.EMAIL_UNKNOWN)
+      mockResponse('post', '/api/verifyEmail', 422, {
+        message: err.EMAIL_UNKNOWN,
+      })
       factory()
       userEvent.type(screen.getByRole('textbox'), email)
       userEvent.click(screen.getByRole('button'))

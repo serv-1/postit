@@ -45,8 +45,6 @@ const factory = ({
   render(<Form />)
 }
 
-afterEach(() => jest.resetAllMocks())
-
 describe('TextInput', () => {
   it('should use the name for html attributes', () => {
     factory({ isFormSubmitted: true, error })

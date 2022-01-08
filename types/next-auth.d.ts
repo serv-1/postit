@@ -1,14 +1,14 @@
 import NextAuth from 'next-auth'
 
-type SessionUser = Omit<User, 'image'>
+type SessionUser = {
+  id: string
+  name: string
+  email: string
+}
 
 declare module 'next-auth' {
-  interface Session {
-    user: SessionUser
-  }
-
   interface User {
-    id: number
+    id: string
     email: string
     name: string
     image:
@@ -17,6 +17,10 @@ declare module 'next-auth' {
           data: Buffer
           contentType: string
         }
+  }
+
+  interface Session {
+    user: SessionUser
   }
 }
 

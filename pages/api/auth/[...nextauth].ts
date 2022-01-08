@@ -8,7 +8,7 @@ import clientPromise from '../../../lib/mongodb'
 import User, { defaultImage } from '../../../models/User'
 import dbConnect from '../../../utils/dbConnect'
 import env from '../../../utils/env'
-import { INTERNAL_SERVER_ERROR } from '../../../utils/errors'
+import err from '../../../utils/errors'
 
 export default NextAuth({
   providers: [
@@ -19,17 +19,17 @@ export default NextAuth({
       },
       async authorize(credentials, req) {
         try {
-          const res = await axios.post('http://localhost:3000/api/signIn', {
+          const res = await axios.post(env.BASE_URL + '/api/signIn', {
             email: credentials?.email,
             password: credentials?.password,
           })
           return res.data
         } catch (e) {
-          const err = e as AxiosError
-          if (err.response) {
-            throw new Error(err.response.data.message)
+          const res = (e as AxiosError).response
+          if (!res) {
+            throw new Error(err.NO_RESPONSE)
           }
-          throw new Error(INTERNAL_SERVER_ERROR)
+          throw new Error(res.data.message || err.DEFAULT_SERVER_ERROR)
         }
       },
     }),

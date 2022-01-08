@@ -1,9 +1,8 @@
 import Register from '../../pages/register'
 import { screen, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import server from '../../mocks/server'
 import err from '../../utils/errors'
-import { rest } from 'msw'
+import { mockResponse } from '../../utils/msw'
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
@@ -22,11 +21,7 @@ describe('Register form', () => {
   beforeEach(() => render(<Register />))
 
   it('should sign in the user and redirect to the profile page after a successful submission', async () => {
-    server.use(
-      rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
-        return res(ctx.status(200))
-      })
-    )
+    mockResponse('post', '/api/user', 200)
     validSubmission()
     await waitFor(() => {
       expect(router.push).toHaveBeenCalledWith('/profile')
@@ -35,11 +30,7 @@ describe('Register form', () => {
   })
 
   it('should redirect to the sign in page if an error occured while trying to sign in the user', async () => {
-    server.use(
-      rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
-        return res(ctx.status(200))
-      })
-    )
+    mockResponse('post', '/api/user', 200)
     signIn.mockResolvedValue({ error: 'err', ok: true, status: 200, url: null })
     validSubmission()
     await waitFor(() => {
@@ -49,14 +40,7 @@ describe('Register form', () => {
   })
 
   it('should render server-side error not related to the fields', async () => {
-    server.use(
-      rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
-        return res(
-          ctx.status(405),
-          ctx.json({ message: err.METHOD_NOT_ALLOWED })
-        )
-      })
-    )
+    mockResponse('post', '/api/user', 405, { message: err.METHOD_NOT_ALLOWED })
     validSubmission()
     expect(await screen.findByRole('alert')).toHaveTextContent(
       err.METHOD_NOT_ALLOWED
@@ -105,8 +89,7 @@ describe('Register form', () => {
 
   describe('Name', () => {
     it('should display an error when it is greater than 90 characters.', async () => {
-      let name = ''
-      for (let i = 0; i < 91; i++) name += '.'
+      const name = new Uint8Array(91).toString()
       userEvent.type(screen.getByLabelText(/name/i), name)
       userEvent.click(screen.getByRole('button', { name: 'Register' }))
       expect(await screen.findByText(err.NAME_MAX)).toBeInTheDocument()

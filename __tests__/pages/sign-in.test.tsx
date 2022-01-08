@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/errors'
 import { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
+
 const csrfToken = 'csrfToken'
 const email = 'example@test.com'
 const password = '0123456789'
