@@ -1,4 +1,4 @@
-import DeleteUser from '../components/DeleteUser'
+import ProfileDeleteAccount from '../components/ProfileDeleteAccount'
 import Toast from '../components/Toast'
 import UpdateImage from '../components/UpdateImage'
 import UpdateNameOrEmail from '../components/UpdateNameOrEmail'
@@ -14,7 +14,7 @@ const Profile = () => {
         <UpdateNameOrEmail subject="email" />
       </h1>
       <UpdatePassword />
-      <DeleteUser />
+      <ProfileDeleteAccount />
     </main>
   )
 }

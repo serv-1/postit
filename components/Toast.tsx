@@ -1,20 +1,24 @@
 import { useToast } from '../contexts/toast'
+import CloseButton from './CloseButton'
 
 const needWhiteText = ['success', 'danger', 'primary', 'secondary', 'dark']
 
 const Toast = () => {
   const { toast, setToast } = useToast()
-
   const { message, background } = toast
+
+  let toastClass =
+    'position-absolute start-50 p-2 rounded-pill d-flex shadow-lg justify-content-between'
+
   const bg = background || 'primary'
-  const textColor = needWhiteText.includes(bg) ? ' text-white' : ''
-  const btnColor = textColor ? ' btn-close-white' : ''
+  toastClass += ' bg-' + bg
+
+  const needWhite = needWhiteText.includes(bg)
+  if (needWhite) toastClass += ' text-white'
 
   return message ? (
     <div
-      className={`position-absolute start-50 bg-${
-        bg + textColor
-      } p-2 rounded-pill d-flex shadow-lg justify-content-between`}
+      className={toastClass}
       style={{
         zIndex: 2000,
         transform: 'translateX(-50%)',
@@ -22,11 +26,11 @@ const Toast = () => {
       role="alert"
     >
       <div>{message}</div>
-      <button
-        className={`btn-close${btnColor} ms-2`}
-        aria-label="close"
+      <CloseButton
+        className="ms-2"
+        isWhite={needWhite}
         onClick={() => setToast({ message: null })}
-      ></button>
+      />
     </div>
   ) : null
 }
