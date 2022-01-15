@@ -1,8 +1,8 @@
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, ReactNode, SetStateAction } from 'react'
 import CloseButton from './CloseButton'
 
-type ModalProps = {
-  children: JSX.Element | JSX.Element[] | string
+export interface ModalProps {
+  children: ReactNode
   title: string
   setIsModalOpen: Dispatch<SetStateAction<boolean>>
 }

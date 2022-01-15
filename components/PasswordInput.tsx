@@ -1,129 +1,83 @@
-import { ChangeEvent, useEffect, useState } from 'react'
-import {
-  FieldPath,
-  FieldError,
-  UseFormRegister,
-  UseFormSetFocus,
-} from 'react-hook-form'
+import classNames from 'classnames'
+import { ChangeEvent, ComponentPropsWithoutRef, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
 import zxcvbn from 'zxcvbn'
-import Link from 'next/link'
 import Eye from '../public/static/images/eye-fill.svg'
 import EyeSlash from '../public/static/images/eye-slash-fill.svg'
+import Button from './Button'
+import TextInput from './TextInput'
 
-type Props<TFieldValues> = {
-  labelName: string
-  rules?: boolean
-  showBtn?: boolean
-  strength?: boolean
-  forgotPassword?: boolean
-  name: FieldPath<TFieldValues>
-  isFormSubmitted: boolean
-  error?: FieldError
-  register: UseFormRegister<TFieldValues>
-  setFocus?: UseFormSetFocus<TFieldValues>
-  userInputs?: string[]
-}
-
-type PasswordStrength = {
+interface Strength {
   estimated_time: string | number
   color: string
 }
 
-const PasswordInput = <TFieldValues,>({
-  labelName,
-  rules,
-  showBtn,
-  strength,
-  forgotPassword,
-  name,
-  isFormSubmitted,
-  error,
-  register,
-  setFocus,
-  userInputs,
-}: Props<TFieldValues>) => {
-  const [showPassword, setShowPassword] = useState(false)
-  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>()
+export interface PasswordInputProps extends ComponentPropsWithoutRef<'input'> {
+  needFocus?: boolean
+  showStrength?: boolean
+  hasRules?: boolean
+}
 
-  useEffect(() => {
-    if (!setFocus) return
-    setFocus(name)
-  }, [setFocus, name])
+const PasswordInput = ({
+  showStrength,
+  needFocus,
+  hasRules,
+  ...props
+}: PasswordInputProps) => {
+  const [showPassword, setShowPassword] = useState(false)
+  const [strength, setStrength] = useState<Strength>()
+  const { getValues } = useFormContext()
+  const values = Object.values(getValues()).slice(0, -1)
+
+  const ariaDescr = classNames('visibilityBtn passwordStrength', {
+    passwordRules: hasRules,
+  })
 
   const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { crack_times_display, score } = zxcvbn(e.target.value, userInputs)
-    let c = 'success'
-    if (score <= 2) c = 'danger'
-    else if (score === 3) c = 'warning'
-    setPasswordStrength({
+    const { crack_times_display, score } = zxcvbn(e.target.value, values)
+
+    let color = 'success'
+    if (score <= 2) color = 'danger'
+    else if (score === 3) color = 'warning'
+
+    setStrength({
       estimated_time: crack_times_display.offline_slow_hashing_1e4_per_second,
-      color: c,
+      color,
     })
   }
 
-  const inputClass = isFormSubmitted && (error ? 'is-invalid' : 'is-valid')
-  const pwFeedbackId = name + 'Feedback'
-  const pwStrengthId = name + 'Strength'
-  const pwRulesId = name + 'Rules'
-
   return (
-    <div className="mb-3 text-start">
-      <label htmlFor={name} className="form-label">
-        {labelName}
-      </label>
-      {rules && (
-        <div className="form-text m-0" id={pwRulesId} role="note">
-          It must be 10-20 characters long. It must not equal the others
-          fields&apos; value. There is no characters restriction so you can use
-          emojis, cyrillic, etc.
-        </div>
+    <>
+      <Button
+        id="visibilityBtn"
+        className="btn-outline-secondary"
+        onClick={() => setShowPassword(!showPassword)}
+        aria-label={(showPassword ? 'Hide' : 'Show') + ' password'}
+      >
+        {showPassword ? (
+          <EyeSlash data-testid="eyeClosed" width="20" height="20" />
+        ) : (
+          <Eye data-testid="eyeOpened" width="20" height="20" />
+        )}
+      </Button>
+      <TextInput
+        {...props}
+        name="password"
+        type={showPassword ? 'text' : 'password'}
+        onChange={showStrength ? onPasswordChange : undefined}
+        aria-describedby={ariaDescr}
+        needFocus={needFocus}
+      />
+      {showStrength && strength && (
+        <span
+          className={`input-group-text text-white border-1 border-${strength.color} bg-${strength.color}`}
+          id="passwordStrength"
+          role="status"
+        >
+          Need {strength.estimated_time} to crack
+        </span>
       )}
-      <div className="input-group">
-        {showBtn && (
-          <button
-            id="visibilityBtn"
-            className="btn btn-outline-secondary"
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? (
-              <Eye width="20" height="20" aria-label="Hide password" />
-            ) : (
-              <EyeSlash width="20" height="20" aria-label="Show password" />
-            )}
-          </button>
-        )}
-        <input
-          {...register(name)}
-          onChange={onPasswordChange}
-          type={showPassword ? 'text' : 'password'}
-          id={name}
-          className={`form-control ${inputClass || ''}`}
-          aria-describedby={`${pwFeedbackId} ${pwRulesId} ${pwStrengthId} visibilityBtn`}
-        />
-        {strength && passwordStrength && (
-          <span
-            className={`input-group-text text-white border-1 border-${passwordStrength.color} bg-${passwordStrength.color}`}
-            id={pwStrengthId}
-            role="status"
-          >
-            Need {passwordStrength.estimated_time} to crack
-          </span>
-        )}
-        {isFormSubmitted && error && (
-          <div className="invalid-feedback" id={pwFeedbackId} role="alert">
-            {error.message}
-          </div>
-        )}
-      </div>
-      {forgotPassword && (
-        <Link href="/auth/forgot-password">
-          <a className="form-text d-block text-decoration-none text-dark text-end">
-            Forgot password?
-          </a>
-        </Link>
-      )}
-    </div>
+    </>
   )
 }
 

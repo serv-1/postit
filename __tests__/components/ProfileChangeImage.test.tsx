@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import UpdateImage from '../../components/UpdateImage'
+import ProfileChangeImage from '../../components/ProfileChangeImage'
 import { ToastProvider } from '../../contexts/toast'
 import userEvent from '@testing-library/user-event'
 import { mockSession } from '../../mocks/nextAuth'
@@ -22,7 +22,7 @@ const factory = () => {
   render(
     <SessionProvider session={mockSession}>
       <ToastProvider>
-        <UpdateImage />
+        <ProfileChangeImage />
         <Toast />
       </ToastProvider>
     </SessionProvider>
@@ -37,7 +37,7 @@ afterEach(() => {
   axios.put = axiosPut
 })
 
-describe('UpdateImage', () => {
+describe('ProfileChangeImage', () => {
   describe('API call', () => {
     it('should render an error if the image cannot be obtained', async () => {
       mockResponse('get', '/api/users/:id', 404, {

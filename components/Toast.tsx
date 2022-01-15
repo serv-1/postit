@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import { useToast } from '../contexts/toast'
 import CloseButton from './CloseButton'
 
@@ -5,27 +6,27 @@ const needWhiteText = ['success', 'danger', 'primary', 'secondary', 'dark']
 
 const Toast = () => {
   const { toast, setToast } = useToast()
-  const { message, background } = toast
 
-  let toastClass =
-    'position-absolute start-50 p-2 rounded-pill d-flex shadow-lg justify-content-between'
-
-  const bg = background || 'primary'
-  toastClass += ' bg-' + bg
-
+  const bg = toast.background || 'primary'
   const needWhite = needWhiteText.includes(bg)
-  if (needWhite) toastClass += ' text-white'
 
-  return message ? (
+  const className = classNames(
+    'position-absolute start-50 p-2 rounded-pill',
+    'd-flex shadow-lg justify-content-between',
+    `bg-${bg}`,
+    { 'text-white': needWhite }
+  )
+
+  return toast.message ? (
     <div
-      className={toastClass}
+      className={className}
       style={{
         zIndex: 2000,
         transform: 'translateX(-50%)',
       }}
       role="alert"
     >
-      <div>{message}</div>
+      <div>{toast.message}</div>
       <CloseButton
         className="ms-2"
         isWhite={needWhite}

@@ -5,12 +5,16 @@ import Head from 'next/head'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
-import TextInput from '../../components/TextInput'
 import { emailSchema } from '../../utils/joiSchemas'
 import Send from '../../public/static/images/send.svg'
 import err from '../../utils/errors'
+import Form from '../../components/Form'
+import FormTextField from '../../components/FormTextField'
+import Button from '../../components/Button'
 
-type FormFields = { email: string }
+interface FormFields {
+  email: string
+}
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
@@ -20,17 +24,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 }
 
-const ForgotPassword = ({ csrfToken }: { csrfToken?: string }) => {
-  const [serverError, setServerError] = useState<string>()
-  const {
-    handleSubmit,
-    register,
-    formState: { errors, isSubmitted },
-    setFocus,
-    setError,
-  } = useForm<FormFields>({ resolver: joiResolver(emailSchema) })
+interface ForgotPasswordProps {
+  csrfToken?: string
+}
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+const ForgotPassword = ({ csrfToken }: ForgotPasswordProps) => {
+  const [serverError, setServerError] = useState<string>()
+  const methods = useForm<FormFields>({ resolver: joiResolver(emailSchema) })
+
+  const submitHandler: SubmitHandler<FormFields> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/verifyEmail', data)
       await signIn('email', {
@@ -42,7 +44,7 @@ const ForgotPassword = ({ csrfToken }: { csrfToken?: string }) => {
       if (!res) return setServerError(err.NO_RESPONSE)
       const { message } = res.data
       if (res.status === 422) {
-        return setError('email', { message }, { shouldFocus: true })
+        return methods.setError('email', { message }, { shouldFocus: true })
       }
       setServerError(message)
     }
@@ -66,30 +68,23 @@ const ForgotPassword = ({ csrfToken }: { csrfToken?: string }) => {
             {serverError}
           </div>
         )}
-        <form
-          name="sendEmail"
-          id="sendEmail"
+        <Form
+          name="sendMail"
           method="post"
-          action=""
-          encType="application/json"
-          noValidate
-          className="p-2 text-end"
-          onSubmit={handleSubmit(onSubmit)}
+          submitHandlers={{ submitHandler }}
+          methods={methods}
+          csrfToken={csrfToken}
         >
-          <input type="hidden" value={csrfToken} name="csrfToken" />
-          <TextInput
-            email
-            name="email"
-            labelName="Email"
-            setFocus={setFocus}
-            register={register}
-            error={errors.email}
-            isFormSubmitted={isSubmitted}
+          <FormTextField
+            labelText="Email"
+            inputName="email"
+            type="email"
+            needFocus
           />
-          <button type="submit" className="btn btn-primary">
+          <Button type="submit" className="btn-primary">
             <Send /> Send
-          </button>
-        </form>
+          </Button>
+        </Form>
       </main>
     </>
   )

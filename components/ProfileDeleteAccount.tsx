@@ -19,12 +19,17 @@ const ProfileDeleteAccount = () => {
   const deleteUser = async () => {
     try {
       await axios.delete(`http://localhost:3000/api/users/${id}`)
+
       const data = await signOut({ redirect: false, callbackUrl: '/' })
+
       router.push(data.url)
     } catch (e) {
       const res = (e as AxiosError).response
-      if (!res)
+
+      if (!res) {
         return setToast({ message: err.NO_RESPONSE, background: 'danger' })
+      }
+
       setToast({
         message: res.data.message || err.DEFAULT_SERVER_ERROR,
         background: 'danger',
@@ -33,10 +38,10 @@ const ProfileDeleteAccount = () => {
   }
 
   return (
-    <div className="w-25 m-auto">
+    <div className="container text-center">
       <OpenModalButton
         name="Delete your account"
-        className="btn-danger w-100"
+        className="btn-danger"
         setIsModalOpen={setIsModalOpen}
       />
       {isModalOpen && (

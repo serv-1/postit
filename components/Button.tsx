@@ -1,19 +1,23 @@
-import { MouseEventHandler } from 'react'
+import { ComponentPropsWithoutRef } from 'react'
+import classNames from 'classnames'
 
-type ButtonProps = {
-  children?: JSX.Element | JSX.Element[] | string
-  className: string
-  onClick?: MouseEventHandler<HTMLButtonElement>
-  ariaLabel?: string
+export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
+  gradient?: boolean
 }
 
-const Button = ({ children, className, onClick, ariaLabel }: ButtonProps) => {
+const Button = ({
+  className,
+  type,
+  children,
+  gradient,
+  ...props
+}: ButtonProps) => {
+  const _className = classNames('btn', className, {
+    'bg-gradient': gradient,
+  })
+
   return (
-    <button
-      aria-label={ariaLabel}
-      className={`btn ${className}`}
-      onClick={onClick}
-    >
+    <button {...props} type={type || 'button'} className={_className}>
       {children}
     </button>
   )

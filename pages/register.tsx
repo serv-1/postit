@@ -3,14 +3,15 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
-import TextInput from '../components/TextInput'
-import PasswordInput from '../components/PasswordInput'
 import { useState } from 'react'
 import { registerSchema } from '../utils/joiSchemas'
 import { signIn } from 'next-auth/react'
 import err from '../utils/errors'
+import Form from '../components/Form'
+import FormTextField from '../components/FormTextField'
+import FormPasswordField from '../components/FormPasswordField'
 
-type FormFields = {
+interface FormFields {
   name: string
   email: string
   password: string
@@ -18,18 +19,10 @@ type FormFields = {
 
 const Register = () => {
   const [serverError, setServerError] = useState<string>()
-  const [nameValue, setNameValue] = useState<string>()
-  const [emailValue, setEmailValue] = useState<string>()
-  const {
-    register,
-    formState: { errors, isSubmitted },
-    handleSubmit,
-    setError,
-    setFocus,
-  } = useForm<FormFields>({ resolver: joiResolver(registerSchema) })
+  const methods = useForm<FormFields>({ resolver: joiResolver(registerSchema) })
   const router = useRouter()
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+  const submitHandler: SubmitHandler<FormFields> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/user', data)
       await signIn('email', {
@@ -49,16 +42,11 @@ const Register = () => {
       if (!res) return setServerError(err.NO_RESPONSE)
       const { name, message } = res.data
       if (res.status === 422) {
-        return setError(name, { message }, { shouldFocus: true })
+        return methods.setError(name, { message }, { shouldFocus: true })
       }
       setServerError(message || err.DEFAULT_SERVER_ERROR)
     }
   }
-
-  const userInputs: string[] = []
-
-  if (nameValue) userInputs.push(nameValue)
-  if (emailValue) userInputs.push(emailValue)
 
   return (
     <>
@@ -72,47 +60,23 @@ const Register = () => {
             {serverError}
           </div>
         )}
-        <form
+        <Form
           name="register"
-          id="register"
-          className="p-2 text-end"
           method="post"
-          action=""
-          encType="application/json"
-          noValidate
-          onSubmit={handleSubmit(onSubmit)}
+          submitHandlers={{ submitHandler }}
+          methods={methods}
+          className="text-end"
         >
-          <TextInput
-            labelName="Name"
-            name="name"
-            isFormSubmitted={isSubmitted}
-            error={errors.name}
-            register={register}
-            setFocus={setFocus}
-            setValue={setNameValue}
+          <FormTextField
+            labelText="Name"
+            inputName="name"
+            type="text"
+            needFocus
           />
-          <TextInput
-            labelName="Email"
-            email
-            name="email"
-            isFormSubmitted={isSubmitted}
-            error={errors.email}
-            register={register}
-            setValue={setEmailValue}
-          />
-          <PasswordInput
-            labelName="Password"
-            rules
-            showBtn
-            strength
-            name="password"
-            isFormSubmitted={isSubmitted}
-            error={errors.password}
-            register={register}
-            userInputs={userInputs}
-          />
+          <FormTextField labelText="Email" inputName="email" type="email" />
+          <FormPasswordField showForgotPasswordLink showStrength showRules />
           <input type="submit" value="Register" className="btn btn-primary" />
-        </form>
+        </Form>
       </main>
     </>
   )

@@ -1,25 +1,19 @@
-import { MouseEventHandler } from 'react'
+import classNames from 'classnames'
+import { ComponentPropsWithoutRef } from 'react'
 import Button from './Button'
 
-export type CloseButtonProps = {
+export interface CloseButtonProps extends ComponentPropsWithoutRef<'button'> {
   isWhite?: boolean
-  onClick: MouseEventHandler<HTMLButtonElement>
-  className?: string
 }
 
-const CloseButton = ({
-  isWhite = false,
-  onClick,
-  className,
-}: CloseButtonProps) => {
-  let _class = 'btn-close'
-
-  if (isWhite) _class += ' btn-close-white'
-  if (className) _class += ' ' + className
-
-  return (
-    <Button ariaLabel="Close" className={_class} onClick={onClick}></Button>
+const CloseButton = ({ isWhite, className, ...props }: CloseButtonProps) => {
+  const _className = classNames(
+    'btn-close',
+    { 'btn-close-white': isWhite },
+    className
   )
+
+  return <Button {...props} aria-label="Close" className={_className}></Button>
 }
 
 export default CloseButton

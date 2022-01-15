@@ -49,26 +49,6 @@ describe('ForgotPassword', () => {
       expect(screen.getByRole('textbox')).toHaveFocus()
     })
 
-    it('should focus the first field at first render', () => {
-      factory()
-      expect(screen.getByRole('textbox')).toHaveFocus()
-    })
-
-    it('should not focus the first field after the first render', async () => {
-      factory()
-      userEvent.click(screen.getByRole('button'))
-      await waitFor(() => expect(screen.getByRole('textbox')).not.toHaveFocus())
-    })
-
-    describe('CSRF Token', () => {
-      it('should be an input type hidden with the CSRF token as value', () => {
-        factory()
-        const input = screen.getByDisplayValue(csrfToken)
-        expect(input).toHaveAttribute('type', 'hidden')
-        expect(input).toHaveDisplayValue(csrfToken)
-      })
-    })
-
     describe('Email', () => {
       it('should be rendered', () => {
         factory()

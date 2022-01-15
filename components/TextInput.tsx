@@ -1,65 +1,40 @@
-import { ChangeEvent, Dispatch, SetStateAction, useEffect } from 'react'
-import {
-  FieldPath,
-  FieldError,
-  UseFormRegister,
-  UseFormSetFocus,
-} from 'react-hook-form'
+import classNames from 'classnames'
+import React from 'react'
+import { useFormContext } from 'react-hook-form'
 
-type Props<TFieldValues> = {
-  labelName: string
-  email?: boolean
-  name: FieldPath<TFieldValues>
-  isFormSubmitted: boolean
-  error?: FieldError
-  register: UseFormRegister<TFieldValues>
-  setFocus?: UseFormSetFocus<TFieldValues>
-  setValue?: Dispatch<SetStateAction<string | undefined>>
+interface TextInputProps extends React.ComponentPropsWithRef<'input'> {
+  name: string
+  needFocus?: boolean
 }
 
-const TextInput = <TFieldValues,>({
-  labelName,
-  email,
+const TextInput = ({
   name,
-  isFormSubmitted,
-  error,
-  register,
-  setFocus,
-  setValue,
-}: Props<TFieldValues>) => {
-  const type = email ? 'email' : 'text'
-  const inputClass = isFormSubmitted && (error ? ' is-invalid' : ' is-valid')
-  const feedbackName = name + 'Feedback'
+  onBlur,
+  onChange,
+  needFocus,
+  className,
+  ...props
+}: TextInputProps) => {
+  const { register, setFocus, formState } = useFormContext()
+  const { isSubmitted, errors } = formState
 
-  useEffect(() => {
-    if (!setFocus) return
-    setFocus(name)
-  }, [setFocus, name])
+  const _className = classNames(
+    'form-control',
+    isSubmitted && (errors[name] ? 'is-invalid' : 'is-valid'),
+    className
+  )
+
+  React.useEffect(() => {
+    if (needFocus) setFocus(name)
+  }, [needFocus, setFocus, name])
 
   return (
-    <div className="mb-3 text-start">
-      <label htmlFor={name} className="form-label">
-        {labelName}
-      </label>
-      <input
-        {...register(
-          name,
-          setValue && {
-            onChange: (e: ChangeEvent<HTMLInputElement>) =>
-              setValue(e.target.value),
-          }
-        )}
-        type={type}
-        id={name}
-        className={`form-control${inputClass || ''}`}
-        aria-describedby={feedbackName}
-      />
-      {isFormSubmitted && error && (
-        <div className="invalid-feedback" id={feedbackName} role="alert">
-          {error.message}
-        </div>
-      )}
-    </div>
+    <input
+      {...props}
+      {...register(name, { onBlur, onChange })}
+      className={_className}
+      id={name}
+    />
   )
 }
 

@@ -39,7 +39,7 @@ describe('Register form', () => {
     })
   })
 
-  it('should render server-side error not related to the fields', async () => {
+  it('should render server-side error not related to the form validation', async () => {
     mockResponse('post', '/api/user', 405, { message: err.METHOD_NOT_ALLOWED })
     validSubmission()
     expect(await screen.findByRole('alert')).toHaveTextContent(
@@ -53,24 +53,7 @@ describe('Register form', () => {
     expect(screen.getByLabelText(/email/i)).toHaveFocus()
   })
 
-  it('should focus the first field at first render', () => {
-    expect(screen.getByLabelText(/name/i)).toHaveFocus()
-  })
-
-  it('should not focus the first field after the first render', async () => {
-    userEvent.click(screen.getByRole('button', { name: 'Register' }))
-    await waitFor(() =>
-      expect(screen.getByLabelText(/name/i)).not.toHaveFocus()
-    )
-  })
-
   describe('All fields', () => {
-    it('should be rendered correctly', () => {
-      expect(screen.getByLabelText(/name/i)).toBeInTheDocument()
-      expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-      expect(screen.getByLabelText(/^password/i)).toBeInTheDocument()
-    })
-
     it('should display an error when it is empty', async () => {
       const btn = screen.getByRole('button', { name: 'Register' })
       userEvent.click(btn)

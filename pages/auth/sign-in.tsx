@@ -1,23 +1,19 @@
 import Head from 'next/head'
 import { GetServerSideProps } from 'next'
-import {
-  getCsrfToken,
-  signIn,
-  getProviders,
-  LiteralUnion,
-  ClientSafeProvider,
-} from 'next-auth/react'
+import * as NextAuth from 'next-auth/react'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { signInSchema } from '../../utils/joiSchemas'
-import TextInput from '../../components/TextInput'
-import PasswordInput from '../../components/PasswordInput'
 import Link from 'next/link'
 import { BuiltInProviderType } from 'next-auth/providers'
+import Form from '../../components/Form'
+import FormTextField from '../../components/FormTextField'
+import FormPasswordField from '../../components/FormPasswordField'
+import Button from '../../components/Button'
 
-type FormFields = {
+interface FormFields {
   email: string
   password: string
 }
@@ -25,44 +21,38 @@ type FormFields = {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
-      csrfToken: await getCsrfToken(ctx),
-      providers: await getProviders(),
+      csrfToken: await NextAuth.getCsrfToken(ctx),
+      providers: await NextAuth.getProviders(),
     },
   }
 }
 
-type Props = {
-  csrfToken?: string | null
+interface SignInProps {
+  csrfToken?: string
   providers: Record<
-    LiteralUnion<BuiltInProviderType, string>,
-    ClientSafeProvider
+    NextAuth.LiteralUnion<BuiltInProviderType, string>,
+    NextAuth.ClientSafeProvider
   > | null
 }
 
-const SignIn = ({ csrfToken, providers }: Props) => {
+const SignIn = ({ csrfToken, providers }: SignInProps) => {
   const [serverError, setServerError] = useState<string>()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitted },
-    setFocus,
-    setError,
-  } = useForm<FormFields>({
+  const methods = useForm<FormFields>({
     resolver: joiResolver(signInSchema),
   })
   const router = useRouter()
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    const res = await signIn<'credentials'>('credentials', {
+  const submitHandler: SubmitHandler<FormFields> = async (data) => {
+    const res = await NextAuth.signIn<'credentials'>('credentials', {
       ...data,
       redirect: false,
     })
     if (res && res.error) {
       const err = res.error
       if (new RegExp(/email/i).test(err)) {
-        setError('email', { message: err }, { shouldFocus: true })
+        methods.setError('email', { message: err }, { shouldFocus: true })
       } else if (new RegExp(/password/i).test(err)) {
-        setError('password', { message: err }, { shouldFocus: true })
+        methods.setError('password', { message: err }, { shouldFocus: true })
       } else {
         setServerError(err)
       }
@@ -88,38 +78,20 @@ const SignIn = ({ csrfToken, providers }: Props) => {
               {serverError}
             </div>
           )}
-          <form
-            name="login"
-            id="login"
+          <Form
+            name="signin"
             method="post"
-            action=""
-            encType="application/json"
-            noValidate
-            className="p-2 text-end"
-            onSubmit={handleSubmit(onSubmit)}
+            submitHandlers={{ submitHandler }}
+            methods={methods}
+            csrfToken={csrfToken}
           >
-            <input
-              type="hidden"
-              name="csrfToken"
-              defaultValue={csrfToken || undefined}
+            <FormTextField
+              labelText="Email"
+              inputName="email"
+              type="email"
+              needFocus
             />
-            <TextInput
-              email
-              name="email"
-              labelName="Email"
-              register={register}
-              error={errors.email}
-              isFormSubmitted={isSubmitted}
-              setFocus={setFocus}
-            />
-            <PasswordInput
-              name="password"
-              register={register}
-              labelName="Password"
-              error={errors.password}
-              isFormSubmitted={isSubmitted}
-              forgotPassword
-            />
+            <FormPasswordField showForgotPasswordLink />
             <div className="d-flex justify-content-between align-items-end">
               <Link href="/register">
                 <a className="text-decoration-none">Create an account</a>
@@ -130,24 +102,25 @@ const SignIn = ({ csrfToken, providers }: Props) => {
                 className="btn btn-primary"
               />
             </div>
-          </form>
+          </Form>
         </section>
         {providers &&
           Object.values(providers).map(
             (provider) =>
               provider.id === 'credentials' ||
               provider.id === 'email' || (
-                <button
+                <Button
                   key={provider.id}
-                  className="btn btn-primary d-block m-auto w-25 mt-4"
+                  data-cy={`${provider.id}Btn`}
+                  className="btn-primary d-block m-auto w-25 mt-4"
                   onClick={() =>
-                    signIn(provider.id, {
+                    NextAuth.signIn(provider.id, {
                       callbackUrl: 'http://localhost:3000/profile',
                     })
                   }
                 >
                   Sign in with <span className="fw-bold">{provider.name}</span>
-                </button>
+                </Button>
               )
           )}
       </main>

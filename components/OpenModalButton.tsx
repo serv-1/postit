@@ -1,19 +1,19 @@
-import { Dispatch, SetStateAction } from 'react'
+import { ComponentPropsWithoutRef, Dispatch, SetStateAction } from 'react'
 import Button from './Button'
 
-type OpenModalButtonProps = {
+export interface OpenModalButtonProps
+  extends ComponentPropsWithoutRef<'button'> {
   name: string
-  className: string
   setIsModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
 const OpenModalButton = ({
   name,
-  className,
   setIsModalOpen,
+  ...props
 }: OpenModalButtonProps) => {
   return (
-    <Button className={className} onClick={() => setIsModalOpen(true)}>
+    <Button {...props} onClick={() => setIsModalOpen(true)}>
       {name}
     </Button>
   )

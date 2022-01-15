@@ -25,7 +25,7 @@ describe('User sign in and register', () => {
       username,
       password,
       loginUrl: 'http://localhost:3000/auth/sign-in',
-      loginSelector: 'button',
+      loginSelector: '[data-cy="googleBtn"]',
       postLoginSelector: '[data-cy="profile"]',
     }).then(({ cookies }: any) => {
       const cookie = cookies.filter(

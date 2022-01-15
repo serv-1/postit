@@ -1,7 +1,11 @@
 import { signIn, useSession } from 'next-auth/react'
-import { useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 
-const AuthGuard = ({ children }: { children: JSX.Element }) => {
+export interface AuthGuardProps {
+  children: ReactNode
+}
+
+const AuthGuard = ({ children }: AuthGuardProps) => {
   const { status } = useSession()
 
   useEffect(() => {
@@ -12,7 +16,7 @@ const AuthGuard = ({ children }: { children: JSX.Element }) => {
   }, [status])
 
   if (status === 'authenticated') {
-    return children
+    return <>{children}</>
   }
 
   return <div>Loading...</div>

@@ -12,37 +12,25 @@ type MockProvider = Record<
   LiteralUnion<'google' | 'email', string>,
   ClientSafeProvider
 > | null
+
+const createProvider = (p: string): ClientSafeProvider => ({
+  id: p,
+  callbackUrl: 'http://localhost:3000/api/auth/callback/' + p,
+  name: p[0].toUpperCase() + p.slice(1),
+  signinUrl: 'http://localhost:3000/api/auth/signin/' + p,
+  type: p[0] == 'g' ? 'oauth' : p[0] == 'c' ? 'credentials' : 'email',
+})
+
 const mockProviders: MockProvider = {
-  google: {
-    id: 'google',
-    callbackUrl: 'http://localhost:3000/api/auth/callback/google',
-    name: 'Google',
-    signinUrl: 'http://localhost:3000/api/auth/signin/google',
-    type: 'oauth',
-  },
-  email: {
-    id: 'email',
-    callbackUrl: 'http://localhost:3000/api/auth/callback/email',
-    name: 'Email',
-    signinUrl: 'http://localhost:3000/api/auth/signin/email',
-    type: 'oauth',
-  },
-  credentials: {
-    id: 'credentials',
-    callbackUrl: 'http://localhost:3000/api/auth/callback/credentials',
-    name: 'Credentials',
-    signinUrl: 'http://localhost:3000/api/auth/signin/credentials',
-    type: 'oauth',
-  },
+  google: createProvider('google'),
+  email: createProvider('email'),
+  credentials: createProvider('credentials'),
 }
 
 const factory = (providers: MockProvider = null) => {
   render(<SignIn csrfToken={csrfToken} providers={providers} />)
 }
 
-jest.mock('next/link', () => {
-  return ({ children }: { children: JSX.Element }) => children
-})
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const router = { push: jest.fn() }
@@ -60,7 +48,7 @@ describe('Sign in', () => {
       })
     })
 
-    it('should render server-side error not related to the fields', async () => {
+    it('should render server-side error not related to the form validation', async () => {
       signIn.mockResolvedValue({ error: err.INTERNAL_SERVER_ERROR })
       factory()
       validSubmission()
@@ -77,35 +65,7 @@ describe('Sign in', () => {
       expect(screen.getByLabelText(/email/i)).toHaveFocus()
     })
 
-    it('should focus the first field at first render', () => {
-      factory()
-      expect(screen.getByLabelText(/email/i)).toHaveFocus()
-    })
-
-    it('should not focus the first field after the first render', async () => {
-      factory()
-      userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
-      await waitFor(() =>
-        expect(screen.getByLabelText(/email/i)).not.toHaveFocus()
-      )
-    })
-
-    describe('CSRF token', () => {
-      it('should be an input type hidden with the CSRF token as value', () => {
-        factory()
-        const input = screen.getByDisplayValue(csrfToken)
-        expect(input).toHaveAttribute('type', 'hidden')
-        expect(input).toHaveDisplayValue(csrfToken)
-      })
-    })
-
     describe('Email/Password', () => {
-      it('should be rendered', () => {
-        factory()
-        expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-        expect(screen.getByLabelText(/^password/i)).toBeInTheDocument()
-      })
-
       it('should display an error when it is empty', async () => {
         factory()
         const btn = screen.getByRole('button', { name: 'Sign in' })

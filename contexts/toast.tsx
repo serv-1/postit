@@ -1,6 +1,6 @@
-import * as React from 'react'
+import React from 'react'
 
-export type ToastState = {
+export interface ToastState {
   message: string | null
   background?:
     | 'success'
@@ -16,7 +16,9 @@ export type ToastState = {
     | 'transparent'
 }
 type SetToast = React.Dispatch<React.SetStateAction<ToastState>>
-type ToastProviderProps = { children: JSX.Element | JSX.Element[] }
+interface ToastProviderProps {
+  children: React.ReactNode
+}
 
 const ToastContext = React.createContext<
   | {

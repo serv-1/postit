@@ -5,24 +5,13 @@ import OpenModalButton from '../../components/OpenModalButton'
 const setIsModalOpen = jest.fn()
 
 const factory = () => {
-  render(
-    <OpenModalButton
-      name="Open"
-      className="btn-primary"
-      setIsModalOpen={setIsModalOpen}
-    />
-  )
+  render(<OpenModalButton name="Open" setIsModalOpen={setIsModalOpen} />)
 }
 
 describe('OpenModalButton', () => {
   it('should render the given name', () => {
     factory()
     expect(screen.getByRole('button')).toHaveTextContent('Open')
-  })
-
-  it('should use the given className', () => {
-    factory()
-    expect(screen.getByRole('button')).toHaveClass('btn-primary')
   })
 
   it('should call "setIsModalOpen" on click', () => {

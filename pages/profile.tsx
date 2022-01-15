@@ -1,19 +1,19 @@
 import ProfileDeleteAccount from '../components/ProfileDeleteAccount'
 import Toast from '../components/Toast'
-import UpdateImage from '../components/UpdateImage'
-import UpdateNameOrEmail from '../components/UpdateNameOrEmail'
-import UpdatePassword from '../components/UpdatePassword'
+import ProfileChangeImage from '../components/ProfileChangeImage'
+import ProfileChangeNameOrEmail from '../components/ProfileChangeNameOrEmail'
+import ProfileChangePassword from '../components/ProfileChangePassword'
 
 const Profile = () => {
   return (
     <main data-cy="profile" className="my-4">
       <Toast />
-      <UpdateImage />
-      <h1 className="text-center my-2">
-        <UpdateNameOrEmail subject="name" />
-        <UpdateNameOrEmail subject="email" />
-      </h1>
-      <UpdatePassword />
+      <ProfileChangeImage />
+      <div className="container my-2 d-flex flex-column">
+        <ProfileChangeNameOrEmail subject="name" />
+        <ProfileChangeNameOrEmail subject="email" />
+      </div>
+      <ProfileChangePassword />
       <ProfileDeleteAccount />
     </main>
   )

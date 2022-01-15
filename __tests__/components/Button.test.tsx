@@ -1,40 +1,43 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import Button from '../../components/Button'
 
-const handleClick = jest.fn()
+interface FactoryParams {
+  type?: 'button' | 'submit' | 'reset'
+  className?: string
+  gradient?: boolean
+}
 
-const factory = () => {
+const factory = ({ type, className, gradient }: FactoryParams = {}) => {
   render(
-    <Button
-      ariaLabel={'send mail'}
-      className="btn-primary"
-      onClick={handleClick}
-    >
+    <Button type={type} className={className} gradient={gradient}>
       Super button !
     </Button>
   )
 }
 
 describe('Button', () => {
-  it('should render children', () => {
+  it('should render the children', () => {
     factory()
     expect(screen.getByRole('button')).toHaveTextContent('Super button !')
   })
 
-  it('should have the given class', () => {
+  it('should have the type "button" by default', () => {
     factory()
-    expect(screen.getByRole('button')).toHaveClass('btn-primary')
+    expect(screen.getByRole('button')).toHaveAttribute('type', 'button')
   })
 
-  it('should use the given onClick handler', () => {
-    factory()
-    userEvent.click(screen.getByRole('button'))
-    expect(handleClick).toHaveBeenCalledTimes(1)
+  it('should use the given className', () => {
+    factory({ className: 'red' })
+    expect(screen.getByRole('button')).toHaveClass('red')
   })
 
-  it('should have the given aria-label', () => {
+  it('should have "bg-gradient" if "gradient" is defined', () => {
+    factory({ gradient: true })
+    expect(screen.getByRole('button')).toHaveClass('bg-gradient')
+  })
+
+  it('should not have "bg-gradient" if "gradient" is undefined', () => {
     factory()
-    expect(screen.getByRole('button')).toHaveAccessibleName('send mail')
+    expect(screen.getByRole('button')).not.toHaveClass('bg-gradient')
   })
 })

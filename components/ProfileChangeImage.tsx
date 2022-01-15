@@ -5,8 +5,9 @@ import err from '../utils/errors'
 import { useSession } from 'next-auth/react'
 import { Session } from 'next-auth'
 import { useToast } from '../contexts/toast'
+import Button from './Button'
 
-const UpdateImage = () => {
+const ProfileChangeImage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [image, setImage] = useState<string>()
   const { setToast } = useToast()
@@ -73,11 +74,9 @@ const UpdateImage = () => {
 
   return (
     <>
-      <button
-        type="button"
-        tabIndex={0}
-        className={`d-block m-auto p-0 bg-white border-0 shadow rounded-circle`}
-        style={{ width: 200, height: 200, cursor: 'pointer' }}
+      <Button
+        className="d-block m-auto p-0 bg-white border-0 shadow rounded-circle"
+        style={{ width: 200, height: 200 }}
         onClick={() => fileInputRef.current?.click()}
       >
         {image && (
@@ -90,7 +89,7 @@ const UpdateImage = () => {
             className="rounded-circle"
           />
         )}
-      </button>
+      </Button>
       <input
         onChange={updateImage}
         ref={fileInputRef}
@@ -105,4 +104,4 @@ const UpdateImage = () => {
   )
 }
 
-export default UpdateImage
+export default ProfileChangeImage
