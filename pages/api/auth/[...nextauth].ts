@@ -57,16 +57,13 @@ export default NextAuth({
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
-        token.user = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        }
+        const { id, name, email, image } = user
+        token.user = { id, name, email }
 
-        if (account.provider === 'google' && typeof user.image === 'string') {
+        if (account.provider === 'google' && typeof image === 'string') {
           await dbConnect()
           await User.updateOne(
-            { _id: user.id },
+            { _id: id },
             { emailVerified: new Date(), image: defaultImage }
           ).exec()
         }
