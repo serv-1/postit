@@ -28,6 +28,7 @@ export type ReqParams = {
   url?: string
   body?: Record<string, unknown>
   failOnStatusCode?: boolean
+  csrfToken?: boolean
 }
 
 declare global {

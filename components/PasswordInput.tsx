@@ -49,15 +49,16 @@ const PasswordInput = ({
   return (
     <>
       <Button
+        type="button"
         id="visibilityBtn"
         className="btn-outline-secondary"
         onClick={() => setShowPassword(!showPassword)}
         aria-label={(showPassword ? 'Hide' : 'Show') + ' password'}
       >
         {showPassword ? (
-          <EyeSlash data-testid="eyeClosed" width="20" height="20" />
+          <EyeSlash data-testid="closeEye" width="20" height="20" />
         ) : (
-          <Eye data-testid="eyeOpened" width="20" height="20" />
+          <Eye data-testid="openEye" width="20" height="20" />
         )}
       </Button>
       <TextInput

@@ -1,6 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axios from 'axios'
 import { SessionProvider } from 'next-auth/react'
 import Toast from '../../components/Toast'
 import ProfileChangePassword from '../../components/ProfileChangePassword'
@@ -9,7 +8,6 @@ import { mockSession } from '../../mocks/nextAuth'
 import err from '../../utils/errors'
 import { mockResponse } from '../../utils/msw'
 
-const changeBtn = { name: /change/i }
 const labelText = new RegExp('change your password', 'i')
 
 const factory = () => {
@@ -23,59 +21,36 @@ const factory = () => {
   )
 }
 
-const axiosPut = axios.put
-afterEach(() => (axios.put = axiosPut))
+test('the form updates the user password and then a successful message renders', async () => {
+  factory()
 
-describe('ProfileChangePassword', () => {
-  describe('API call', () => {
-    it('should render an error if the server did not respond', async () => {
-      axios.put = jest.fn().mockRejectedValueOnce({ isAxiosError: true })
-      factory()
-      userEvent.type(screen.getByLabelText(labelText), 'new super password')
-      userEvent.click(screen.getByRole('button', changeBtn))
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        err.NO_RESPONSE
-      )
-    })
+  await screen.findByTestId('csrfToken')
 
-    it('should render an error if the server failed to udpate the user', async () => {
-      mockResponse('put', '/api/users/:id', 422, { message: err.PASSWORD_SAME })
-      factory()
-      userEvent.type(screen.getByLabelText(labelText), 'johndoe@test.com')
-      userEvent.click(screen.getByRole('button', changeBtn))
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        err.PASSWORD_SAME
-      )
-    })
-  })
+  const input = screen.getByLabelText(labelText)
+  userEvent.type(input, 'my new password')
 
-  it('should update the user password', async () => {
-    factory()
-    userEvent.type(screen.getByLabelText(labelText), 'new super password')
-    userEvent.click(screen.getByRole('button', changeBtn))
-    expect(await screen.findByRole('alert')).toHaveClass('bg-success')
-  })
+  const submitBtn = screen.getByRole('button', { name: /change/i })
+  userEvent.click(submitBtn)
 
-  it('should not update the user password if it is too short', async () => {
-    factory()
-    userEvent.type(screen.getByLabelText(labelText), 'ah')
-    userEvent.click(screen.getByRole('button', changeBtn))
-    expect(await screen.findByRole('alert')).toHaveTextContent(err.PASSWORD_MIN)
-  })
+  const toast = await screen.findByRole('alert')
+  expect(toast).toHaveClass('bg-success')
+})
 
-  it('should not update the user password if it is too long', async () => {
-    factory()
-    const tooLongPw = new Uint8Array(21).toString()
-    userEvent.type(screen.getByLabelText(labelText), tooLongPw)
-    userEvent.click(screen.getByRole('button', changeBtn))
-    expect(await screen.findByRole('alert')).toHaveTextContent(err.PASSWORD_MAX)
-  })
+test('an error renders if the server fails to updates the user', async () => {
+  mockResponse('put', '/api/users/:id', 422, { message: err.PASSWORD_MIN })
 
-  it('should not update the user password if it is empty', async () => {
-    factory()
-    userEvent.click(screen.getByRole('button', changeBtn))
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      err.PASSWORD_REQUIRED
-    )
-  })
+  factory()
+
+  await screen.findByTestId('csrfToken')
+
+  const input = screen.getByLabelText(labelText)
+  userEvent.type(input, 'pw')
+
+  const submitBtn = screen.getByRole('button', { name: /change/i })
+  userEvent.click(submitBtn)
+
+  const alert = await screen.findByRole('alert')
+  expect(alert).toHaveTextContent(err.PASSWORD_MIN)
+
+  await waitFor(() => expect(input).toHaveFocus())
 })

@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth'
 
-type SessionUser = {
+interface SessionUser {
   id: string
   name: string
   email: string

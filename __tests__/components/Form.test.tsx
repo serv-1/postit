@@ -15,57 +15,43 @@ const submitHandlers = {
 
 const methods = {
   handleSubmit: (fn: () => void) => fn,
+  register: (name: string) => ({ name }),
 } as unknown as UseFormReturn
 
-const Page = ({ csrfToken }: { csrfToken?: string }) => {
-  return (
+const factory = (needCsrfToken?: boolean) => {
+  render(
     <Form
       name="register"
       method="post"
       submitHandlers={submitHandlers}
       methods={methods}
-      csrfToken={csrfToken}
+      needCsrfToken={needCsrfToken}
     >
       <input type="submit" />
     </Form>
   )
 }
 
-const factory = (csrfToken?: string) => {
-  render(<Page csrfToken={csrfToken} />)
-}
+test('the form renders', async () => {
+  factory(true)
 
-describe('Form', () => {
-  it("should render it's children", () => {
-    factory()
-    expect(screen.getByRole('button')).toBeInTheDocument()
-  })
+  const form = screen.getByRole('form')
+  expect(form).toHaveAttribute('name', 'register')
+  expect(form).toHaveAttribute('method', 'post')
 
-  it('should use the given name', () => {
-    factory()
-    const form = screen.getByRole('form')
-    expect(form).toHaveAttribute('name', 'register')
-    expect(form).toHaveAttribute('id', 'register')
-  })
+  const submitBtn = screen.getByRole('button')
+  expect(submitBtn).toBeInTheDocument()
 
-  it('should use the given method', () => {
-    factory()
-    expect(screen.getByRole('form')).toHaveAttribute('method', 'post')
-  })
+  userEvent.click(submitBtn)
+  expect(submitHandler).toHaveBeenCalledTimes(1)
 
-  it('should use the given "submitHandler"', () => {
-    factory()
-    userEvent.click(screen.getByRole('button'))
-    expect(submitHandler).toHaveBeenCalledTimes(1)
-  })
+  const csrfToken = await screen.findByTestId('csrfToken')
+  expect(csrfToken).toBeInTheDocument()
+})
 
-  it('should render the csrf token input if "csrfToken" is defined', () => {
-    factory('csrfToken')
-    expect(screen.getByDisplayValue('csrfToken')).toBeInTheDocument()
-  })
+test('the csrfToken input does not renders', () => {
+  factory()
 
-  it('should not render the csrf token input if "csrfToken" is undefined', () => {
-    factory()
-    expect(screen.queryByDisplayValue('csrfToken')).not.toBeInTheDocument()
-  })
+  const csrfToken = screen.queryByTestId('csrfToken')
+  expect(csrfToken).not.toBeInTheDocument()
 })

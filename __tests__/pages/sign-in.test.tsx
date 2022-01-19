@@ -3,10 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/errors'
 import { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
-
-const csrfToken = 'csrfToken'
-const email = 'example@test.com'
-const password = '0123456789'
+import { ToastProvider } from '../../contexts/toast'
 
 type MockProvider = Record<
   LiteralUnion<'google' | 'email', string>,
@@ -18,7 +15,7 @@ const createProvider = (p: string): ClientSafeProvider => ({
   callbackUrl: 'http://localhost:3000/api/auth/callback/' + p,
   name: p[0].toUpperCase() + p.slice(1),
   signinUrl: 'http://localhost:3000/api/auth/signin/' + p,
-  type: p[0] == 'g' ? 'oauth' : p[0] == 'c' ? 'credentials' : 'email',
+  type: p[0] === 'g' ? 'oauth' : p[0] === 'c' ? 'credentials' : 'email',
 })
 
 const mockProviders: MockProvider = {
@@ -28,7 +25,11 @@ const mockProviders: MockProvider = {
 }
 
 const factory = (providers: MockProvider = null) => {
-  render(<SignIn csrfToken={csrfToken} providers={providers} />)
+  render(
+    <ToastProvider>
+      <SignIn providers={providers} />
+    </ToastProvider>
+  )
 }
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
@@ -37,107 +38,78 @@ const router = { push: jest.fn() }
 
 beforeEach(() => useRouter.mockReturnValue(router))
 
-describe('Sign in', () => {
-  describe('Form', () => {
-    it('should redirect to the profile page after a successful submission', async () => {
-      factory()
-      validSubmission()
-      await waitFor(() => {
-        expect(router.push).toHaveBeenCalledWith('/profile')
-        expect(router.push).toHaveBeenCalledTimes(1)
-      })
-    })
+test("the form signs in the user and redirect him to it's profile", async () => {
+  factory()
 
-    it('should render server-side error not related to the form validation', async () => {
-      signIn.mockResolvedValue({ error: err.INTERNAL_SERVER_ERROR })
-      factory()
-      validSubmission()
-      expect(
-        await screen.findByText(err.INTERNAL_SERVER_ERROR)
-      ).toBeInTheDocument()
-    })
+  const emailInput = screen.getByRole('textbox')
+  userEvent.type(emailInput, 'johndoe@test.com')
 
-    it('should render server-side validation error and focus the field that goes with', async () => {
-      signIn.mockResolvedValue({ error: err.EMAIL_UNKNOWN })
-      factory()
-      validSubmission()
-      expect(await screen.findByText(err.EMAIL_UNKNOWN)).toBeInTheDocument()
-      expect(screen.getByLabelText(/email/i)).toHaveFocus()
-    })
+  const passwordInput = screen.getByLabelText(/^password$/i)
+  userEvent.type(passwordInput, 'my super password')
 
-    describe('Email/Password', () => {
-      it('should display an error when it is empty', async () => {
-        factory()
-        const btn = screen.getByRole('button', { name: 'Sign in' })
-        userEvent.click(btn)
+  const submitBtn = screen.getByRole('button', { name: /sign in/i })
+  userEvent.click(submitBtn)
 
-        expect(await screen.findByText(err.EMAIL_REQUIRED)).toBeInTheDocument()
-
-        // avoid the PASSWORD_SAME error
-        userEvent.type(screen.getByLabelText(/email/i), 'a')
-
-        expect(
-          await screen.findByText(err.PASSWORD_REQUIRED)
-        ).toBeInTheDocument()
-      })
-    })
-
-    describe('Email', () => {
-      it('should display an error when it is not an email', async () => {
-        factory()
-        userEvent.type(screen.getByLabelText(/email/i), 'bad email')
-        userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
-        expect(await screen.findByText(err.EMAIL_INVALID)).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('Providers buttons', () => {
-    it('should be rendered if providers is not null', () => {
-      factory(mockProviders)
-      const btn = screen.getAllByRole('button', { name: /sign in with/i })
-      expect(btn).not.toHaveLength(0)
-    })
-
-    it('should not be rendered if providers is null', () => {
-      factory()
-      const btn = screen.queryByRole('button', { name: /sign in with/i })
-      expect(btn).not.toBeInTheDocument()
-    })
-
-    it('should display the provider name', () => {
-      factory(mockProviders)
-      const btn = screen.getByRole('button', { name: /google/i })
-      expect(btn).toBeInTheDocument()
-    })
-
-    it('should call signIn with the provider id and the callback url', async () => {
-      factory(mockProviders)
-      userEvent.click(screen.getByRole('button', { name: /google/i }))
-      await waitFor(() => {
-        expect(signIn).toHaveBeenCalledWith('google', {
-          callbackUrl: 'http://localhost:3000/profile',
-        })
-        expect(signIn).toHaveBeenCalledTimes(1)
-      })
-    })
-
-    it('should not render the credentials provider', () => {
-      factory(mockProviders)
-      const btn = screen.queryByRole('button', { name: /credentials/i })
-      expect(btn).not.toBeInTheDocument()
-    })
-
-    it('should not render the email provider', () => {
-      factory(mockProviders)
-      const btn = screen.queryByRole('button', { name: /email/i })
-      expect(btn).not.toBeInTheDocument()
-    })
+  await waitFor(() => {
+    expect(router.push).toHaveBeenCalledTimes(1)
+    expect(router.push).toHaveBeenCalledWith('/profile')
   })
 })
 
-function validSubmission() {
-  userEvent.type(screen.getByLabelText(/email/i), email)
-  userEvent.type(screen.getByLabelText(/^password/i), password)
-  userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
-}
+test('an error renders if the server fails to sign in the user', async () => {
+  signIn.mockResolvedValueOnce({ error: 'Error' })
+
+  factory()
+
+  const emailInput = screen.getByRole('textbox')
+  userEvent.type(emailInput, 'johndoe@test.com')
+
+  const passwordInput = screen.getByLabelText(/^password$/i)
+  userEvent.type(passwordInput, 'my super password')
+
+  const submitBtn = screen.getByRole('button', { name: /sign in/i })
+  userEvent.click(submitBtn)
+
+  const toast = await screen.findByRole('alert')
+  expect(toast).toHaveTextContent('Error')
+  expect(toast).toHaveClass('bg-danger')
+})
+
+test('an error renders if the values given by the user are invalid', async () => {
+  signIn.mockResolvedValueOnce({ error: err.EMAIL_INVALID })
+
+  factory()
+
+  const emailInput = screen.getByRole('textbox')
+  userEvent.type(emailInput, 'johndoe@test.com')
+
+  const passwordInput = screen.getByLabelText(/^password$/i)
+  userEvent.type(passwordInput, 'my super password')
+
+  const submitBtn = screen.getByRole('button', { name: /sign in/i })
+  userEvent.click(submitBtn)
+
+  const alert = await screen.findByRole('alert')
+  expect(alert).toHaveTextContent(err.EMAIL_INVALID)
+
+  await waitFor(() => expect(emailInput).toHaveFocus())
+})
+
+test('the providers render', () => {
+  factory(mockProviders)
+
+  const googleBtn = screen.getByRole('button', { name: /google/i })
+  expect(googleBtn).toBeInTheDocument()
+
+  userEvent.click(googleBtn)
+  expect(signIn).toHaveBeenCalledTimes(1)
+  expect(signIn).toHaveBeenCalledWith('google', {
+    callbackUrl: 'http://localhost:3000/profile',
+  })
+
+  const emailBtn = screen.queryByRole('button', { name: /email/i })
+  expect(emailBtn).not.toBeInTheDocument()
+
+  const credentialsBtn = screen.queryByRole('button', { name: /credentials/i })
+  expect(credentialsBtn).not.toBeInTheDocument()
+})

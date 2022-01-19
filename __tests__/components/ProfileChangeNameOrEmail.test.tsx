@@ -1,8 +1,7 @@
 import ProfileChangeNameOrEmail from '../../components/ProfileChangeNameOrEmail'
-import axios from 'axios'
 import { SessionProvider } from 'next-auth/react'
 import { mockSession } from '../../mocks/nextAuth'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/errors'
 import { mockResponse } from '../../utils/msw'
@@ -10,9 +9,6 @@ import { ToastProvider } from '../../contexts/toast'
 import Toast from '../../components/Toast'
 
 const username = mockSession.user.name
-const submitBtn = { name: /submit/i }
-const cancelBtn = { name: /cancel/i }
-const editBtn = { name: /edit/i }
 
 const factory = (subject: 'name' | 'email' = 'name') => {
   render(
@@ -25,111 +21,115 @@ const factory = (subject: 'name' | 'email' = 'name') => {
   )
 }
 
-const axiosPut = axios.put
-afterEach(() => (axios.put = axiosPut))
+test('the user name/email, the edit button and the form renders correctly', async () => {
+  factory()
 
-describe('ProfileChangeNameOrEmail', () => {
-  describe('API call', () => {
-    it('should render an error if the server did not respond while updating the user', async () => {
-      axios.put = jest.fn().mockRejectedValueOnce({ isAxiosError: true })
-      factory()
-      userEvent.click(screen.getByRole('button', editBtn))
-      userEvent.type(screen.getByRole('textbox'), 'edited')
-      userEvent.click(screen.getByRole('button', submitBtn))
-      const toast = await screen.findByRole('alert')
-      expect(toast).toHaveTextContent(err.NO_RESPONSE)
-      expect(toast).toHaveClass('bg-danger')
-    })
+  const name = screen.getByText(username)
+  expect(name).toBeInTheDocument()
 
-    it('should render an error if the server failed to udpate the user', async () => {
-      mockResponse('put', '/api/users/:id', 422, { message: err.NAME_MAX })
-      factory()
-      userEvent.click(screen.getByRole('button', editBtn))
-      userEvent.type(await screen.findByRole('textbox'), 'edited')
-      userEvent.click(screen.getByRole('button', submitBtn))
-      const toast = await screen.findByRole('alert')
-      expect(toast).toHaveTextContent(err.NAME_MAX)
-      expect(toast).toHaveClass('bg-danger')
-    })
-  })
+  const editBtn = screen.getByRole('button', { name: /edit/i })
+  userEvent.click(editBtn)
 
-  describe('Form', () => {
-    it('should render the user subject', () => {
-      factory()
-      expect(screen.getByText(username)).toBeInTheDocument()
-    })
+  const form = screen.getByRole('form')
+  expect(form).toBeInTheDocument()
 
-    it('should update the user subject and render a successful message', async () => {
-      factory()
-      userEvent.click(screen.getByRole('button', editBtn))
-      userEvent.type(screen.getByRole('textbox'), 'edited')
-      userEvent.click(screen.getByRole('button', submitBtn))
-      expect(await screen.findByText(username + 'edited')).toBeInTheDocument()
-      expect(await screen.findByRole('alert')).toHaveClass('bg-success')
-    })
+  await screen.findByTestId('csrfToken')
 
-    it('should not update the user subject if it has not change', async () => {
-      factory()
-      userEvent.click(screen.getByRole('button', editBtn))
-      userEvent.click(screen.getByRole('button', submitBtn))
-      await screen.findByText(username)
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-    })
+  const input = screen.getByRole('textbox')
+  expect(input).toHaveValue(username)
+  expect(input).toHaveFocus()
+})
 
-    describe('input', () => {
-      it('should not be rendered initially', () => {
-        factory()
-        expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
-      })
+test('the cancel button renders the user name/email before being edited with the edit button', async () => {
+  factory()
 
-      it('should have the user subject to default value', () => {
-        factory()
-        userEvent.click(screen.getByRole('button', editBtn))
-        expect(screen.getByRole('textbox')).toHaveValue(username)
-      })
+  let editBtn = screen.getByRole('button', { name: /edit/i })
+  userEvent.click(editBtn)
 
-      it('should have the focus', () => {
-        factory()
-        userEvent.click(screen.getByRole('button', editBtn))
-        expect(screen.getByRole('textbox')).toHaveFocus()
-      })
-    })
+  await screen.findByTestId('csrfToken')
 
-    describe('submit button', () => {
-      it('should not be rendered initially', () => {
-        factory()
-        expect(screen.queryByRole('button', submitBtn)).not.toBeInTheDocument()
-      })
-    })
+  const input = screen.getByRole('textbox')
+  userEvent.type(input, ' edited')
 
-    describe('edit button', () => {
-      it('should render the input and the submit btn and remove the user subject on click', async () => {
-        factory()
-        userEvent.click(screen.getByRole('button', editBtn))
-        expect(screen.getByRole('textbox')).toBeInTheDocument()
-        expect(screen.getByRole('button', submitBtn)).toBeInTheDocument()
-        expect(screen.queryByText(username)).not.toBeInTheDocument()
-      })
-    })
+  const cancelBtn = screen.getByRole('button', { name: /cancel/i })
+  userEvent.click(cancelBtn)
 
-    describe('cancel button', () => {
-      it('should render the user subject and the edit btn and remove the input and the submit btn on click', async () => {
-        factory()
-        userEvent.click(screen.getByRole('button', editBtn))
-        userEvent.click(screen.getByRole('button', cancelBtn))
-        expect(screen.getByText(username)).toBeInTheDocument()
-        expect(screen.getByRole('button', editBtn)).toBeInTheDocument()
-        expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
-        expect(screen.queryByRole('button', submitBtn)).not.toBeInTheDocument()
-      })
+  const name = screen.getByText(username)
+  expect(name).toBeInTheDocument()
 
-      it('should not update the user subject on click', () => {
-        factory()
-        userEvent.click(screen.getByRole('button', editBtn))
-        userEvent.type(screen.getByRole('textbox'), 'edited')
-        userEvent.click(screen.getByRole('button', cancelBtn))
-        expect(screen.queryByText(username + 'edited')).not.toBeInTheDocument()
-      })
-    })
-  })
+  editBtn = screen.getByRole('button', { name: /edit/i })
+  expect(editBtn).toBeInTheDocument()
+
+  const form = screen.queryByRole('form')
+  expect(form).not.toBeInTheDocument()
+})
+
+test('the form updates the user name/email and renders it with the edit button and a successful message', async () => {
+  factory()
+
+  let editBtn = screen.getByRole('button', { name: /edit/i })
+  userEvent.click(editBtn)
+
+  await screen.findByTestId('csrfToken')
+
+  const input = screen.getByRole('textbox')
+  userEvent.type(input, ' edited')
+
+  const submitBtn = screen.getByRole('button', { name: /submit/i })
+  userEvent.click(submitBtn)
+
+  const name = await screen.findByText(username + ' edited')
+  expect(name).toBeInTheDocument()
+
+  editBtn = screen.getByRole('button', { name: /edit/i })
+  expect(editBtn).toBeInTheDocument()
+
+  const toast = screen.getByRole('alert')
+  expect(toast).toHaveClass('bg-success')
+
+  const form = screen.queryByRole('form')
+  expect(form).not.toBeInTheDocument()
+})
+
+test('the form does not update the user name/email if it has not change', async () => {
+  factory()
+
+  const editBtn = screen.getByRole('button', { name: /edit/i })
+  userEvent.click(editBtn)
+
+  await screen.findByTestId('csrfToken')
+
+  const input = screen.getByRole('textbox')
+  userEvent.clear(input)
+  userEvent.type(input, username)
+
+  const submitBtn = screen.getByRole('button', { name: /submit/i })
+  userEvent.click(submitBtn)
+
+  await screen.findByText(username)
+
+  const toast = screen.queryByRole('alert')
+  expect(toast).not.toBeInTheDocument()
+})
+
+test('an error renders if the server failed to update the user', async () => {
+  mockResponse('put', '/api/users/:id', 422, { message: err.NAME_MAX })
+
+  factory()
+
+  const editBtn = screen.getByRole('button', { name: /edit/i })
+  userEvent.click(editBtn)
+
+  await screen.findByTestId('csrfToken')
+
+  const input = screen.getByRole('textbox')
+  userEvent.type(input, ' edited')
+
+  const submitBtn = screen.getByRole('button', { name: /submit/i })
+  userEvent.click(submitBtn)
+
+  const alert = await screen.findByRole('alert')
+  expect(alert).toHaveTextContent(err.NAME_MAX)
+
+  await waitFor(() => expect(input).toHaveFocus())
 })

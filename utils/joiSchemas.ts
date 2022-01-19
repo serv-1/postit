@@ -27,18 +27,17 @@ const passwordRules = Joi.string().min(10).max(20).required().messages({
   'any.required': err.PASSWORD_REQUIRED,
 })
 
-export const registerSchema = Joi.object({
+const csrfTokenRules = Joi.string()
+  .required()
+  .messages({ '*': err.DATA_INVALID })
+
+export const registerSchema = object({
   name: nameRules,
   email: emailRules,
   password: passwordRules.invalid(Joi.ref('email'), Joi.ref('name')),
 })
-  .required()
-  .messages({
-    'object.base': err.DATA_INVALID,
-    'object.required': err.DATA_INVALID,
-  })
 
-export const signInSchema = Joi.object({
+export const signInSchema = object({
   email: emailRules,
   password: Joi.string().required().messages({
     'string.base': err.PASSWORD_INVALID,
@@ -46,27 +45,37 @@ export const signInSchema = Joi.object({
     'any.required': err.PASSWORD_REQUIRED,
   }),
 })
-  .required()
-  .messages({
-    'object.base': err.DATA_INVALID,
-    'object.required': err.DATA_INVALID,
-  })
 
-export const emailSchema = Joi.object({ email: emailRules })
-  .required()
-  .messages({
-    'object.base': err.DATA_INVALID,
-    'object.required': err.DATA_INVALID,
-  })
-
-export const nameSchema = Joi.object({ name: nameRules }).required().messages({
-  'object.base': err.DATA_INVALID,
-  'object.required': err.DATA_INVALID,
+export const emailSchema = object({
+  email: emailRules,
 })
 
-export const passwordSchema = Joi.object({ password: passwordRules })
-  .required()
-  .messages({
+export const emailCsrfSchema = object({
+  email: emailRules,
+  csrfToken: csrfTokenRules,
+})
+
+export const nameSchema = object({
+  name: nameRules,
+})
+
+export const nameCsrfSchema = object({
+  name: nameRules,
+  csrfToken: csrfTokenRules,
+})
+
+export const passwordSchema = object({
+  password: passwordRules,
+})
+
+export const passwordCsrfSchema = object({
+  password: passwordRules,
+  csrfToken: csrfTokenRules,
+})
+
+function object<TSchema>(schema?: Joi.PartialSchemaMap<TSchema>) {
+  return Joi.object(schema).required().messages({
     'object.base': err.DATA_INVALID,
     'object.required': err.DATA_INVALID,
   })
+}

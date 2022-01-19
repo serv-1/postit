@@ -1,43 +1,25 @@
 import { render, screen } from '@testing-library/react'
 import Button from '../../components/Button'
 
-interface FactoryParams {
-  type?: 'button' | 'submit' | 'reset'
-  className?: string
-  gradient?: boolean
-}
-
-const factory = ({ type, className, gradient }: FactoryParams = {}) => {
+const factory = (gradient?: boolean) => {
   render(
-    <Button type={type} className={className} gradient={gradient}>
+    <Button className="red" gradient={gradient}>
       Super button !
     </Button>
   )
 }
 
-describe('Button', () => {
-  it('should render the children', () => {
-    factory()
-    expect(screen.getByRole('button')).toHaveTextContent('Super button !')
-  })
+test('the button renders', () => {
+  factory(true)
 
-  it('should have the type "button" by default', () => {
-    factory()
-    expect(screen.getByRole('button')).toHaveAttribute('type', 'button')
-  })
+  const btn = screen.getByRole('button')
+  expect(btn).toHaveTextContent('Super button !')
+  expect(btn).toHaveClass('red', 'bg-gradient')
+})
 
-  it('should use the given className', () => {
-    factory({ className: 'red' })
-    expect(screen.getByRole('button')).toHaveClass('red')
-  })
+test('the button does not have bg-gradient class', () => {
+  factory()
 
-  it('should have "bg-gradient" if "gradient" is defined', () => {
-    factory({ gradient: true })
-    expect(screen.getByRole('button')).toHaveClass('bg-gradient')
-  })
-
-  it('should not have "bg-gradient" if "gradient" is undefined', () => {
-    factory()
-    expect(screen.getByRole('button')).not.toHaveClass('bg-gradient')
-  })
+  const btn = screen.getByRole('button')
+  expect(btn).not.toHaveClass('bg-gradient')
 })

@@ -15,26 +15,19 @@ const factory = () => {
   render(<InputError inputName="email" />)
 }
 
-describe('InputError', () => {
-  it('should be rendered if the form is submitted and there is an error', () => {
-    factory()
-    expect(screen.getByRole('alert')).toHaveTextContent('Error')
-  })
+test('the alert renders if the form is submitted an there is an error', () => {
+  factory()
 
-  it('should not be rendered if the form is not submitted', () => {
-    useFormContext.mockReturnValue(setFormContext(false))
-    factory()
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-  })
+  const alert = screen.getByRole('alert')
+  expect(alert).toHaveTextContent('Error')
+  expect(alert).toHaveAttribute('id', 'feedbackEmail')
+})
 
-  it('should not be rendered if the form is submitted and there is no error', () => {
-    useFormContext.mockReturnValue(setFormContext(true))
-    factory()
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-  })
+test('the alert does no render if the form is not submitted even if there is an error', () => {
+  useFormContext.mockReturnValue(setFormContext(false, 'Error'))
 
-  it('should use the given "inputName"', () => {
-    factory()
-    expect(screen.getByRole('alert')).toHaveAttribute('id', 'feedbackEmail')
-  })
+  factory()
+
+  const alert = screen.queryByRole('alert')
+  expect(alert).not.toBeInTheDocument()
 })

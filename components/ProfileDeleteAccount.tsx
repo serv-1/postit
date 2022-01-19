@@ -1,10 +1,10 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { Session } from 'next-auth'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useToast } from '../contexts/toast'
-import err from '../utils/errors'
+import getApiError from '../utils/getApiError'
 import Button from './Button'
 import Modal from './Modal'
 import OpenModalButton from './OpenModalButton'
@@ -18,22 +18,18 @@ const ProfileDeleteAccount = () => {
 
   const deleteUser = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/users/${id}`)
+      const res = await axios.get('http://localhost:3000/api/auth/csrf')
+
+      await axios.delete(`http://localhost:3000/api/users/${id}`, {
+        data: { csrfToken: res.data.csrfToken },
+      })
 
       const data = await signOut({ redirect: false, callbackUrl: '/' })
 
       router.push(data.url)
     } catch (e) {
-      const res = (e as AxiosError).response
-
-      if (!res) {
-        return setToast({ message: err.NO_RESPONSE, background: 'danger' })
-      }
-
-      setToast({
-        message: res.data.message || err.DEFAULT_SERVER_ERROR,
-        background: 'danger',
-      })
+      const { message } = getApiError(e)
+      setToast({ message, background: 'danger' })
     }
   }
 

@@ -1,22 +1,20 @@
 import { joiResolver } from '@hookform/resolvers/joi'
-import axios, { AxiosError } from 'axios'
-import { ValidationError } from 'joi'
+import axios from 'axios'
 import { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
-import err from '../utils/errors'
-import { emailSchema, nameSchema } from '../utils/joiSchemas'
+import getApiError from '../utils/getApiError'
+import { emailCsrfSchema, nameCsrfSchema } from '../utils/joiSchemas'
 import Button from './Button'
 import Form from './Form'
 import InputError from './InputError'
 import TextInput from './TextInput'
-import Pencil from '../public/static/images/pencil.svg'
-import X from '../public/static/images/x-lg.svg'
-import Check from '../public/static/images/check-lg.svg'
 
-type FormFields = { name: string } | { email: string }
+type FormFields =
+  | { csrfToken?: string; name: string }
+  | { csrfToken?: string; email: string }
 
 export interface ProfileChangeNameOrEmailProps {
   subject: 'name' | 'email'
@@ -30,39 +28,26 @@ const ProfileChangeNameOrEmail = ({
   const [subjectValue, setSubjectValue] = useState(user[subject])
   const [showForm, setShowForm] = useState(false)
   const { setToast } = useToast()
-  const resolver = joiResolver(subject === 'name' ? nameSchema : emailSchema)
-  const methods = useForm<FormFields>({ resolver })
+  const schema = subject === 'name' ? nameCsrfSchema : emailCsrfSchema
+  const methods = useForm<FormFields>({ resolver: joiResolver(schema) })
 
   const submitHandler: SubmitHandler<FormFields> = async (data) => {
     const value = Object.values(data)[0]
 
-    setShowForm(false)
-
-    if (value === subjectValue) return
+    if (value === subjectValue) return setShowForm(false)
 
     try {
       await axios.put(`http://localhost:3000/api/users/${user.id}`, data)
 
+      setShowForm(false)
       setSubjectValue(value)
       setToast({
         message: `The ${subject} has been successfully updated! 🎉`,
         background: 'success',
       })
     } catch (e) {
-      if (e instanceof ValidationError) {
-        setToast({ message: e.details[0].message, background: 'danger' })
-      }
-
-      const res = (e as AxiosError).response
-
-      if (!res) {
-        return setToast({ message: err.NO_RESPONSE, background: 'danger' })
-      }
-
-      setToast({
-        message: res.data.message || err.DEFAULT_SERVER_ERROR,
-        background: 'danger',
-      })
+      const { message } = getApiError(e)
+      methods.setError(subject, { message }, { shouldFocus: true })
     }
   }
 
@@ -72,6 +57,7 @@ const ProfileChangeNameOrEmail = ({
       method="post"
       submitHandlers={{ submitHandler }}
       methods={methods}
+      needCsrfToken
     >
       <div className="input-group w-50 m-auto d-flex align-items-center">
         <TextInput
@@ -81,8 +67,8 @@ const ProfileChangeNameOrEmail = ({
           name={subject}
           needFocus
         />
-        <InputError inputName={subject} />
         <Button
+          type="button"
           className="p-0 ms-2"
           aria-label="Cancel"
           onClick={() => setShowForm(false)}
@@ -92,6 +78,7 @@ const ProfileChangeNameOrEmail = ({
         <Button className="p-0 ms-2" aria-label="Submit" type="submit">
           ✔
         </Button>
+        <InputError inputName={subject} />
       </div>
     </Form>
   ) : (

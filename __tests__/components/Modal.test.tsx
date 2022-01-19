@@ -3,31 +3,26 @@ import userEvent from '@testing-library/user-event'
 import Modal from '../../components/Modal'
 
 const setIsModalOpen = jest.fn()
-const title = 'This is a super modal!'
 
 const factory = () => {
   render(
-    <Modal title={title} setIsModalOpen={setIsModalOpen}>
-      Super modal !
+    <Modal title={'This is a super modal!'} setIsModalOpen={setIsModalOpen}>
+      <a href="#">Super modal !</a>
     </Modal>
   )
 }
 
-describe('Modal', () => {
-  it('should render the given children', () => {
-    factory()
-    expect(screen.getByText('Super modal !')).toBeInTheDocument()
-  })
+test('the modal renders and can be closed', () => {
+  factory()
 
-  it('should render the given title', () => {
-    factory()
-    expect(screen.getByRole('heading')).toHaveTextContent(title)
-  })
+  const title = screen.getByRole('heading')
+  expect(title).toHaveTextContent('This is a super modal!')
 
-  it('should call "setIsModalOpen" when the close button is clicked', () => {
-    factory()
-    userEvent.click(screen.getByRole('button'))
-    expect(setIsModalOpen).toHaveBeenCalledWith(false)
-    expect(setIsModalOpen).toHaveBeenCalledTimes(1)
-  })
+  const child = screen.getByRole('link')
+  expect(child).toBeInTheDocument()
+
+  const closeBtn = screen.getByRole('button')
+  userEvent.click(closeBtn)
+  expect(setIsModalOpen).toHaveBeenCalledWith(false)
+  expect(setIsModalOpen).toHaveBeenCalledTimes(1)
 })

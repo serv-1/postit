@@ -1,6 +1,8 @@
 import msw, { rest } from 'msw'
 import server from '../mocks/server'
 
+type Resolver = msw.ResponseResolver<msw.RestRequest, msw.RestContext>
+
 export const mockResponse = (
   method: string,
   path: string,
@@ -9,11 +11,7 @@ export const mockResponse = (
 ) => {
   let handler: msw.RestHandler
   const url = 'http://localhost:3000' + path
-  const resolver: msw.ResponseResolver<msw.RestRequest, msw.RestContext> = (
-    req,
-    res,
-    ctx
-  ) => {
+  const resolver: Resolver = (req, res, ctx) => {
     return res(ctx.status(code), ctx.json(json))
   }
 

@@ -57,13 +57,29 @@ describe('/api/users/:id', () => {
       })
     })
 
+    it('should not update if a CSRF token is invalid', function () {
+      cy.signIn(this.user.email, this.user.password)
+      cy.req({
+        url: this.url,
+        method,
+        body: { csrfToken: 'very invalid', name: 'Carloman' },
+      }).then((res) => {
+        expect(res.status).to.eq(422)
+        expect(res.body).to.have.property('message', err.DATA_INVALID)
+      })
+    })
+
     it('should not allow a user to update another user', function () {
       cy.signIn(this.user.email, this.user.password)
-      const body = { name: 'Your new hacked name haha!' }
-      cy.req({ url: `/api/users/${this.u2Id}`, method, body }).then((res) => {
+      cy.req({
+        url: `/api/users/${this.u2Id}`,
+        method,
+        body: { name: 'Yes, I have renamed you!' },
+        csrfToken: true,
+      }).then((res) => {
         expect(res.status).to.eq(422)
         cy.task<IUser>('db:getUserById', this.u2Id).then((user) => {
-          expect(user.name).to.not.eq(body.name)
+          expect(user.name).to.not.eq('Yes, I have renamed you!')
         })
       })
     })
@@ -83,20 +99,24 @@ describe('/api/users/:id', () => {
 
       it('422 - Invalid name', function () {
         const name = { oh: 'nooo!' }
-        cy.req({ url: this.url, method, body: { name } }).then((res) => {
-          expect(res.status).to.eq(422)
-          expect(res.body).to.have.property('message', err.NAME_INVALID)
-        })
+        cy.req({ url: this.url, method, body: { name }, csrfToken: true }).then(
+          (res) => {
+            expect(res.status).to.eq(422)
+            expect(res.body).to.have.property('message', err.NAME_INVALID)
+          }
+        )
       })
 
       it('200 - Name updated', function () {
         const name = 'John Doe'
-        cy.req({ url: this.url, method, body: { name } }).then((res) => {
-          expect(res.status).to.eq(200)
-          cy.task<IUser>('db:getUserById', this.u1Id).then((user) => {
-            expect(user.name).to.eq(name)
-          })
-        })
+        cy.req({ url: this.url, method, body: { name }, csrfToken: true }).then(
+          (res) => {
+            expect(res.status).to.eq(200)
+            cy.task<IUser>('db:getUserById', this.u1Id).then((user) => {
+              expect(user.name).to.eq(name)
+            })
+          }
+        )
       })
     })
 
@@ -106,19 +126,27 @@ describe('/api/users/:id', () => {
       })
 
       it('422 - Invalid email', function () {
-        const email = { oh: 'nooo!' }
-        cy.req({ url: this.url, method, body: { email } }).then((res) => {
+        cy.req({
+          url: this.url,
+          method,
+          body: { email: { oh: 'nooo!' } },
+          csrfToken: true,
+        }).then((res) => {
           expect(res.status).to.eq(422)
           expect(res.body).to.have.property('message', err.EMAIL_INVALID)
         })
       })
 
       it('200 - Email updated', function () {
-        const email = 'superemail@test.com'
-        cy.req({ url: this.url, method, body: { email } }).then((res) => {
+        cy.req({
+          url: this.url,
+          method,
+          body: { email: 'superemail@test.com' },
+          csrfToken: true,
+        }).then((res) => {
           expect(res.status).to.eq(200)
           cy.task<IUser>('db:getUserById', this.u1Id).then((user) => {
-            expect(user.email).to.eq(email)
+            expect(user.email).to.eq('superemail@test.com')
           })
         })
       })
@@ -130,18 +158,26 @@ describe('/api/users/:id', () => {
       })
 
       it('422 - Invalid password', function () {
-        const password = { oh: 'nooo!' }
-        cy.req({ url: this.url, method, body: { password } }).then((res) => {
+        cy.req({
+          url: this.url,
+          method,
+          body: { password: { oh: 'nooo!' } },
+          csrfToken: true,
+        }).then((res) => {
           expect(res.status).to.eq(422)
           expect(res.body).to.have.property('message', err.PASSWORD_INVALID)
         })
       })
 
       it('200 - Password updated', function () {
-        const password = 'super oh nooo! password'
         cy.task<IUser>('db:getUserById', this.u1Id).then((user) => {
           const oldHash = (user.password as string).split(':')[1]
-          cy.req({ url: this.url, method, body: { password } }).then((res) => {
+          cy.req({
+            url: this.url,
+            method,
+            body: { password: 'super oh nooo! pw' },
+            csrfToken: true,
+          }).then((res) => {
             cy.task<IUser>('db:getUserById', this.u1Id).then((user) => {
               const newHash = (user.password as string).split(':')[1]
               expect(res.status).to.eq(200)
@@ -158,16 +194,24 @@ describe('/api/users/:id', () => {
       })
 
       it('422 - Invalid file type', function () {
-        const image = { base64Uri: 'text', type: 'text/plain' }
-        cy.req({ url: this.url, method, body: { image } }).then((res) => {
+        cy.req({
+          url: this.url,
+          method,
+          body: { image: { base64Uri: 'text', type: 'text/plain' } },
+          csrfToken: true,
+        }).then((res) => {
           expect(res.status).to.eq(422)
           expect(res.body).to.have.property('message', err.USER_IMAGE_INVALID)
         })
       })
 
       it('422 - Invalid file data', function () {
-        const image = { base64Uri: 'not base 64 uri', type: 'image/jpeg' }
-        cy.req({ url: this.url, method, body: { image } }).then((res) => {
+        cy.req({
+          url: this.url,
+          method,
+          body: { image: { base64Uri: 'not base 64 uri', type: 'image/jpeg' } },
+          csrfToken: true,
+        }).then((res) => {
           expect(res.status).to.eq(422)
           expect(res.body).to.have.property('message', err.DATA_INVALID)
         })
@@ -176,8 +220,12 @@ describe('/api/users/:id', () => {
       it('413 - File too large', function () {
         const type = 'image/jpeg'
         const base64 = Buffer.from(new Uint8Array(1000001)).toString('base64')
-        const image = { base64Uri: `data:${type};base64,${base64}`, type }
-        cy.req({ url: this.url, method, body: { image } }).then((res) => {
+        cy.req({
+          url: this.url,
+          method,
+          body: { image: { base64Uri: `data:${type};base64,${base64}`, type } },
+          csrfToken: true,
+        }).then((res) => {
           expect(res.status).to.eq(413)
           expect(res.body).to.have.property('message', err.USER_IMAGE_TOO_LARGE)
         })
@@ -186,8 +234,12 @@ describe('/api/users/:id', () => {
       it('200 - Image updated', function () {
         const type = 'image/jpeg'
         const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
-        const image = { base64Uri: `data:${type};base64,${base64}`, type }
-        cy.req({ url: this.url, method, body: { image } }).then((res) => {
+        cy.req({
+          url: this.url,
+          method,
+          body: { image: { base64Uri: `data:${type};base64,${base64}`, type } },
+          csrfToken: true,
+        }).then((res) => {
           expect(res.status).to.eq(200)
           cy.task<IUser>('db:getUserById', this.u1Id).then((user) => {
             expect(user.image.contentType).to.eq(type)
@@ -209,19 +261,33 @@ describe('/api/users/:id', () => {
       })
     })
 
+    it('should not update if the CSRF token is invalid', function () {
+      cy.signIn(this.user.email, this.user.password)
+      cy.req({
+        url: this.url,
+        method,
+        body: { csrfToken: '100% certified - very secure token' },
+      }).then((res) => {
+        expect(res.status).to.eq(422)
+        expect(res.body).to.have.property('message', err.DATA_INVALID)
+      })
+    })
+
     it('should not allow a user to delete another user', function () {
       cy.signIn(this.user.email, this.user.password)
-      cy.req({ url: `/api/users/${this.u2Id}`, method }).then((res) => {
-        expect(res.status).to.eq(422)
-        cy.task<IUser>('db:getUserById', this.u2Id).then((user) => {
-          expect(user).to.not.be.null
-        })
-      })
+      cy.req({ url: `/api/users/${this.u2Id}`, method, csrfToken: true }).then(
+        (res) => {
+          expect(res.status).to.eq(422)
+          cy.task<IUser>('db:getUserById', this.u2Id).then((user) => {
+            expect(user).to.not.be.null
+          })
+        }
+      )
     })
 
     it('200 - Delete the user', function () {
       cy.signIn(this.user.email, this.user.password)
-      cy.req({ url: this.url, method }).then((res) => {
+      cy.req({ url: this.url, method, csrfToken: true }).then((res) => {
         expect(res.status).to.eq(200)
         cy.task<null>('db:getUserById', this.u1Id).then((user) => {
           expect(user).to.eq(null)

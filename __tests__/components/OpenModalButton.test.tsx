@@ -8,16 +8,13 @@ const factory = () => {
   render(<OpenModalButton name="Open" setIsModalOpen={setIsModalOpen} />)
 }
 
-describe('OpenModalButton', () => {
-  it('should render the given name', () => {
-    factory()
-    expect(screen.getByRole('button')).toHaveTextContent('Open')
-  })
+test('the button renders and open the modal', () => {
+  factory()
 
-  it('should call "setIsModalOpen" on click', () => {
-    factory()
-    userEvent.click(screen.getByRole('button'))
-    expect(setIsModalOpen).toHaveBeenCalledWith(true)
-    expect(setIsModalOpen).toHaveBeenCalledTimes(1)
-  })
+  const openBtn = screen.getByRole('button')
+  expect(openBtn).toHaveTextContent('Open')
+
+  userEvent.click(openBtn)
+  expect(setIsModalOpen).toHaveBeenCalledWith(true)
+  expect(setIsModalOpen).toHaveBeenCalledTimes(1)
 })

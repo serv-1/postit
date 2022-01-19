@@ -47,6 +47,9 @@ const handlers = [
   rest.get('http://localhost/api/auth/csrf', (req, res, ctx) =>
     res(ctx.status(200), ctx.json(mockCSRFToken))
   ),
+  rest.get('http://localhost:3000/api/auth/csrf', (req, res, ctx) =>
+    res(ctx.status(200), ctx.json(mockCSRFToken))
+  ),
   rest.post('http://localhost/api/auth/signout', (req, res, ctx) =>
     res(ctx.status(200), ctx.json(mockSignOutResponse))
   ),

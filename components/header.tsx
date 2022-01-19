@@ -34,7 +34,7 @@ const Header = () => {
           >
             Sign in
           </a>
-        ) : undefined}
+        ) : null}
       </nav>
     </header>
   )

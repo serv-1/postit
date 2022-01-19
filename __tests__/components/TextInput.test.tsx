@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, RegisterOptions, useForm } from 'react-hook-form'
+import { RegisterOptions } from 'react-hook-form'
 import TextInput from '../../components/TextInput'
 
 const setFocus = jest.fn()
@@ -8,7 +8,7 @@ const setFocus = jest.fn()
 const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
 
 const setFormContext = (isSubmitted: boolean, message?: string) => ({
-  formState: { isSubmitted, errors: message ? { name: { message } } : {} },
+  formState: { isSubmitted, errors: message ? { username: { message } } : {} },
   register: jest.fn((name: string, options: RegisterOptions) => ({
     name,
     onBlur: options.onBlur,
@@ -22,79 +22,59 @@ beforeEach(() => useFormContext.mockReturnValue(setFormContext(false)))
 const handleChange = jest.fn()
 const handleBlur = jest.fn()
 
-const NameInput = ({ needFocus }: { needFocus: boolean }) => {
-  const methods = useForm<{ name: string }>()
-
-  return (
-    <FormProvider {...methods}>
-      <TextInput
-        name="name"
-        onChange={handleChange}
-        onBlur={handleBlur}
-        needFocus={needFocus}
-        className="red"
-      />
-    </FormProvider>
+const factory = (needFocus: boolean = false) => {
+  render(
+    <TextInput
+      name="username"
+      onChange={handleChange}
+      onBlur={handleBlur}
+      needFocus={needFocus}
+      className="red"
+    />
   )
 }
 
-const factory = (needFocus: boolean = false) => {
-  render(<NameInput needFocus={needFocus} />)
-}
+test('the input renders', () => {
+  factory(true)
 
-describe('Input', () => {
-  it('should use the given name', () => {
-    factory()
-    const input = screen.getByRole('textbox')
-    expect(input).toHaveAttribute('id', 'name')
-    expect(input).toHaveAttribute('name', 'name')
-  })
+  const input = screen.getByRole('textbox')
+  expect(input).toHaveAttribute('id', 'username')
+  expect(input).toHaveAttribute('name', 'username')
+  expect(input).toHaveClass('red')
+  expect(input).not.toHaveClass('is-invalid', 'is-valid')
 
-  it('should use the given className', () => {
-    factory()
-    expect(screen.getByRole('textbox')).toHaveClass('red')
-  })
+  userEvent.type(input, 'a')
+  expect(handleChange).toHaveBeenCalledTimes(1)
 
-  it('should use the given onChange handler', () => {
-    factory()
-    userEvent.type(screen.getByRole('textbox'), 'John Doe')
-    expect(handleChange).toHaveBeenCalled()
-  })
+  userEvent.tab()
+  expect(handleBlur).toHaveBeenCalledTimes(1)
 
-  it('should use the given onBlur handler', () => {
-    factory()
-    screen.getByRole('textbox').focus()
-    userEvent.tab()
-    expect(handleBlur).toHaveBeenCalledTimes(1)
-  })
+  expect(setFocus).toHaveBeenCalledWith('username')
+  expect(setFocus).toHaveBeenCalledTimes(1)
+})
 
-  it('should have the focus if "needFocus" is defined', () => {
-    factory(true)
-    expect(setFocus).toHaveBeenCalledWith('name')
-    expect(setFocus).toHaveBeenCalledTimes(1)
-  })
+test('the input do not have the focus', () => {
+  factory()
 
-  it('should not have the focus if "needFocus" is undefined', () => {
-    factory()
-    expect(screen.getByRole('textbox')).not.toHaveFocus()
-  })
+  expect(setFocus).not.toHaveBeenCalled()
+})
 
-  it('should have class "is-invalid" if the form is submitted and there is an error', () => {
-    useFormContext.mockReturnValueOnce(setFormContext(true, 'An error'))
-    factory()
-    expect(screen.getByRole('textbox')).toHaveClass('is-invalid')
-  })
+test('the input have is-invalid class if the form is submitted and there is an error', () => {
+  useFormContext.mockReturnValueOnce(setFormContext(true, 'Error'))
 
-  it('should have class "is-valid" if the form is submitted and there is no error', () => {
-    useFormContext.mockReturnValueOnce(setFormContext(true))
-    factory()
-    expect(screen.getByRole('textbox')).toHaveClass('is-valid')
-  })
+  factory()
 
-  it('should not have class "is-invalid" nor "is-valid" if the form is not submitted', () => {
-    factory()
-    const input = screen.getByRole('textbox')
-    expect(input).not.toHaveClass('is-invalid')
-    expect(input).not.toHaveClass('is-valid')
-  })
+  const input = screen.getByRole('textbox')
+  expect(input).toHaveClass('is-invalid')
+  expect(input).not.toHaveClass('is-valid')
+})
+
+test('the input have is-valid class if the form is submitted and there is no error', () => {
+  useFormContext.mockReturnValueOnce(setFormContext(true))
+
+  factory()
+
+  const input = screen.getByRole('textbox')
+  expect(input).toHaveClass('is-valid')
+  expect(input).not.toHaveClass('is-invalid')
 })

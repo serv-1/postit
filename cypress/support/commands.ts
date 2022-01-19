@@ -45,9 +45,20 @@ Cypress.Commands.add(
     url = '/',
     body = {},
     failOnStatusCode = false,
+    csrfToken = false,
   }: ReqParams) => {
-    return cy
-      .request<T>({ method, url, body, failOnStatusCode })
-      .then((res) => res)
+    if (csrfToken) {
+      cy.request('http://localhost:3000/api/auth/csrf').then((res) => {
+        cy.wrap({ csrfToken: res.body.csrfToken, ...body }).as('body')
+      })
+    } else {
+      cy.wrap(body).as('body')
+    }
+
+    return cy.get('@body').then((body) => {
+      return cy
+        .request<T>({ method, url, body, failOnStatusCode })
+        .then((res) => res)
+    })
   }
 )

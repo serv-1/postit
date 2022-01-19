@@ -16,32 +16,32 @@ const factory = (session?: Session | null) => {
   )
 }
 
-describe('Header', () => {
-  it('should render nothing while the session is not fetched yet', () => {
-    factory()
-    expect(screen.queryByRole('link', { name: 'Sign in' })).toBe(null)
-    expect(screen.queryByRole('link', { name: 'Sign out' })).toBe(null)
-  })
+test('no link renders while the user is being fetched', () => {
+  factory()
 
-  it('should render the sign in link if the user is unauthenticated', () => {
-    factory(null)
-    expect(screen.getByRole('link', { name: 'Sign in' })).toBeInTheDocument()
-  })
+  const signInLink = screen.queryByRole('link', { name: /sign in/i })
+  expect(signInLink).not.toBeInTheDocument()
 
-  it('should render the sign out link if the user is authenticated', () => {
-    factory(mockSession)
-    expect(screen.getByRole('link', { name: 'Sign out' })).toBeInTheDocument()
-  })
+  const signOutLink = screen.queryByRole('link', { name: /sign out/i })
+  expect(signOutLink).not.toBeInTheDocument()
+})
 
-  it('should call signIn on click on sign in link', () => {
-    factory(null)
-    userEvent.click(screen.getByRole('link', { name: 'Sign in' }))
-    expect(signIn).toHaveBeenCalledTimes(1)
-  })
+test('the sign in link renders if the user is unauthenticated', () => {
+  factory(null)
 
-  it('should call signOut on click on sign out link', () => {
-    factory(mockSession)
-    userEvent.click(screen.getByRole('link', { name: 'Sign out' }))
-    expect(signOut).toHaveBeenCalledTimes(1)
-  })
+  const signInLink = screen.getByRole('link', { name: /sign in/i })
+  expect(signInLink).toBeInTheDocument()
+
+  userEvent.click(signInLink)
+  expect(signIn).toHaveBeenCalledTimes(1)
+})
+
+test('the sign out link renders if the user is authenticated', () => {
+  factory(mockSession)
+
+  const signOutLink = screen.getByRole('link', { name: /sign out/i })
+  expect(signOutLink).toBeInTheDocument()
+
+  userEvent.click(signOutLink)
+  expect(signOut).toHaveBeenCalledTimes(1)
 })

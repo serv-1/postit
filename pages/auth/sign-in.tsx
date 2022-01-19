@@ -3,7 +3,6 @@ import { GetServerSideProps } from 'next'
 import * as NextAuth from 'next-auth/react'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { signInSchema } from '../../utils/joiSchemas'
 import Link from 'next/link'
@@ -12,6 +11,8 @@ import Form from '../../components/Form'
 import FormTextField from '../../components/FormTextField'
 import FormPasswordField from '../../components/FormPasswordField'
 import Button from '../../components/Button'
+import { useToast } from '../../contexts/toast'
+import Toast from '../../components/Toast'
 
 interface FormFields {
   email: string
@@ -21,25 +22,21 @@ interface FormFields {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
-      csrfToken: await NextAuth.getCsrfToken(ctx),
       providers: await NextAuth.getProviders(),
     },
   }
 }
 
 interface SignInProps {
-  csrfToken?: string
   providers: Record<
     NextAuth.LiteralUnion<BuiltInProviderType, string>,
     NextAuth.ClientSafeProvider
   > | null
 }
 
-const SignIn = ({ csrfToken, providers }: SignInProps) => {
-  const [serverError, setServerError] = useState<string>()
-  const methods = useForm<FormFields>({
-    resolver: joiResolver(signInSchema),
-  })
+const SignIn = ({ providers }: SignInProps) => {
+  const methods = useForm<FormFields>({ resolver: joiResolver(signInSchema) })
+  const { setToast } = useToast()
   const router = useRouter()
 
   const submitHandler: SubmitHandler<FormFields> = async (data) => {
@@ -54,7 +51,7 @@ const SignIn = ({ csrfToken, providers }: SignInProps) => {
       } else if (new RegExp(/password/i).test(err)) {
         methods.setError('password', { message: err }, { shouldFocus: true })
       } else {
-        setServerError(err)
+        setToast({ message: err, background: 'danger' })
       }
       return
     }
@@ -67,23 +64,14 @@ const SignIn = ({ csrfToken, providers }: SignInProps) => {
         <title>Filanad - Sign in</title>
       </Head>
       <main className="my-4">
+        <Toast />
         <section className="w-25 m-auto shadow rounded">
           <h1 className="bg-primary text-light rounded-top p-2 m-0">Sign in</h1>
-          {serverError && (
-            <div
-              className="fw-bold p-2 pb-0 text-danger"
-              id="globalFeedback"
-              role="alert"
-            >
-              {serverError}
-            </div>
-          )}
           <Form
             name="signin"
             method="post"
             submitHandlers={{ submitHandler }}
             methods={methods}
-            csrfToken={csrfToken}
           >
             <FormTextField
               labelText="Email"

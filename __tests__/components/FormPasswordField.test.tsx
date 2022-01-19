@@ -12,12 +12,7 @@ const setFormContext = (isSubmitted: boolean, message?: string) => ({
 
 beforeEach(() => useFormContext.mockReturnValue(setFormContext(false)))
 
-interface FactoryParams {
-  showForgotPasswordLink?: boolean
-  showRules?: boolean
-}
-
-const factory = ({ showRules, showForgotPasswordLink }: FactoryParams = {}) => {
+const factory = (showRules?: boolean, showForgotPasswordLink?: boolean) => {
   render(
     <FormPasswordField
       showForgotPasswordLink={showForgotPasswordLink}
@@ -26,28 +21,22 @@ const factory = ({ showRules, showForgotPasswordLink }: FactoryParams = {}) => {
   )
 }
 
-describe('FormPasswordField', () => {
-  describe('Rules', () => {
-    it('should not be rendered if "showRules" is undefined', () => {
-      factory()
-      expect(screen.queryByRole('note')).not.toBeInTheDocument()
-    })
+test('the forgot password link and the password rules render', () => {
+  factory(true, true)
 
-    it('should be rendered if "showRules" is defined', () => {
-      factory({ showRules: true })
-      expect(screen.getByRole('note')).toBeInTheDocument()
-    })
-  })
+  const link = screen.getByRole('link')
+  expect(link).toBeInTheDocument()
 
-  describe('Forgot password link', () => {
-    it('should not be rendered if "showForgotPasswordLink" is undefined', () => {
-      factory()
-      expect(screen.queryByRole('link')).not.toBeInTheDocument()
-    })
+  const rules = screen.getByRole('note')
+  expect(rules).toBeInTheDocument()
+})
 
-    it('should be rendered if "showForgotPasswordLink" is defined', () => {
-      factory({ showForgotPasswordLink: true })
-      expect(screen.getByRole('link')).toBeInTheDocument()
-    })
-  })
+test('the forgot password link and the password rules do no render', () => {
+  factory(false, false)
+
+  const link = screen.queryByRole('link')
+  expect(link).not.toBeInTheDocument()
+
+  const rules = screen.queryByRole('note')
+  expect(rules).not.toBeInTheDocument()
 })

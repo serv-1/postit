@@ -1,10 +1,16 @@
 import { randomBytes, scryptSync } from 'crypto'
+import Joi, { Schema, ValidationError } from 'joi'
 import { isValidObjectId } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import User from '../../../models/User'
-import { authCheck } from '../../../utils'
+import authCheck from '../../../utils/authCheck'
 import dbConnect from '../../../utils/dbConnect'
-import errors from '../../../utils/errors'
+import err from '../../../utils/errors'
+import {
+  emailCsrfSchema,
+  nameCsrfSchema,
+  passwordCsrfSchema,
+} from '../../../utils/joiSchemas'
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,7 +18,7 @@ export default async function handler(
 ) {
   const id = req.query.id as string
   if (!isValidObjectId(id)) {
-    return res.status(422).send({ message: errors.PARAMS_INVALID })
+    return res.status(422).send({ message: err.PARAMS_INVALID })
   }
 
   switch (req.method) {
@@ -21,7 +27,7 @@ export default async function handler(
       const user = await User.findOne({ _id: id }).exec()
 
       if (!user) {
-        return res.status(404).send({ message: errors.USER_NOT_FOUND })
+        return res.status(404).send({ message: err.USER_NOT_FOUND })
       }
 
       const base64 = user.image.data.toString('base64')
@@ -34,101 +40,86 @@ export default async function handler(
       })
       break
     case 'PUT':
-      const err = await authCheck(req, id)
-      if (err) return res.status(err.status).send({ message: err.message })
+      const resp = await authCheck(req, id)
+      if (resp) return res.status(resp.status).send({ message: resp.message })
 
-      const key = Object.keys(req.body)[0]
+      const key = Object.keys(req.body).reduce((prev, next) =>
+        next !== 'csrfToken' ? next : prev
+      )
+
       let update: Record<string, unknown>
 
       switch (key) {
         case 'name':
-          const name = req.body.name
-
-          if (typeof name !== 'string') {
-            return res.status(422).send({ message: errors.NAME_INVALID })
-          }
-
-          update = req.body
+          validBody(res, req.body, nameCsrfSchema)
+          update = { name: req.body.name }
           break
-        case 'email':
-          const email = req.body.email
-
-          if (typeof email !== 'string') {
-            return res.status(422).send({ message: errors.EMAIL_INVALID })
-          }
-
-          update = req.body
+        case 'email': {
+          validBody(res, req.body, emailCsrfSchema)
+          update = { email: req.body.email }
           break
-        case 'password':
-          const password = req.body.password
-
-          if (typeof password !== 'string') {
-            return res.status(422).send({ message: errors.PASSWORD_INVALID })
-          }
-
+        }
+        case 'password': {
+          validBody(res, req.body, passwordCsrfSchema)
           const salt = randomBytes(16).toString('hex')
-          const hash = scryptSync(password, salt, 64).toString('hex')
-
+          const hash = scryptSync(req.body.password, salt, 64).toString('hex')
           update = { password: `${salt}:${hash}` }
           break
+        }
         case 'image':
           type Image = { type?: string; base64Uri?: string }
           const { type, base64Uri }: Image = req.body.image
 
           if (!base64Uri || !type) {
-            return res.status(422).send({ message: errors.DATA_INVALID })
+            return res.status(422).send({ message: err.DATA_INVALID })
           }
 
           if (!['image/jpeg', 'image/png', 'image/gif'].includes(type)) {
-            return res.status(422).send({ message: errors.USER_IMAGE_INVALID })
+            return res.status(422).send({ message: err.USER_IMAGE_INVALID })
           }
 
           if (base64Uri.search(/^data:image\/(jpeg|png|gif);base64,/) === -1) {
-            return res.status(422).send({ message: errors.DATA_INVALID })
+            return res.status(422).send({ message: err.DATA_INVALID })
           }
 
           const b64: string = base64Uri.split(',')[1]
-          const pad =
-            b64.slice(-1) == '=' ? 1 : 0 + b64.slice(-2) == '=' ? 1 : 0
+          const pad = b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0
           if (b64.length * (3 / 4) - pad > 1000000) {
-            return res
-              .status(413)
-              .send({ message: errors.USER_IMAGE_TOO_LARGE })
+            return res.status(413).send({ message: err.USER_IMAGE_TOO_LARGE })
           }
 
-          update = {
-            image: { data: Buffer.from(b64, 'base64'), contentType: type },
-          }
+          const image = { data: Buffer.from(b64, 'base64'), contentType: type }
+          update = { image }
           break
         default:
-          return res.status(422).send({ message: errors.DATA_INVALID })
+          return res.status(422).send({ message: err.DATA_INVALID })
       }
 
       try {
         await dbConnect()
         await User.updateOne({ _id: id }, update).exec()
       } catch (e) {
-        res.status(500).send({ message: errors.INTERNAL_SERVER_ERROR })
+        res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
       }
 
       res.status(200).end()
       break
     case 'DELETE': {
-      const err = await authCheck(req, id)
-      if (err) return res.status(err.status).send({ message: err.message })
+      const resp = await authCheck(req, id)
+      if (resp) return res.status(resp.status).send({ message: resp.message })
 
       try {
         await dbConnect()
         await User.deleteOne({ _id: id }).exec()
       } catch (e) {
-        res.status(500).send({ message: errors.INTERNAL_SERVER_ERROR })
+        res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
       }
 
       res.status(200).end()
       break
     }
     default:
-      res.status(405).send({ message: errors.METHOD_NOT_ALLOWED })
+      res.status(405).send({ message: err.METHOD_NOT_ALLOWED })
   }
 }
 
@@ -138,4 +129,17 @@ export const config = {
       sizeLimit: '2mb',
     },
   },
+}
+
+const validBody = (
+  res: NextApiResponse,
+  body: NextApiRequest['body'],
+  schema: Schema
+) => {
+  try {
+    Joi.assert(body, schema)
+  } catch (e) {
+    const message = (e as ValidationError).details[0].message
+    res.status(422).send({ message })
+  }
 }

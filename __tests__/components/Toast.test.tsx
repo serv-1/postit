@@ -25,44 +25,35 @@ const factory = ({ message, background }: ToastState = defaultToast) => {
   )
 }
 
-describe('Toast', () => {
-  it('should be rendered with the message', async () => {
-    factory()
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      defaultToast.message
-    )
-  })
+test('the alert renders and if the close button is clicked the alert disappears', () => {
+  factory()
 
-  it('should not be rendered if there is no message', () => {
-    factory({ message: null })
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-  })
+  let alert: HTMLElement | null = screen.getByRole('alert')
+  expect(alert).toHaveTextContent(defaultToast.message)
+  expect(alert).toHaveClass('bg-primary', 'text-white')
 
-  it('should use "primary" bg color if no bg color is defined', () => {
-    factory()
-    expect(screen.getByRole('alert')).toHaveClass('bg-primary')
-  })
+  const closeBtn = screen.getByRole('button')
+  expect(closeBtn).toHaveClass('btn-close-white')
 
-  it('should use the bg color', () => {
-    factory({ ...defaultToast, background: 'success' })
-    expect(screen.getByRole('alert')).toHaveClass('bg-success')
-  })
+  userEvent.click(closeBtn)
+  alert = screen.queryByRole('alert')
+  expect(alert).not.toBeInTheDocument()
+})
 
-  it('should have a white text if the bg color is one of the bg colors that needs it', () => {
-    factory({ ...defaultToast, background: 'danger' })
-    expect(screen.getByRole('alert')).toHaveClass('text-white')
-    expect(screen.getByRole('button')).toHaveClass('btn-close-white')
-  })
+test('the alert do not render if there is no message to display', () => {
+  factory({ message: null })
 
-  it('should not have a white text if the bg color is not one of the bg colors that needs it', () => {
-    factory({ ...defaultToast, background: 'white' })
-    expect(screen.getByRole('alert')).not.toHaveClass('text-white')
-    expect(screen.getByRole('button')).not.toHaveClass('btn-close-white')
-  })
+  const alert = screen.queryByRole('alert')
+  expect(alert).not.toBeInTheDocument()
+})
 
-  it('should be removed if the close button is clicked', () => {
-    factory()
-    userEvent.click(screen.getByRole('button'))
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-  })
+test('the alert use the given background color with the related text color', () => {
+  factory({ message: defaultToast.message, background: 'white' })
+
+  const alert = screen.getByRole('alert')
+  expect(alert).toHaveClass('bg-white')
+  expect(alert).not.toHaveClass('text-white')
+
+  const closeBtn = screen.getByRole('button')
+  expect(closeBtn).not.toHaveClass('btn-close-white')
 })

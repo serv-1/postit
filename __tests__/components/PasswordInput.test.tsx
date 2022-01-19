@@ -11,137 +11,92 @@ const setFormContext = () => ({
     onChange: opt.onChange,
   })),
   setFocus: jest.fn(),
-  getValues: () => ({ password: 'english rigole zoro', name: 'John Doe' }),
+  getValues: () => ({ name: 'John Doe', password: 'my password' }),
   formState: { isSubmitted: false },
 })
 
 beforeEach(() => useFormContext.mockReturnValue(setFormContext()))
 
-interface FactoryParams {
-  showStrength?: boolean
-  needFocus?: boolean
-  hasRules?: boolean
-}
-
-const factory = ({ showStrength, needFocus, hasRules }: FactoryParams = {}) => {
+const factory = (showStrength?: boolean, hasRules?: boolean) => {
   render(
     <>
       <Label htmlFor="password" labelText="Password" />
-      <PasswordInput
-        showStrength={showStrength}
-        needFocus={needFocus}
-        hasRules={hasRules}
-      />
+      <PasswordInput showStrength={showStrength} hasRules={hasRules} />
     </>
   )
 }
 
-describe('PasswordInput', () => {
-  describe('Visibility Button', () => {
-    it('should render an eye opened when the password is hidden', () => {
-      factory()
-      expect(screen.getByRole('button')).toHaveAccessibleName(/show/i)
-      expect(screen.getByTestId('eyeOpened')).toBeInTheDocument()
-    })
+test('the open eye btn and the input render', () => {
+  factory(true, true)
 
-    it('should render an eye closed when the password is shown', () => {
-      factory()
-      userEvent.click(screen.getByRole('button'))
-      expect(screen.getByRole('button')).toHaveAccessibleName(/hide/i)
-      expect(screen.getByTestId('eyeClosed')).toBeInTheDocument()
-    })
-  })
+  const btn = screen.getByRole('button')
+  expect(btn).toHaveAccessibleName(/show/i)
 
-  describe('Input', () => {
-    it('should be of type "password" by default', () => {
-      factory()
-      expect(screen.getByLabelText(/^password$/i)).toHaveAttribute(
-        'type',
-        'password'
-      )
-    })
+  const openEye = screen.getByTestId('openEye')
+  expect(openEye).toBeInTheDocument()
 
-    it('should be of type "text" if the password needs to be shown', () => {
-      factory()
-      userEvent.click(screen.getByRole('button'))
-      expect(screen.getByLabelText(/^password$/i)).toHaveAttribute(
-        'type',
-        'text'
-      )
-    })
+  const closeEye = screen.queryByTestId('closeEye')
+  expect(closeEye).not.toBeInTheDocument()
 
-    it('should be of type "password" if the password needs to be hidden', () => {
-      factory()
-      userEvent.dblClick(screen.getByRole('button'))
-      expect(screen.getByLabelText(/^password$/i)).toHaveAttribute(
-        'type',
-        'password'
-      )
-    })
+  const input = screen.getByLabelText(/^password$/i)
+  expect(input).toHaveAttribute('type', 'password')
 
-    it('should have "passwordRules" to "aria-describedby" value if "hasRules" is defined', () => {
-      factory({ hasRules: true })
-      const input = screen.getByLabelText(/^password$/i)
-      expect(input.getAttribute('aria-describedby')).toContain('passwordRules')
-    })
+  const inputAriaDescr = input.getAttribute('aria-describedby')
+  expect(inputAriaDescr).toContain('passwordRules')
 
-    it('should not have "passwordRules" to "aria-describedby" value if "hasRules" is undefined"', () => {
-      factory()
-      const input = screen.getByLabelText(/^password$/i)
-      expect(input.getAttribute('aria-describedby')).not.toContain(
-        'passwordRules'
-      )
-    })
-  })
+  const strength = screen.queryByRole('status')
+  expect(strength).not.toBeInTheDocument()
+})
 
-  describe('Strength', () => {
-    it('should be rendered if "showStrength" is defined', () => {
-      factory({ showStrength: true })
-      userEvent.type(screen.getByLabelText(/^password$/i), 'haha')
-      expect(screen.getByRole('status')).toBeInTheDocument()
-    })
+test('the visibility button shows the password', () => {
+  factory()
 
-    it('should not be rendered if "showStrength" is undefined', () => {
-      factory()
-      userEvent.type(screen.getByLabelText(/^password$/i), 'haha')
-      expect(screen.queryByRole('status')).not.toBeInTheDocument()
-    })
+  const btn = screen.getByRole('button')
 
-    it('should not be rendered while the user has not type something', () => {
-      factory({ showStrength: true })
-      expect(screen.queryByRole('status')).not.toBeInTheDocument()
-    })
+  userEvent.click(btn)
+  expect(btn).toHaveAccessibleName(/hide/i)
 
-    it('should be green if the password is strong', () => {
-      factory({ showStrength: true })
-      const pw = 'english rigole halt'
-      userEvent.type(screen.getByLabelText(/^password$/i), pw)
-      expect(screen.getByRole('status').className).toContain('success')
-    })
+  const openEye = screen.queryByTestId('openEye')
+  expect(openEye).not.toBeInTheDocument()
 
-    it('should be yellow if the password is strong', () => {
-      factory({ showStrength: true })
-      userEvent.type(screen.getByLabelText(/^password$/i), 'english rigole')
-      expect(screen.getByRole('status').className).toContain('warning')
-    })
+  const closeEye = screen.getByTestId('closeEye')
+  expect(closeEye).toBeInTheDocument()
 
-    it('should be red if the password is strong', () => {
-      factory({ showStrength: true })
-      userEvent.type(screen.getByLabelText(/^password$/i), 'english')
-      expect(screen.getByRole('status').className).toContain('danger')
-    })
+  const input = screen.getByLabelText(/^password$/i)
+  expect(input).toHaveAttribute('type', 'text')
 
-    it('should render the estimated time to crack the password', () => {
-      factory({ showStrength: true })
-      userEvent.type(screen.getByLabelText(/^password$/i), 'english')
-      expect(screen.getByRole('status')).toHaveTextContent(/second/i)
-    })
+  const inputAriaDescr = input.getAttribute('aria-describedby')
+  expect(inputAriaDescr).not.toContain('passwordRules')
+})
 
-    it("should take into account the other fields' values", () => {
-      factory({ showStrength: true })
-      const pw = 'english rigole zoro'
-      userEvent.type(screen.getByLabelText(/^password$/i), pw)
-      expect(screen.getByRole('status')).toHaveTextContent(/second/i)
-    })
-  })
+test("the password strength renders and take into account the other fields' values", () => {
+  factory(true)
+
+  const input = screen.getByLabelText(/^password$/i)
+  userEvent.type(input, 'english')
+
+  const strength = screen.getByRole('status')
+  expect(strength).toHaveClass('bg-danger')
+
+  userEvent.clear(input)
+  userEvent.type(input, 'english rigole')
+  expect(strength).toHaveClass('bg-warning')
+
+  userEvent.clear(input)
+  userEvent.type(input, 'english rigole tile')
+  expect(strength).toHaveClass('bg-success')
+
+  userEvent.clear(input)
+  userEvent.type(input, 'John Doe') // value of another field
+  expect(strength).toHaveClass('bg-danger')
+})
+
+test('the password strength does not render even if the user has typed something', () => {
+  factory()
+
+  const input = screen.getByLabelText(/^password$/i)
+  userEvent.type(input, 'John Doe')
+
+  const strength = screen.queryByRole('status')
+  expect(strength).not.toBeInTheDocument()
 })

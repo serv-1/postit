@@ -1,11 +1,12 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import err from '../utils/errors'
 import { useSession } from 'next-auth/react'
 import { Session } from 'next-auth'
 import { useToast } from '../contexts/toast'
 import Button from './Button'
+import getApiError from '../utils/getApiError'
+import err from '../utils/errors'
 
 const ProfileChangeImage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -20,11 +21,8 @@ const ProfileChangeImage = () => {
         const res = await axios.get(`http://localhost:3000/api/users/${id}`)
         setImage(res.data.image)
       } catch (e) {
-        const res = (e as AxiosError).response
-        if (!res) {
-          return setToast({ message: err.NO_RESPONSE, background: 'danger' })
-        }
-        setToast({ message: err.IMAGE_NOT_FOUND, background: 'danger' })
+        const { message } = getApiError(e)
+        setToast({ message, background: 'danger' })
       }
     }
     getImage()
@@ -49,23 +47,21 @@ const ProfileChangeImage = () => {
     reader.onload = async (e) => {
       if (!e.target?.result) return
       try {
+        const res = await axios.get('http://localhost:3000/api/auth/csrf')
+
         await axios.put<null>(`http://localhost:3000/api/users/${id}`, {
+          csrfToken: res.data.csrfToken,
           image: { base64Uri: e.target.result, type: files[0].type },
         })
+
         setToast({
           message: 'The image has been updated! 🎉',
           background: 'success',
         })
         setImage(e.target.result as string)
       } catch (e) {
-        const res = (e as AxiosError).response
-        if (!res) {
-          return setToast({ message: err.NO_RESPONSE, background: 'danger' })
-        }
-        setToast({
-          message: res.data.message || err.DEFAULT_SERVER_ERROR,
-          background: 'danger',
-        })
+        const { message } = getApiError(e)
+        setToast({ message, background: 'danger' })
       }
     }
 
