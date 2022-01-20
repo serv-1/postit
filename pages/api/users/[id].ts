@@ -3,6 +3,7 @@ import Joi, { Schema, ValidationError } from 'joi'
 import { isValidObjectId } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import User from '../../../models/User'
+import Account from '../../../models/Account'
 import authCheck from '../../../utils/authCheck'
 import dbConnect from '../../../utils/dbConnect'
 import err from '../../../utils/errors'
@@ -111,6 +112,7 @@ export default async function handler(
       try {
         await dbConnect()
         await User.deleteOne({ _id: id }).exec()
+        await Account.deleteOne({ userId: id }).exec()
       } catch (e) {
         res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
       }

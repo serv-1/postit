@@ -285,12 +285,15 @@ describe('/api/users/:id', () => {
       )
     })
 
-    it('200 - Delete the user', function () {
+    it("200 - Delete the user and it's related account", function () {
       cy.signIn(this.user.email, this.user.password)
       cy.req({ url: this.url, method, csrfToken: true }).then((res) => {
         expect(res.status).to.eq(200)
-        cy.task<null>('db:getUserById', this.u1Id).then((user) => {
+        cy.task('db:getUserById', this.u1Id).then((user) => {
           expect(user).to.eq(null)
+        })
+        cy.task('db:getAccountByUserId', this.u1Id).then((account) => {
+          expect(account).to.eq(null)
         })
       })
     })

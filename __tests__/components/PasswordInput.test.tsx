@@ -6,13 +6,13 @@ import PasswordInput from '../../components/PasswordInput'
 
 const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
 
-const setFormContext = () => ({
+const setFormContext = (isSubmitted: boolean = false, error?: string) => ({
   register: jest.fn((name: string, opt: RegisterOptions) => ({
     onChange: opt.onChange,
   })),
   setFocus: jest.fn(),
   getValues: () => ({ name: 'John Doe', password: 'my password' }),
-  formState: { isSubmitted: false },
+  formState: { isSubmitted, errors: error ? { password: error } : {} },
 })
 
 beforeEach(() => useFormContext.mockReturnValue(setFormContext()))
@@ -26,7 +26,7 @@ const factory = (showStrength?: boolean, hasRules?: boolean) => {
   )
 }
 
-test('the open eye btn and the input render', () => {
+test('the open eye button and the input render', () => {
   factory(true, true)
 
   const btn = screen.getByRole('button')
@@ -34,6 +34,7 @@ test('the open eye btn and the input render', () => {
 
   const openEye = screen.getByTestId('openEye')
   expect(openEye).toBeInTheDocument()
+  expect(openEye).not.toHaveClass('border-danger', 'border-success')
 
   const closeEye = screen.queryByTestId('closeEye')
   expect(closeEye).not.toBeInTheDocument()
@@ -45,7 +46,7 @@ test('the open eye btn and the input render', () => {
   expect(inputAriaDescr).toContain('passwordRules')
 })
 
-test('the visibility button shows the password', () => {
+test('the eye button shows the password', () => {
   factory()
 
   const btn = screen.getByRole('button')
@@ -64,6 +65,26 @@ test('the visibility button shows the password', () => {
 
   const inputAriaDescr = input.getAttribute('aria-describedby')
   expect(inputAriaDescr).not.toContain('passwordRules')
+})
+
+test('the eye button border is red if the form is Submitted and there is an error', () => {
+  useFormContext.mockReturnValue(setFormContext(true, 'error'))
+
+  factory()
+
+  const btn = screen.getByRole('button')
+  expect(btn).toHaveClass('border-danger')
+  expect(btn).not.toHaveClass('border-success')
+})
+
+test('the eye button border is green if the form is Submitted and there is no error', () => {
+  useFormContext.mockReturnValue(setFormContext(true))
+
+  factory()
+
+  const btn = screen.getByRole('button')
+  expect(btn).toHaveClass('border-success')
+  expect(btn).not.toHaveClass('border-danger')
 })
 
 test("the password strength renders and take into account the other fields' values", () => {

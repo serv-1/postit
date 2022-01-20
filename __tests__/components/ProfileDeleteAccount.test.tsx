@@ -11,10 +11,6 @@ import { mockResponse } from '../../utils/msw'
 const signOut = jest.spyOn(require('next-auth/react'), 'signOut')
 signOut.mockResolvedValue({ url: '/' })
 
-const useRouter = jest.spyOn(require('next/router'), 'useRouter')
-const router = { push: jest.fn() }
-useRouter.mockReturnValue(router)
-
 const factory = () => {
   render(
     <SessionProvider session={mockSession}>
@@ -26,7 +22,7 @@ const factory = () => {
   )
 }
 
-test('the user is signed out and redirected to the home page after been deleted', async () => {
+test('the user is signed out and redirected to the home page after being deleted', async () => {
   factory()
 
   const openModalBtn = screen.getByRole('button')
@@ -37,8 +33,7 @@ test('the user is signed out and redirected to the home page after been deleted'
 
   await waitFor(() => {
     expect(signOut).toHaveBeenCalledTimes(1)
-    expect(router.push).toHaveBeenCalledWith('/')
-    expect(router.push).toHaveBeenCalledTimes(1)
+    expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/' })
   })
 })
 

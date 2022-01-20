@@ -10,8 +10,8 @@ export interface ModalProps {
 const Modal = ({ children, title, setIsModalOpen }: ModalProps) => {
   return (
     <div
-      className="position-fixed top-0 start-0 w-100 h-100"
-      style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+      className="position-fixed top-0 start-0 w-100 h-100 text-start"
+      style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999 }}
     >
       <div className="position-relative bg-white p-2 w-25 rounded shadow start-50 translate-middle-x mt-5">
         <header className="d-flex justify-content-between">

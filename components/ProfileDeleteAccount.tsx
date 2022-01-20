@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { Session } from 'next-auth'
 import { signOut, useSession } from 'next-auth/react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useToast } from '../contexts/toast'
 import getApiError from '../utils/getApiError'
@@ -11,7 +10,6 @@ import OpenModalButton from './OpenModalButton'
 
 const ProfileDeleteAccount = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const router = useRouter()
   const { setToast } = useToast()
   const { data } = useSession()
   const { id } = (data as Session).user
@@ -24,9 +22,7 @@ const ProfileDeleteAccount = () => {
         data: { csrfToken: res.data.csrfToken },
       })
 
-      const data = await signOut({ redirect: false, callbackUrl: '/' })
-
-      router.push(data.url)
+      await signOut({ callbackUrl: '/' })
     } catch (e) {
       const { message } = getApiError(e)
       setToast({ message, background: 'danger' })

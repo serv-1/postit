@@ -27,7 +27,8 @@ const PasswordInput = ({
   const [showPassword, setShowPassword] = useState(false)
   const defaultStrength = { text: 'weak', color: 'danger' }
   const [strength, setStrength] = useState<Strength>(defaultStrength)
-  const { getValues } = useFormContext()
+  const { getValues, formState } = useFormContext()
+  const { isSubmitted, errors } = formState
   const userInputs = getValues()
   delete userInputs.password
 
@@ -52,6 +53,11 @@ const PasswordInput = ({
     })
   }
 
+  const btnClass = classNames('text-secondary rounded-end border-start-0', {
+    'border-danger': isSubmitted && errors.password,
+    'border-success': isSubmitted && !errors.password,
+  })
+
   return (
     <>
       <TextInput
@@ -65,7 +71,7 @@ const PasswordInput = ({
       />
       <Button
         type="button"
-        className="text-secondary rounded-end border-start-0"
+        className={btnClass}
         style={{ border: '1px solid #ced4da' }}
         onClick={() => setShowPassword(!showPassword)}
         aria-label={(showPassword ? 'Hide' : 'Show') + ' password'}

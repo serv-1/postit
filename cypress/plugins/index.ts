@@ -1,6 +1,8 @@
 import { connect, connection as conn } from 'mongoose'
 import User, { IUser } from '../../models/User'
-import user from '../fixtures/user.json'
+import Account, { IAccount } from '../../models/Account'
+import userJson from '../fixtures/user.json'
+import accountJson from '../fixtures/account.json'
 const { GoogleSocialLogin } = require('cypress-social-logins').plugins
 require('dotenv').config()
 import env from '../../utils/env'
@@ -26,25 +28,43 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
     async 'db:seed'(): Promise<dbSeedResult> {
       await connect(env.MONGODB_URI)
 
-      const salt = randomBytes(16).toString('hex')
-      const hash = scryptSync(user.password, salt, 64).toString('hex')
+      const u1 = await saveUser()
+      const u2 = await saveUser({ name: 'Jane Doe', email: 'janedoe@test.com' })
 
-      const u = new User({ ...user, password: `${salt}:${hash}` })
-      await u.save()
-
-      const newUser = { name: 'Jane Doe', email: 'janedoe@test.com' }
-      const u2 = new User({ ...user, ...newUser, password: `${salt}:${hash}` })
-      await u2.save()
-
-      return { u1Id: u.id, u2Id: u2.id }
+      return { u1Id: u1._id, u2Id: u2._id }
     },
     async 'db:getUserById'(id: string): Promise<IUser | null> {
       await connect(env.MONGODB_URI)
       const user = await User.findOne({ _id: id }).exec()
       return user
     },
+    async 'db:getAccountByUserId'(id: string): Promise<IAccount | null> {
+      await connect(env.MONGODB_URI)
+      const account = await Account.findOne({ userId: id }).exec()
+      return account
+    },
     GoogleSocialLogin: GoogleSocialLogin,
   })
 }
 
 export default pluginConfig
+
+const saveUser = async (update?: Partial<typeof userJson>) => {
+  let password: string | undefined
+  const user = { ...userJson, ...update }
+
+  if (user.password) {
+    const salt = randomBytes(16).toString('hex')
+    const hash = scryptSync(user.password, salt, 64).toString('hex')
+    password = salt + ':' + hash
+  }
+
+  const image = { ...user.image, data: Buffer.from(user.image.data, 'base64') }
+  const u = new User({ ...user, image, password })
+  await u.save()
+
+  const uAccount = new Account({ ...accountJson, userId: u._id })
+  await uAccount.save()
+
+  return u
+}
