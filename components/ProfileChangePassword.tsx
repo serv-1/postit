@@ -39,13 +39,13 @@ const ProfileChangePassword = () => {
   }
 
   return (
-    <div className="container my-4">
+    <div className="my-4">
       <Form
         name="updateUserPassword"
         method="post"
         submitHandlers={{ submitHandler }}
         methods={methods}
-        className="w-50 m-auto p-2 rounded border border-1"
+        className="p-2 rounded border border-1"
         needCsrfToken
       >
         <Label htmlFor="password" labelText="Change your password" />

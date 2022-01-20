@@ -34,7 +34,7 @@ const ProfileDeleteAccount = () => {
   }
 
   return (
-    <div className="container text-center">
+    <div className="text-center">
       <OpenModalButton
         name="Delete your account"
         className="btn-danger"

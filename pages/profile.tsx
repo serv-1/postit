@@ -6,15 +6,17 @@ import ProfileChangePassword from '../components/ProfileChangePassword'
 
 const Profile = () => {
   return (
-    <main data-cy="profile" className="my-4">
+    <main data-cy="profile" className="container-fluid my-4">
       <Toast />
-      <ProfileChangeImage />
-      <div className="container my-2 d-flex flex-column">
-        <ProfileChangeNameOrEmail subject="name" />
-        <ProfileChangeNameOrEmail subject="email" />
+      <div className="col-md-6 col-6 m-auto">
+        <ProfileChangeImage />
+        <div className="my-2 d-flex flex-column">
+          <ProfileChangeNameOrEmail subject="name" />
+          <ProfileChangeNameOrEmail subject="email" />
+        </div>
+        <ProfileChangePassword />
+        <ProfileDeleteAccount />
       </div>
-      <ProfileChangePassword />
-      <ProfileDeleteAccount />
     </main>
   )
 }

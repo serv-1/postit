@@ -59,7 +59,7 @@ const ProfileChangeNameOrEmail = ({
       methods={methods}
       needCsrfToken
     >
-      <div className="input-group w-50 m-auto d-flex align-items-center">
+      <div className="input-group">
         <TextInput
           className="rounded"
           type={subject === 'name' ? 'text' : 'email'}
@@ -82,7 +82,7 @@ const ProfileChangeNameOrEmail = ({
       </div>
     </Form>
   ) : (
-    <div className="input-group w-50 m-auto d-flex align-items-center">
+    <div className="input-group d-flex align-items-center">
       <span className={subject === 'name' ? 'fw-bold fs-1' : 'fs-5'}>
         {subjectValue}
       </span>
