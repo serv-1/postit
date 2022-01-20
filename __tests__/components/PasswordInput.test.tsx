@@ -43,9 +43,6 @@ test('the open eye btn and the input render', () => {
 
   const inputAriaDescr = input.getAttribute('aria-describedby')
   expect(inputAriaDescr).toContain('passwordRules')
-
-  const strength = screen.queryByRole('status')
-  expect(strength).not.toBeInTheDocument()
 })
 
 test('the visibility button shows the password', () => {
@@ -73,30 +70,34 @@ test("the password strength renders and take into account the other fields' valu
   factory(true)
 
   const input = screen.getByLabelText(/^password$/i)
+  const redDot = screen.getByTestId('redDot')
+  const yellowDot = screen.getByTestId('yellowDot')
+  const greenDot = screen.getByTestId('greenDot')
+
   userEvent.type(input, 'english')
 
-  const strength = screen.getByRole('status')
-  expect(strength).toHaveClass('bg-danger')
+  expect(redDot).toHaveClass('bg-danger')
+  expect(yellowDot).not.toHaveClass('bg-warning')
+  expect(greenDot).not.toHaveClass('bg-success')
 
   userEvent.clear(input)
   userEvent.type(input, 'english rigole')
-  expect(strength).toHaveClass('bg-warning')
+
+  expect(redDot).not.toHaveClass('bg-danger')
+  expect(yellowDot).toHaveClass('bg-warning')
+  expect(greenDot).not.toHaveClass('bg-success')
 
   userEvent.clear(input)
   userEvent.type(input, 'english rigole tile')
-  expect(strength).toHaveClass('bg-success')
+
+  expect(redDot).not.toHaveClass('bg-danger')
+  expect(yellowDot).not.toHaveClass('bg-warning')
+  expect(greenDot).toHaveClass('bg-success')
 
   userEvent.clear(input)
   userEvent.type(input, 'John Doe') // value of another field
-  expect(strength).toHaveClass('bg-danger')
-})
 
-test('the password strength does not render even if the user has typed something', () => {
-  factory()
-
-  const input = screen.getByLabelText(/^password$/i)
-  userEvent.type(input, 'John Doe')
-
-  const strength = screen.queryByRole('status')
-  expect(strength).not.toBeInTheDocument()
+  expect(redDot).toHaveClass('bg-danger')
+  expect(yellowDot).not.toHaveClass('bg-warning')
+  expect(greenDot).not.toHaveClass('bg-success')
 })

@@ -8,7 +8,7 @@ import Button from './Button'
 import TextInput from './TextInput'
 
 interface Strength {
-  estimated_time: string | number
+  text: string
   color: string
 }
 
@@ -25,33 +25,48 @@ const PasswordInput = ({
   ...props
 }: PasswordInputProps) => {
   const [showPassword, setShowPassword] = useState(false)
-  const [strength, setStrength] = useState<Strength>()
+  const defaultStrength = { text: 'weak', color: 'danger' }
+  const [strength, setStrength] = useState<Strength>(defaultStrength)
   const { getValues } = useFormContext()
-  const values = Object.values(getValues()).slice(0, -1)
+  const userInputs = getValues()
+  delete userInputs.password
 
-  const ariaDescr = classNames('visibilityBtn passwordStrength', {
-    passwordRules: hasRules,
-  })
+  const ariaDescr = classNames('passwordStrength', { passwordRules: hasRules })
 
   const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { crack_times_display, score } = zxcvbn(e.target.value, values)
+    const { score } = zxcvbn(e.target.value, Object.values(userInputs))
 
-    let color = 'success'
-    if (score <= 2) color = 'danger'
-    else if (score === 3) color = 'warning'
+    if (score <= 2) {
+      return setStrength({ text: 'weak', color: 'danger' })
+    } else if (score === 3) {
+      return setStrength({ text: 'good but not strong', color: 'warning' })
+    }
 
-    setStrength({
-      estimated_time: crack_times_display.offline_slow_hashing_1e4_per_second,
-      color,
+    setStrength({ text: 'strong', color: 'success' })
+  }
+
+  const getClassNames = (color: 'danger' | 'warning' | 'success') => {
+    return classNames('rounded-circle', {
+      'me-2': color !== 'success',
+      [`bg-${color}`]: strength?.color === color,
     })
   }
 
   return (
     <>
+      <TextInput
+        {...props}
+        name="password"
+        type={showPassword ? 'text' : 'password'}
+        onChange={showStrength ? onPasswordChange : undefined}
+        aria-describedby={ariaDescr}
+        needFocus={needFocus}
+        className="rounded-start border-end-0"
+      />
       <Button
         type="button"
-        id="visibilityBtn"
-        className="btn-outline-secondary"
+        className="text-secondary rounded-end border-start-0"
+        style={{ border: '1px solid #ced4da' }}
         onClick={() => setShowPassword(!showPassword)}
         aria-label={(showPassword ? 'Hide' : 'Show') + ' password'}
       >
@@ -61,22 +76,27 @@ const PasswordInput = ({
           <Eye data-testid="openEye" width="20" height="20" />
         )}
       </Button>
-      <TextInput
-        {...props}
-        name="password"
-        type={showPassword ? 'text' : 'password'}
-        onChange={showStrength ? onPasswordChange : undefined}
-        aria-describedby={ariaDescr}
-        needFocus={needFocus}
-      />
-      {showStrength && strength && (
-        <span
-          className={`input-group-text text-white border-1 border-${strength.color} bg-${strength.color}`}
-          id="passwordStrength"
-          role="status"
-        >
-          Need {strength.estimated_time} to crack
-        </span>
+      {showStrength && (
+        <div className="input-group-text bg-white border-0" role="status">
+          <div
+            data-testid="redDot"
+            className={getClassNames('danger')}
+            style={{ width: 18, height: 18, backgroundColor: '#931a26' }}
+          ></div>
+          <div
+            data-testid="yellowDot"
+            className={getClassNames('warning')}
+            style={{ width: 18, height: 18, backgroundColor: '#9e7700' }}
+          ></div>
+          <div
+            data-testid="greenDot"
+            className={getClassNames('success')}
+            style={{ width: 18, height: 18, backgroundColor: '#115a38' }}
+          ></div>
+          <span id="passwordStrength" className="d-none">
+            Your password is {strength.text}.
+          </span>
+        </div>
       )}
     </>
   )

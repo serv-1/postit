@@ -52,7 +52,7 @@ const ProfileChangePassword = () => {
         <div className="input-group">
           <PasswordInput showStrength />
           <input
-            className="btn btn-primary rounded-end"
+            className="btn btn-primary rounded"
             type="submit"
             value="Change"
           />

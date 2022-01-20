@@ -19,7 +19,7 @@ const FormPasswordField = ({
   <div className="mb-3 text-start">
     <Label htmlFor="password" labelText="Password" />
     {showRules && (
-      <div className="form-text m-0" id="passwordRules" role="note">
+      <div className="form-text m-0 mb-1" id="passwordRules" role="note">
         It must be 10-20 characters long. It must not equal the others
         fields&apos; value. There is no characters restriction so you can use
         emojis, cyrillic, etc.

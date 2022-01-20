@@ -48,6 +48,7 @@ const ForgotPassword = () => {
           method="post"
           submitHandlers={{ submitHandler }}
           methods={methods}
+          className="text-end"
         >
           <FormTextField
             labelText="Email"
