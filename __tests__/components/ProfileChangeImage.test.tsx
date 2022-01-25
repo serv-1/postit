@@ -4,9 +4,9 @@ import { ToastProvider } from '../../contexts/toast'
 import userEvent from '@testing-library/user-event'
 import { mockSession } from '../../mocks/nextAuth'
 import { SessionProvider } from 'next-auth/react'
-import { mockResponse } from '../../utils/msw'
+import { mockResponse } from '../../lib/msw'
 import Toast from '../../components/Toast'
-import err from '../../utils/errors'
+import err from '../../utils/constants/errors'
 
 const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
 
@@ -61,7 +61,7 @@ test('an error renders if the user image is invalid', async () => {
   userEvent.upload(input, textFile)
 
   let toast = await screen.findByRole('alert')
-  expect(toast).toHaveTextContent(err.USER_IMAGE_INVALID)
+  expect(toast).toHaveTextContent(err.IMAGE_INVALID)
   expect(toast).toHaveClass('bg-danger')
 
   const buffer = new ArrayBuffer(1000001)
@@ -69,7 +69,7 @@ test('an error renders if the user image is invalid', async () => {
   userEvent.upload(input, tooLargeFile)
 
   toast = await screen.findByRole('alert')
-  expect(toast).toHaveTextContent(err.USER_IMAGE_TOO_LARGE)
+  expect(toast).toHaveTextContent(err.IMAGE_TOO_LARGE)
   expect(toast).toHaveClass('bg-danger')
 })
 
@@ -85,7 +85,7 @@ test('an error renders if the server fails to fetch the user image', async () =>
 
 test('an error renders if the server fails to update the user image', async () => {
   mockResponse('put', '/api/users/:id', 422, {
-    message: err.USER_IMAGE_INVALID,
+    message: err.IMAGE_INVALID,
   })
 
   factory()
@@ -96,6 +96,6 @@ test('an error renders if the server fails to update the user image', async () =
   userEvent.upload(input, file)
 
   const toast = await screen.findByRole('alert')
-  expect(toast).toHaveTextContent(err.USER_IMAGE_INVALID)
+  expect(toast).toHaveTextContent(err.IMAGE_INVALID)
   expect(toast).toHaveClass('bg-danger')
 })

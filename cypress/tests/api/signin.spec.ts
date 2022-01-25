@@ -1,12 +1,12 @@
-import err from '../../../utils/errors'
-import { dbSeedResult } from '../../plugins'
+import err from '../../../utils/constants/errors'
+import { DbSeedResult } from '../../plugins'
 
 const url = '/api/signIn'
 
 describe('/api/signIn', () => {
   beforeEach(() => {
     cy.task('db:reset')
-    cy.task<dbSeedResult>('db:seed').then((result) => {
+    cy.task<DbSeedResult>('db:seed').then((result) => {
       cy.wrap(result.u1Id).as('userId')
     })
     cy.fixture('user').as('user')
@@ -38,7 +38,7 @@ describe('/api/signIn', () => {
       })
     })
 
-    it('422 - Joi validation error', function () {
+    it('422 - Invalid request body', function () {
       cy.req({ url, method, body: { email: 'not an email' } }).then((res) => {
         expect(res.status).to.eq(422)
         expect(res.body).to.have.ownProperty('message', err.EMAIL_INVALID)

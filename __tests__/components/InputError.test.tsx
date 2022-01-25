@@ -20,7 +20,7 @@ test('the alert renders if the form is submitted an there is an error', () => {
 
   const alert = screen.getByRole('alert')
   expect(alert).toHaveTextContent('Error')
-  expect(alert).toHaveAttribute('id', 'feedbackEmail')
+  expect(alert).toHaveAttribute('id', 'emailFeedback')
 })
 
 test('the alert does no render if the form is not submitted even if there is an error', () => {

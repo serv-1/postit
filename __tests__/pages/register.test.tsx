@@ -1,9 +1,10 @@
 import Register from '../../pages/register'
 import { screen, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import err from '../../utils/errors'
-import { mockResponse } from '../../utils/msw'
+import err from '../../utils/constants/errors'
+import { mockResponse } from '../../lib/msw'
 import { ToastProvider } from '../../contexts/toast'
+import Toast from '../../components/Toast'
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
@@ -18,6 +19,7 @@ const factory = () => {
   render(
     <ToastProvider>
       <Register />
+      <Toast />
     </ToastProvider>
   )
 }

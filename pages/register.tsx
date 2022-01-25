@@ -3,14 +3,13 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import axios from 'axios'
 import { useRouter } from 'next/router'
-import { registerSchema } from '../utils/joiSchemas'
 import { signIn } from 'next-auth/react'
 import Form from '../components/Form'
-import FormTextField from '../components/FormTextField'
+import FormField from '../components/FormField'
 import FormPasswordField from '../components/FormPasswordField'
-import getApiError from '../utils/getApiError'
+import getApiError from '../utils/functions/getApiError'
 import { useToast } from '../contexts/toast'
-import Toast from '../components/Toast'
+import registerSchema from '../lib/joi/registerSchema'
 
 interface FormFields {
   name: string
@@ -59,7 +58,6 @@ const Register = () => {
         <title>Filanad - Register</title>
       </Head>
       <main className="w-25 my-4 m-auto shadow rounded">
-        <Toast />
         <h1 className="bg-primary text-light rounded-top p-2 m-0">Register</h1>
         <Form
           name="register"
@@ -68,13 +66,8 @@ const Register = () => {
           methods={methods}
           className="text-end"
         >
-          <FormTextField
-            labelText="Name"
-            inputName="name"
-            type="text"
-            needFocus
-          />
-          <FormTextField labelText="Email" inputName="email" type="email" />
+          <FormField labelText="Name" inputName="name" type="text" needFocus />
+          <FormField labelText="Email" inputName="email" type="email" />
           <FormPasswordField showForgotPasswordLink showStrength showRules />
           <input type="submit" value="Register" className="btn btn-primary" />
         </Form>

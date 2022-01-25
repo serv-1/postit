@@ -1,5 +1,5 @@
 import { models, model, Schema, Model } from 'mongoose'
-import err from '../utils/errors'
+import err from '../utils/constants/errors'
 import { readFileSync } from 'fs'
 import { Buffer } from 'buffer'
 import { join } from 'path'

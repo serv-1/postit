@@ -5,8 +5,8 @@ import { useSession } from 'next-auth/react'
 import { Session } from 'next-auth'
 import { useToast } from '../contexts/toast'
 import Button from './Button'
-import getApiError from '../utils/getApiError'
-import err from '../utils/errors'
+import getApiError from '../utils/functions/getApiError'
+import err from '../utils/constants/errors'
 
 const ProfileChangeImage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -34,10 +34,10 @@ const ProfileChangeImage = () => {
     if (!files || files.length === 0) return
 
     if (!['image/jpeg', 'image/png', 'image/gif'].includes(files[0].type)) {
-      return setToast({ message: err.USER_IMAGE_INVALID, background: 'danger' })
+      return setToast({ message: err.IMAGE_INVALID, background: 'danger' })
     } else if (files[0].size > 1000000) {
       return setToast({
-        message: err.USER_IMAGE_TOO_LARGE,
+        message: err.IMAGE_TOO_LARGE,
         background: 'danger',
       })
     }

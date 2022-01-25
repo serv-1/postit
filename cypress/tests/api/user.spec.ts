@@ -1,4 +1,4 @@
-import err from '../../../utils/errors'
+import err from '../../../utils/constants/errors'
 
 const url = '/api/user'
 
@@ -18,7 +18,7 @@ describe('/api/user', () => {
   describe('POST', () => {
     const method = 'POST'
 
-    it('422 - Joi validation error', function () {
+    it('422 - Invalid request body', function () {
       cy.req({ url, method }).then((res) => {
         expect(res.status).to.eq(422)
         expect(res.body).to.have.property('message')

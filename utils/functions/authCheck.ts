@@ -1,8 +1,8 @@
 import { NextApiRequest } from 'next'
 import { getSession } from 'next-auth/react'
-import err from './errors'
+import err from '../constants/errors'
 import { createHash } from 'crypto'
-import env from './env'
+import env from '../constants/env'
 
 const authCheck = async (
   req: NextApiRequest,

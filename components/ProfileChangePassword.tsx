@@ -4,12 +4,12 @@ import { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
-import { passwordCsrfSchema } from '../utils/joiSchemas'
+import { passwordCsrfSchema } from '../lib/joi/passwordSchema'
 import Form from './Form'
 import InputError from './InputError'
 import Label from './Label'
 import PasswordInput from './PasswordInput'
-import getApiError from '../utils/getApiError'
+import getApiError from '../utils/functions/getApiError'
 
 interface FormFields {
   csrfToken?: string

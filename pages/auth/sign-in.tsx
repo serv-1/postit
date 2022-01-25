@@ -4,15 +4,14 @@ import * as NextAuth from 'next-auth/react'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import { signInSchema } from '../../utils/joiSchemas'
 import Link from 'next/link'
 import { BuiltInProviderType } from 'next-auth/providers'
 import Form from '../../components/Form'
-import FormTextField from '../../components/FormTextField'
+import FormField from '../../components/FormField'
 import FormPasswordField from '../../components/FormPasswordField'
 import Button from '../../components/Button'
 import { useToast } from '../../contexts/toast'
-import Toast from '../../components/Toast'
+import signInSchema from '../../lib/joi/signInSchema'
 
 interface FormFields {
   email: string
@@ -64,7 +63,6 @@ const SignIn = ({ providers }: SignInProps) => {
         <title>Filanad - Sign in</title>
       </Head>
       <main className="my-4">
-        <Toast />
         <section className="w-25 m-auto shadow rounded">
           <h1 className="bg-primary text-light rounded-top p-2 m-0">Sign in</h1>
           <Form
@@ -73,7 +71,7 @@ const SignIn = ({ providers }: SignInProps) => {
             submitHandlers={{ submitHandler }}
             methods={methods}
           >
-            <FormTextField
+            <FormField
               labelText="Email"
               inputName="email"
               type="email"

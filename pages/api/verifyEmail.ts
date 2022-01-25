@@ -1,8 +1,8 @@
 import Joi, { ValidationError } from 'joi'
 import { NextApiRequest, NextApiResponse } from 'next'
+import forgotPasswordSchema from '../../lib/joi/forgotPasswordSchema'
 import User from '../../models/User'
-import err from '../../utils/errors'
-import { emailSchema } from '../../utils/joiSchemas'
+import err from '../../utils/constants/errors'
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,7 +13,7 @@ export default async function handler(
   }
 
   try {
-    Joi.assert(req.body, emailSchema)
+    Joi.assert(req.body, forgotPasswordSchema)
     const { email } = req.body
 
     const user = await User.findOne({ email }).exec()

@@ -6,6 +6,8 @@ import { SessionProvider } from 'next-auth/react'
 import AuthGuard from '../components/AuthGuard'
 import { ComponentType } from 'react'
 import { ToastProvider } from '../contexts/toast'
+import { useEffect } from 'react'
+import Toast from '../components/Toast'
 
 export type PageType = ComponentType<{}> & {
   needAuth: boolean
@@ -14,6 +16,9 @@ export type PageType = ComponentType<{}> & {
 type NextAppProps = AppProps & { Component: PageType }
 
 const App = ({ Component, pageProps }: NextAppProps) => {
+  useEffect(() => {
+    require('bootstrap/dist/js/bootstrap.min')
+  }, [])
   return (
     <>
       <Head>
@@ -23,6 +28,7 @@ const App = ({ Component, pageProps }: NextAppProps) => {
       <SessionProvider session={pageProps.session}>
         <ToastProvider>
           <Header />
+          <Toast />
           {Component.needAuth ? (
             <AuthGuard>
               <Component {...pageProps} />

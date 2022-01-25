@@ -5,12 +5,13 @@ import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
-import getApiError from '../utils/getApiError'
-import { emailCsrfSchema, nameCsrfSchema } from '../utils/joiSchemas'
+import { emailCsrfSchema } from '../lib/joi/emailSchema'
+import { nameCsrfSchema } from '../lib/joi/nameSchema'
+import getApiError from '../utils/functions/getApiError'
 import Button from './Button'
 import Form from './Form'
 import InputError from './InputError'
-import TextInput from './TextInput'
+import Input from './Input'
 
 type FormFields =
   | { csrfToken?: string; name: string }
@@ -60,7 +61,7 @@ const ProfileChangeNameOrEmail = ({
       needCsrfToken
     >
       <div className="input-group">
-        <TextInput
+        <Input
           className="rounded"
           type={subject === 'name' ? 'text' : 'email'}
           defaultValue={subjectValue}

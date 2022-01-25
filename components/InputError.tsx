@@ -8,10 +8,8 @@ const InputError = ({ inputName }: InputErrorProps) => {
   const { formState } = useFormContext()
   const { isSubmitted, errors } = formState
 
-  const name = inputName[0].toUpperCase() + inputName.slice(1)
-
   return isSubmitted && errors[inputName] ? (
-    <div className="invalid-feedback" id={`feedback${name}`} role="alert">
+    <div className="invalid-feedback" id={`${inputName}Feedback`} role="alert">
       {errors[inputName].message}
     </div>
   ) : null

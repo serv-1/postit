@@ -3,19 +3,21 @@ import { signIn } from 'next-auth/react'
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
-import { emailSchema } from '../../utils/joiSchemas'
 import Send from '../../public/static/images/send.svg'
 import Form from '../../components/Form'
-import FormTextField from '../../components/FormTextField'
+import FormField from '../../components/FormField'
 import Button from '../../components/Button'
-import getApiError from '../../utils/getApiError'
+import getApiError from '../../utils/functions/getApiError'
+import forgotPasswordSchema from '../../lib/joi/forgotPasswordSchema'
 
 interface FormFields {
   email: string
 }
 
 const ForgotPassword = () => {
-  const methods = useForm<FormFields>({ resolver: joiResolver(emailSchema) })
+  const methods = useForm<FormFields>({
+    resolver: joiResolver(forgotPasswordSchema),
+  })
 
   const submitHandler: SubmitHandler<FormFields> = async (data) => {
     try {
@@ -50,7 +52,7 @@ const ForgotPassword = () => {
           methods={methods}
           className="text-end"
         >
-          <FormTextField
+          <FormField
             labelText="Email"
             inputName="email"
             type="email"

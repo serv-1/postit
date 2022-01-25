@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios'
-import err from './errors'
+import err from '../constants/errors'
 
 interface GetErrorReturn<TName> {
   name?: TName

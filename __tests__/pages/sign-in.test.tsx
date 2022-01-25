@@ -1,9 +1,10 @@
 import SignIn from '../../pages/auth/sign-in'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import err from '../../utils/errors'
+import err from '../../utils/constants/errors'
 import { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
 import { ToastProvider } from '../../contexts/toast'
+import Toast from '../../components/Toast'
 
 type MockProvider = Record<
   LiteralUnion<'google' | 'email', string>,
@@ -28,6 +29,7 @@ const factory = (providers: MockProvider = null) => {
   render(
     <ToastProvider>
       <SignIn providers={providers} />
+      <Toast />
     </ToastProvider>
   )
 }

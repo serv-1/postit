@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import User from '../../models/User'
-import dbConnect from '../../utils/dbConnect'
+import dbConnect from '../../utils/functions/dbConnect'
 import crypto from 'crypto'
 import { Buffer } from 'buffer'
 import Joi, { ValidationError } from 'joi'
-import { signInSchema } from '../../utils/joiSchemas'
-import err from '../../utils/errors'
+import err from '../../utils/constants/errors'
+import signInSchema from '../../lib/joi/signInSchema'
 
 export default async function handler(
   req: NextApiRequest,

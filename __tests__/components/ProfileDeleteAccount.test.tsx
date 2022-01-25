@@ -5,8 +5,8 @@ import ProfileDeleteAccount from '../../components/ProfileDeleteAccount'
 import Toast from '../../components/Toast'
 import { ToastProvider } from '../../contexts/toast'
 import { mockSession } from '../../mocks/nextAuth'
-import err from '../../utils/errors'
-import { mockResponse } from '../../utils/msw'
+import err from '../../utils/constants/errors'
+import { mockResponse } from '../../lib/msw'
 
 const signOut = jest.spyOn(require('next-auth/react'), 'signOut')
 signOut.mockResolvedValue({ url: '/' })

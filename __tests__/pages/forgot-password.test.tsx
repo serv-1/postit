@@ -1,8 +1,8 @@
 import ForgotPassword from '../../pages/auth/forgot-password'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import err from '../../utils/errors'
-import { mockResponse } from '../../utils/msw'
+import err from '../../utils/constants/errors'
+import { mockResponse } from '../../lib/msw'
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 

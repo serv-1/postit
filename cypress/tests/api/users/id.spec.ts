@@ -1,12 +1,12 @@
-import err from '../../../../utils/errors'
+import err from '../../../../utils/constants/errors'
 import { Buffer } from 'buffer'
-import { dbSeedResult } from '../../../plugins'
+import { DbSeedResult } from '../../../plugins'
 import { IUser } from '../../../../models/User'
 
 describe('/api/users/:id', () => {
   beforeEach(() => {
     cy.task<null>('db:reset')
-    cy.task<dbSeedResult>('db:seed').then((result) => {
+    cy.task<DbSeedResult>('db:seed').then((result) => {
       cy.wrap(result.u1Id).as('u1Id')
       cy.wrap(result.u2Id).as('u2Id')
       cy.wrap(`/api/users/${result.u1Id}`).as('url')
@@ -57,7 +57,7 @@ describe('/api/users/:id', () => {
       })
     })
 
-    it('should not update if a CSRF token is invalid', function () {
+    it('422 - Invalid CSRF token', function () {
       cy.signIn(this.user.email, this.user.password)
       cy.req({
         url: this.url,
@@ -193,7 +193,7 @@ describe('/api/users/:id', () => {
         cy.signIn(this.user.email, this.user.password)
       })
 
-      it('422 - Invalid file type', function () {
+      it('422 - Invalid image type', function () {
         cy.req({
           url: this.url,
           method,
@@ -201,11 +201,11 @@ describe('/api/users/:id', () => {
           csrfToken: true,
         }).then((res) => {
           expect(res.status).to.eq(422)
-          expect(res.body).to.have.property('message', err.USER_IMAGE_INVALID)
+          expect(res.body).to.have.property('message', err.IMAGE_INVALID)
         })
       })
 
-      it('422 - Invalid file data', function () {
+      it('422 - Invalid image base64 uri', function () {
         cy.req({
           url: this.url,
           method,
@@ -217,7 +217,7 @@ describe('/api/users/:id', () => {
         })
       })
 
-      it('413 - File too large', function () {
+      it('413 - Image too large', function () {
         const type = 'image/jpeg'
         const base64 = Buffer.from(new Uint8Array(1000001)).toString('base64')
         cy.req({
@@ -227,7 +227,7 @@ describe('/api/users/:id', () => {
           csrfToken: true,
         }).then((res) => {
           expect(res.status).to.eq(413)
-          expect(res.body).to.have.property('message', err.USER_IMAGE_TOO_LARGE)
+          expect(res.body).to.have.property('message', err.IMAGE_TOO_LARGE)
         })
       })
 
@@ -261,7 +261,7 @@ describe('/api/users/:id', () => {
       })
     })
 
-    it('should not update if the CSRF token is invalid', function () {
+    it('422 - Invalid CSRF token', function () {
       cy.signIn(this.user.email, this.user.password)
       cy.req({
         url: this.url,

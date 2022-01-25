@@ -5,7 +5,7 @@ import zxcvbn from 'zxcvbn'
 import Eye from '../public/static/images/eye-fill.svg'
 import EyeSlash from '../public/static/images/eye-slash-fill.svg'
 import Button from './Button'
-import TextInput from './TextInput'
+import Input from './Input'
 
 interface Strength {
   text: string
@@ -60,7 +60,7 @@ const PasswordInput = ({
 
   return (
     <>
-      <TextInput
+      <Input
         {...props}
         name="password"
         type={showPassword ? 'text' : 'password'}

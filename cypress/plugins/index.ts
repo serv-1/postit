@@ -1,14 +1,15 @@
 import { connect, connection as conn } from 'mongoose'
 import User, { IUser } from '../../models/User'
 import Account, { IAccount } from '../../models/Account'
+import Post, { IPost } from '../../models/Post'
 import userJson from '../fixtures/user.json'
 import accountJson from '../fixtures/account.json'
 const { GoogleSocialLogin } = require('cypress-social-logins').plugins
 require('dotenv').config()
-import env from '../../utils/env'
+import env from '../../utils/constants/env'
 import { randomBytes, scryptSync } from 'crypto'
 
-export type dbSeedResult = {
+export interface DbSeedResult {
   u1Id: string
   u2Id: string
 }
@@ -25,7 +26,7 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
       return null
     },
-    async 'db:seed'(): Promise<dbSeedResult> {
+    async 'db:seed'(): Promise<DbSeedResult> {
       await connect(env.MONGODB_URI)
 
       const u1 = await saveUser()
@@ -42,6 +43,11 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
       await connect(env.MONGODB_URI)
       const account = await Account.findOne({ userId: id }).exec()
       return account
+    },
+    async 'db:getPostByUserId'(id: string): Promise<IPost | null> {
+      await connect(env.MONGODB_URI)
+      const post = await Post.findOne({ userId: id }).exec()
+      return post
     },
     GoogleSocialLogin: GoogleSocialLogin,
   })

@@ -1,11 +1,11 @@
 import Joi, { ValidationError } from 'joi'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { randomBytes, scryptSync } from 'crypto'
-import dbConnect from '../../utils/dbConnect'
+import dbConnect from '../../utils/functions/dbConnect'
 import User from '../../models/User'
 import { MongoError } from 'mongodb'
-import { registerSchema } from '../../utils/joiSchemas'
-import err from '../../utils/errors'
+import err from '../../utils/constants/errors'
+import registerSchema from '../../lib/joi/registerSchema'
 
 export default async function handler(
   req: NextApiRequest,

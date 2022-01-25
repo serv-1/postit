@@ -6,9 +6,9 @@ import EmailProvider from 'next-auth/providers/email'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from '../../../lib/mongodb'
 import User, { defaultImage } from '../../../models/User'
-import dbConnect from '../../../utils/dbConnect'
-import env from '../../../utils/env'
-import err from '../../../utils/errors'
+import dbConnect from '../../../utils/functions/dbConnect'
+import env from '../../../utils/constants/env'
+import err from '../../../utils/constants/errors'
 
 export default NextAuth({
   providers: [

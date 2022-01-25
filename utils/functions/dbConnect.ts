@@ -1,5 +1,5 @@
 import { connect, connection } from 'mongoose'
-import env from './env'
+import env from '../constants/env'
 
 const dbConnect = async () => {
   if (connection.readyState === 1) return connection

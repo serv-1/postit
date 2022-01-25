@@ -12,7 +12,7 @@ const Toast = () => {
 
   const className = classNames(
     'position-absolute start-50 p-2 rounded-pill',
-    'd-flex shadow-lg justify-content-between',
+    'd-flex justify-content-between m-3 border border-dark border-2',
     `bg-${bg}`,
     { 'text-white': needWhite }
   )
@@ -23,6 +23,7 @@ const Toast = () => {
       style={{
         zIndex: 2000,
         transform: 'translateX(-50%)',
+        boxShadow: '0 0 5px #05F',
       }}
       role="alert"
     >

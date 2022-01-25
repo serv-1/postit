@@ -1,17 +1,17 @@
+import isBase64ValueTooLarge from '../../../utils/functions/isBase64ValueTooLarge'
 import { randomBytes, scryptSync } from 'crypto'
 import Joi, { Schema, ValidationError } from 'joi'
 import { isValidObjectId } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import User from '../../../models/User'
 import Account from '../../../models/Account'
-import authCheck from '../../../utils/authCheck'
-import dbConnect from '../../../utils/dbConnect'
-import err from '../../../utils/errors'
-import {
-  emailCsrfSchema,
-  nameCsrfSchema,
-  passwordCsrfSchema,
-} from '../../../utils/joiSchemas'
+import authCheck from '../../../utils/functions/authCheck'
+import dbConnect from '../../../utils/functions/dbConnect'
+import err from '../../../utils/constants/errors'
+import { nameCsrfSchema } from '../../../lib/joi/nameSchema'
+import { emailCsrfSchema } from '../../../lib/joi/emailSchema'
+import { passwordCsrfSchema } from '../../../lib/joi/passwordSchema'
+import imageSchema from '../../../lib/joi/imageSchema'
 
 export default async function handler(
   req: NextApiRequest,
@@ -68,29 +68,28 @@ export default async function handler(
           break
         }
         case 'image':
-          type Image = { type?: string; base64Uri?: string }
-          const { type, base64Uri }: Image = req.body.image
+          const { error } = imageSchema.validate(req.body.image)
+          if (error) {
+            const { message, details } = error
+            return res.status(422).send({ name: details[0].path[0], message })
+          }
 
-          if (!base64Uri || !type) {
+          const { type, base64Uri } = req.body.image
+
+          if (!base64Uri.includes(',')) {
             return res.status(422).send({ message: err.DATA_INVALID })
           }
 
-          if (!['image/jpeg', 'image/png', 'image/gif'].includes(type)) {
-            return res.status(422).send({ message: err.USER_IMAGE_INVALID })
+          if (isBase64ValueTooLarge(base64Uri, 1000000)) {
+            return res.status(413).send({ message: err.IMAGE_TOO_LARGE })
           }
 
-          if (base64Uri.search(/^data:image\/(jpeg|png|gif);base64,/) === -1) {
-            return res.status(422).send({ message: err.DATA_INVALID })
+          update = {
+            image: {
+              data: Buffer.from(base64Uri.split(',')[1], 'base64'),
+              contentType: type,
+            },
           }
-
-          const b64: string = base64Uri.split(',')[1]
-          const pad = b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0
-          if (b64.length * (3 / 4) - pad > 1000000) {
-            return res.status(413).send({ message: err.USER_IMAGE_TOO_LARGE })
-          }
-
-          const image = { data: Buffer.from(b64, 'base64'), contentType: type }
-          update = { image }
           break
         default:
           return res.status(422).send({ message: err.DATA_INVALID })

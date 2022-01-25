@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { RegisterOptions } from 'react-hook-form'
-import TextInput from '../../components/TextInput'
+import Input from '../../components/Input'
 
 const setFocus = jest.fn()
 
@@ -22,13 +22,15 @@ beforeEach(() => useFormContext.mockReturnValue(setFormContext(false)))
 const handleChange = jest.fn()
 const handleBlur = jest.fn()
 
-const factory = (needFocus: boolean = false) => {
+const factory = (needFocus: boolean = false, isTextArea: boolean = false) => {
   render(
-    <TextInput
+    <Input
+      type="text"
       name="username"
       onChange={handleChange}
       onBlur={handleBlur}
       needFocus={needFocus}
+      isTextArea={isTextArea}
       className="red"
     />
   )
@@ -51,6 +53,13 @@ test('the input renders', () => {
 
   expect(setFocus).toHaveBeenCalledWith('username')
   expect(setFocus).toHaveBeenCalledTimes(1)
+})
+
+test('the textarea renders', () => {
+  factory(false, true)
+
+  const textarea = screen.getByRole('textbox')
+  expect(textarea.tagName).toBe('TEXTAREA')
 })
 
 test('the input do not have the focus', () => {

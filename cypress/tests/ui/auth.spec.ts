@@ -45,6 +45,7 @@ describe('User sign in and register', () => {
     cy.visit('/profile')
     cy.contains(username).should('exist')
 
+    cy.get('[data-cy="headerProfileDropdown"]').click()
     cy.contains('Sign out').click()
 
     cy.location('pathname').should('equal', '/auth/sign-in')
@@ -62,6 +63,7 @@ describe('User sign in and register', () => {
     cy.location('pathname').should('equal', '/profile')
     cy.contains(this.user.email).should('exist')
 
+    cy.get('[data-cy="headerProfileDropdown"]').click()
     cy.contains('Sign out').click()
 
     cy.location('pathname').should('equal', '/auth/sign-in')
@@ -79,6 +81,7 @@ describe('User sign in and register', () => {
     cy.location('pathname').should('equal', '/profile')
     cy.contains(this.user.email).should('exist')
 
+    cy.get('[data-cy="headerProfileDropdown"]').click()
     cy.contains('Sign out').click()
 
     cy.location('pathname').should('equal', '/auth/sign-in')

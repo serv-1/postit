@@ -5,8 +5,8 @@ import Toast from '../../components/Toast'
 import ProfileChangePassword from '../../components/ProfileChangePassword'
 import { ToastProvider } from '../../contexts/toast'
 import { mockSession } from '../../mocks/nextAuth'
-import err from '../../utils/errors'
-import { mockResponse } from '../../utils/msw'
+import err from '../../utils/constants/errors'
+import { mockResponse } from '../../lib/msw'
 
 const labelText = new RegExp('change your password', 'i')
 

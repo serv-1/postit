@@ -1,0 +1,25 @@
+const categories = [
+  'furniture',
+  'household appliance',
+  'electronic device',
+  'plant',
+  'pet',
+  'cat',
+  'dog',
+  'bird',
+  'horse',
+  'turtle',
+  'computer',
+  'smartphone',
+  'laptop',
+  'vehicle',
+  'bicycle',
+  'clothes',
+  'screen',
+  'printer',
+  'dishes',
+  'keyboard',
+  'headset',
+]
+
+export default categories
