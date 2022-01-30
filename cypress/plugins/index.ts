@@ -1,17 +1,19 @@
-import { connect, connection as conn } from 'mongoose'
-import User, { IUser } from '../../models/User'
+import { connect, connection as conn, Types } from 'mongoose'
+import User, { defaultImage, IUser } from '../../models/User'
 import Account, { IAccount } from '../../models/Account'
 import Post, { IPost } from '../../models/Post'
-import userJson from '../fixtures/user.json'
-import accountJson from '../fixtures/account.json'
+import { faker } from '@faker-js/faker'
+import user from '../fixtures/user.json'
+import postsJson from '../fixtures/posts.json'
+import googleUser from '../fixtures/google-user.json'
 const { GoogleSocialLogin } = require('cypress-social-logins').plugins
 require('dotenv').config()
 import env from '../../utils/constants/env'
 import { randomBytes, scryptSync } from 'crypto'
 
-export interface DbSeedResult {
-  u1Id: string
-  u2Id: string
+export interface UsersIds {
+  uId: string
+  guId: string
 }
 
 const pluginConfig: Cypress.PluginConfig = (on, config) => {
@@ -26,13 +28,15 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
       return null
     },
-    async 'db:seed'(): Promise<DbSeedResult> {
+    async 'db:seed'({ posts }: { posts?: boolean } = {}): Promise<UsersIds> {
       await connect(env.MONGODB_URI)
 
-      const u1 = await saveUser()
-      const u2 = await saveUser({ name: 'Jane Doe', email: 'janedoe@test.com' })
+      const usersIds = await insertUsers()
+      await insertAccount(usersIds.guId)
 
-      return { u1Id: u1._id, u2Id: u2._id }
+      if (posts) await insertPosts()
+
+      return usersIds
     },
     async 'db:getUserById'(id: string): Promise<IUser | null> {
       await connect(env.MONGODB_URI)
@@ -55,22 +59,84 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
 export default pluginConfig
 
-const saveUser = async (update?: Partial<typeof userJson>) => {
-  let password: string | undefined
-  const user = { ...userJson, ...update }
+/**
+ * Insert a user registered with it's credentials and a user
+ * registered with Google in database
+ * @returns \{ uId: "credentials user id", guId: "google user id" \}
+ */
+async function insertUsers(): Promise<UsersIds> {
+  const salt = randomBytes(16).toString('hex')
+  const hash = scryptSync(user.password, salt, 64).toString('hex')
 
-  if (user.password) {
-    const salt = randomBytes(16).toString('hex')
-    const hash = scryptSync(user.password, salt, 64).toString('hex')
-    password = salt + ':' + hash
+  const u = { ...user, password: `${salt}:${hash}`, image: defaultImage }
+  const gu = { ...googleUser, image: defaultImage }
+
+  const result = await User.insertMany([u, gu])
+
+  return { uId: result[0]._id.toString(), guId: result[1]._id.toString() }
+}
+
+/**
+ * Insert an account with the given user id in database
+ * @param id User's id
+ */
+async function insertAccount(id: string) {
+  const account: IAccount = {
+    type: 'oauth',
+    provider: 'google',
+    providerAccountId: String(faker.datatype.number()),
+    refresh_token: faker.datatype.string(),
+    scope: 'openid',
+    id_token: faker.datatype.string(),
+    userId: new Types.ObjectId(id),
+    oauth_token_secret: faker.datatype.string(),
+    oauth_token: faker.datatype.string(),
+    session_state: faker.datatype.string(),
   }
 
-  const image = { ...user.image, data: Buffer.from(user.image.data, 'base64') }
-  const u = new User({ ...user, image, password })
-  await u.save()
+  const doc = new Account(account)
 
-  const uAccount = new Account({ ...accountJson, userId: u._id })
-  await uAccount.save()
+  await doc.save()
+}
 
-  return u
+async function insertPosts() {
+  const posts: Omit<IPost, '_id'>[] = postsJson.map((post) => ({
+    ...post,
+    images: post.images.map((image) => ({
+      ...image,
+      data: Buffer.from(image.data, 'base64'),
+    })),
+    userId: new Types.ObjectId(post.userId),
+  }))
+
+  for (let i = 0; i < 40; i++) {
+    const categories =
+      i % 2 === 0 ? ['pet'] : i % 3 === 0 ? ['cat'] : ['pet', 'cat']
+
+    posts.push({
+      name: 'Cat',
+      description: 'Horribly monstruous cat',
+      categories,
+      price: (i === 0 ? 1 : i) * 1000,
+      images: [
+        {
+          data: Buffer.from('base64', 'base64'),
+          contentType: 'image/jpeg',
+        },
+      ],
+      userId: new Types.ObjectId(generateRandomObjectId()),
+    })
+  }
+
+  await Post.insertMany(posts)
+}
+
+function generateRandomObjectId() {
+  let objectId: string = ''
+
+  for (let i = 0; i < 24; i++) {
+    objectId += Math.floor(Math.random() * 10)
+  }
+
+  return objectId
 }

@@ -2,14 +2,15 @@ import classNames from 'classnames'
 import React from 'react'
 import { useFormContext } from 'react-hook-form'
 
-export interface InputProps extends React.ComponentPropsWithRef<'input'> {
-  type: 'text' | 'email' | 'number' | 'file' | 'password'
+export interface InputProps extends React.ComponentPropsWithoutRef<'input'> {
+  type: 'text' | 'email' | 'number' | 'file' | 'password' | 'search'
   name: string
   needFocus?: boolean
   isTextArea?: false
 }
 
-export interface TextAreaProps extends React.ComponentPropsWithRef<'textarea'> {
+export interface TextAreaProps
+  extends React.ComponentPropsWithoutRef<'textarea'> {
   name: string
   needFocus?: boolean
   isTextArea: true

@@ -1,0 +1,41 @@
+[
+  {
+    "name": "Table",
+    "description": "Magnificent Table",
+    "categories": ["furniture"],
+    "price": 2000,
+    "images": [
+      {
+        "data": "base64",
+        "contentType": "image/jpeg"
+      }
+    ],
+    "userId": "f0f0f0f0f0f0f0f0f0f0f0f0"
+  },
+  {
+    "name": "Modern Table",
+    "description": "Breathtaking Modern Table",
+    "categories": ["furniture"],
+    "price": 4000,
+    "images": [
+      {
+        "data": "base64",
+        "contentType": "image/jpeg"
+      }
+    ],
+    "userId": "f1f1f1f1f1f1f1f1f1f1f1f1"
+  },
+  {
+    "name": "Cat",
+    "description": "Amazingly Awesome Cat",
+    "categories": ["pet", "cat"],
+    "price": 7000,
+    "images": [
+      {
+        "data": "base64",
+        "contentType": "image/jpeg"
+      }
+    ],
+    "userId": "f2f2f2f2f2f2f2f2f2f2f2f2"
+  }
+]

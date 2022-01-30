@@ -1,7 +1,8 @@
 import err from '../../../utils/constants/errors'
 import { Buffer } from 'buffer'
-import { DbSeedResult } from '../../plugins'
+import { UsersIds } from '../../plugins'
 import { IPost } from '../../../models/Post'
+import user from '../../fixtures/user.json'
 
 const url = '/api/post'
 
@@ -13,16 +14,15 @@ const defaultBody = {
   images: [createImage(10), createImage(20)],
 }
 
-beforeEach(() => {
+before(() => {
   cy.task('db:reset')
-  cy.task<DbSeedResult>('db:seed').then((result) => {
-    cy.wrap(result.u1Id).as('userId')
+  cy.task<UsersIds>('db:seed').then((result) => {
+    cy.wrap(result.uId).as('uId')
   })
-  cy.fixture('user').as('user')
 })
 
 it('405 - Method not allowed', function () {
-  cy.signIn(this.user.email, this.user.password)
+  cy.signIn(user.email, user.password)
   cy.req({ url, method: 'PATCH', csrfToken: true }).then((res) => {
     expect(res.status).to.eq(405)
     expect(res.body).to.have.property('message', err.METHOD_NOT_ALLOWED)
@@ -40,7 +40,7 @@ describe('POST', () => {
   })
 
   it('422 - Invalid CSRF token', function () {
-    cy.signIn(this.user.email, this.user.password)
+    cy.signIn(user.email, user.password)
     cy.req({ url, method }).then((res) => {
       expect(res.status).to.eq(422)
       expect(res.body).to.have.property('message', err.DATA_INVALID)
@@ -48,7 +48,7 @@ describe('POST', () => {
   })
 
   it('422 - Invalid request body', function () {
-    cy.signIn(this.user.email, this.user.password)
+    cy.signIn(user.email, user.password)
     cy.req({ url, method, csrfToken: true }).then((res) => {
       expect(res.status).to.eq(422)
       expect(res.body).to.have.property('name', 'name')
@@ -57,7 +57,7 @@ describe('POST', () => {
   })
 
   it('422 - Invalid price', function () {
-    cy.signIn(this.user.email, this.user.password)
+    cy.signIn(user.email, user.password)
     const body = { ...defaultBody, price: 1.123 }
     cy.req({ url, method, csrfToken: true, body }).then((res) => {
       expect(res.status).to.eq(422)
@@ -67,7 +67,7 @@ describe('POST', () => {
   })
 
   it('422 - Invalid image type', function () {
-    cy.signIn(this.user.email, this.user.password)
+    cy.signIn(user.email, user.password)
 
     const image = { ...createImage(0), base64Uri: 'not a base64 uri' }
     const body = { ...defaultBody, images: [image] }
@@ -80,7 +80,7 @@ describe('POST', () => {
   })
 
   it('413 - image too large', function () {
-    cy.signIn(this.user.email, this.user.password)
+    cy.signIn(user.email, user.password)
 
     const body = { ...defaultBody, images: [createImage(1000001)] }
 
@@ -92,15 +92,30 @@ describe('POST', () => {
   })
 
   it('200 - Post created', function () {
-    cy.signIn(this.user.email, this.user.password)
-    cy.req({ url, method, csrfToken: true, body: defaultBody }).then((res) => {
-      expect(res.status).to.eq(200)
-      cy.task<IPost>('db:getPostByUserId', this.userId).then((post) => {
-        expect(post).not.to.eq(null)
-        expect(post.price).to.eq(defaultBody.price * 100)
-        expect(post.userId).to.eq(this.userId)
-      })
-    })
+    cy.signIn(user.email, user.password)
+
+    const body = {
+      ...defaultBody,
+      images: [
+        createImage(1000000),
+        createImage(1000000),
+        createImage(1000000),
+        createImage(1000000),
+        createImage(1000000),
+      ],
+    }
+
+    cy.req({ url, method, csrfToken: true, body, timeout: 90000 }).then(
+      (res) => {
+        expect(res.status).to.eq(200)
+
+        cy.task<IPost>('db:getPostByUserId', this.uId).then((post) => {
+          expect(post).not.to.eq(null)
+          expect(post.price).to.eq(defaultBody.price * 100)
+          expect(post.userId).to.eq(this.uId)
+        })
+      }
+    )
   })
 })
 

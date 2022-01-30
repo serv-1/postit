@@ -23,7 +23,7 @@ interface TextareaProps extends FormFieldProps, TextareaHtmlProps {
 }
 
 interface InputProps extends FormFieldProps, InputHtmlProps {
-  type: 'text' | 'email' | 'number' | 'file' | 'password'
+  type: 'text' | 'email' | 'number' | 'file' | 'password' | 'search'
   isTextArea?: false
   onChange?: ChangeEventHandler<HTMLInputElement>
   onBlur?: FocusEventHandler<HTMLInputElement>

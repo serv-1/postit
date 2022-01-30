@@ -62,7 +62,7 @@ const SignIn = ({ providers }: SignInProps) => {
       <Head>
         <title>Filanad - Sign in</title>
       </Head>
-      <main className="my-4">
+      <main data-cy="signIn" className="my-4">
         <section className="w-25 m-auto shadow rounded">
           <h1 className="bg-primary text-light rounded-top p-2 m-0">Sign in</h1>
           <Form

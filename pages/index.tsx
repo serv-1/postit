@@ -1,14 +1,21 @@
 import Head from 'next/head'
+import { useState } from 'react'
+import HomeSearchPosts from '../components/HomeSearchPosts'
+import { IPost } from '../models/Post'
 
-const Home = () => (
-  <>
-    <Head>
-      <title>Filanad - Home</title>
-    </Head>
-    <main className="w-75 my-4 m-auto shadow rounded">
-      <h1>Home</h1>
-    </main>
-  </>
-)
+const Home = () => {
+  const [posts, setPosts] = useState<IPost[]>()
+
+  return (
+    <>
+      <Head>
+        <title>Filanad - Home</title>
+      </Head>
+      <main>
+        <HomeSearchPosts setPosts={setPosts} />
+      </main>
+    </>
+  )
+}
 
 export default Home

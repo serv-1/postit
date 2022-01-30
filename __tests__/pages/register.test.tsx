@@ -57,6 +57,7 @@ test('the forms redirects the user to the sign in page if it fails to do it', as
   factory()
 
   const nameInput = screen.getByLabelText(/name/i)
+  expect(nameInput).toHaveFocus()
   userEvent.type(nameInput, 'John Doe')
 
   const emailInput = screen.getByLabelText(/email/i)
@@ -74,20 +75,12 @@ test('the forms redirects the user to the sign in page if it fails to do it', as
   })
 })
 
-test('validation errors and server errors are rendered separatly', async () => {
+test('an error renders if the server fails to register the user', async () => {
   mockResponse('post', '/api/user', 405, { message: err.METHOD_NOT_ALLOWED })
 
   factory()
 
-  const submitBtn = screen.getByRole('button', { name: /register/i })
-  userEvent.click(submitBtn)
-
-  const alerts = await screen.findAllByRole('alert')
-  expect(alerts[0]).toHaveTextContent(err.NAME_REQUIRED)
-
   const nameInput = screen.getByLabelText(/name/i)
-  expect(nameInput).toHaveFocus()
-
   userEvent.type(nameInput, 'John Doe')
 
   const emailInput = screen.getByLabelText(/email/i)
@@ -96,9 +89,35 @@ test('validation errors and server errors are rendered separatly', async () => {
   const passwordInput = screen.getByLabelText(/^password$/i)
   userEvent.type(passwordInput, 'my super password')
 
+  const submitBtn = screen.getByRole('button', { name: /register/i })
   userEvent.click(submitBtn)
 
   const toast = await screen.findByRole('alert')
   expect(toast).toHaveTextContent(err.METHOD_NOT_ALLOWED)
   expect(toast).toHaveClass('bg-danger')
+})
+
+test('an error renders if the server fails to validate the request data', async () => {
+  mockResponse('post', '/api/user', 422, {
+    name: 'name',
+    message: err.NAME_REQUIRED,
+  })
+
+  factory()
+
+  const nameInput = screen.getByLabelText(/name/i)
+  userEvent.type(nameInput, 'John Doe')
+
+  const emailInput = screen.getByLabelText(/email/i)
+  userEvent.type(emailInput, 'johndoe@test.com')
+
+  const passwordInput = screen.getByLabelText(/^password$/i)
+  userEvent.type(passwordInput, 'my super password')
+
+  const submitBtn = screen.getByRole('button', { name: /register/i })
+  userEvent.click(submitBtn)
+
+  const alert = await screen.findByRole('alert')
+  expect(alert).toHaveTextContent(err.NAME_REQUIRED)
+  expect(alert).not.toHaveClass('bg-danger')
 })

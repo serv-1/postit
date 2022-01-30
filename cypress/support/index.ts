@@ -23,11 +23,7 @@ import './commands'
 
 ///<reference types="cypress" />
 
-export type ReqParams = {
-  method?: string
-  url?: string
-  body?: Record<string, unknown>
-  failOnStatusCode?: boolean
+export interface ReqParams extends Partial<Cypress.RequestOptions> {
   csrfToken?: boolean
 }
 

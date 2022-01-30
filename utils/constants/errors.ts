@@ -22,21 +22,28 @@ const err = {
 	/* Description */
 	DESCRIPTION_INVALID: 'The description is invalid.' as const,
 	DESCRIPTION_REQUIRED: 'The description is required.' as const,
-	DESCRIPTION_MIN: 'The description mush have 10 characters.' as const,
+	DESCRIPTION_MIN: 'The description must have 10 characters.' as const,
 	DESCRIPTION_MAX: 'The description cannot exceed 300 characters.' as const,
 	/* Categories */
 	CATEGORIES_INVALID: 'One or many categories are invalid.' as const,
 	CATEGORIES_REQUIRED: 'At least one category is required.' as const,
-	CATEGORIES_MAX: 'Only 10 categories are allowed per posts.' as const,
+	CATEGORIES_MAX: 'Only 3 categories are allowed per posts.' as const,
 	/* Category */
 	CATEGORY_INVALID: 'A category is invalid.' as const,
 	/* Price */
 	PRICE_INVALID: 'The price is invalid.' as const,
 	PRICE_REQUIRED: 'The price is required.' as const,
+	MAX_PRICE_MIN: 'The maximum price must be greater than the minimum price.' as const,
 	/* Images */
 	IMAGES_INVALID: 'One or many images are invalid.' as const,
 	IMAGES_REQUIRED: 'At least one image is required.' as const,
 	IMAGES_MAX: 'Only 5 images are allowed per posts.' as const,
+	/* Page */
+	PAGE_INVALID: 'The page is invalid.' as const,
+	/* Query */
+	QUERY_INVALID: 'Your query is invalid.' as const,
+	QUERY_REQUIRED: 'You must express a query.' as const,
+	QUERY_MAX: 'Your query cannot exceed 90 characters.' as const,
 	/* Data */
   DATA_INVALID: 'The given data are invalid.' as const,
 	/* Server */

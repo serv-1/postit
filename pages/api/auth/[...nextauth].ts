@@ -52,7 +52,7 @@ export default NextAuth({
   ],
   pages: {
     signIn: '/auth/sign-in',
-    verifyRequest: '/auth/email-sent',
+    verifyRequest: '/auth/mail-sent',
   },
   callbacks: {
     async jwt({ token, user, account }) {

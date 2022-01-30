@@ -7,11 +7,15 @@ import dbConnect from '../../utils/functions/dbConnect'
 import err from '../../utils/constants/errors'
 import isBase64ValueTooLarge from '../../utils/functions/isBase64ValueTooLarge'
 import { createPostServerSchema } from '../../lib/joi/createPostSchema'
+import { Buffer } from 'buffer'
+import validateSchema from '../../utils/functions/validateSchema'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+interface Image {
+  base64Uri: string
+  type: 'image/jpeg' | 'image/png' | 'image/gif'
+}
+
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const resp = await authCheck(req)
   if (resp) return res.status(resp.status).send({ message: resp.message })
 
@@ -19,11 +23,7 @@ export default async function handler(
     return res.status(405).send({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  const { error } = createPostServerSchema.validate(req.body)
-  if (error) {
-    const { message, details } = error
-    return res.status(422).send({ name: details[0].path[0], message })
-  }
+  validateSchema(createPostServerSchema, req.body, res, true)
 
   const decimals = req.body.price.toString().split(/\.|,/)[1]
   if (decimals && decimals.length > 2) {
@@ -47,9 +47,16 @@ export default async function handler(
   try {
     const session = (await getSession({ req })) as Session
     await dbConnect()
+
+    const images = (req.body.images as Image[]).map((image) => ({
+      data: Buffer.from(image.base64Uri.split(',')[1], 'base64'),
+      contentType: image.type,
+    }))
+
     const post = new Post({
       ...req.body,
       price: req.body.price * 100,
+      images,
       userId: session.user.id,
     })
     await post.save()
@@ -59,6 +66,8 @@ export default async function handler(
 
   res.status(200).end()
 }
+
+export default handler
 
 export const config = {
   api: {

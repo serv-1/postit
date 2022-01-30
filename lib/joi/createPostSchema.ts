@@ -1,25 +1,23 @@
-import categoriesSchema from './categoriesSchema'
+import { reqCategoriesSchema } from './categoriesSchema'
 import csrfTokenSchema from './csrfTokenSchema'
 import descriptionSchema from './descritptionSchema'
 import { imagesObjectSchema, imagesArraySchema } from './imagesSchema'
 import { nameSchema } from './nameSchema'
 import object from './object'
-import priceSchema from './priceSchema'
+import { reqPriceSchema } from './priceSchema'
 
-export const createPostClientSchema = object({
+const createPostSchema = object({
   name: nameSchema,
   description: descriptionSchema,
-  categories: categoriesSchema,
-  price: priceSchema,
-  images: imagesObjectSchema,
+  categories: reqCategoriesSchema,
+  price: reqPriceSchema,
   csrfToken: csrfTokenSchema,
 })
 
-export const createPostServerSchema = object({
-  name: nameSchema,
-  description: descriptionSchema,
-  categories: categoriesSchema,
-  price: priceSchema,
+export const createPostClientSchema = createPostSchema.append({
+  images: imagesObjectSchema,
+})
+
+export const createPostServerSchema = createPostSchema.append({
   images: imagesArraySchema,
-  csrfToken: csrfTokenSchema,
 })

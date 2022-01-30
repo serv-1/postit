@@ -77,7 +77,7 @@ test('an error renders if the server fails to sign in the user', async () => {
   expect(toast).toHaveClass('bg-danger')
 })
 
-test('an error renders if the values given by the user are invalid', async () => {
+test('an error renders if the server fails to validate the request data', async () => {
   signIn.mockResolvedValueOnce({ error: err.EMAIL_INVALID })
 
   factory()

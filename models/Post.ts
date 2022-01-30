@@ -1,32 +1,14 @@
 import { models, model, Schema, Model, Types } from 'mongoose'
 import err from '../utils/constants/errors'
-
-interface IImage {
-  base64Uri: string
-  type: 'image/jpeg' | 'image/png' | 'image/gif'
-}
-
-const imageSchema = new Schema<IImage>({
-  base64Uri: {
-    type: String,
-    required: [true, err.IMAGE_INVALID],
-  },
-  type: {
-    type: String,
-    required: [true, err.IMAGE_INVALID],
-    enum: {
-      values: ['image/jpeg', 'image/png', 'image/gif'],
-      message: err.IMAGE_INVALID,
-    },
-  },
-})
+import { Image } from './User'
 
 export interface IPost {
+  _id: Types.ObjectId
   name: string
   description: string
   categories: string[]
   price: number
-  images: IImage[]
+  images: Image[]
   userId: Types.ObjectId
 }
 
@@ -55,7 +37,12 @@ const postSchema = new Schema<IPost>({
     min: [1, err.PRICE_REQUIRED],
   },
   images: {
-    type: [imageSchema],
+    type: [
+      {
+        data: Buffer,
+        contentType: String,
+      },
+    ],
     validate: [validateImages, 'At least one image is required. (5 maximum)'],
   },
   userId: {
@@ -72,7 +59,7 @@ function validateCategories(value: string[]) {
   return true
 }
 
-function validateImages(value: IImage[]) {
+function validateImages(value: Image[]) {
   if (value.length < 1) return false
   else if (value.length > 5) return false
   return true

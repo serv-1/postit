@@ -1,6 +1,5 @@
 import isBase64ValueTooLarge from '../../../utils/functions/isBase64ValueTooLarge'
 import { randomBytes, scryptSync } from 'crypto'
-import Joi, { Schema, ValidationError } from 'joi'
 import { isValidObjectId } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import User from '../../../models/User'
@@ -12,11 +11,9 @@ import { nameCsrfSchema } from '../../../lib/joi/nameSchema'
 import { emailCsrfSchema } from '../../../lib/joi/emailSchema'
 import { passwordCsrfSchema } from '../../../lib/joi/passwordSchema'
 import imageSchema from '../../../lib/joi/imageSchema'
+import validateSchema from '../../../utils/functions/validateSchema'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
   if (!isValidObjectId(id)) {
     return res.status(422).send({ message: err.PARAMS_INVALID })
@@ -25,7 +22,7 @@ export default async function handler(
   switch (req.method) {
     case 'GET':
       await dbConnect()
-      const user = await User.findOne({ _id: id }).exec()
+      const user = await User.findOne({ _id: id }).lean().exec()
 
       if (!user) {
         return res.status(404).send({ message: err.USER_NOT_FOUND })
@@ -34,7 +31,7 @@ export default async function handler(
       const base64 = user.image.data.toString('base64')
 
       res.status(200).send({
-        id: user.id,
+        id: user._id.toString(),
         name: user.name,
         email: user.email,
         image: `data:${user.image.contentType};base64,${base64}`,
@@ -52,16 +49,16 @@ export default async function handler(
 
       switch (key) {
         case 'name':
-          validBody(res, req.body, nameCsrfSchema)
+          validateSchema(nameCsrfSchema, req.body, res)
           update = { name: req.body.name }
           break
         case 'email': {
-          validBody(res, req.body, emailCsrfSchema)
+          validateSchema(emailCsrfSchema, req.body, res)
           update = { email: req.body.email }
           break
         }
         case 'password': {
-          validBody(res, req.body, passwordCsrfSchema)
+          validateSchema(passwordCsrfSchema, req.body, res)
           const salt = randomBytes(16).toString('hex')
           const hash = scryptSync(req.body.password, salt, 64).toString('hex')
           update = { password: `${salt}:${hash}` }
@@ -124,23 +121,12 @@ export default async function handler(
   }
 }
 
+export default handler
+
 export const config = {
   api: {
     bodyParser: {
       sizeLimit: '2mb',
     },
   },
-}
-
-const validBody = (
-  res: NextApiResponse,
-  body: NextApiRequest['body'],
-  schema: Schema
-) => {
-  try {
-    Joi.assert(body, schema)
-  } catch (e) {
-    const message = (e as ValidationError).details[0].message
-    res.status(422).send({ message })
-  }
 }

@@ -1,4 +1,4 @@
-import { models, model, Schema, Model } from 'mongoose'
+import { models, model, Schema, Model, Types } from 'mongoose'
 import err from '../utils/constants/errors'
 import { readFileSync } from 'fs'
 import { Buffer } from 'buffer'
@@ -12,15 +12,18 @@ export const defaultImage = {
   contentType: 'image/jpeg',
 }
 
+export interface Image {
+  data: Buffer
+  contentType: string
+}
+
 export interface IUser {
+  _id: Types.ObjectId
   name: string
   email: string
   password?: string
   emailVerified?: Date
-  image: {
-    data: Buffer
-    contentType: string
-  }
+  image: Image
 }
 
 const userSchema = new Schema<IUser>({

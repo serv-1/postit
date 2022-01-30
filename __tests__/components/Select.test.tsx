@@ -1,14 +1,21 @@
 import { render, screen } from '@testing-library/react'
 import { FormProvider, useForm } from 'react-hook-form'
+import Select from '../../components/Select'
 import selectEvent from 'react-select-event'
-import FormCategoriesField from '../../components/FormCategoriesField'
+import categories from '../../categories'
+
+const options = categories.map((category) => ({
+  label: category,
+  value: category,
+}))
 
 const Form = () => {
   const methods = useForm()
 
   return (
     <FormProvider {...methods}>
-      <FormCategoriesField />
+      <label htmlFor="categories">Categories</label>
+      <Select name="categories" options={options} />
     </FormProvider>
   )
 }

@@ -3,28 +3,30 @@ import User from '../../models/User'
 import dbConnect from '../../utils/functions/dbConnect'
 import crypto from 'crypto'
 import { Buffer } from 'buffer'
-import Joi, { ValidationError } from 'joi'
 import err from '../../utils/constants/errors'
 import signInSchema from '../../lib/joi/signInSchema'
+import validateSchema from '../../utils/functions/validateSchema'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return res.status(405).send({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  try {
-    Joi.assert(req.body, signInSchema)
-    const { email, password } = req.body
+  validateSchema(signInSchema, req.body, res)
 
+  const { email, password } = req.body
+
+  try {
     await dbConnect()
     const user = await User.findOne({ email }).exec()
 
-    if (!user) return res.status(422).send({ message: err.EMAIL_UNKNOWN })
-    if (!user.password)
+    if (!user) {
+      return res.status(422).send({ message: err.EMAIL_UNKNOWN })
+    }
+
+    if (!user.password) {
       return res.status(422).send({ message: err.EMAIL_GOOGLE })
+    }
 
     const [salt, hash] = user.password.split(':')
     const dbHash = Buffer.from(hash, 'hex')
@@ -40,9 +42,8 @@ export default async function handler(
       email: user.email,
     })
   } catch (e) {
-    if (e instanceof ValidationError) {
-      return res.status(422).send({ message: e.details[0].message })
-    }
     res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
   }
 }
+
+export default handler

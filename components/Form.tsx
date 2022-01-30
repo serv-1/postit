@@ -38,6 +38,7 @@ const Form = <TFieldValues extends RHF.FieldValues>(
         name={props.name}
         id={props.name}
         className={className}
+        style={props.style}
         action=""
         method={props.method}
         noValidate

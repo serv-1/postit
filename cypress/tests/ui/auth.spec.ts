@@ -1,3 +1,5 @@
+import user from '../../fixtures/user.json'
+
 const username = Cypress.env('googleUsername')
 const password = Cypress.env('googlePassword')
 const cookieName = Cypress.env('sessionCookieName')
@@ -8,16 +10,10 @@ const cleanInboxUrl = `${smtpBaseUrl}/api/v1/inboxes/1577170/clean?api_token=${s
 const getInboxMsgUrl = `${smtpBaseUrl}/api/v1/inboxes/1577170/messages?api_token=${smtpToken}`
 
 describe('User sign in and register', () => {
-  beforeEach(() => {
-    cy.task('db:reset')
-    cy.fixture('user').as('user')
-    cy.request('PATCH', cleanInboxUrl)
-  })
-
   it('Unauthenticated user should be redirected to the sign in page', () => {
     cy.visit('/profile')
     cy.contains(/loading/i).should('exist')
-    cy.location('pathname').should('equal', '/auth/sign-in')
+    cy.get('[data-cy="signIn"]').should('exist')
   })
 
   it('Sign in with Google and sign out', () => {
@@ -48,43 +44,28 @@ describe('User sign in and register', () => {
     cy.get('[data-cy="headerProfileDropdown"]').click()
     cy.contains('Sign out').click()
 
-    cy.location('pathname').should('equal', '/auth/sign-in')
-    cy.contains('Sign out').should('not.exist')
-  })
-
-  it('Sign in with credentials and sign out', function () {
-    cy.task('db:seed')
-    cy.visit('/auth/sign-in')
-
-    cy.get('#email').type(this.user.email)
-    cy.get('#password').type(this.user.password)
-    cy.get('input[type="submit"]').click()
-
-    cy.location('pathname').should('equal', '/profile')
-    cy.contains(this.user.email).should('exist')
-
-    cy.get('[data-cy="headerProfileDropdown"]').click()
-    cy.contains('Sign out').click()
-
-    cy.location('pathname').should('equal', '/auth/sign-in')
+    cy.get('[data-cy="signIn"]').should('exist')
     cy.contains('Sign out').should('not.exist')
   })
 
   it('Register, send a verification mail with credentials and sign out', function () {
+    cy.request('PATCH', cleanInboxUrl)
+    cy.task('db:reset')
+
     cy.visit('/register')
 
-    cy.get('#name').type(this.user.name)
-    cy.get('#email').type(this.user.email)
-    cy.get('#password').type(this.user.password)
+    cy.get('#name').type(user.name)
+    cy.get('#email').type(user.email)
+    cy.get('#password').type(user.password)
     cy.get('input[type="submit"]').click()
 
-    cy.location('pathname').should('equal', '/profile')
-    cy.contains(this.user.email).should('exist')
+    cy.get('[data-cy="profile"]').should('exist')
+    cy.contains(user.email).should('exist')
 
     cy.get('[data-cy="headerProfileDropdown"]').click()
     cy.contains('Sign out').click()
 
-    cy.location('pathname').should('equal', '/auth/sign-in')
+    cy.get('[data-cy="signIn"]').should('exist')
     cy.contains('Sign out').should('not.exist')
 
     // verify that a mail has been sent
@@ -93,14 +74,39 @@ describe('User sign in and register', () => {
     })
   })
 
-  it('Forgot password', function () {
+  it('Sign in with credentials and sign out', function () {
+    cy.task('db:reset')
     cy.task('db:seed')
+
+    cy.visit('/auth/sign-in')
+
+    cy.get('#email').type(user.email)
+    cy.get('#password').type(user.password)
+    cy.get('input[type="submit"]').click()
+
+    cy.get('[data-cy="profile"]').should('exist')
+    cy.contains(user.email).should('exist')
+
+    cy.get('[data-cy="headerProfileDropdown"]').click()
+    cy.contains('Sign out').click()
+
+    cy.get('[data-cy="signIn"]').should('exist')
+    cy.contains('Sign out').should('not.exist')
+  })
+
+  it('Forgot password', function () {
+    cy.request('PATCH', cleanInboxUrl)
+    cy.task('db:reset')
+    cy.task('db:seed')
+
     cy.visit('/auth/forgot-password')
 
-    cy.get('#email').type(this.user.email)
+    cy.get('#email').type(user.email)
+
     cy.get('button[type="submit"]').click()
 
-    cy.location('pathname').should('equal', '/auth/email-sent')
+    // redirected to the mail sent confirmation page
+    cy.get('[data-cy="mailSent"]').should('exist')
 
     cy.request(getInboxMsgUrl).then((res) => {
       cy.request(
@@ -111,11 +117,10 @@ describe('User sign in and register', () => {
     })
 
     // remove target html attribute to stay on the actual tab
-    cy.get('a').invoke('removeAttr', 'target')
-    cy.get('a').click()
+    cy.get('a').invoke('removeAttr', 'target').click()
 
-    cy.location('pathname').should('equal', '/profile')
-    cy.contains(this.user.email).should('exist')
+    cy.get('[data-cy="profile"]').should('exist')
+    cy.contains(user.email).should('exist')
   })
 })
 
