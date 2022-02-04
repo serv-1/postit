@@ -18,11 +18,6 @@ export const imagesArraySchema = Joi.array()
   .messages({
     'array.base': err.IMAGES_INVALID,
     'any.required': err.IMAGES_REQUIRED,
-    'array.excludes': err.IMAGES_INVALID,
-    'array.includes': err.IMAGES_INVALID,
-    'array.includesRequiredBoth': err.IMAGES_INVALID,
-    'array.includesRequiredKnowns': err.IMAGES_INVALID,
-    'array.includesRequiredUnKnowns': err.IMAGES_INVALID,
     'array.min': err.IMAGES_REQUIRED,
     'array.max': err.IMAGES_MAX,
   })

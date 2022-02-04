@@ -16,15 +16,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).send({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  const reqQuery = req.query
+  const data = { ...req.query }
+  const queryCategories = data['categories[]']
 
-  if (reqQuery.categories && !Array.isArray(reqQuery.categories)) {
-    reqQuery.categories = [reqQuery.categories]
+  if (queryCategories) {
+    if (Array.isArray(queryCategories)) {
+      data.categories = queryCategories
+    } else {
+      data.categories = [queryCategories]
+    }
+
+    delete data['categories[]']
   }
 
-  validateSchema(searchPostSchema, reqQuery, res, true)
+  validateSchema(searchPostSchema, data, res, true)
 
-  const { query, page, minPrice, maxPrice, categories } = req.query
+  const { query, page, minPrice, maxPrice, categories } = data
 
   const filter: Filter = { $text: { $search: `"${query}"` } }
 
@@ -42,6 +49,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await dbConnect()
 
+    const totalPosts = await Post.countDocuments(filter).exec()
+    const totalPages = Math.ceil(totalPosts / 20)
+
     const skip = page ? (+page - 1) * 20 : 0
     const posts = await Post.find(filter).skip(skip).limit(20).lean().exec()
     const formatedPosts: (Omit<IPost, 'images' | 'userId'> & {
@@ -57,14 +67,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         price: post.price / 100,
         images: post.images.map((image) => {
           const base64 = image.data.toString('base64')
-          return `data:${image.contentType};base64;${base64}`
+          return `data:${image.contentType};base64,${base64}`
         }),
         userId: post.userId.toString(),
       })
     }
 
-    res.status(200).send({ posts: formatedPosts })
+    res.status(200).send({ posts: formatedPosts, totalPages, totalPosts })
   } catch (e) {
+    console.dir(e)
     res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
   }
 }

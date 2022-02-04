@@ -1,2 +1,2 @@
-module.exports = 'default-test-image'
+module.exports = 'file-mock'
 export {}

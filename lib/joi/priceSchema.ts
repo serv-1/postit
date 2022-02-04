@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import err from '../../utils/constants/errors'
 
-export const priceSchema = Joi.number().min(0).precision(2).messages({
+export const priceSchema = Joi.number().allow('').min(0).precision(2).messages({
   'number.base': err.PRICE_INVALID,
   'number.infinity': err.PRICE_INVALID,
   'number.integer': err.PRICE_INVALID,

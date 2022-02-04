@@ -1,2 +1,2 @@
-const Particles = () => <div>react-tsparticles mocked</div>
+const Particles = () => <div>react-tsparticles mock</div>
 export default Particles

@@ -1,18 +1,26 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import selectEvent from 'react-select-event'
 import HomeSearchPosts from '../../components/HomeSearchPosts'
 import Toast from '../../components/Toast'
 import { ToastProvider } from '../../contexts/toast'
 import { mockResponse } from '../../lib/msw'
-import { posts } from '../../mocks/posts/search'
+import { data } from '../../mocks/posts/search'
 import err from '../../utils/constants/errors'
 
 const setPosts = jest.fn()
+const setTotalPosts = jest.fn()
+const setTotalPages = jest.fn()
 
 const factory = () => {
   render(
     <ToastProvider>
-      <HomeSearchPosts setPosts={setPosts} />
+      <HomeSearchPosts
+        setPosts={setPosts}
+        setTotalPosts={setTotalPosts}
+        setTotalPages={setTotalPages}
+        currentPage={1}
+      />
       <Toast />
     </ToastProvider>
   )
@@ -24,12 +32,25 @@ test('the form gets the posts', async () => {
   const queryInput = screen.getByRole('searchbox')
   userEvent.type(queryInput, 'Car')
 
-  const submitBtn = screen.getByRole('button')
+  const minPriceInput = screen.getByRole('spinbutton', { name: /minimum/i })
+  userEvent.type(minPriceInput, '50')
+
+  const maxPriceInput = screen.getByRole('spinbutton', { name: /maximum/i })
+  userEvent.type(maxPriceInput, '200')
+
+  const categoriesSelect = screen.getByRole('combobox')
+  await selectEvent.select(categoriesSelect, ['pet', 'cat'])
+
+  const submitBtn = screen.getByRole('button', { name: /search/i })
   userEvent.click(submitBtn)
 
   await waitFor(() => {
     expect(setPosts).toHaveBeenCalledTimes(1)
-    expect(setPosts).toHaveBeenCalledWith(posts)
+    expect(setPosts).toHaveBeenCalledWith(data.posts)
+    expect(setTotalPosts).toHaveBeenCalledTimes(1)
+    expect(setTotalPosts).toHaveBeenCalledWith(data.totalPosts)
+    expect(setTotalPages).toHaveBeenCalledTimes(1)
+    expect(setTotalPages).toHaveBeenCalledWith(data.totalPages)
   })
 })
 
