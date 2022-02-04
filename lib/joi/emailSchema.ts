@@ -6,6 +6,7 @@ import object from './object'
 export const emailSchema = Joi.string()
   .required()
   .email({ tlds: { allow: false } })
+  .trim()
   .messages({
     'string.base': err.EMAIL_INVALID,
     'string.empty': err.EMAIL_REQUIRED,

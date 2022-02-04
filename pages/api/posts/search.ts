@@ -75,7 +75,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     res.status(200).send({ posts: formatedPosts, totalPages, totalPosts })
   } catch (e) {
-    console.dir(e)
     res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
   }
 }
