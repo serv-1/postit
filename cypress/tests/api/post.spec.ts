@@ -105,17 +105,16 @@ describe('POST', () => {
       ],
     }
 
-    cy.req({ url, method, csrfToken: true, body, timeout: 90000 }).then(
-      (res) => {
-        expect(res.status).to.eq(200)
+    cy.req({ url, method, csrfToken: true, body }).then((res) => {
+      expect(res.status).to.eq(200)
 
-        cy.task<IPost>('db:getPostByUserId', this.uId).then((post) => {
-          expect(post).not.to.eq(null)
-          expect(post.price).to.eq(defaultBody.price * 100)
-          expect(post.userId).to.eq(this.uId)
-        })
-      }
-    )
+      cy.task<IPost>('db:getPostByUserId', this.uId).then((post) => {
+        expect(post).not.to.eq(null)
+        expect(post.price).to.eq(defaultBody.price * 100)
+        expect(post.userId).to.eq(this.uId)
+        expect(post.images.length).to.eq(5)
+      })
+    })
   })
 })
 

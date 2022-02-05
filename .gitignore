@@ -37,3 +37,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# images
+/public/static/images/posts
+/public/static/images/users

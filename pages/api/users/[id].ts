@@ -12,6 +12,10 @@ import { emailCsrfSchema } from '../../../lib/joi/emailSchema'
 import { passwordCsrfSchema } from '../../../lib/joi/passwordSchema'
 import imageSchema from '../../../lib/joi/imageSchema'
 import validateSchema from '../../../utils/functions/validateSchema'
+import { nanoid } from 'nanoid'
+import { cwd } from 'process'
+import { appendFile, unlink } from 'fs/promises'
+import { Buffer } from 'buffer'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
@@ -28,13 +32,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(404).send({ message: err.USER_NOT_FOUND })
       }
 
-      const base64 = user.image.data.toString('base64')
-
       res.status(200).send({
         id: user._id.toString(),
         name: user.name,
         email: user.email,
-        image: `data:${user.image.contentType};base64,${base64}`,
+        image: user.image,
       })
       break
     case 'PUT':
@@ -81,12 +83,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             return res.status(413).send({ message: err.IMAGE_TOO_LARGE })
           }
 
-          update = {
-            image: {
-              data: Buffer.from(base64Uri.split(',')[1], 'base64'),
-              contentType: type,
-            },
+          const user = await User.findOne({ _id: id }).lean().exec()
+
+          if (!user) {
+            return res.status(404).send({ message: err.USER_NOT_FOUND })
           }
+
+          if (user.image !== '/static/images/default.jpg') {
+            await unlink(cwd() + '/public' + user.image)
+          }
+
+          const filename = nanoid() + '.' + type.split('/')[1]
+          const uri = '/static/images/users/' + filename
+          const path = cwd() + '/public' + uri
+
+          const imageData = Buffer.from(base64Uri.split(',')[1], 'base64')
+          await appendFile(path, imageData)
+
+          update = { image: uri }
           break
         default:
           return res.status(422).send({ message: err.DATA_INVALID })

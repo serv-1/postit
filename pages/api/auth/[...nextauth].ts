@@ -5,7 +5,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/email'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from '../../../lib/mongodb'
-import User, { defaultImage } from '../../../models/User'
+import User from '../../../models/User'
 import dbConnect from '../../../utils/functions/dbConnect'
 import env from '../../../utils/constants/env'
 import err from '../../../utils/constants/errors'
@@ -60,11 +60,17 @@ export default NextAuth({
         const { id, name, email, image } = user
         token.user = { id, name, email }
 
-        if (account.provider === 'google' && typeof image === 'string') {
+        if (
+          account.provider === 'google' &&
+          !image.includes('/static/images/')
+        ) {
           await dbConnect()
           await User.updateOne(
             { _id: id },
-            { emailVerified: new Date(), image: defaultImage }
+            {
+              emailVerified: new Date(),
+              image: '/static/images/default.jpg',
+            }
           ).exec()
         }
       }

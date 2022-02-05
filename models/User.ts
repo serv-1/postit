@@ -1,21 +1,5 @@
 import { models, model, Schema, Model, Types } from 'mongoose'
 import err from '../utils/constants/errors'
-import { readFileSync } from 'fs'
-import { Buffer } from 'buffer'
-import { join } from 'path'
-
-const path = join('public/static/images/default.jpg')
-const base64Data = readFileSync(path, 'base64')
-
-export const defaultImage = {
-  data: Buffer.from(base64Data, 'base64'),
-  contentType: 'image/jpeg',
-}
-
-export interface Image {
-  data: Buffer
-  contentType: string
-}
 
 export interface IUser {
   _id: Types.ObjectId
@@ -23,7 +7,7 @@ export interface IUser {
   email: string
   password?: string
   emailVerified?: Date
-  image: Image
+  image: string
 }
 
 const userSchema = new Schema<IUser>({
@@ -44,11 +28,8 @@ const userSchema = new Schema<IUser>({
   },
   emailVerified: Date,
   image: {
-    type: {
-      data: Buffer,
-      contentType: String,
-    },
-    default: defaultImage,
+    type: String,
+    default: '/static/images/default.jpg',
   },
 })
 

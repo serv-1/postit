@@ -1,5 +1,5 @@
 import { connect, connection as conn, Types } from 'mongoose'
-import User, { defaultImage, IUser } from '../../models/User'
+import User, { IUser } from '../../models/User'
 import Account, { IAccount } from '../../models/Account'
 import Post, { IPost } from '../../models/Post'
 import { faker } from '@faker-js/faker'
@@ -38,19 +38,27 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
       return usersIds
     },
-    async 'db:getUserById'(id: string): Promise<IUser | null> {
+    async 'db:getUser'(idOrEmail: string): Promise<IUser | null> {
       await connect(env.MONGODB_URI)
-      const user = await User.findOne({ _id: id }).exec()
+
+      let user: IUser | null
+
+      if (idOrEmail.includes('@')) {
+        user = await User.findOne({ email: idOrEmail }).lean().exec()
+      } else {
+        user = await User.findOne({ _id: idOrEmail }).lean().exec()
+      }
+
       return user
     },
     async 'db:getAccountByUserId'(id: string): Promise<IAccount | null> {
       await connect(env.MONGODB_URI)
-      const account = await Account.findOne({ userId: id }).exec()
+      const account = await Account.findOne({ userId: id }).lean().exec()
       return account
     },
     async 'db:getPostByUserId'(id: string): Promise<IPost | null> {
       await connect(env.MONGODB_URI)
-      const post = await Post.findOne({ userId: id }).exec()
+      const post = await Post.findOne({ userId: id }).lean().exec()
       return post
     },
     GoogleSocialLogin: GoogleSocialLogin,
@@ -68,8 +76,8 @@ async function insertUsers(): Promise<UsersIds> {
   const salt = randomBytes(16).toString('hex')
   const hash = scryptSync(user.password, salt, 64).toString('hex')
 
-  const u = { ...user, password: `${salt}:${hash}`, image: defaultImage }
-  const gu = { ...googleUser, image: defaultImage }
+  const u = { ...user, password: `${salt}:${hash}` }
+  const gu = { ...googleUser }
 
   const result = await User.insertMany([u, gu])
 
@@ -102,10 +110,6 @@ async function insertAccount(id: string) {
 async function insertPosts() {
   const posts: Omit<IPost, '_id'>[] = postsJson.map((post) => ({
     ...post,
-    images: post.images.map((image) => ({
-      ...image,
-      data: Buffer.from(image.data, 'base64'),
-    })),
     userId: new Types.ObjectId(post.userId),
   }))
 
@@ -118,12 +122,7 @@ async function insertPosts() {
       description: 'Horribly monstruous cat',
       categories,
       price: (i === 0 ? 1 : i) * 1000,
-      images: [
-        {
-          data: Buffer.from('base64', 'base64'),
-          contentType: 'image/jpeg',
-        },
-      ],
+      images: ['/static/images/posts/cat-' + i + '.jpeg'],
       userId: new Types.ObjectId(generateRandomObjectId()),
     })
   }

@@ -4,12 +4,7 @@
     "description": "Magnificent Table",
     "categories": ["furniture"],
     "price": 2000,
-    "images": [
-      {
-        "data": "base64",
-        "contentType": "image/jpeg"
-      }
-    ],
+    "images": ["/static/images/posts/table.jpeg"],
     "userId": "f0f0f0f0f0f0f0f0f0f0f0f0"
   },
   {
@@ -17,12 +12,7 @@
     "description": "Breathtaking Modern Table",
     "categories": ["furniture"],
     "price": 4000,
-    "images": [
-      {
-        "data": "base64",
-        "contentType": "image/jpeg"
-      }
-    ],
+    "images": ["/static/images/posts/modern-table.jpeg"],
     "userId": "f1f1f1f1f1f1f1f1f1f1f1f1"
   },
   {
@@ -30,12 +20,7 @@
     "description": "Amazingly Awesome Cat",
     "categories": ["pet", "cat"],
     "price": 7000,
-    "images": [
-      {
-        "data": "base64",
-        "contentType": "image/jpeg"
-      }
-    ],
+    "images": ["/static/images/posts/cat.jpeg"],
     "userId": "f2f2f2f2f2f2f2f2f2f2f2f2"
   }
 ]

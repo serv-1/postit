@@ -1,6 +1,5 @@
 import { models, model, Schema, Model, Types } from 'mongoose'
 import err from '../utils/constants/errors'
-import { Image } from './User'
 
 export interface IPost {
   _id: Types.ObjectId
@@ -8,7 +7,7 @@ export interface IPost {
   description: string
   categories: string[]
   price: number
-  images: Image[]
+  images: string[]
   userId: Types.ObjectId
 }
 
@@ -37,12 +36,7 @@ const postSchema = new Schema<IPost>({
     min: [1, err.PRICE_REQUIRED],
   },
   images: {
-    type: [
-      {
-        data: Buffer,
-        contentType: String,
-      },
-    ],
+    type: [String],
     validate: [validateImages, 'At least one image is required. (5 maximum)'],
   },
   userId: {
@@ -59,7 +53,7 @@ function validateCategories(value: string[]) {
   return true
 }
 
-function validateImages(value: Image[]) {
+function validateImages(value: string[]) {
   if (value.length < 1) return false
   else if (value.length > 5) return false
   return true

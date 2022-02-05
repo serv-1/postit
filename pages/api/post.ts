@@ -7,8 +7,10 @@ import dbConnect from '../../utils/functions/dbConnect'
 import err from '../../utils/constants/errors'
 import isBase64ValueTooLarge from '../../utils/functions/isBase64ValueTooLarge'
 import { createPostServerSchema } from '../../lib/joi/createPostSchema'
-import { Buffer } from 'buffer'
+import { appendFile } from 'fs/promises'
+import { nanoid } from 'nanoid'
 import validateSchema from '../../utils/functions/validateSchema'
+import { cwd } from 'process'
 
 interface Image {
   base64Uri: string
@@ -48,10 +50,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const session = (await getSession({ req })) as Session
     await dbConnect()
 
-    const images = (req.body.images as Image[]).map((image) => ({
-      data: Buffer.from(image.base64Uri.split(',')[1], 'base64'),
-      contentType: image.type,
-    }))
+    const images: string[] = []
+
+    for (const { base64Uri, type } of req.body.images as Image[]) {
+      const filename = nanoid() + '.' + type.split('/')[1]
+      const uri = '/static/images/posts/' + filename
+      const path = cwd() + '/public/' + uri
+
+      const imageData = Buffer.from(base64Uri.split(',')[1], 'base64')
+      await appendFile(path, imageData)
+
+      images.push(uri)
+    }
 
     const post = new Post({
       ...req.body,

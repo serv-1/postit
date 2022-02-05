@@ -51,8 +51,10 @@ const Header = () => {
                   <Image
                     src={image}
                     alt="Your profile image"
+                    layout="responsive"
                     width={44}
                     height={44}
+                    className="rounded-circle"
                   />
                 ) : (
                   <div className="spinner-border" role="status">

@@ -65,10 +65,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         ...post,
         id: post._id.toString(),
         price: post.price / 100,
-        images: post.images.map((image) => {
-          const base64 = image.data.toString('base64')
-          return `data:${image.contentType};base64,${base64}`
-        }),
         userId: post.userId.toString(),
       })
     }

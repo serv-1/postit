@@ -78,7 +78,7 @@ describe('/api/users/:id', () => {
         csrfToken: true,
       }).then((res) => {
         expect(res.status).to.eq(422)
-        cy.task<IUser>('db:getUserById', this.guId).then((user) => {
+        cy.task<IUser>('db:getUser', this.guId).then((user) => {
           expect(user.name).to.not.eq('Yes, I have renamed you!')
         })
       })
@@ -112,7 +112,7 @@ describe('/api/users/:id', () => {
         cy.req({ url: this.url, method, body: { name }, csrfToken: true }).then(
           (res) => {
             expect(res.status).to.eq(200)
-            cy.task<IUser>('db:getUserById', this.uId).then((user) => {
+            cy.task<IUser>('db:getUser', this.uId).then((user) => {
               expect(user.name).to.eq(name)
             })
           }
@@ -145,7 +145,7 @@ describe('/api/users/:id', () => {
           csrfToken: true,
         }).then((res) => {
           expect(res.status).to.eq(200)
-          cy.task<IUser>('db:getUserById', this.uId).then((user) => {
+          cy.task<IUser>('db:getUser', this.uId).then((user) => {
             expect(user.email).to.eq('superemail@test.com')
           })
         })
@@ -170,7 +170,7 @@ describe('/api/users/:id', () => {
       })
 
       it('200 - Password updated', function () {
-        cy.task<IUser>('db:getUserById', this.uId).then((user) => {
+        cy.task<IUser>('db:getUser', this.uId).then((user) => {
           const oldHash = (user.password as string).split(':')[1]
           cy.req({
             url: this.url,
@@ -178,7 +178,7 @@ describe('/api/users/:id', () => {
             body: { password: 'super oh nooo! pw' },
             csrfToken: true,
           }).then((res) => {
-            cy.task<IUser>('db:getUserById', this.uId).then((user) => {
+            cy.task<IUser>('db:getUser', this.uId).then((user) => {
               const newHash = (user.password as string).split(':')[1]
               expect(res.status).to.eq(200)
               expect(oldHash).to.not.eq(newHash)
@@ -241,10 +241,8 @@ describe('/api/users/:id', () => {
           csrfToken: true,
         }).then((res) => {
           expect(res.status).to.eq(200)
-          cy.task<IUser>('db:getUserById', this.uId).then((user) => {
-            expect(user.image.contentType).to.eq(type)
-            const dbBase64 = Buffer.from(user.image.data).toString('base64')
-            expect(dbBase64).to.eq(base64)
+          cy.task<IUser>('db:getUser', this.uId).then((u) => {
+            expect(u.image).to.not.eq(user.image)
           })
         })
       })
@@ -278,7 +276,7 @@ describe('/api/users/:id', () => {
       cy.req({ url: `/api/users/${this.guId}`, method, csrfToken: true }).then(
         (res) => {
           expect(res.status).to.eq(422)
-          cy.task<IUser>('db:getUserById', this.guId).then((user) => {
+          cy.task<IUser>('db:getUser', this.guId).then((user) => {
             expect(user).to.not.be.null
           })
         }
@@ -289,7 +287,7 @@ describe('/api/users/:id', () => {
       cy.signIn(user.email, user.password)
       cy.req({ url: this.url, method, csrfToken: true }).then((res) => {
         expect(res.status).to.eq(200)
-        cy.task('db:getUserById', this.uId).then((user) => {
+        cy.task('db:getUser', this.uId).then((user) => {
           expect(user).to.eq(null)
         })
         cy.task('db:getAccountByUserId', this.uId).then((account) => {

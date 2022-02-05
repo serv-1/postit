@@ -1,3 +1,4 @@
+import { IUser } from '../../../models/User'
 import err from '../../../utils/constants/errors'
 import user from '../../fixtures/user.json'
 
@@ -33,11 +34,17 @@ describe('/api/user', () => {
       })
     })
 
-    it('200 - User created', function () {
+    it.only('200 - User created', function () {
       cy.task('db:reset')
-      const { name, email, password } = user
+      const { name, email, password, image } = user
       cy.req({ url, method, body: { name, email, password } }).then((res) => {
         expect(res.status).to.eq(200)
+        cy.task<IUser>('db:getUser', email).then((u) => {
+          expect(u.name).to.eq(name)
+          expect(u.email).to.eq(email)
+          expect(u.password).to.not.eq(undefined)
+          expect(u.image).to.eq(image)
+        })
       })
     })
   })
