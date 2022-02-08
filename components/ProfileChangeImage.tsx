@@ -1,32 +1,20 @@
 import axios from 'axios'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useRef, useState } from 'react'
 import Image from 'next/image'
-import { useSession } from 'next-auth/react'
-import { Session } from 'next-auth'
 import { useToast } from '../contexts/toast'
 import Button from './Button'
 import getApiError from '../utils/functions/getApiError'
 import err from '../utils/constants/errors'
 
-const ProfileChangeImage = () => {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [image, setImage] = useState<string>()
-  const { setToast } = useToast()
-  const { data } = useSession()
-  const { id } = (data as Session).user
+interface ProfileChangeImageProps {
+  id?: string
+  image?: string
+}
 
-  useEffect(() => {
-    async function getImage() {
-      try {
-        const res = await axios.get(`http://localhost:3000/api/users/${id}`)
-        setImage(res.data.image)
-      } catch (e) {
-        const { message } = getApiError(e)
-        setToast({ message, background: 'danger' })
-      }
-    }
-    getImage()
-  }, [id, setToast])
+const ProfileChangeImage = ({ id, image }: ProfileChangeImageProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [newImage, setNewImage] = useState<string>()
+  const { setToast } = useToast()
 
   const updateImage = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -35,7 +23,9 @@ const ProfileChangeImage = () => {
 
     if (!['image/jpeg', 'image/png', 'image/gif'].includes(files[0].type)) {
       return setToast({ message: err.IMAGE_INVALID, background: 'danger' })
-    } else if (files[0].size > 1000000) {
+    }
+
+    if (files[0].size > 1000000) {
       return setToast({
         message: err.IMAGE_TOO_LARGE,
         background: 'danger',
@@ -54,11 +44,11 @@ const ProfileChangeImage = () => {
           image: { base64Uri: e.target.result, type: files[0].type },
         })
 
+        setNewImage(e.target.result as string)
         setToast({
           message: 'The image has been updated! 🎉',
           background: 'success',
         })
-        setImage(e.target.result as string)
       } catch (e) {
         const { message } = getApiError(e)
         setToast({ message, background: 'danger' })
@@ -68,6 +58,8 @@ const ProfileChangeImage = () => {
     reader.readAsDataURL(files[0])
   }
 
+  const src = newImage || image
+
   return (
     <>
       <Button
@@ -75,9 +67,9 @@ const ProfileChangeImage = () => {
         style={{ width: 200, height: 200 }}
         onClick={() => fileInputRef.current?.click()}
       >
-        {image && (
+        {src && (
           <Image
-            src={image}
+            src={src}
             width={200}
             height={200}
             alt="Your profile image"

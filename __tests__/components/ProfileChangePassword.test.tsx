@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { SessionProvider } from 'next-auth/react'
 import Toast from '../../components/Toast'
 import ProfileChangePassword from '../../components/ProfileChangePassword'
 import { ToastProvider } from '../../contexts/toast'
@@ -12,16 +11,14 @@ const labelText = new RegExp('change your password', 'i')
 
 const factory = () => {
   render(
-    <SessionProvider session={mockSession}>
-      <ToastProvider>
-        <ProfileChangePassword />
-        <Toast />
-      </ToastProvider>
-    </SessionProvider>
+    <ToastProvider>
+      <ProfileChangePassword id={mockSession.id} />
+      <Toast />
+    </ToastProvider>
   )
 }
 
-test('the form updates the user password and then a successful message renders', async () => {
+test('an alert renders if the user password is updated', async () => {
   factory()
 
   await screen.findByTestId('csrfToken')
@@ -36,7 +33,7 @@ test('the form updates the user password and then a successful message renders',
   expect(toast).toHaveClass('bg-success')
 })
 
-test('an error renders if the server fails to updates the user', async () => {
+test('an error renders if the server fails to update the user', async () => {
   mockResponse('put', '/api/users/:id', 422, { message: err.PASSWORD_MIN })
 
   factory()

@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { SessionProvider } from 'next-auth/react'
 import ProfileDeleteAccount from '../../components/ProfileDeleteAccount'
 import Toast from '../../components/Toast'
 import { ToastProvider } from '../../contexts/toast'
@@ -13,12 +12,10 @@ signOut.mockResolvedValue({ url: '/' })
 
 const factory = () => {
   render(
-    <SessionProvider session={mockSession}>
-      <ToastProvider>
-        <ProfileDeleteAccount />
-        <Toast />
-      </ToastProvider>
-    </SessionProvider>
+    <ToastProvider>
+      <ProfileDeleteAccount id={mockSession.id} />
+      <Toast />
+    </ToastProvider>
   )
 }
 
@@ -50,7 +47,7 @@ test('the cancel button closes the modal', () => {
   expect(deleteBtn).not.toBeInTheDocument()
 })
 
-test('an error renders if the server fails the delete the user', async () => {
+test('an error renders if the server fails to delete the user', async () => {
   mockResponse('delete', '/api/users/:id', 422, { message: err.PARAMS_INVALID })
 
   factory()

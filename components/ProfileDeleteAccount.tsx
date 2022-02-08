@@ -1,6 +1,5 @@
 import axios from 'axios'
-import { Session } from 'next-auth'
-import { signOut, useSession } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
 import { useState } from 'react'
 import { useToast } from '../contexts/toast'
 import getApiError from '../utils/functions/getApiError'
@@ -8,19 +7,21 @@ import Button from './Button'
 import Modal from './Modal'
 import OpenModalButton from './OpenModalButton'
 
-const ProfileDeleteAccount = () => {
+interface ProfileDeleteAccountProps {
+  id?: string
+}
+
+const ProfileDeleteAccount = ({ id }: ProfileDeleteAccountProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
+
   const { setToast } = useToast()
-  const { data } = useSession()
-  const { id } = (data as Session).user
 
   const deleteUser = async () => {
     try {
       const res = await axios.get('http://localhost:3000/api/auth/csrf')
 
-      await axios.delete(`http://localhost:3000/api/users/${id}`, {
-        data: { csrfToken: res.data.csrfToken },
-      })
+      const data = { csrfToken: res.data.csrfToken }
+      await axios.delete(`http://localhost:3000/api/users/${id}`, { data })
 
       await signOut({ callbackUrl: '/' })
     } catch (e) {

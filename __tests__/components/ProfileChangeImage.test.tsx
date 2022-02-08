@@ -3,28 +3,30 @@ import ProfileChangeImage from '../../components/ProfileChangeImage'
 import { ToastProvider } from '../../contexts/toast'
 import userEvent from '@testing-library/user-event'
 import { mockSession } from '../../mocks/nextAuth'
-import { SessionProvider } from 'next-auth/react'
 import { mockResponse } from '../../lib/msw'
 import Toast from '../../components/Toast'
 import err from '../../utils/constants/errors'
 
 const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
 
-const factory = () => {
+const factory = (image?: string) => {
   render(
-    <SessionProvider session={mockSession}>
-      <ToastProvider>
-        <ProfileChangeImage />
-        <Toast />
-      </ToastProvider>
-    </SessionProvider>
+    <ToastProvider>
+      <ProfileChangeImage id={mockSession.id} image={image} />
+      <Toast />
+    </ToastProvider>
   )
 }
 
-test('the button trigger a click on the file input', async () => {
+test('no image renders if there is no image', () => {
   factory()
 
-  await screen.findByRole('img')
+  const img = screen.queryByRole('img')
+  expect(img).not.toBeInTheDocument()
+})
+
+test('the button trigger a click on the file input', () => {
+  factory()
 
   const input = screen.getByTestId('fileInput')
   const click = jest.fn()
@@ -35,26 +37,28 @@ test('the button trigger a click on the file input', async () => {
   expect(click).toHaveBeenCalledTimes(1)
 })
 
-test('the user image is updated and rendered in the button and a successful message renders', async () => {
-  factory()
+test('an alert renders if the user image is updated and the new user image renders', async () => {
+  factory('base64Uri')
 
-  const img = await screen.findByRole('img')
-  const imgsrc = img.getAttribute('src')
+  const oldImg = screen.getByRole('img')
+  const oldSrc = oldImg.getAttribute('src')
 
   const input = screen.getByTestId('fileInput')
   userEvent.upload(input, file)
 
-  const _img = screen.getByRole('img')
-  await waitFor(() => expect(imgsrc).not.toBe(_img.getAttribute('src')))
-
   const toast = await screen.findByRole('alert')
   expect(toast).toHaveClass('bg-success')
+
+  const newImg = screen.getByRole('img')
+  const newSrc = newImg.getAttribute('src')
+
+  await waitFor(() => {
+    expect(newSrc).not.toBe(oldSrc)
+  })
 })
 
 test('an error renders if the user image is invalid', async () => {
   factory()
-
-  await screen.findByRole('img')
 
   const input = screen.getByTestId('fileInput')
   const textFile = new File(['text'], 'text.txt', { type: 'text/plain' })
@@ -64,22 +68,12 @@ test('an error renders if the user image is invalid', async () => {
   expect(toast).toHaveTextContent(err.IMAGE_INVALID)
   expect(toast).toHaveClass('bg-danger')
 
-  const buffer = new ArrayBuffer(1000001)
-  const tooLargeFile = new File([buffer], file.name, { type: file.type })
+  const data = new ArrayBuffer(1000001)
+  const tooLargeFile = new File([data], file.name, { type: file.type })
   userEvent.upload(input, tooLargeFile)
 
   toast = await screen.findByRole('alert')
   expect(toast).toHaveTextContent(err.IMAGE_TOO_LARGE)
-  expect(toast).toHaveClass('bg-danger')
-})
-
-test('an error renders if the server fails to fetch the user image', async () => {
-  mockResponse('get', '/api/users/:id', 404, { message: err.IMAGE_NOT_FOUND })
-
-  factory()
-
-  const toast = await screen.findByRole('alert')
-  expect(toast).toHaveTextContent(err.IMAGE_NOT_FOUND)
   expect(toast).toHaveClass('bg-danger')
 })
 
@@ -89,8 +83,6 @@ test('an error renders if the server fails to update the user image', async () =
   })
 
   factory()
-
-  await screen.findByRole('img')
 
   const input = screen.getByTestId('fileInput')
   userEvent.upload(input, file)

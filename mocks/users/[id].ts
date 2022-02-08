@@ -9,8 +9,10 @@ const handlers = [
     return res(
       ctx.status(200),
       ctx.json({
-        ...mockSession.user,
-        image: 'data:image/jpeg;base64,R5d65e=',
+        id: mockSession.id,
+        name: 'John Doe',
+        email: 'johndoe@test.com',
+        image: 'data:image/jpeg;base64,E4d54=',
       })
     )
   }),

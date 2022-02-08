@@ -67,7 +67,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       ...req.body,
       price: req.body.price * 100,
       images,
-      userId: session.user.id,
+      userId: session.id,
     })
     await post.save()
   } catch (e) {

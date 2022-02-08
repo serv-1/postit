@@ -23,7 +23,7 @@ const authCheck = async (
     return { status: 422, message: err.DATA_INVALID }
   }
 
-  if (id && id !== session.user.id) {
+  if (id && id !== session.id) {
     return { status: 422, message: err.PARAMS_INVALID }
   }
 }

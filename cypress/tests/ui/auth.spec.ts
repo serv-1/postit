@@ -41,14 +41,13 @@ describe('User sign in and register', () => {
     cy.visit('/profile')
     cy.contains(username).should('exist')
 
-    cy.get('[data-cy="headerProfileDropdown"]').click()
-    cy.contains('Sign out').click()
+    cy.get('[aria-label="Sign out"]').click()
 
     cy.get('[data-cy="signIn"]').should('exist')
-    cy.contains('Sign out').should('not.exist')
+    cy.get('[aria-label="Sign out"]').should('not.exist')
   })
 
-  it('Register, send a verification mail with credentials and sign out', function () {
+  it.only('Register, send a verification mail with credentials and sign out', function () {
     cy.request('PATCH', cleanInboxUrl)
     cy.task('db:reset')
 
@@ -62,11 +61,10 @@ describe('User sign in and register', () => {
     cy.get('[data-cy="profile"]').should('exist')
     cy.contains(user.email).should('exist')
 
-    cy.get('[data-cy="headerProfileDropdown"]').click()
-    cy.contains('Sign out').click()
+    cy.get('[aria-label="Sign out"]').click()
 
     cy.get('[data-cy="signIn"]').should('exist')
-    cy.contains('Sign out').should('not.exist')
+    cy.get('[aria-label="Sign out"]').should('not.exist')
 
     // verify that a mail has been sent
     cy.request(getInboxMsgUrl).then((res) => {
@@ -87,11 +85,10 @@ describe('User sign in and register', () => {
     cy.get('[data-cy="profile"]').should('exist')
     cy.contains(user.email).should('exist')
 
-    cy.get('[data-cy="headerProfileDropdown"]').click()
-    cy.contains('Sign out').click()
+    cy.get('[aria-label="Sign out"]').click()
 
     cy.get('[data-cy="signIn"]').should('exist')
-    cy.contains('Sign out').should('not.exist')
+    cy.get('[aria-label="Sign out"]').should('not.exist')
   })
 
   it('Forgot password', function () {

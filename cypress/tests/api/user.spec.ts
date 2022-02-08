@@ -34,7 +34,7 @@ describe('/api/user', () => {
       })
     })
 
-    it.only('200 - User created', function () {
+    it('200 - User created', function () {
       cy.task('db:reset')
       const { name, email, password, image } = user
       cy.req({ url, method, body: { name, email, password } }).then((res) => {

@@ -1,7 +1,5 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import axios from 'axios'
-import { Session } from 'next-auth'
-import { useSession } from 'next-auth/react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
 import { passwordCsrfSchema } from '../lib/joi/passwordSchema'
@@ -16,13 +14,15 @@ interface FormFields {
   password: string
 }
 
-const ProfileChangePassword = () => {
-  const { data } = useSession()
-  const { id } = (data as Session).user
+interface ProfileChangePasswordProps {
+  id?: string
+}
+
+const ProfileChangePassword = ({ id }: ProfileChangePasswordProps) => {
   const { setToast } = useToast()
-  const methods = useForm<FormFields>({
-    resolver: joiResolver(passwordCsrfSchema),
-  })
+
+  const resolver = joiResolver(passwordCsrfSchema)
+  const methods = useForm<FormFields>({ resolver })
 
   const submitHandler: SubmitHandler<FormFields> = async (data) => {
     try {

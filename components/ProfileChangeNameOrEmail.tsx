@@ -1,7 +1,5 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import axios from 'axios'
-import { Session } from 'next-auth'
-import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
@@ -13,48 +11,53 @@ import Form from './Form'
 import InputError from './InputError'
 import Input from './Input'
 
-type FormFields =
-  | { csrfToken?: string; name: string }
-  | { csrfToken?: string; email: string }
+type FormFields<T> = { csrfToken?: string } & (T extends 'name'
+  ? { name: string }
+  : { email: string })
 
 export interface ProfileChangeNameOrEmailProps {
-  subject: 'name' | 'email'
+  type: 'name' | 'email'
+  id?: string
+  value?: string
 }
 
-const ProfileChangeNameOrEmail = ({
-  subject,
-}: ProfileChangeNameOrEmailProps) => {
-  const { data } = useSession()
-  const user = (data as Session).user
-  const [subjectValue, setSubjectValue] = useState(user[subject])
+const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
+  const { type, id, value } = props
+  type Type = typeof type
+
   const [showForm, setShowForm] = useState(false)
+  const [newValue, setNewValue] = useState<string>()
+
   const { setToast } = useToast()
-  const schema = subject === 'name' ? nameCsrfSchema : emailCsrfSchema
-  const methods = useForm<FormFields>({ resolver: joiResolver(schema) })
 
-  const submitHandler: SubmitHandler<FormFields> = async (data) => {
-    const value = Object.values(data)[0]
+  const schema = type === 'name' ? nameCsrfSchema : emailCsrfSchema
+  const methods = useForm<FormFields<Type>>({ resolver: joiResolver(schema) })
 
-    if (value === subjectValue) return setShowForm(false)
+  const submitHandler: SubmitHandler<FormFields<Type>> = async (data) => {
+    const newValue = Object.entries(data).filter(
+      ([key]) => key !== 'csrfToken'
+    )[0][1]
+
+    if (newValue === value) return setShowForm(false)
 
     try {
-      await axios.put(`http://localhost:3000/api/users/${user.id}`, data)
+      await axios.put(`http://localhost:3000/api/users/${id}`, data)
 
       setShowForm(false)
-      setSubjectValue(value)
+      setNewValue(newValue)
       setToast({
-        message: `The ${subject} has been successfully updated! 🎉`,
+        message: `The ${type} has been successfully updated! 🎉`,
         background: 'success',
       })
     } catch (e) {
       const { message } = getApiError(e)
-      methods.setError(subject, { message }, { shouldFocus: true })
+      methods.setError(type, { message }, { shouldFocus: true })
     }
   }
 
   return showForm ? (
     <Form
-      name={`updateUser${subject[0].toUpperCase() + subject.slice(1)}`}
+      name={`updateUser${type[0].toUpperCase() + type.slice(1)}`}
       method="post"
       submitHandlers={{ submitHandler }}
       methods={methods}
@@ -63,9 +66,9 @@ const ProfileChangeNameOrEmail = ({
       <div className="input-group">
         <Input
           className="rounded"
-          type={subject === 'name' ? 'text' : 'email'}
-          defaultValue={subjectValue}
-          name={subject}
+          type={type === 'name' ? 'text' : 'email'}
+          defaultValue={value}
+          name={type}
           needFocus
         />
         <Button
@@ -79,13 +82,13 @@ const ProfileChangeNameOrEmail = ({
         <Button className="p-0 ms-2" aria-label="Submit" type="submit">
           ✔
         </Button>
-        <InputError inputName={subject} />
+        <InputError inputName={type} />
       </div>
     </Form>
   ) : (
     <div className="input-group d-flex align-items-center">
-      <span className={subject === 'name' ? 'fw-bold fs-1' : 'fs-5'}>
-        {subjectValue}
+      <span className={type === 'name' ? 'fw-bold fs-1' : 'fs-5'}>
+        {newValue || value}
       </span>
       <Button aria-label="Edit" onClick={() => setShowForm(true)}>
         ✏

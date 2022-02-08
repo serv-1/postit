@@ -4,11 +4,7 @@ import { Session } from 'next-auth'
 import { SignInResponse, SignOutResponse } from 'next-auth/react'
 
 export const mockSession: Session = {
-  user: {
-    id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
-    name: 'John Doe',
-    email: 'johndoe@test.com',
-  },
+  id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
   expires: '0123456789',
 }
 
