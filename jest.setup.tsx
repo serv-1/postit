@@ -6,6 +6,7 @@ import server from './mocks/server'
 beforeAll(() => server.listen())
 afterEach(() => {
   server.resetHandlers()
+  jest.clearAllMocks()
   jest.resetAllMocks()
 })
 afterAll(() => server.close())
