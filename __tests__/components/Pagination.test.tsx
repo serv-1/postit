@@ -4,35 +4,27 @@ import userEvent from '@testing-library/user-event'
 
 const setCurrentPage = jest.fn()
 
-const pagination = (totalPages: number, currentPage: number) => {
-  return (
+test('nothing render if there is no pages', () => {
+  render(
     <Pagination
-      totalPages={totalPages}
-      currentPage={currentPage}
+      totalPages={0}
+      currentPage={1}
       setCurrentPage={setCurrentPage}
     />
   )
-}
-
-const factory = (totalPages = 20, currentPage = 1) => {
-  const { rerender: rerenderRTL } = render(pagination(totalPages, currentPage))
-
-  const rerender = (totalPages: number, currentPage: number) => {
-    rerenderRTL(pagination(totalPages, currentPage))
-  }
-
-  return rerender
-}
-
-test('nothing render if there is no pages', () => {
-  factory(0)
 
   const navigation = screen.queryByRole('navigation')
   expect(navigation).not.toBeInTheDocument()
 })
 
 test('everything render correctly', () => {
-  factory(20, 10)
+  render(
+    <Pagination
+      totalPages={20}
+      currentPage={10}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   const firstPage = screen.getByRole('link', { name: /first/i })
   expect(firstPage).toBeInTheDocument()
@@ -61,55 +53,109 @@ test('everything render correctly', () => {
 })
 
 test('"first page" link do not render if the current page is lesser than 4', () => {
-  const rerender = factory()
+  const { rerender } = render(
+    <Pagination
+      totalPages={20}
+      currentPage={1}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   let firstPage = screen.queryByRole('link', { name: /first/i })
   expect(firstPage).not.toBeInTheDocument()
 
-  rerender(20, 2)
+  rerender(
+    <Pagination
+      totalPages={20}
+      currentPage={2}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   firstPage = screen.queryByRole('link', { name: /first/i })
   expect(firstPage).not.toBeInTheDocument()
 
-  rerender(20, 3)
+  rerender(
+    <Pagination
+      totalPages={20}
+      currentPage={3}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   firstPage = screen.queryByRole('link', { name: /first/i })
   expect(firstPage).not.toBeInTheDocument()
 })
 
 test('"last page" link do not render if the current page is greater than or equal to the third to last page', () => {
-  const rerender = factory(20, 18)
+  const { rerender } = render(
+    <Pagination
+      totalPages={20}
+      currentPage={18}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   let lastPage = screen.queryByRole('link', { name: /last/i })
   expect(lastPage).not.toBeInTheDocument()
 
-  rerender(20, 19)
+  rerender(
+    <Pagination
+      totalPages={20}
+      currentPage={19}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   lastPage = screen.queryByRole('link', { name: /last/i })
   expect(lastPage).not.toBeInTheDocument()
 
-  rerender(20, 20)
+  rerender(
+    <Pagination
+      totalPages={20}
+      currentPage={20}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   lastPage = screen.queryByRole('link', { name: /last/i })
   expect(lastPage).not.toBeInTheDocument()
 })
 
 test('"previous page" link do not render if the current page is the first page', () => {
-  factory()
+  render(
+    <Pagination
+      totalPages={20}
+      currentPage={1}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   const previousPage = screen.queryByRole('link', { name: /previous/i })
   expect(previousPage).not.toBeInTheDocument()
 })
 
 test('"next page" link do not render if the current page is the last page', () => {
-  factory(20, 20)
+  render(
+    <Pagination
+      totalPages={20}
+      currentPage={20}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   const nextPage = screen.queryByRole('link', { name: /next/i })
   expect(nextPage).not.toBeInTheDocument()
 })
 
 test('there is no additional pages if the current page is lesser than 3', () => {
-  const rerender = factory()
+  const { rerender } = render(
+    <Pagination
+      totalPages={20}
+      currentPage={1}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   const pageMinus1 = screen.queryByRole('link', { name: /-1/i })
   expect(pageMinus1).not.toBeInTheDocument()
@@ -117,19 +163,37 @@ test('there is no additional pages if the current page is lesser than 3', () => 
   let page0 = screen.queryByRole('link', { name: /0/i })
   expect(page0).not.toBeInTheDocument()
 
-  rerender(20, 2)
+  rerender(
+    <Pagination
+      totalPages={20}
+      currentPage={2}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   page0 = screen.queryByRole('link', { name: /0/i })
   expect(page0).not.toBeInTheDocument()
 })
 
 test('there is no additional pages if the current page is greater than the third to last page', () => {
-  const rerender = factory(20, 19)
+  const { rerender } = render(
+    <Pagination
+      totalPages={20}
+      currentPage={19}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   let page21 = screen.queryByRole('link', { name: /21/i })
   expect(page21).not.toBeInTheDocument()
 
-  rerender(20, 20)
+  rerender(
+    <Pagination
+      totalPages={20}
+      currentPage={20}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   page21 = screen.queryByRole('link', { name: /21/i })
   expect(page21).not.toBeInTheDocument()
@@ -139,7 +203,13 @@ test('there is no additional pages if the current page is greater than the third
 })
 
 test('every links update the current page on click', () => {
-  factory(20, 10)
+  render(
+    <Pagination
+      totalPages={20}
+      currentPage={10}
+      setCurrentPage={setCurrentPage}
+    />
+  )
 
   const links = screen.getAllByRole('link')
 

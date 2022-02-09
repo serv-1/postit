@@ -12,17 +12,8 @@ const setFormContext = (isSubmitted: boolean, message?: string) => ({
 
 beforeEach(() => useFormContext.mockReturnValue(setFormContext(false)))
 
-const factory = (showRules?: boolean, showForgotPasswordLink?: boolean) => {
-  render(
-    <FormPasswordField
-      showForgotPasswordLink={showForgotPasswordLink}
-      showRules={showRules}
-    />
-  )
-}
-
 test('the forgot password link and the password rules render', () => {
-  factory(true, true)
+  render(<FormPasswordField showForgotPasswordLink showRules />)
 
   const link = screen.getByRole('link')
   expect(link).toBeInTheDocument()
@@ -32,7 +23,7 @@ test('the forgot password link and the password rules render', () => {
 })
 
 test('the forgot password link and the password rules do no render', () => {
-  factory(false, false)
+  render(<FormPasswordField />)
 
   const link = screen.queryByRole('link')
   expect(link).not.toBeInTheDocument()

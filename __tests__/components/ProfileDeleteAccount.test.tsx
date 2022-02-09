@@ -13,19 +13,16 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const signOut = jest.spyOn(require('next-auth/react'), 'signOut')
-signOut.mockResolvedValue({ url: '/' })
 
-const factory = () => {
+beforeEach(() => signOut.mockResolvedValue({ url: '/' }))
+
+test('the user is signed out and redirected to the home page after being deleted', async () => {
   render(
     <ToastProvider>
       <ProfileDeleteAccount id={mockSession.id} />
       <Toast />
     </ToastProvider>
   )
-}
-
-test('the user is signed out and redirected to the home page after being deleted', async () => {
-  factory()
 
   const openModalBtn = screen.getByRole('button')
   userEvent.click(openModalBtn)
@@ -40,7 +37,12 @@ test('the user is signed out and redirected to the home page after being deleted
 })
 
 test('the cancel button closes the modal', () => {
-  factory()
+  render(
+    <ToastProvider>
+      <ProfileDeleteAccount id={mockSession.id} />
+      <Toast />
+    </ToastProvider>
+  )
 
   const openModalBtn = screen.getByRole('button')
   userEvent.click(openModalBtn)
@@ -59,7 +61,12 @@ test('an error renders if the server fails to delete the user', async () => {
     })
   )
 
-  factory()
+  render(
+    <ToastProvider>
+      <ProfileDeleteAccount id={mockSession.id} />
+      <Toast />
+    </ToastProvider>
+  )
 
   const openModalBtn = screen.getByRole('button')
   userEvent.click(openModalBtn)

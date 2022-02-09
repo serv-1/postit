@@ -2,18 +2,14 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Modal from '../../components/Modal'
 
-const setIsModalOpen = jest.fn()
+test('the modal renders and can be closed', () => {
+  const setIsModalOpen = jest.fn()
 
-const factory = () => {
   render(
     <Modal title={'This is a super modal!'} setIsModalOpen={setIsModalOpen}>
-      <a href="#">Super modal !</a>
+      <a href="#">Modality</a>
     </Modal>
   )
-}
-
-test('the modal renders and can be closed', () => {
-  factory()
 
   const title = screen.getByRole('heading')
   expect(title).toHaveTextContent('This is a super modal!')

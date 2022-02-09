@@ -11,14 +11,10 @@ afterAll(() => server.close())
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 
-const factory = () => {
-  render(<ForgotPassword />)
-}
-
 beforeEach(() => signIn.mockResolvedValue({ error: '' }))
 
 test("the form sends a mail for the user to sign in which redirect him to it's profile", async () => {
-  factory()
+  render(<ForgotPassword />)
 
   const input = screen.getByRole('textbox')
   userEvent.type(input, 'johndoe@test.com')
@@ -42,7 +38,7 @@ test('an error renders if the server fails to verify the user email', async () =
     })
   )
 
-  factory()
+  render(<ForgotPassword />)
 
   const input = screen.getByRole('textbox')
   userEvent.type(input, 'johndoe@test.com')

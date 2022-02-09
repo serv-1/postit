@@ -11,12 +11,8 @@ const setFormContext = (isSubmitted: boolean, message?: string) => ({
 
 beforeEach(() => useFormContext.mockReturnValue(setFormContext(true, 'Error')))
 
-const factory = () => {
-  render(<InputError inputName="email" />)
-}
-
 test('the alert renders if the form is submitted an there is an error', () => {
-  factory()
+  render(<InputError inputName="email" />)
 
   const alert = screen.getByRole('alert')
   expect(alert).toHaveTextContent('Error')
@@ -26,7 +22,7 @@ test('the alert renders if the form is submitted an there is an error', () => {
 test('the alert does no render if the form is not submitted even if there is an error', () => {
   useFormContext.mockReturnValue(setFormContext(false, 'Error'))
 
-  factory()
+  render(<InputError inputName="email" />)
 
   const alert = screen.queryByRole('alert')
   expect(alert).not.toBeInTheDocument()

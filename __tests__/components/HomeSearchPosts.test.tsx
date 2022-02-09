@@ -17,7 +17,7 @@ const setPosts = jest.fn()
 const setTotalPosts = jest.fn()
 const setTotalPages = jest.fn()
 
-const factory = () => {
+test('the form gets the posts', async () => {
   render(
     <ToastProvider>
       <HomeSearchPosts
@@ -29,10 +29,6 @@ const factory = () => {
       <Toast />
     </ToastProvider>
   )
-}
-
-test('the form gets the posts', async () => {
-  factory()
 
   const queryInput = screen.getByRole('searchbox')
   userEvent.type(queryInput, 'Car')
@@ -68,7 +64,17 @@ test('an error renders if the server fails to get the posts', async () => {
       )
     })
   )
-  factory()
+  render(
+    <ToastProvider>
+      <HomeSearchPosts
+        setPosts={setPosts}
+        setTotalPosts={setTotalPosts}
+        setTotalPages={setTotalPages}
+        currentPage={1}
+      />
+      <Toast />
+    </ToastProvider>
+  )
 
   const queryInput = screen.getByRole('searchbox')
   userEvent.type(queryInput, 'Car')
@@ -91,7 +97,17 @@ test('an error renders if the server fails to validate the data', async () => {
     })
   )
 
-  factory()
+  render(
+    <ToastProvider>
+      <HomeSearchPosts
+        setPosts={setPosts}
+        setTotalPosts={setTotalPosts}
+        setTotalPages={setTotalPages}
+        currentPage={1}
+      />
+      <Toast />
+    </ToastProvider>
+  )
 
   const queryInput = screen.getByRole('searchbox')
   userEvent.type(queryInput, 'Car')

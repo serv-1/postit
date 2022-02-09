@@ -30,15 +30,6 @@ const mockProviders: MockProvider = {
   credentials: createProvider('credentials'),
 }
 
-const factory = (providers: MockProvider = null) => {
-  render(
-    <ToastProvider>
-      <SignIn providers={providers} />
-      <Toast />
-    </ToastProvider>
-  )
-}
-
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const router = { push: jest.fn() }
@@ -46,7 +37,12 @@ const router = { push: jest.fn() }
 beforeEach(() => useRouter.mockReturnValue(router))
 
 test("the form signs in the user and redirect him to it's profile", async () => {
-  factory()
+  render(
+    <ToastProvider>
+      <SignIn providers={null} />
+      <Toast />
+    </ToastProvider>
+  )
 
   const emailInput = screen.getByRole('textbox')
   userEvent.type(emailInput, 'johndoe@test.com')
@@ -66,7 +62,12 @@ test("the form signs in the user and redirect him to it's profile", async () => 
 test('an error renders if the server fails to sign in the user', async () => {
   signIn.mockResolvedValueOnce({ error: 'Error' })
 
-  factory()
+  render(
+    <ToastProvider>
+      <SignIn providers={null} />
+      <Toast />
+    </ToastProvider>
+  )
 
   const emailInput = screen.getByRole('textbox')
   userEvent.type(emailInput, 'johndoe@test.com')
@@ -85,7 +86,12 @@ test('an error renders if the server fails to sign in the user', async () => {
 test('an error renders if the server fails to validate the request data', async () => {
   signIn.mockResolvedValueOnce({ error: err.EMAIL_INVALID })
 
-  factory()
+  render(
+    <ToastProvider>
+      <SignIn providers={null} />
+      <Toast />
+    </ToastProvider>
+  )
 
   const emailInput = screen.getByRole('textbox')
   userEvent.type(emailInput, 'johndoe@test.com')
@@ -103,7 +109,12 @@ test('an error renders if the server fails to validate the request data', async 
 })
 
 test('the providers render', () => {
-  factory(mockProviders)
+  render(
+    <ToastProvider>
+      <SignIn providers={mockProviders} />
+      <Toast />
+    </ToastProvider>
+  )
 
   const googleBtn = screen.getByRole('button', { name: /google/i })
   expect(googleBtn).toBeInTheDocument()

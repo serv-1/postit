@@ -24,17 +24,13 @@ const router = { push: jest.fn() }
 
 beforeEach(() => useRouter.mockReturnValue(router))
 
-const factory = () => {
+test("the user is redirected to it's profile after a valid submission", async () => {
   render(
     <ToastProvider>
       <CreateAPost />
       <Toast />
     </ToastProvider>
   )
-}
-
-test("the user is redirected to it's profile after a valid submission", async () => {
-  factory()
 
   await screen.findByTestId('csrfToken')
 
@@ -62,7 +58,12 @@ test("the user is redirected to it's profile after a valid submission", async ()
 })
 
 test('an error renders for the images field if an image is invalid', async () => {
-  factory()
+  render(
+    <ToastProvider>
+      <CreateAPost />
+      <Toast />
+    </ToastProvider>
+  )
 
   await screen.findByTestId('csrfToken')
 
@@ -89,7 +90,12 @@ test('an error renders for the images field if an image is invalid', async () =>
 })
 
 test('an error renders for the images field if an image is too large', async () => {
-  factory()
+  render(
+    <ToastProvider>
+      <CreateAPost />
+      <Toast />
+    </ToastProvider>
+  )
 
   await screen.findByTestId('csrfToken')
 
@@ -123,7 +129,12 @@ test('an error renders if the server fails to create the post', async () => {
     })
   )
 
-  factory()
+  render(
+    <ToastProvider>
+      <CreateAPost />
+      <Toast />
+    </ToastProvider>
+  )
 
   await screen.findByTestId('csrfToken')
 
@@ -159,7 +170,12 @@ test('an error renders if the server fails to validate the request data', async 
     })
   )
 
-  factory()
+  render(
+    <ToastProvider>
+      <CreateAPost />
+      <Toast />
+    </ToastProvider>
+  )
 
   await screen.findByTestId('csrfToken')
 

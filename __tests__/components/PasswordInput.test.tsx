@@ -17,17 +17,13 @@ const setFormContext = (isSubmitted: boolean = false, error?: string) => ({
 
 beforeEach(() => useFormContext.mockReturnValue(setFormContext()))
 
-const factory = (showStrength?: boolean, hasRules?: boolean) => {
+test('the open eye button and the input render', () => {
   render(
     <>
       <Label htmlFor="password" labelText="Password" />
-      <PasswordInput showStrength={showStrength} hasRules={hasRules} />
+      <PasswordInput showStrength hasRules />
     </>
   )
-}
-
-test('the open eye button and the input render', () => {
-  factory(true, true)
 
   const btn = screen.getByRole('button')
   expect(btn).toHaveAccessibleName(/show/i)
@@ -47,7 +43,12 @@ test('the open eye button and the input render', () => {
 })
 
 test('the eye button shows the password', () => {
-  factory()
+  render(
+    <>
+      <Label htmlFor="password" labelText="Password" />
+      <PasswordInput />
+    </>
+  )
 
   const btn = screen.getByRole('button')
 
@@ -70,7 +71,12 @@ test('the eye button shows the password', () => {
 test('the eye button border is red if the form is Submitted and there is an error', () => {
   useFormContext.mockReturnValue(setFormContext(true, 'error'))
 
-  factory()
+  render(
+    <>
+      <Label htmlFor="password" labelText="Password" />
+      <PasswordInput />
+    </>
+  )
 
   const btn = screen.getByRole('button')
   expect(btn).toHaveClass('border-danger')
@@ -80,7 +86,12 @@ test('the eye button border is red if the form is Submitted and there is an erro
 test('the eye button border is green if the form is Submitted and there is no error', () => {
   useFormContext.mockReturnValue(setFormContext(true))
 
-  factory()
+  render(
+    <>
+      <Label htmlFor="password" labelText="Password" />
+      <PasswordInput />
+    </>
+  )
 
   const btn = screen.getByRole('button')
   expect(btn).toHaveClass('border-success')
@@ -88,7 +99,12 @@ test('the eye button border is green if the form is Submitted and there is no er
 })
 
 test("the password strength renders and take into account the other fields' values", () => {
-  factory(true)
+  render(
+    <>
+      <Label htmlFor="password" labelText="Password" />
+      <PasswordInput showStrength />
+    </>
+  )
 
   const input = screen.getByLabelText(/^password$/i)
   const redDot = screen.getByTestId('redDot')

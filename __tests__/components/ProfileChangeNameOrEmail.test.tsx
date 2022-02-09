@@ -12,17 +12,17 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const factory = (type: 'name' | 'email', value?: string) => {
+test('the user name/email and the form renders correctly', async () => {
   render(
     <ToastProvider>
-      <ProfileChangeNameOrEmail type={type} id={mockSession.id} value={value} />
+      <ProfileChangeNameOrEmail
+        type="name"
+        id={mockSession.id}
+        value="John Doe"
+      />
       <Toast />
     </ToastProvider>
   )
-}
-
-test('the user name/email and the form renders correctly', async () => {
-  factory('name', 'John Doe')
 
   const name = screen.getByText('John Doe')
   expect(name).toBeInTheDocument()
@@ -42,7 +42,12 @@ test('the user name/email and the form renders correctly', async () => {
 })
 
 test('an input with an email type renders', async () => {
-  factory('email')
+  render(
+    <ToastProvider>
+      <ProfileChangeNameOrEmail type="email" id={mockSession.id} />
+      <Toast />
+    </ToastProvider>
+  )
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)
@@ -54,7 +59,16 @@ test('an input with an email type renders', async () => {
 })
 
 test('the cancel button cancels the editing process', async () => {
-  factory('name', 'John Doe')
+  render(
+    <ToastProvider>
+      <ProfileChangeNameOrEmail
+        type="name"
+        id={mockSession.id}
+        value="John Doe"
+      />
+      <Toast />
+    </ToastProvider>
+  )
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)
@@ -72,7 +86,16 @@ test('the cancel button cancels the editing process', async () => {
 })
 
 test('an alert renders if the user name/email is updated and the new user name/email renders', async () => {
-  factory('name', 'John Doe')
+  render(
+    <ToastProvider>
+      <ProfileChangeNameOrEmail
+        type="name"
+        id={mockSession.id}
+        value="John Doe"
+      />
+      <Toast />
+    </ToastProvider>
+  )
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)
@@ -93,7 +116,16 @@ test('an alert renders if the user name/email is updated and the new user name/e
 })
 
 test('the user name/email does not update if it has not change', async () => {
-  factory('name', 'John Doe')
+  render(
+    <ToastProvider>
+      <ProfileChangeNameOrEmail
+        type="name"
+        id={mockSession.id}
+        value="John Doe"
+      />
+      <Toast />
+    </ToastProvider>
+  )
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)
@@ -120,7 +152,16 @@ test('an error renders if the server fails to update the user', async () => {
     })
   )
 
-  factory('name', 'John Doe')
+  render(
+    <ToastProvider>
+      <ProfileChangeNameOrEmail
+        type="name"
+        id={mockSession.id}
+        value="John Doe"
+      />
+      <Toast />
+    </ToastProvider>
+  )
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)

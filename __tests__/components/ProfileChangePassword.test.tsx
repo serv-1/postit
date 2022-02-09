@@ -12,23 +12,17 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const labelText = new RegExp('change your password', 'i')
-
-const factory = () => {
+test('an alert renders if the user password is updated', async () => {
   render(
     <ToastProvider>
       <ProfileChangePassword id={mockSession.id} />
       <Toast />
     </ToastProvider>
   )
-}
-
-test('an alert renders if the user password is updated', async () => {
-  factory()
 
   await screen.findByTestId('csrfToken')
 
-  const input = screen.getByLabelText(labelText)
+  const input = screen.getByLabelText(/change your password/i)
   userEvent.type(input, 'my new password')
 
   const submitBtn = screen.getByRole('button', { name: /change/i })
@@ -45,11 +39,16 @@ test('an error renders if the server fails to update the user', async () => {
     })
   )
 
-  factory()
+  render(
+    <ToastProvider>
+      <ProfileChangePassword id={mockSession.id} />
+      <Toast />
+    </ToastProvider>
+  )
 
   await screen.findByTestId('csrfToken')
 
-  const input = screen.getByLabelText(labelText)
+  const input = screen.getByLabelText(/change your password/i)
   userEvent.type(input, 'pw')
 
   const submitBtn = screen.getByRole('button', { name: /change/i })

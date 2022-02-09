@@ -1,54 +1,45 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useEffect } from 'react'
 import Toast from '../../components/Toast'
-import { ToastState } from '../../contexts/toast'
-import { ToastProvider, useToast } from '../../contexts/toast'
 
-const defaultToast = { message: 'My toast!' }
+const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
-const Toaster = ({ message, background }: ToastState) => {
-  const { setToast } = useToast()
+test('the alert renders and is removed on click on the close button', async () => {
+  const setToast = jest.fn()
+  useToast.mockReturnValue({ toast: { message: 'My toast' }, setToast })
 
-  useEffect(() => {
-    setToast({ message, background })
-  }, [setToast, message, background])
-
-  return <Toast />
-}
-
-const factory = ({ message, background }: ToastState = defaultToast) => {
-  render(
-    <ToastProvider>
-      <Toaster message={message} background={background} />
-    </ToastProvider>
-  )
-}
-
-test('the alert renders and if the close button is clicked the alert disappears', () => {
-  factory()
+  render(<Toast />)
 
   let alert: HTMLElement | null = screen.getByRole('alert')
-  expect(alert).toHaveTextContent(defaultToast.message)
+  expect(alert).toHaveTextContent('My toast')
   expect(alert).toHaveClass('bg-primary', 'text-white')
 
   const closeBtn = screen.getByRole('button')
   expect(closeBtn).toHaveClass('btn-close-white')
 
   userEvent.click(closeBtn)
-  alert = screen.queryByRole('alert')
-  expect(alert).not.toBeInTheDocument()
+
+  await waitFor(() => {
+    expect(setToast).toHaveBeenCalledTimes(1)
+    expect(setToast).toHaveBeenCalledWith({ message: null })
+  })
 })
 
 test('the alert do not render if there is no message to display', () => {
-  factory({ message: null })
+  useToast.mockReturnValue({ toast: { message: null } })
+
+  render(<Toast />)
 
   const alert = screen.queryByRole('alert')
   expect(alert).not.toBeInTheDocument()
 })
 
 test('the alert use the given background color with the related text color', () => {
-  factory({ message: defaultToast.message, background: 'white' })
+  useToast.mockReturnValue({
+    toast: { message: 'My toast', background: 'white' },
+  })
+
+  render(<Toast />)
 
   const alert = screen.getByRole('alert')
   expect(alert).toHaveClass('bg-white')

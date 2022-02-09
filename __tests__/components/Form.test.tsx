@@ -23,22 +23,18 @@ const methods = {
   register: (name: string) => ({ name }),
 } as unknown as UseFormReturn
 
-const factory = (needCsrfToken?: boolean) => {
+test('the form renders', async () => {
   render(
     <Form
       name="register"
       method="post"
       submitHandlers={submitHandlers}
       methods={methods}
-      needCsrfToken={needCsrfToken}
+      needCsrfToken
     >
       <input type="submit" />
     </Form>
   )
-}
-
-test('the form renders', async () => {
-  factory(true)
 
   const form = screen.getByRole('form')
   expect(form).toHaveAttribute('name', 'register')
@@ -55,7 +51,16 @@ test('the form renders', async () => {
 })
 
 test('the csrfToken input does not renders', () => {
-  factory()
+  render(
+    <Form
+      name="register"
+      method="post"
+      submitHandlers={submitHandlers}
+      methods={methods}
+    >
+      <input type="submit" />
+    </Form>
+  )
 
   const csrfToken = screen.queryByTestId('csrfToken')
   expect(csrfToken).not.toBeInTheDocument()

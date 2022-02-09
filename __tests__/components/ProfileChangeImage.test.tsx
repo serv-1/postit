@@ -14,24 +14,25 @@ afterAll(() => server.close())
 
 const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
 
-const factory = (image?: string) => {
+test('no image renders if there is no image', () => {
   render(
     <ToastProvider>
-      <ProfileChangeImage id={mockSession.id} image={image} />
+      <ProfileChangeImage id={mockSession.id} />
       <Toast />
     </ToastProvider>
   )
-}
-
-test('no image renders if there is no image', () => {
-  factory()
 
   const img = screen.queryByRole('img')
   expect(img).not.toBeInTheDocument()
 })
 
 test('the button trigger a click on the file input', () => {
-  factory()
+  render(
+    <ToastProvider>
+      <ProfileChangeImage id={mockSession.id} />
+      <Toast />
+    </ToastProvider>
+  )
 
   const input = screen.getByTestId('fileInput')
   const click = jest.fn()
@@ -43,7 +44,12 @@ test('the button trigger a click on the file input', () => {
 })
 
 test('an alert renders if the user image is updated and the new user image renders', async () => {
-  factory('base64Uri')
+  render(
+    <ToastProvider>
+      <ProfileChangeImage id={mockSession.id} image="base64Uri" />
+      <Toast />
+    </ToastProvider>
+  )
 
   const oldImg = screen.getByRole('img')
   const oldSrc = oldImg.getAttribute('src')
@@ -63,7 +69,12 @@ test('an alert renders if the user image is updated and the new user image rende
 })
 
 test('an error renders if the user image is invalid', async () => {
-  factory()
+  render(
+    <ToastProvider>
+      <ProfileChangeImage id={mockSession.id} />
+      <Toast />
+    </ToastProvider>
+  )
 
   const input = screen.getByTestId('fileInput')
   const textFile = new File(['text'], 'text.txt', { type: 'text/plain' })
@@ -89,7 +100,12 @@ test('an error renders if the server fails to update the user image', async () =
     })
   )
 
-  factory()
+  render(
+    <ToastProvider>
+      <ProfileChangeImage id={mockSession.id} />
+      <Toast />
+    </ToastProvider>
+  )
 
   const input = screen.getByTestId('fileInput')
   userEvent.upload(input, file)

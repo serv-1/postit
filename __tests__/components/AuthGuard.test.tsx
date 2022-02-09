@@ -1,36 +1,31 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { Session } from 'next-auth'
-import { SessionProvider } from 'next-auth/react'
 import AuthGuard from '../../components/AuthGuard'
-import { mockSession } from '../../mocks/nextAuth'
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
-
-const factory = (session?: Session | null) => {
-  return render(
-    <SessionProvider session={session}>
-      <AuthGuard>
-        <h1>Welcome!</h1>
-      </AuthGuard>
-    </SessionProvider>
-  )
-}
+const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
 
 test('the AuthGuard redirects unauthenticated user', async () => {
-  factory(null)
+  useSession.mockReturnValue({ status: 'unauthenticated' })
+
+  render(<AuthGuard>Authorized!</AuthGuard>)
+
   await waitFor(() => expect(signIn).toHaveBeenCalledTimes(1))
 })
 
 test('the loading state renders', async () => {
-  factory()
+  useSession.mockReturnValue({ status: 'loading' })
+
+  render(<AuthGuard>Authorized!</AuthGuard>)
 
   const loadingState = screen.getByText(/loading/i)
   expect(loadingState).toBeInTheDocument()
 })
 
 test('the child component renders', () => {
-  factory(mockSession)
+  useSession.mockReturnValue({ status: 'authenticated' })
 
-  const child = screen.getByRole('heading')
+  render(<AuthGuard>Authorized!</AuthGuard>)
+
+  const child = screen.getByText(/authorized/i)
   expect(child).toBeInTheDocument()
 })

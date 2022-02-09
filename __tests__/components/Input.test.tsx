@@ -22,22 +22,17 @@ beforeEach(() => useFormContext.mockReturnValue(setFormContext(false)))
 const handleChange = jest.fn()
 const handleBlur = jest.fn()
 
-const factory = (needFocus: boolean = false, isTextArea: boolean = false) => {
+test('the input renders', () => {
   render(
     <Input
       type="text"
       name="username"
       onChange={handleChange}
       onBlur={handleBlur}
-      needFocus={needFocus}
-      isTextArea={isTextArea}
+      needFocus
       className="red"
     />
   )
-}
-
-test('the input renders', () => {
-  factory(true)
 
   const input = screen.getByRole('textbox')
   expect(input).toHaveAttribute('id', 'username')
@@ -56,14 +51,28 @@ test('the input renders', () => {
 })
 
 test('the textarea renders', () => {
-  factory(false, true)
+  render(
+    <Input
+      name="username"
+      onChange={handleChange}
+      onBlur={handleBlur}
+      isTextArea
+    />
+  )
 
   const textarea = screen.getByRole('textbox')
   expect(textarea.tagName).toBe('TEXTAREA')
 })
 
 test('the input do not have the focus', () => {
-  factory()
+  render(
+    <Input
+      type="text"
+      name="username"
+      onChange={handleChange}
+      onBlur={handleBlur}
+    />
+  )
 
   expect(setFocus).not.toHaveBeenCalled()
 })
@@ -71,7 +80,14 @@ test('the input do not have the focus', () => {
 test('the input have is-invalid class if the form is submitted and there is an error', () => {
   useFormContext.mockReturnValueOnce(setFormContext(true, 'Error'))
 
-  factory()
+  render(
+    <Input
+      type="text"
+      name="username"
+      onChange={handleChange}
+      onBlur={handleBlur}
+    />
+  )
 
   const input = screen.getByRole('textbox')
   expect(input).toHaveClass('is-invalid')
@@ -81,7 +97,14 @@ test('the input have is-invalid class if the form is submitted and there is an e
 test('the input have is-valid class if the form is submitted and there is no error', () => {
   useFormContext.mockReturnValueOnce(setFormContext(true))
 
-  factory()
+  render(
+    <Input
+      type="text"
+      name="username"
+      onChange={handleChange}
+      onBlur={handleBlur}
+    />
+  )
 
   const input = screen.getByRole('textbox')
   expect(input).toHaveClass('is-valid')

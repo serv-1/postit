@@ -20,17 +20,13 @@ beforeEach(() => {
   useRouter.mockReturnValue(router)
 })
 
-const factory = () => {
+test("the form registers the user, sends him a mail, signs in him and redirects him to it's profile", async () => {
   render(
     <ToastProvider>
       <Register />
       <Toast />
     </ToastProvider>
   )
-}
-
-test("the form registers the user, sends him a mail, signs in him and redirects him to it's profile", async () => {
-  factory()
 
   const nameInput = screen.getByLabelText(/name/i)
   userEvent.type(nameInput, 'John Doe')
@@ -59,7 +55,12 @@ test("the form registers the user, sends him a mail, signs in him and redirects 
 test('the forms redirects the user to the sign in page if it fails to do it', async () => {
   signIn.mockResolvedValue({ error: 'Error' })
 
-  factory()
+  render(
+    <ToastProvider>
+      <Register />
+      <Toast />
+    </ToastProvider>
+  )
 
   const nameInput = screen.getByLabelText(/name/i)
   expect(nameInput).toHaveFocus()
@@ -87,7 +88,12 @@ test('an error renders if the server fails to register the user', async () => {
     })
   )
 
-  factory()
+  render(
+    <ToastProvider>
+      <Register />
+      <Toast />
+    </ToastProvider>
+  )
 
   const nameInput = screen.getByLabelText(/name/i)
   userEvent.type(nameInput, 'John Doe')
@@ -116,7 +122,12 @@ test('an error renders if the server fails to validate the request data', async 
     })
   )
 
-  factory()
+  render(
+    <ToastProvider>
+      <Register />
+      <Toast />
+    </ToastProvider>
+  )
 
   const nameInput = screen.getByLabelText(/name/i)
   userEvent.type(nameInput, 'John Doe')

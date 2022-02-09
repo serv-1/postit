@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react'
 import Header from '../../components/Header'
 import Toast from '../../components/Toast'
 import { ToastProvider } from '../../contexts/toast'
-// import { mockResponse } from '../../lib/msw'
 import { mockSession } from '../../mocks/nextAuth'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
@@ -20,17 +19,13 @@ beforeEach(() => {
   useRouter.mockReturnValue({ pathname: '/' })
 })
 
-const factory = () => {
+test('nothing render while the session is loading', () => {
   render(
     <ToastProvider>
       <Header />
       <Toast />
     </ToastProvider>
   )
-}
-
-test('nothing render while the session is loading', () => {
-  factory()
 
   const list = screen.getByRole('list')
   expect(list).toBeEmptyDOMElement()
@@ -39,7 +34,12 @@ test('nothing render while the session is loading', () => {
 test('the user image loads then renders if the user is authenticated', async () => {
   useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
 
-  factory()
+  render(
+    <ToastProvider>
+      <Header />
+      <Toast />
+    </ToastProvider>
+  )
 
   const spinner = screen.getByRole('status')
   expect(spinner).toBeInTheDocument()
@@ -50,7 +50,6 @@ test('the user image loads then renders if the user is authenticated', async () 
 
 test("if the user is on it's profile the dropdown menu does not render but the sign out link renders", () => {
   server.use(
-    // mockResponse('get', '/api/users/:id', 404, { message: err.USER_NOT_FOUND })
     rest.get('http://localhost:3000/api/users/:id', (req, res, ctx) => {
       return res(ctx.status(404), ctx.json({ message: err.USER_NOT_FOUND }))
     })
@@ -59,7 +58,12 @@ test("if the user is on it's profile the dropdown menu does not render but the s
   useRouter.mockReturnValue({ pathname: '/profile' })
   useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
 
-  factory()
+  render(
+    <ToastProvider>
+      <Header />
+      <Toast />
+    </ToastProvider>
+  )
 
   const signOutLink = screen.getByRole('link', { name: /sign out/i })
   expect(signOutLink).toBeInTheDocument()
@@ -74,7 +78,6 @@ test("if the user is on it's profile the dropdown menu does not render but the s
 
 test('an error renders if the server fails to fetch the user image', async () => {
   server.use(
-    // mockResponse('get', '/api/users/:id', 404, { message: err.USER_NOT_FOUND })
     rest.get('http://localhost:3000/api/users/:id', (req, res, ctx) => {
       return res(ctx.status(404), ctx.json({ message: err.USER_NOT_FOUND }))
     })
@@ -82,7 +85,12 @@ test('an error renders if the server fails to fetch the user image', async () =>
 
   useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
 
-  factory()
+  render(
+    <ToastProvider>
+      <Header />
+      <Toast />
+    </ToastProvider>
+  )
 
   const toast = await screen.findByRole('alert')
   expect(toast).toHaveTextContent(err.USER_NOT_FOUND)
@@ -95,7 +103,12 @@ test('an error renders if the server fails to fetch the user image', async () =>
 test('the sign in link renders when the user is unauthenticated', () => {
   useSession.mockReturnValue({ data: null, status: 'unauthenticated' })
 
-  factory()
+  render(
+    <ToastProvider>
+      <Header />
+      <Toast />
+    </ToastProvider>
+  )
 
   const signInLink = screen.getByRole('link', { name: /sign in/i })
   expect(signInLink).toBeInTheDocument()
