@@ -3,8 +3,6 @@ import { mockSession } from '../../mocks/nextAuth'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
-import { ToastProvider } from '../../contexts/toast'
-import Toast from '../../components/Toast'
 import server from '../../mocks/server'
 import { rest } from 'msw'
 
@@ -12,16 +10,17 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
+const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+
+beforeEach(() => useToast.mockReturnValue({}))
+
 test('the user name/email and the form renders correctly', async () => {
   render(
-    <ToastProvider>
-      <ProfileChangeNameOrEmail
-        type="name"
-        id={mockSession.id}
-        value="John Doe"
-      />
-      <Toast />
-    </ToastProvider>
+    <ProfileChangeNameOrEmail
+      type="name"
+      id={mockSession.id}
+      value="John Doe"
+    />
   )
 
   const name = screen.getByText('John Doe')
@@ -42,12 +41,7 @@ test('the user name/email and the form renders correctly', async () => {
 })
 
 test('an input with an email type renders', async () => {
-  render(
-    <ToastProvider>
-      <ProfileChangeNameOrEmail type="email" id={mockSession.id} />
-      <Toast />
-    </ToastProvider>
-  )
+  render(<ProfileChangeNameOrEmail type="email" id={mockSession.id} />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)
@@ -60,14 +54,11 @@ test('an input with an email type renders', async () => {
 
 test('the cancel button cancels the editing process', async () => {
   render(
-    <ToastProvider>
-      <ProfileChangeNameOrEmail
-        type="name"
-        id={mockSession.id}
-        value="John Doe"
-      />
-      <Toast />
-    </ToastProvider>
+    <ProfileChangeNameOrEmail
+      type="name"
+      id={mockSession.id}
+      value="John Doe"
+    />
   )
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
@@ -86,15 +77,16 @@ test('the cancel button cancels the editing process', async () => {
 })
 
 test('an alert renders if the user name/email is updated and the new user name/email renders', async () => {
+  type Update = { message: string; background: string }
+  const setToast = jest.fn((update: Update) => update.background)
+  useToast.mockReturnValue({ setToast })
+
   render(
-    <ToastProvider>
-      <ProfileChangeNameOrEmail
-        type="name"
-        id={mockSession.id}
-        value="John Doe"
-      />
-      <Toast />
-    </ToastProvider>
+    <ProfileChangeNameOrEmail
+      type="name"
+      id={mockSession.id}
+      value="John Doe"
+    />
   )
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
@@ -111,20 +103,19 @@ test('an alert renders if the user name/email is updated and the new user name/e
   const name = await screen.findByText('John Doe' + ' edited')
   expect(name).toBeInTheDocument()
 
-  const toast = screen.getByRole('alert')
-  expect(toast).toHaveClass('bg-success')
+  await waitFor(() => expect(setToast).toHaveNthReturnedWith(1, 'success'))
 })
 
 test('the user name/email does not update if it has not change', async () => {
+  const setToast = jest.fn()
+  useToast.mockReturnValue({ setToast })
+
   render(
-    <ToastProvider>
-      <ProfileChangeNameOrEmail
-        type="name"
-        id={mockSession.id}
-        value="John Doe"
-      />
-      <Toast />
-    </ToastProvider>
+    <ProfileChangeNameOrEmail
+      type="name"
+      id={mockSession.id}
+      value="John Doe"
+    />
   )
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
@@ -141,8 +132,7 @@ test('the user name/email does not update if it has not change', async () => {
 
   await screen.findByText('John Doe')
 
-  const toast = screen.queryByRole('alert')
-  expect(toast).not.toBeInTheDocument()
+  await waitFor(() => expect(setToast).not.toHaveBeenCalled())
 })
 
 test('an error renders if the server fails to update the user', async () => {
@@ -153,14 +143,11 @@ test('an error renders if the server fails to update the user', async () => {
   )
 
   render(
-    <ToastProvider>
-      <ProfileChangeNameOrEmail
-        type="name"
-        id={mockSession.id}
-        value="John Doe"
-      />
-      <Toast />
-    </ToastProvider>
+    <ProfileChangeNameOrEmail
+      type="name"
+      id={mockSession.id}
+      value="John Doe"
+    />
   )
 
   const editBtn = screen.getByRole('button', { name: /edit/i })

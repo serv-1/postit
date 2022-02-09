@@ -15,9 +15,9 @@ const setFormContext = (isSubmitted: boolean = false, error?: string) => ({
   formState: { isSubmitted, errors: error ? { password: error } : {} },
 })
 
-beforeEach(() => useFormContext.mockReturnValue(setFormContext()))
-
 test('the open eye button and the input render', () => {
+  useFormContext.mockReturnValue(setFormContext())
+
   render(
     <>
       <Label htmlFor="password" labelText="Password" />
@@ -43,6 +43,8 @@ test('the open eye button and the input render', () => {
 })
 
 test('the eye button shows the password', () => {
+  useFormContext.mockReturnValue(setFormContext())
+
   render(
     <>
       <Label htmlFor="password" labelText="Password" />
@@ -99,6 +101,8 @@ test('the eye button border is green if the form is Submitted and there is no er
 })
 
 test("the password strength renders and take into account the other fields' values", () => {
+  useFormContext.mockReturnValue(setFormContext())
+
   render(
     <>
       <Label htmlFor="password" labelText="Password" />

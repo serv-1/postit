@@ -17,12 +17,12 @@ const setFormContext = (isSubmitted: boolean, message?: string) => ({
   setFocus,
 })
 
-beforeEach(() => useFormContext.mockReturnValue(setFormContext(false)))
-
 const handleChange = jest.fn()
 const handleBlur = jest.fn()
 
 test('the input renders', () => {
+  useFormContext.mockReturnValue(setFormContext(false))
+
   render(
     <Input
       type="text"
@@ -46,11 +46,12 @@ test('the input renders', () => {
   userEvent.tab()
   expect(handleBlur).toHaveBeenCalledTimes(1)
 
-  expect(setFocus).toHaveBeenCalledWith('username')
-  expect(setFocus).toHaveBeenCalledTimes(1)
+  expect(setFocus).toHaveBeenNthCalledWith(1, 'username')
 })
 
 test('the textarea renders', () => {
+  useFormContext.mockReturnValue(setFormContext(false))
+
   render(
     <Input
       name="username"
@@ -65,6 +66,8 @@ test('the textarea renders', () => {
 })
 
 test('the input do not have the focus', () => {
+  useFormContext.mockReturnValue(setFormContext(false))
+
   render(
     <Input
       type="text"

@@ -2,8 +2,6 @@ import Register from '../../pages/register'
 import { screen, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
-import { ToastProvider } from '../../contexts/toast'
-import Toast from '../../components/Toast'
 import server from '../../mocks/server'
 import { rest } from 'msw'
 
@@ -12,21 +10,18 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
+const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const router = { push: jest.fn() }
 
 beforeEach(() => {
   signIn.mockResolvedValue({ error: '' })
+  useToast.mockReturnValue({})
   useRouter.mockReturnValue(router)
 })
 
 test("the form registers the user, sends him a mail, signs in him and redirects him to it's profile", async () => {
-  render(
-    <ToastProvider>
-      <Register />
-      <Toast />
-    </ToastProvider>
-  )
+  render(<Register />)
 
   const nameInput = screen.getByLabelText(/name/i)
   userEvent.type(nameInput, 'John Doe')
@@ -47,20 +42,14 @@ test("the form registers the user, sends him a mail, signs in him and redirects 
       redirect: false,
     })
 
-    expect(router.push).toHaveBeenCalledTimes(1)
-    expect(router.push).toHaveBeenCalledWith('/profile')
+    expect(router.push).toHaveBeenNthCalledWith(1, '/profile')
   })
 })
 
 test('the forms redirects the user to the sign in page if it fails to do it', async () => {
   signIn.mockResolvedValue({ error: 'Error' })
 
-  render(
-    <ToastProvider>
-      <Register />
-      <Toast />
-    </ToastProvider>
-  )
+  render(<Register />)
 
   const nameInput = screen.getByLabelText(/name/i)
   expect(nameInput).toHaveFocus()
@@ -76,24 +65,21 @@ test('the forms redirects the user to the sign in page if it fails to do it', as
   userEvent.click(submitBtn)
 
   await waitFor(() => {
-    expect(router.push).toHaveBeenCalledTimes(1)
-    expect(router.push).toHaveBeenCalledWith('/auth/sign-in')
+    expect(router.push).toHaveBeenNthCalledWith(1, '/auth/sign-in')
   })
 })
 
 test('an error renders if the server fails to register the user', async () => {
+  const setToast = jest.fn()
+  useToast.mockReturnValue({ setToast })
+
   server.use(
     rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
       return res(ctx.status(405), ctx.json({ message: err.METHOD_NOT_ALLOWED }))
     })
   )
 
-  render(
-    <ToastProvider>
-      <Register />
-      <Toast />
-    </ToastProvider>
-  )
+  render(<Register />)
 
   const nameInput = screen.getByLabelText(/name/i)
   userEvent.type(nameInput, 'John Doe')
@@ -107,9 +93,13 @@ test('an error renders if the server fails to register the user', async () => {
   const submitBtn = screen.getByRole('button', { name: /register/i })
   userEvent.click(submitBtn)
 
-  const toast = await screen.findByRole('alert')
-  expect(toast).toHaveTextContent(err.METHOD_NOT_ALLOWED)
-  expect(toast).toHaveClass('bg-danger')
+  // const toast = await screen.findByRole('alert')
+  // expect(toast).toHaveTextContent(err.METHOD_NOT_ALLOWED)
+  // expect(toast).toHaveClass('bg-danger')
+  await waitFor(() => {
+    const toast = { message: err.METHOD_NOT_ALLOWED, background: 'danger' }
+    expect(setToast).toHaveBeenNthCalledWith(1, toast)
+  })
 })
 
 test('an error renders if the server fails to validate the request data', async () => {
@@ -122,12 +112,7 @@ test('an error renders if the server fails to validate the request data', async 
     })
   )
 
-  render(
-    <ToastProvider>
-      <Register />
-      <Toast />
-    </ToastProvider>
-  )
+  render(<Register />)
 
   const nameInput = screen.getByLabelText(/name/i)
   userEvent.type(nameInput, 'John Doe')
@@ -143,5 +128,4 @@ test('an error renders if the server fails to validate the request data', async 
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent(err.NAME_REQUIRED)
-  expect(alert).not.toHaveClass('bg-danger')
 })

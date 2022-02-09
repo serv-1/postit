@@ -1,8 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProfileDeleteAccount from '../../components/ProfileDeleteAccount'
-import Toast from '../../components/Toast'
-import { ToastProvider } from '../../contexts/toast'
 import { mockSession } from '../../mocks/nextAuth'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
@@ -13,16 +11,15 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const signOut = jest.spyOn(require('next-auth/react'), 'signOut')
+const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
-beforeEach(() => signOut.mockResolvedValue({ url: '/' }))
+beforeEach(() => {
+  signOut.mockResolvedValue({ url: '/' })
+  useToast.mockReturnValue({})
+})
 
 test('the user is signed out and redirected to the home page after being deleted', async () => {
-  render(
-    <ToastProvider>
-      <ProfileDeleteAccount id={mockSession.id} />
-      <Toast />
-    </ToastProvider>
-  )
+  render(<ProfileDeleteAccount id={mockSession.id} />)
 
   const openModalBtn = screen.getByRole('button')
   userEvent.click(openModalBtn)
@@ -31,18 +28,12 @@ test('the user is signed out and redirected to the home page after being deleted
   userEvent.click(deleteBtn)
 
   await waitFor(() => {
-    expect(signOut).toHaveBeenCalledTimes(1)
-    expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/' })
+    expect(signOut).toHaveBeenNthCalledWith(1, { callbackUrl: '/' })
   })
 })
 
 test('the cancel button closes the modal', () => {
-  render(
-    <ToastProvider>
-      <ProfileDeleteAccount id={mockSession.id} />
-      <Toast />
-    </ToastProvider>
-  )
+  render(<ProfileDeleteAccount id={mockSession.id} />)
 
   const openModalBtn = screen.getByRole('button')
   userEvent.click(openModalBtn)
@@ -55,18 +46,16 @@ test('the cancel button closes the modal', () => {
 })
 
 test('an error renders if the server fails to delete the user', async () => {
+  const setToast = jest.fn()
+  useToast.mockReturnValue({ setToast })
+
   server.use(
     rest.delete('http://localhost:3000/api/users/:id', (req, res, ctx) => {
       return res(ctx.status(422), ctx.json({ message: err.PARAMS_INVALID }))
     })
   )
 
-  render(
-    <ToastProvider>
-      <ProfileDeleteAccount id={mockSession.id} />
-      <Toast />
-    </ToastProvider>
-  )
+  render(<ProfileDeleteAccount id={mockSession.id} />)
 
   const openModalBtn = screen.getByRole('button')
   userEvent.click(openModalBtn)
@@ -74,7 +63,8 @@ test('an error renders if the server fails to delete the user', async () => {
   const deleteBtn = screen.getByRole('button', { name: /^delete$/i })
   userEvent.click(deleteBtn)
 
-  const toast = await screen.findByRole('alert')
-  expect(toast).toHaveTextContent(err.PARAMS_INVALID)
-  expect(toast).toHaveClass('bg-danger')
+  await waitFor(() => {
+    const toast = { message: err.PARAMS_INVALID, background: 'danger' }
+    expect(setToast).toHaveBeenNthCalledWith(1, toast)
+  })
 })

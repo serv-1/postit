@@ -1,8 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import Toast from '../../components/Toast'
 import ProfileChangePassword from '../../components/ProfileChangePassword'
-import { ToastProvider } from '../../contexts/toast'
 import { mockSession } from '../../mocks/nextAuth'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
@@ -12,13 +10,14 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
+const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+
 test('an alert renders if the user password is updated', async () => {
-  render(
-    <ToastProvider>
-      <ProfileChangePassword id={mockSession.id} />
-      <Toast />
-    </ToastProvider>
-  )
+  type Update = { message: string; background: string }
+  const setToast = jest.fn((update: Update) => update.background)
+  useToast.mockReturnValue({ setToast })
+
+  render(<ProfileChangePassword id={mockSession.id} />)
 
   await screen.findByTestId('csrfToken')
 
@@ -28,23 +27,19 @@ test('an alert renders if the user password is updated', async () => {
   const submitBtn = screen.getByRole('button', { name: /change/i })
   userEvent.click(submitBtn)
 
-  const toast = await screen.findByRole('alert')
-  expect(toast).toHaveClass('bg-success')
+  await waitFor(() => expect(setToast).toHaveNthReturnedWith(1, 'success'))
 })
 
 test('an error renders if the server fails to update the user', async () => {
+  useToast.mockReturnValue({})
+
   server.use(
     rest.put('http://localhost:3000/api/users/:id', (req, res, ctx) => {
       return res(ctx.status(422), ctx.json({ message: err.PASSWORD_MIN }))
     })
   )
 
-  render(
-    <ToastProvider>
-      <ProfileChangePassword id={mockSession.id} />
-      <Toast />
-    </ToastProvider>
-  )
+  render(<ProfileChangePassword id={mockSession.id} />)
 
   await screen.findByTestId('csrfToken')
 

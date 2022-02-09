@@ -11,6 +11,5 @@ test('the button renders and open the modal', () => {
   expect(openBtn).toHaveTextContent('Open')
 
   userEvent.click(openBtn)
-  expect(setIsModalOpen).toHaveBeenCalledWith(true)
-  expect(setIsModalOpen).toHaveBeenCalledTimes(1)
+  expect(setIsModalOpen).toHaveBeenNthCalledWith(1, true)
 })

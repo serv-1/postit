@@ -23,8 +23,7 @@ test("the form sends a mail for the user to sign in which redirect him to it's p
   userEvent.click(submitBtn)
 
   await waitFor(() => {
-    expect(signIn).toHaveBeenCalledTimes(1)
-    expect(signIn).toHaveBeenCalledWith('email', {
+    expect(signIn).toHaveBeenNthCalledWith(1, 'email', {
       email: 'johndoe@test.com',
       callbackUrl: 'http://localhost:3000/profile',
     })

@@ -9,9 +9,9 @@ const setFormContext = (isSubmitted: boolean, message?: string) => ({
   setFocus: jest.fn(),
 })
 
-beforeEach(() => useFormContext.mockReturnValue(setFormContext(true, 'Error')))
-
 test('the alert renders if the form is submitted an there is an error', () => {
+  useFormContext.mockReturnValue(setFormContext(true, 'Error'))
+
   render(<InputError inputName="email" />)
 
   const alert = screen.getByRole('alert')

@@ -2,8 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import selectEvent from 'react-select-event'
 import HomeSearchPosts from '../../components/HomeSearchPosts'
-import Toast from '../../components/Toast'
-import { ToastProvider } from '../../contexts/toast'
 import { data } from '../../mocks/posts/search'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
@@ -17,17 +15,18 @@ const setPosts = jest.fn()
 const setTotalPosts = jest.fn()
 const setTotalPages = jest.fn()
 
+const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+
+beforeEach(() => useToast.mockReturnValue({}))
+
 test('the form gets the posts', async () => {
   render(
-    <ToastProvider>
-      <HomeSearchPosts
-        setPosts={setPosts}
-        setTotalPosts={setTotalPosts}
-        setTotalPages={setTotalPages}
-        currentPage={1}
-      />
-      <Toast />
-    </ToastProvider>
+    <HomeSearchPosts
+      setPosts={setPosts}
+      setTotalPosts={setTotalPosts}
+      setTotalPages={setTotalPages}
+      currentPage={1}
+    />
   )
 
   const queryInput = screen.getByRole('searchbox')
@@ -46,16 +45,16 @@ test('the form gets the posts', async () => {
   userEvent.click(submitBtn)
 
   await waitFor(() => {
-    expect(setPosts).toHaveBeenCalledTimes(1)
-    expect(setPosts).toHaveBeenCalledWith(data.posts)
-    expect(setTotalPosts).toHaveBeenCalledTimes(1)
-    expect(setTotalPosts).toHaveBeenCalledWith(data.totalPosts)
-    expect(setTotalPages).toHaveBeenCalledTimes(1)
-    expect(setTotalPages).toHaveBeenCalledWith(data.totalPages)
+    expect(setPosts).toHaveBeenNthCalledWith(1, data.posts)
+    expect(setTotalPosts).toHaveBeenNthCalledWith(1, data.totalPosts)
+    expect(setTotalPages).toHaveBeenNthCalledWith(1, data.totalPages)
   })
 })
 
 test('an error renders if the server fails to get the posts', async () => {
+  const setToast = jest.fn()
+  useToast.mockReturnValue({ setToast })
+
   server.use(
     rest.get('http://localhost:3000/api/posts/search', (req, res, ctx) => {
       return res(
@@ -65,15 +64,12 @@ test('an error renders if the server fails to get the posts', async () => {
     })
   )
   render(
-    <ToastProvider>
-      <HomeSearchPosts
-        setPosts={setPosts}
-        setTotalPosts={setTotalPosts}
-        setTotalPages={setTotalPages}
-        currentPage={1}
-      />
-      <Toast />
-    </ToastProvider>
+    <HomeSearchPosts
+      setPosts={setPosts}
+      setTotalPosts={setTotalPosts}
+      setTotalPages={setTotalPages}
+      currentPage={1}
+    />
   )
 
   const queryInput = screen.getByRole('searchbox')
@@ -82,9 +78,10 @@ test('an error renders if the server fails to get the posts', async () => {
   const submitBtn = screen.getByRole('button')
   userEvent.click(submitBtn)
 
-  const toast = await screen.findByRole('alert')
-  expect(toast).toHaveTextContent(err.INTERNAL_SERVER_ERROR)
-  expect(toast).toHaveClass('bg-danger')
+  await waitFor(() => {
+    const update = { message: err.INTERNAL_SERVER_ERROR, background: 'danger' }
+    expect(setToast).toHaveBeenNthCalledWith(1, update)
+  })
 })
 
 test('an error renders if the server fails to validate the data', async () => {
@@ -98,15 +95,12 @@ test('an error renders if the server fails to validate the data', async () => {
   )
 
   render(
-    <ToastProvider>
-      <HomeSearchPosts
-        setPosts={setPosts}
-        setTotalPosts={setTotalPosts}
-        setTotalPages={setTotalPages}
-        currentPage={1}
-      />
-      <Toast />
-    </ToastProvider>
+    <HomeSearchPosts
+      setPosts={setPosts}
+      setTotalPosts={setTotalPosts}
+      setTotalPages={setTotalPages}
+      currentPage={1}
+    />
   )
 
   const queryInput = screen.getByRole('searchbox')
@@ -117,5 +111,4 @@ test('an error renders if the server fails to validate the data', async () => {
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent(err.QUERY_REQUIRED)
-  expect(alert).not.toHaveClass('bg-danger')
 })

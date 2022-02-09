@@ -19,6 +19,5 @@ test('the modal renders and can be closed', () => {
 
   const closeBtn = screen.getByRole('button')
   userEvent.click(closeBtn)
-  expect(setIsModalOpen).toHaveBeenCalledWith(false)
-  expect(setIsModalOpen).toHaveBeenCalledTimes(1)
+  expect(setIsModalOpen).toHaveBeenNthCalledWith(1, false)
 })

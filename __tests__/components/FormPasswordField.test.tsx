@@ -3,14 +3,14 @@ import FormPasswordField from '../../components/FormPasswordField'
 
 const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
 
-const setFormContext = (isSubmitted: boolean, message?: string) => ({
-  formState: { isSubmitted, errors: message ? { password: { message } } : {} },
-  register: jest.fn(),
-  setFocus: jest.fn(),
-  getValues: () => ({ password: 'super strong pw' }),
+beforeEach(() => {
+  useFormContext.mockReturnValue({
+    formState: { isSubmitted: false, errors: {} },
+    register: jest.fn(),
+    setFocus: jest.fn(),
+    getValues: () => ({ password: 'super strong pw' }),
+  })
 })
-
-beforeEach(() => useFormContext.mockReturnValue(setFormContext(false)))
 
 test('the forgot password link and the password rules render', () => {
   render(<FormPasswordField showForgotPasswordLink showRules />)

@@ -20,8 +20,7 @@ test('the alert renders and is removed on click on the close button', async () =
   userEvent.click(closeBtn)
 
   await waitFor(() => {
-    expect(setToast).toHaveBeenCalledTimes(1)
-    expect(setToast).toHaveBeenCalledWith({ message: null })
+    expect(setToast).toHaveBeenNthCalledWith(1, { message: null })
   })
 })
 
