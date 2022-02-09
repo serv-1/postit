@@ -2,7 +2,12 @@ import ForgotPassword from '../../pages/auth/forgot-password'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
-import { mockResponse } from '../../lib/msw'
+import server from '../../mocks/server'
+import { rest } from 'msw'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 
@@ -31,7 +36,11 @@ test("the form sends a mail for the user to sign in which redirect him to it's p
 })
 
 test('an error renders if the server fails to verify the user email', async () => {
-  mockResponse('post', '/api/verifyEmail', 422, { message: err.EMAIL_INVALID })
+  server.use(
+    rest.post('http://localhost:3000/api/verifyEmail', (req, res, ctx) => {
+      return res(ctx.status(422), ctx.json({ message: err.EMAIL_INVALID }))
+    })
+  )
 
   factory()
 

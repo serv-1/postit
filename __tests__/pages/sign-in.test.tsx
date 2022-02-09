@@ -5,6 +5,11 @@ import err from '../../utils/constants/errors'
 import { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
 import { ToastProvider } from '../../contexts/toast'
 import Toast from '../../components/Toast'
+import server from '../../mocks/server'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 type MockProvider = Record<
   LiteralUnion<'google' | 'email', string>,

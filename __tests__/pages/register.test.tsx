@@ -2,9 +2,14 @@ import Register from '../../pages/register'
 import { screen, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
-import { mockResponse } from '../../lib/msw'
 import { ToastProvider } from '../../contexts/toast'
 import Toast from '../../components/Toast'
+import server from '../../mocks/server'
+import { rest } from 'msw'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
@@ -76,7 +81,11 @@ test('the forms redirects the user to the sign in page if it fails to do it', as
 })
 
 test('an error renders if the server fails to register the user', async () => {
-  mockResponse('post', '/api/user', 405, { message: err.METHOD_NOT_ALLOWED })
+  server.use(
+    rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
+      return res(ctx.status(405), ctx.json({ message: err.METHOD_NOT_ALLOWED }))
+    })
+  )
 
   factory()
 
@@ -98,10 +107,14 @@ test('an error renders if the server fails to register the user', async () => {
 })
 
 test('an error renders if the server fails to validate the request data', async () => {
-  mockResponse('post', '/api/user', 422, {
-    name: 'name',
-    message: err.NAME_REQUIRED,
-  })
+  server.use(
+    rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
+      return res(
+        ctx.status(422),
+        ctx.json({ name: 'name', message: err.NAME_REQUIRED })
+      )
+    })
+  )
 
   factory()
 

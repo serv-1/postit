@@ -2,9 +2,15 @@ import { render, screen } from '@testing-library/react'
 import Header from '../../components/Header'
 import Toast from '../../components/Toast'
 import { ToastProvider } from '../../contexts/toast'
-import { mockResponse } from '../../lib/msw'
+// import { mockResponse } from '../../lib/msw'
 import { mockSession } from '../../mocks/nextAuth'
 import err from '../../utils/constants/errors'
+import server from '../../mocks/server'
+import { rest } from 'msw'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
@@ -43,7 +49,12 @@ test('the user image loads then renders if the user is authenticated', async () 
 })
 
 test("if the user is on it's profile the dropdown menu does not render but the sign out link renders", () => {
-  mockResponse('get', '/api/users/:id', 404, { message: err.USER_NOT_FOUND })
+  server.use(
+    // mockResponse('get', '/api/users/:id', 404, { message: err.USER_NOT_FOUND })
+    rest.get('http://localhost:3000/api/users/:id', (req, res, ctx) => {
+      return res(ctx.status(404), ctx.json({ message: err.USER_NOT_FOUND }))
+    })
+  )
 
   useRouter.mockReturnValue({ pathname: '/profile' })
   useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
@@ -62,7 +73,12 @@ test("if the user is on it's profile the dropdown menu does not render but the s
 })
 
 test('an error renders if the server fails to fetch the user image', async () => {
-  mockResponse('get', '/api/users/:id', 404, { message: err.USER_NOT_FOUND })
+  server.use(
+    // mockResponse('get', '/api/users/:id', 404, { message: err.USER_NOT_FOUND })
+    rest.get('http://localhost:3000/api/users/:id', (req, res, ctx) => {
+      return res(ctx.status(404), ctx.json({ message: err.USER_NOT_FOUND }))
+    })
+  )
 
   useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
 

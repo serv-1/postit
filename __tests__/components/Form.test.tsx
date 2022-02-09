@@ -3,6 +3,11 @@ import userEvent from '@testing-library/user-event'
 import { BaseSyntheticEvent } from 'react'
 import { SubmitHandler, UseFormReturn } from 'react-hook-form'
 import Form from '../../components/Form'
+import server from '../../mocks/server'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const submitHandler = jest.fn()
 

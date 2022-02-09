@@ -4,9 +4,14 @@ import selectEvent from 'react-select-event'
 import HomeSearchPosts from '../../components/HomeSearchPosts'
 import Toast from '../../components/Toast'
 import { ToastProvider } from '../../contexts/toast'
-import { mockResponse } from '../../lib/msw'
 import { data } from '../../mocks/posts/search'
 import err from '../../utils/constants/errors'
+import server from '../../mocks/server'
+import { rest } from 'msw'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const setPosts = jest.fn()
 const setTotalPosts = jest.fn()
@@ -55,10 +60,14 @@ test('the form gets the posts', async () => {
 })
 
 test('an error renders if the server fails to get the posts', async () => {
-  mockResponse('get', '/api/posts/search', 500, {
-    message: err.INTERNAL_SERVER_ERROR,
-  })
-
+  server.use(
+    rest.get('http://localhost:3000/api/posts/search', (req, res, ctx) => {
+      return res(
+        ctx.status(500),
+        ctx.json({ message: err.INTERNAL_SERVER_ERROR })
+      )
+    })
+  )
   factory()
 
   const queryInput = screen.getByRole('searchbox')
@@ -73,10 +82,14 @@ test('an error renders if the server fails to get the posts', async () => {
 })
 
 test('an error renders if the server fails to validate the data', async () => {
-  mockResponse('get', '/api/posts/search', 422, {
-    name: 'query',
-    message: err.QUERY_REQUIRED,
-  })
+  server.use(
+    rest.get('http://localhost:3000/api/posts/search', (req, res, ctx) => {
+      return res(
+        ctx.status(422),
+        ctx.json({ name: 'query', message: err.QUERY_REQUIRED })
+      )
+    })
+  )
 
   factory()
 

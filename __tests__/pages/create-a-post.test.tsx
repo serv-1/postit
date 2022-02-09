@@ -4,8 +4,13 @@ import { ToastProvider } from '../../contexts/toast'
 import CreateAPost from '../../pages/create-a-post'
 import selectEvent from 'react-select-event'
 import err from '../../utils/constants/errors'
-import { mockResponse } from '../../lib/msw'
 import Toast from '../../components/Toast'
+import server from '../../mocks/server'
+import { rest } from 'msw'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const files: File[] = []
 
@@ -16,7 +21,8 @@ for (let i = 0; i < 3; i++) {
 
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const router = { push: jest.fn() }
-useRouter.mockReturnValue(router)
+
+beforeEach(() => useRouter.mockReturnValue(router))
 
 const factory = () => {
   render(
@@ -111,7 +117,11 @@ test('an error renders for the images field if an image is too large', async () 
 })
 
 test('an error renders if the server fails to create the post', async () => {
-  mockResponse('post', '/api/post', 403, { message: err.FORBIDDEN })
+  server.use(
+    rest.post('http://localhost:3000/api/post', (req, res, ctx) => {
+      return res(ctx.status(403), ctx.json({ message: err.FORBIDDEN }))
+    })
+  )
 
   factory()
 
@@ -140,10 +150,14 @@ test('an error renders if the server fails to create the post', async () => {
 })
 
 test('an error renders if the server fails to validate the request data', async () => {
-  mockResponse('post', '/api/post', 422, {
-    name: 'name',
-    message: err.NAME_MAX,
-  })
+  server.use(
+    rest.post('http://localhost:3000/api/post', (req, res, ctx) => {
+      return res(
+        ctx.status(422),
+        ctx.json({ name: 'name', message: err.NAME_MAX })
+      )
+    })
+  )
 
   factory()
 

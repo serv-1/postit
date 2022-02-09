@@ -5,7 +5,12 @@ import Toast from '../../components/Toast'
 import { ToastProvider } from '../../contexts/toast'
 import { mockSession } from '../../mocks/nextAuth'
 import err from '../../utils/constants/errors'
-import { mockResponse } from '../../lib/msw'
+import server from '../../mocks/server'
+import { rest } from 'msw'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const signOut = jest.spyOn(require('next-auth/react'), 'signOut')
 signOut.mockResolvedValue({ url: '/' })
@@ -48,7 +53,11 @@ test('the cancel button closes the modal', () => {
 })
 
 test('an error renders if the server fails to delete the user', async () => {
-  mockResponse('delete', '/api/users/:id', 422, { message: err.PARAMS_INVALID })
+  server.use(
+    rest.delete('http://localhost:3000/api/users/:id', (req, res, ctx) => {
+      return res(ctx.status(422), ctx.json({ message: err.PARAMS_INVALID }))
+    })
+  )
 
   factory()
 

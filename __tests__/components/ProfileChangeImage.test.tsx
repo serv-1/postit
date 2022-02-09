@@ -3,9 +3,14 @@ import ProfileChangeImage from '../../components/ProfileChangeImage'
 import { ToastProvider } from '../../contexts/toast'
 import userEvent from '@testing-library/user-event'
 import { mockSession } from '../../mocks/nextAuth'
-import { mockResponse } from '../../lib/msw'
 import Toast from '../../components/Toast'
 import err from '../../utils/constants/errors'
+import server from '../../mocks/server'
+import { rest } from 'msw'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
 
@@ -78,9 +83,11 @@ test('an error renders if the user image is invalid', async () => {
 })
 
 test('an error renders if the server fails to update the user image', async () => {
-  mockResponse('put', '/api/users/:id', 422, {
-    message: err.IMAGE_INVALID,
-  })
+  server.use(
+    rest.put('http://localhost:3000/api/users/:id', (req, res, ctx) => {
+      return res(ctx.status(422), ctx.json({ message: err.IMAGE_INVALID }))
+    })
+  )
 
   factory()
 

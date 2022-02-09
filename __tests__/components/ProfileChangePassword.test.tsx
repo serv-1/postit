@@ -5,7 +5,12 @@ import ProfileChangePassword from '../../components/ProfileChangePassword'
 import { ToastProvider } from '../../contexts/toast'
 import { mockSession } from '../../mocks/nextAuth'
 import err from '../../utils/constants/errors'
-import { mockResponse } from '../../lib/msw'
+import server from '../../mocks/server'
+import { rest } from 'msw'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const labelText = new RegExp('change your password', 'i')
 
@@ -34,7 +39,11 @@ test('an alert renders if the user password is updated', async () => {
 })
 
 test('an error renders if the server fails to update the user', async () => {
-  mockResponse('put', '/api/users/:id', 422, { message: err.PASSWORD_MIN })
+  server.use(
+    rest.put('http://localhost:3000/api/users/:id', (req, res, ctx) => {
+      return res(ctx.status(422), ctx.json({ message: err.PASSWORD_MIN }))
+    })
+  )
 
   factory()
 

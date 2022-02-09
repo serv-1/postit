@@ -3,9 +3,14 @@ import { mockSession } from '../../mocks/nextAuth'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
-import { mockResponse } from '../../lib/msw'
 import { ToastProvider } from '../../contexts/toast'
 import Toast from '../../components/Toast'
+import server from '../../mocks/server'
+import { rest } from 'msw'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 const factory = (type: 'name' | 'email', value?: string) => {
   render(
@@ -109,7 +114,11 @@ test('the user name/email does not update if it has not change', async () => {
 })
 
 test('an error renders if the server fails to update the user', async () => {
-  mockResponse('put', '/api/users/:id', 422, { message: err.NAME_MAX })
+  server.use(
+    rest.put('http://localhost:3000/api/users/:id', (req, res, ctx) => {
+      return res(ctx.status(422), ctx.json({ message: err.NAME_MAX }))
+    })
+  )
 
   factory('name', 'John Doe')
 
