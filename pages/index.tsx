@@ -18,7 +18,7 @@ const Home = () => {
       <Head>
         <title>Filanad - Home</title>
       </Head>
-      <main>
+      <main data-cy="home">
         <div className="container-fluid py-4 mb-4 position-relative">
           <Particles
             className="position-absolute top-0 start-0 w-100 h-100"

@@ -2,16 +2,17 @@ import ChevronLeft from '../public/static/images/chevron-left.svg'
 import ChevronRight from '../public/static/images/chevron-right.svg'
 import ChevronDoubleLeft from '../public/static/images/chevron-double-left.svg'
 import ChevronDoubleRight from '../public/static/images/chevron-double-right.svg'
-import { Dispatch, MouseEvent, ReactNode, SetStateAction } from 'react'
+import React from 'react'
 
 interface liAttributes {
   className: string
   'aria-current'?: 'page'
+  style?: React.CSSProperties
 }
 
 interface PaginationProps {
   totalPages: number
-  setCurrentPage: Dispatch<SetStateAction<number>>
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
   currentPage: number
 }
 
@@ -20,12 +21,12 @@ const Pagination = ({
   setCurrentPage,
   currentPage,
 }: PaginationProps) => {
-  const onClick = (e: MouseEvent<HTMLAnchorElement>, page: number) => {
+  const onClick = (e: React.MouseEvent<HTMLAnchorElement>, page: number) => {
     e.preventDefault()
     setCurrentPage(page)
   }
 
-  const pagesLinks: ReactNode[] = []
+  const pagesLinks: React.ReactNode[] = []
 
   const start = currentPage > 2 ? currentPage - 2 : 1
   const end = currentPage < totalPages - 1 ? currentPage + 2 : totalPages
@@ -38,6 +39,7 @@ const Pagination = ({
     if (i === currentPage) {
       attr.className += ' active'
       attr['aria-current'] = 'page'
+      attr.style = { zIndex: 0 }
     }
 
     pagesLinks.push(

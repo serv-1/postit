@@ -17,16 +17,16 @@ type FormFields<T> = { csrfToken?: string } & (T extends 'name'
 
 export interface ProfileChangeNameOrEmailProps {
   type: 'name' | 'email'
-  id?: string
-  value?: string
+  id: string
+  value: string
 }
 
 const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
-  const { type, id, value } = props
+  const { type, id, value: val } = props
   type Type = typeof type
 
   const [showForm, setShowForm] = useState(false)
-  const [newValue, setNewValue] = useState<string>()
+  const [value, setValue] = useState(val)
 
   const { setToast } = useToast()
 
@@ -44,7 +44,7 @@ const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
       await axios.put(`http://localhost:3000/api/users/${id}`, data)
 
       setShowForm(false)
-      setNewValue(newValue)
+      setValue(newValue)
       setToast({
         message: `The ${type} has been successfully updated! 🎉`,
         background: 'success',
@@ -87,9 +87,7 @@ const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
     </Form>
   ) : (
     <div className="input-group d-flex align-items-center">
-      <span className={type === 'name' ? 'fw-bold fs-1' : 'fs-5'}>
-        {newValue || value}
-      </span>
+      <span className={type === 'name' ? 'fw-bold fs-1' : 'fs-5'}>{value}</span>
       <Button aria-label="Edit" onClick={() => setShowForm(true)}>
         ✏
       </Button>

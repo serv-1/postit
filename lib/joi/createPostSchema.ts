@@ -1,6 +1,6 @@
 import { reqCategoriesSchema } from './categoriesSchema'
 import csrfTokenSchema from './csrfTokenSchema'
-import descriptionSchema from './descritptionSchema'
+import { descriptionSchema } from './descritptionSchema'
 import { imagesObjectSchema, imagesArraySchema } from './imagesSchema'
 import { nameSchema } from './nameSchema'
 import object from './object'

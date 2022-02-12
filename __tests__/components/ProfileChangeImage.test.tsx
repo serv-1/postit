@@ -16,15 +16,8 @@ const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 beforeEach(() => useToast.mockReturnValue({}))
 
-test('no image renders if there is no image', () => {
-  render(<ProfileChangeImage id={mockSession.id} />)
-
-  const img = screen.queryByRole('img')
-  expect(img).not.toBeInTheDocument()
-})
-
 test('the button trigger a click on the file input', () => {
-  render(<ProfileChangeImage id={mockSession.id} />)
+  render(<ProfileChangeImage id={mockSession.id} image="/img" />)
 
   const input = screen.getByTestId('fileInput')
   const click = jest.fn()
@@ -62,7 +55,7 @@ test('an error renders if the user image is invalid', async () => {
   const setToast = jest.fn()
   useToast.mockReturnValue({ setToast })
 
-  render(<ProfileChangeImage id={mockSession.id} />)
+  render(<ProfileChangeImage id={mockSession.id} image="/img" />)
 
   const input = screen.getByTestId('fileInput')
   const textFile = new File(['text'], 'text.txt', { type: 'text/plain' })
@@ -93,7 +86,7 @@ test('an error renders if the server fails to update the user image', async () =
     })
   )
 
-  render(<ProfileChangeImage id={mockSession.id} />)
+  render(<ProfileChangeImage id={mockSession.id} image="/img" />)
 
   const input = screen.getByTestId('fileInput')
   userEvent.upload(input, file)

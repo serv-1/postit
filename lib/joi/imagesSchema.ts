@@ -1,5 +1,6 @@
 import Joi from 'joi'
 import err from '../../utils/constants/errors'
+import csrfTokenSchema from './csrfTokenSchema'
 import imageSchema from './imageSchema'
 import object from './object'
 
@@ -21,3 +22,8 @@ export const imagesArraySchema = Joi.array()
     'array.min': err.IMAGES_REQUIRED,
     'array.max': err.IMAGES_MAX,
   })
+
+export const imagesArrayCsrfSchema = object({
+  images: imagesArraySchema,
+  csrfToken: csrfTokenSchema,
+})

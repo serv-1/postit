@@ -41,7 +41,13 @@ test('the user name/email and the form renders correctly', async () => {
 })
 
 test('an input with an email type renders', async () => {
-  render(<ProfileChangeNameOrEmail type="email" id={mockSession.id} />)
+  render(
+    <ProfileChangeNameOrEmail
+      type="email"
+      id={mockSession.id}
+      value="johndoe@test.com"
+    />
+  )
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)

@@ -24,7 +24,7 @@ const Select = ({ name, options, className, ...props }: SelectProps) => {
         })
 
         const styles: StylesConfig<Option> = {
-          control: () => ({ display: 'flex', height: 36 }),
+          control: () => ({ display: 'flex', minHeight: 36 }),
           menu: (provided) => ({ ...provided, marginLeft: -12 }),
           valueContainer: (provided) => ({ ...provided, paddingLeft: 0 }),
         }

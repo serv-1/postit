@@ -1,16 +1,16 @@
 import err from '../../../utils/constants/errors'
-import user from '../../fixtures/user.json'
+import u1 from '../../fixtures/user1.json'
 
 const url = '/api/verifyEmail'
 
 describe('/api/verifyEmail', () => {
   describe('POST', () => {
-    const method = 'POST'
-
     it('422 - Email unknown', function () {
       cy.task('db:reset')
-      const body = { email: user.email }
-      cy.req({ url, method, body }).then((res) => {
+
+      const body = { email: u1.email }
+
+      cy.req({ url, method: 'POST', body }).then((res) => {
         expect(res.status).to.eq(422)
         expect(res.body).to.have.property('message', err.EMAIL_UNKNOWN)
       })
@@ -18,7 +18,8 @@ describe('/api/verifyEmail', () => {
 
     it('422 - Invalid request body', function () {
       const body = { email: 'not an email' }
-      cy.req({ url, method, body }).then((res) => {
+
+      cy.req({ url, method: 'POST', body }).then((res) => {
         expect(res.status).to.eq(422)
         expect(res.body).to.have.property('message', err.EMAIL_INVALID)
       })
@@ -27,8 +28,10 @@ describe('/api/verifyEmail', () => {
     it('200 - Email verified', function () {
       cy.task('db:reset')
       cy.task('db:seed')
-      const body = { email: user.email }
-      cy.req({ url, method, body }).then((res) => {
+
+      const body = { email: u1.email }
+
+      cy.req({ url, method: 'POST', body }).then((res) => {
         expect(res.status).to.eq(200)
       })
     })

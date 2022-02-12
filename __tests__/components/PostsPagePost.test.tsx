@@ -1,4 +1,4 @@
-import PostsPagePost from '../../components/PostsPagePost' // PostsPagePostProps,
+import PostsPagePost from '../../components/PostsPagePost'
 import { render, screen } from '@testing-library/react'
 
 const defaultPost = {
@@ -20,7 +20,7 @@ test('the post renders correctly', () => {
   const link = screen.getByRole('link')
   expect(link).toHaveTextContent(name)
 
-  const href = `/post/${id}/${name.replaceAll(' ', '-')}`
+  const href = `/posts/${id}/${name.replaceAll(' ', '-')}`
   expect(link).toHaveAttribute('href', href)
 
   const priceText = screen.getByText(price + '€')

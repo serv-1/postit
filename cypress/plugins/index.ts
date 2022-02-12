@@ -3,21 +3,33 @@ import User, { IUser } from '../../models/User'
 import Account, { IAccount } from '../../models/Account'
 import Post, { IPost } from '../../models/Post'
 import { faker } from '@faker-js/faker'
-import user from '../fixtures/user.json'
+import u1Json from '../fixtures/user1.json'
 import postsJson from '../fixtures/posts.json'
-import googleUser from '../fixtures/google-user.json'
+import u2Json from '../fixtures/user2.json'
 const { GoogleSocialLogin } = require('cypress-social-logins').plugins
 require('dotenv').config()
 import env from '../../utils/constants/env'
 import { randomBytes, scryptSync } from 'crypto'
+import { readdir, unlink } from 'fs/promises'
+import { cwd } from 'process'
 
-export interface UsersIds {
-  uId: string
-  guId: string
+export interface Ids {
+  u1Id: string
+  u2Id: string
+  pId?: string
 }
 
 const pluginConfig: Cypress.PluginConfig = (on, config) => {
   on('task', {
+    async deleteImages() {
+      const files = await readdir(cwd() + '/public/static/images/posts')
+
+      for (const file of files) {
+        await unlink(cwd() + '/public/static/images/posts/' + file)
+      }
+
+      return null
+    },
     async 'db:reset'() {
       await connect(env.MONGODB_URI)
       const colls = await conn.db.collections()
@@ -28,15 +40,15 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
       return null
     },
-    async 'db:seed'({ posts }: { posts?: boolean } = {}): Promise<UsersIds> {
+    async 'db:seed'({ posts }: { posts?: boolean } = {}): Promise<Ids> {
       await connect(env.MONGODB_URI)
 
-      const usersIds = await insertUsers()
-      await insertAccount(usersIds.guId)
+      const ids = await insertUsers()
+      await insertAccount(ids.u1Id)
 
-      if (posts) await insertPosts()
+      if (posts) ids.pId = await insertPosts(ids.u1Id)
 
-      return usersIds
+      return ids
     },
     async 'db:getUser'(idOrEmail: string): Promise<IUser | null> {
       await connect(env.MONGODB_URI)
@@ -72,16 +84,19 @@ export default pluginConfig
  * registered with Google in database
  * @returns \{ uId: "credentials user id", guId: "google user id" \}
  */
-async function insertUsers(): Promise<UsersIds> {
-  const salt = randomBytes(16).toString('hex')
-  const hash = scryptSync(user.password, salt, 64).toString('hex')
+async function insertUsers(): Promise<Ids> {
+  const salt1 = randomBytes(16).toString('hex')
+  const hash1 = scryptSync(u1Json.password, salt1, 64).toString('hex')
 
-  const u = { ...user, password: `${salt}:${hash}` }
-  const gu = { ...googleUser }
+  const salt2 = randomBytes(16).toString('hex')
+  const hash2 = scryptSync(u2Json.password, salt2, 64).toString('hex')
 
-  const result = await User.insertMany([u, gu])
+  const u1 = { ...u1Json, password: `${salt1}:${hash1}` }
+  const u2 = { ...u2Json, password: `${salt2}:${hash2}` }
 
-  return { uId: result[0]._id.toString(), guId: result[1]._id.toString() }
+  const result = await User.insertMany([u1, u2])
+
+  return { u1Id: result[0]._id.toString(), u2Id: result[1]._id.toString() }
 }
 
 /**
@@ -107,11 +122,18 @@ async function insertAccount(id: string) {
   await doc.save()
 }
 
-async function insertPosts() {
+/**
+ * Insert 40 posts and return the id of the first added post (visible in posts.json fixture)
+ * @param id user's id that will create the first post
+ * @returns first added post's id
+ */
+async function insertPosts(id: string): Promise<string> {
   const posts: Omit<IPost, '_id'>[] = postsJson.map((post) => ({
     ...post,
     userId: new Types.ObjectId(post.userId),
   }))
+
+  posts[0].userId = new Types.ObjectId(id)
 
   for (let i = 0; i < 40; i++) {
     const categories =
@@ -127,7 +149,9 @@ async function insertPosts() {
     })
   }
 
-  await Post.insertMany(posts)
+  const result = await Post.insertMany(posts)
+
+  return result[0]._id.toString()
 }
 
 function generateRandomObjectId() {

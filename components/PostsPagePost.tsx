@@ -28,7 +28,7 @@ const PostsPagePost = ({ id, name, price, image }: PostsPagePostProps) => {
       </div>
       <div className="card-body">
         <h5 className="card-title m-0 fw-normal">
-          <Link href={`/post/${id}/${urlFriendlyName}`}>
+          <Link href={`/posts/${id}/${urlFriendlyName}`}>
             <a className="text-decoration-none">
               {truncatedName} <ArrowRight />
             </a>

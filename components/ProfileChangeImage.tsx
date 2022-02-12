@@ -7,13 +7,13 @@ import getApiError from '../utils/functions/getApiError'
 import err from '../utils/constants/errors'
 
 interface ProfileChangeImageProps {
-  id?: string
-  image?: string
+  id: string
+  image: string
 }
 
-const ProfileChangeImage = ({ id, image }: ProfileChangeImageProps) => {
+const ProfileChangeImage = ({ id, image: img }: ProfileChangeImageProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [newImage, setNewImage] = useState<string>()
+  const [image, setImage] = useState(img)
   const { setToast } = useToast()
 
   const updateImage = (e: ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +44,7 @@ const ProfileChangeImage = ({ id, image }: ProfileChangeImageProps) => {
           image: { base64Uri: e.target.result, type: files[0].type },
         })
 
-        setNewImage(e.target.result as string)
+        setImage(e.target.result as string)
         setToast({
           message: 'The image has been updated! 🎉',
           background: 'success',
@@ -58,8 +58,6 @@ const ProfileChangeImage = ({ id, image }: ProfileChangeImageProps) => {
     reader.readAsDataURL(files[0])
   }
 
-  const src = newImage || image
-
   return (
     <>
       <Button
@@ -67,16 +65,14 @@ const ProfileChangeImage = ({ id, image }: ProfileChangeImageProps) => {
         style={{ width: 200, height: 200 }}
         onClick={() => fileInputRef.current?.click()}
       >
-        {src && (
-          <Image
-            src={src}
-            width={200}
-            height={200}
-            alt="Your profile image"
-            title="Click to change your profile image"
-            className="rounded-circle"
-          />
-        )}
+        <Image
+          src={image}
+          width={200}
+          height={200}
+          alt="Your profile image"
+          title="Click to change your profile image"
+          className="rounded-circle"
+        />
       </Button>
       <input
         onChange={updateImage}

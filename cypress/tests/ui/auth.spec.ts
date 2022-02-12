@@ -1,4 +1,4 @@
-import user from '../../fixtures/user.json'
+import u1 from '../../fixtures/user1.json'
 
 const username = Cypress.env('googleUsername')
 const password = Cypress.env('googlePassword')
@@ -10,12 +10,6 @@ const cleanInboxUrl = `${smtpBaseUrl}/api/v1/inboxes/1577170/clean?api_token=${s
 const getInboxMsgUrl = `${smtpBaseUrl}/api/v1/inboxes/1577170/messages?api_token=${smtpToken}`
 
 describe('User sign in and register', () => {
-  it('Unauthenticated user should be redirected to the sign in page', () => {
-    cy.visit('/profile')
-    cy.contains(/loading/i).should('exist')
-    cy.get('[data-cy="signIn"]').should('exist')
-  })
-
   it('Sign in with Google and sign out', () => {
     cy.task('GoogleSocialLogin', {
       username,
@@ -43,27 +37,27 @@ describe('User sign in and register', () => {
 
     cy.get('[aria-label="Sign out"]').click()
 
-    cy.get('[data-cy="signIn"]').should('exist')
+    cy.get('[data-cy="home"]').should('exist')
     cy.get('[aria-label="Sign out"]').should('not.exist')
   })
 
-  it.only('Register, send a verification mail with credentials and sign out', function () {
+  it('Register, send a verification mail with credentials and sign out', function () {
     cy.request('PATCH', cleanInboxUrl)
     cy.task('db:reset')
 
     cy.visit('/register')
 
-    cy.get('#name').type(user.name)
-    cy.get('#email').type(user.email)
-    cy.get('#password').type(user.password)
+    cy.get('#name').type(u1.name)
+    cy.get('#email').type(u1.email)
+    cy.get('#password').type(u1.password)
     cy.get('input[type="submit"]').click()
 
-    cy.get('[data-cy="profile"]').should('exist')
-    cy.contains(user.email).should('exist')
+    cy.get('[data-cy="profile"]', { timeout: 10000 }).should('exist')
+    cy.contains(u1.email).should('exist')
 
     cy.get('[aria-label="Sign out"]').click()
 
-    cy.get('[data-cy="signIn"]').should('exist')
+    cy.get('[data-cy="home"]').should('exist')
     cy.get('[aria-label="Sign out"]').should('not.exist')
 
     // verify that a mail has been sent
@@ -78,16 +72,16 @@ describe('User sign in and register', () => {
 
     cy.visit('/auth/sign-in')
 
-    cy.get('#email').type(user.email)
-    cy.get('#password').type(user.password)
+    cy.get('#email').type(u1.email)
+    cy.get('#password').type(u1.password)
     cy.get('input[type="submit"]').click()
 
     cy.get('[data-cy="profile"]').should('exist')
-    cy.contains(user.email).should('exist')
+    cy.contains(u1.email).should('exist')
 
     cy.get('[aria-label="Sign out"]').click()
 
-    cy.get('[data-cy="signIn"]').should('exist')
+    cy.get('[data-cy="home"]').should('exist')
     cy.get('[aria-label="Sign out"]').should('not.exist')
   })
 
@@ -98,12 +92,12 @@ describe('User sign in and register', () => {
 
     cy.visit('/auth/forgot-password')
 
-    cy.get('#email').type(user.email)
+    cy.get('#email').type(u1.email)
 
     cy.get('button[type="submit"]').click()
 
     // redirected to the mail sent confirmation page
-    cy.get('[data-cy="mailSent"]').should('exist')
+    cy.get('[data-cy="mailSent"]', { timeout: 10000 }).should('exist')
 
     cy.request(getInboxMsgUrl).then((res) => {
       cy.request(
@@ -117,8 +111,6 @@ describe('User sign in and register', () => {
     cy.get('a').invoke('removeAttr', 'target').click()
 
     cy.get('[data-cy="profile"]').should('exist')
-    cy.contains(user.email).should('exist')
+    cy.contains(u1.email).should('exist')
   })
 })
-
-export {}

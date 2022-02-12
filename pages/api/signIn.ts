@@ -24,11 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(422).send({ message: err.EMAIL_UNKNOWN })
     }
 
-    if (!user.password) {
-      return res.status(422).send({ message: err.EMAIL_GOOGLE })
-    }
-
-    const [salt, hash] = user.password.split(':')
+    const [salt, hash] = (user.password as string).split(':')
     const dbHash = Buffer.from(hash, 'hex')
     const givenHash = crypto.scryptSync(password, salt, 64)
 

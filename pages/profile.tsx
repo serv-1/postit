@@ -2,52 +2,46 @@ import ProfileDeleteAccount from '../components/ProfileDeleteAccount'
 import ProfileChangeImage from '../components/ProfileChangeImage'
 import ProfileChangeNameOrEmail from '../components/ProfileChangeNameOrEmail'
 import ProfileChangePassword from '../components/ProfileChangePassword'
-import { useEffect, useState } from 'react'
-import { Session, User } from 'next-auth'
+import { User } from 'next-auth'
 import axios from 'axios'
-import { useSession } from 'next-auth/react'
-import getApiError from '../utils/functions/getApiError'
-import { useToast } from '../contexts/toast'
+import { getSession } from 'next-auth/react'
+import { GetServerSideProps } from 'next'
 
-const Profile = () => {
-  const { data } = useSession()
-  const { id } = data as Session
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getSession(ctx)
 
-  const { setToast } = useToast()
+  if (!session) {
+    return { notFound: true }
+  }
 
-  const [user, setUser] = useState<User>()
+  const res = await axios.get(`http://localhost:3000/api/users/${session.id}`)
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const res = await axios.get(`http://localhost:3000/api/users/${id}`)
-        setUser(res.data)
-      } catch (e) {
-        const { message } = getApiError(e)
-        setToast({ message, background: 'danger' })
-      }
-    }
-    getUser()
-  }, [setUser, id, setToast])
+  return { props: { user: res.data } }
+}
 
+interface ProfileProps {
+  user: User
+}
+
+const Profile = ({ user }: ProfileProps) => {
   return (
     <main data-cy="profile" className="container-fluid my-4">
       <div className="col-md-6 col-6 m-auto">
-        <ProfileChangeImage id={user?.id} image={user?.image} />
+        <ProfileChangeImage id={user.id} image={user.image} />
         <div className="my-2 d-flex flex-column">
           <ProfileChangeNameOrEmail
-            id={user?.id}
-            value={user?.name}
+            id={user.id}
+            value={user.name}
             type="name"
           />
           <ProfileChangeNameOrEmail
-            id={user?.id}
-            value={user?.email}
+            id={user.id}
+            value={user.email}
             type="email"
           />
         </div>
-        <ProfileChangePassword id={user?.id} />
-        <ProfileDeleteAccount id={user?.id} />
+        <ProfileChangePassword id={user.id} />
+        <ProfileDeleteAccount id={user.id} />
       </div>
     </main>
   )

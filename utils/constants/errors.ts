@@ -4,7 +4,6 @@ const err = {
   EMAIL_INVALID: 'The email is invalid.' as const,
 	EMAIL_USED: 'The email is already used.' as const,
 	EMAIL_UNKNOWN: 'The email is not registered.' as const,
-	EMAIL_GOOGLE: 'The email is linked to a Google account. (sign in with Google)' as const,
 	/* Name */
   NAME_REQUIRED: 'The name is required.' as const,
   NAME_INVALID: 'The name is invalid.' as const,
@@ -56,6 +55,7 @@ const err = {
 	/* Resource Not Found */
 	USER_NOT_FOUND: 'User not found.' as const,
 	IMAGE_NOT_FOUND: 'Image not found.' as const,
+	POST_NOT_FOUND: 'Post not found.' as const,
 	/* csrf token */
 	CSRF_TOKEN_INVALID: 'Something weird happen! Try to refresh the page or sign out and sign in again.' as const
 }

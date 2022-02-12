@@ -15,7 +15,7 @@ interface FormFields {
 }
 
 interface ProfileChangePasswordProps {
-  id?: string
+  id: string
 }
 
 const ProfileChangePassword = ({ id }: ProfileChangePasswordProps) => {

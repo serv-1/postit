@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { FormProvider, useForm } from 'react-hook-form'
 import Select from '../../components/Select'
 import selectEvent from 'react-select-event'
 import categories from '../../categories'

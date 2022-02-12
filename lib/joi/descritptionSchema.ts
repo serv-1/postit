@@ -1,7 +1,9 @@
 import Joi from 'joi'
 import err from '../../utils/constants/errors'
+import csrfTokenSchema from './csrfTokenSchema'
+import object from './object'
 
-const descriptionSchema = Joi.string()
+export const descriptionSchema = Joi.string()
   .required()
   .trim()
   .min(10)
@@ -14,4 +16,7 @@ const descriptionSchema = Joi.string()
     'string.max': err.DESCRIPTION_MAX,
   })
 
-export default descriptionSchema
+export const descriptionCsrfSchema = object({
+  description: descriptionSchema,
+  csrfToken: csrfTokenSchema,
+})

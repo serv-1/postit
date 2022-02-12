@@ -87,7 +87,7 @@ const Header = () => {
                         className="btn text-decoration-none text-dark"
                         onClick={(e) => {
                           e.preventDefault()
-                          signOut()
+                          signOut({ callbackUrl: '/' })
                         }}
                       >
                         Sign out
@@ -102,7 +102,7 @@ const Header = () => {
                     className="btn px-0 text-dark"
                     onClick={(e) => {
                       e.preventDefault()
-                      signOut()
+                      signOut({ callbackUrl: '/' })
                     }}
                     aria-label="Sign out"
                     title="Sign out"

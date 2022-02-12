@@ -1,6 +1,8 @@
 import Joi from 'joi'
 import categories from '../../categories'
 import err from '../../utils/constants/errors'
+import csrfTokenSchema from './csrfTokenSchema'
+import object from './object'
 
 export const categoriesSchema = Joi.array()
   .items(Joi.any().valid(...categories))
@@ -16,3 +18,8 @@ export const categoriesSchema = Joi.array()
 export const reqCategoriesSchema = categoriesSchema
   .required()
   .messages({ 'any.required': err.CATEGORIES_REQUIRED })
+
+export const reqCategoriesCsrfSchema = object({
+  categories: reqCategoriesSchema,
+  csrfToken: csrfTokenSchema,
+})

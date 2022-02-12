@@ -8,7 +8,7 @@ import Modal from './Modal'
 import OpenModalButton from './OpenModalButton'
 
 interface ProfileDeleteAccountProps {
-  id?: string
+  id: string
 }
 
 const ProfileDeleteAccount = ({ id }: ProfileDeleteAccountProps) => {
