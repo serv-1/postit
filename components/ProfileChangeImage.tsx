@@ -39,9 +39,11 @@ const ProfileChangeImage = ({ id, image: img }: ProfileChangeImageProps) => {
       try {
         const res = await axios.get('http://localhost:3000/api/auth/csrf')
 
+        const base64 = (e.target.result as string).split(',')[1]
+
         await axios.put<null>(`http://localhost:3000/api/users/${id}`, {
           csrfToken: res.data.csrfToken,
-          image: { base64Uri: e.target.result, type: files[0].type },
+          image: { base64, type: files[0].type.split('/')[1] },
         })
 
         setImage(e.target.result as string)

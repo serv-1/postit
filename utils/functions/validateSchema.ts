@@ -14,7 +14,7 @@ function validateSchema(
   const { path, message } = error.details[0]
 
   if (needName) {
-    return res.status(422).send({ name: path[path.length - 1], message })
+    return res.status(422).send({ name: path[0], message })
   }
 
   res.status(422).send({ message })

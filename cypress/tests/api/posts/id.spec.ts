@@ -4,6 +4,7 @@ import { IPost } from '../../../../models/Post'
 import u1 from '../../../fixtures/user1.json'
 import u2 from '../../../fixtures/user2.json'
 const post = require('../../../fixtures/posts.json')[0]
+import { Image } from '../../../../types/common'
 
 describe('/api/posts/:id', () => {
   it('405 - Method not allowed', function () {
@@ -274,28 +275,22 @@ describe('/api/posts/:id', () => {
           cy.signIn(u2.email, u2.password)
 
           const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
-          const type = 'image/jpeg'
           const body = {
             name: 'Chair',
             description: 'Incredible chair',
             categories: ['furniture'],
             price: 20,
-            images: [{ base64Uri: `data:${type};base64,${base64}`, type }],
+            images: [{ base64, type: 'jpeg' }],
           }
 
           cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })
 
           cy.task<IPost>('db:getPostByUserId', ids.u2Id).then((post) => {
-            const images: { base64Uri: string; type: string }[] = []
+            const images: Image[] = []
 
             for (let i = 0; i < 5; i++) {
-              const type = 'image/jpeg'
               const base64 = Buffer.from(new Uint8Array(1000000))
-
-              images.push({
-                base64Uri: `data:${type};base64,${base64.toString('base64')}`,
-                type,
-              })
+              images.push({ base64: base64.toString('base64'), type: 'jpeg' })
             }
 
             const url = `/api/posts/${post._id}`
@@ -360,13 +355,12 @@ describe('/api/posts/:id', () => {
         cy.signIn(u2.email, u2.password)
 
         const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
-        const type = 'image/jpeg'
         const body = {
           name: 'Chair',
           description: 'Incredible chair',
           categories: ['furniture'],
           price: 20,
-          images: [{ base64Uri: `data:${type};base64,${base64}`, type }],
+          images: [{ base64, type: 'jpeg' }],
         }
 
         cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })

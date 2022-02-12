@@ -17,6 +17,7 @@ import { descriptionCsrfSchema } from '../../../lib/joi/descritptionSchema'
 import { reqCategoriesCsrfSchema } from '../../../lib/joi/categoriesSchema'
 import { reqPriceCsrfSchema } from '../../../lib/joi/priceSchema'
 import { imagesArrayCsrfSchema } from '../../../lib/joi/imagesSchema'
+import { Image } from '../../../types/common'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
@@ -89,20 +90,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           const images: string[] = []
 
-          for (const { base64Uri, type } of req.body.images) {
-            if (!base64Uri.includes(',')) {
-              return res.status(422).send({ message: err.DATA_INVALID })
-            }
-
-            if (isBase64ValueTooLarge(base64Uri, 1000000)) {
+          for (const { base64, type } of req.body.images as Image[]) {
+            if (isBase64ValueTooLarge(base64, 1000000)) {
               return res.status(413).send({ message: err.IMAGE_TOO_LARGE })
             }
 
-            const filename = nanoid() + '.' + type.split('/')[1]
+            const filename = nanoid() + '.' + type
             const uri = '/static/images/posts/' + filename
             const path = cwd() + '/public' + uri
 
-            const imageData = Buffer.from(base64Uri.split(',')[1], 'base64')
+            const imageData = Buffer.from(base64, 'base64')
             await appendFile(path, imageData)
 
             images.push(uri)

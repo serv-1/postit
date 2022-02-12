@@ -53,25 +53,19 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
     async 'db:getUser'(idOrEmail: string): Promise<IUser | null> {
       await connect(env.MONGODB_URI)
 
-      let user: IUser | null
-
       if (idOrEmail.includes('@')) {
-        user = await User.findOne({ email: idOrEmail }).lean().exec()
+        return await User.findOne({ email: idOrEmail }).lean().exec()
       } else {
-        user = await User.findOne({ _id: idOrEmail }).lean().exec()
+        return await User.findOne({ _id: idOrEmail }).lean().exec()
       }
-
-      return user
     },
     async 'db:getAccountByUserId'(id: string): Promise<IAccount | null> {
       await connect(env.MONGODB_URI)
-      const account = await Account.findOne({ userId: id }).lean().exec()
-      return account
+      return await Account.findOne({ userId: id }).lean().exec()
     },
     async 'db:getPostByUserId'(id: string): Promise<IPost | null> {
       await connect(env.MONGODB_URI)
-      const post = await Post.findOne({ userId: id }).lean().exec()
-      return post
+      return await Post.findOne({ userId: id }).lean().exec()
     },
     GoogleSocialLogin: GoogleSocialLogin,
   })

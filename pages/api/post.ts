@@ -11,11 +11,7 @@ import { appendFile } from 'fs/promises'
 import { nanoid } from 'nanoid'
 import validateSchema from '../../utils/functions/validateSchema'
 import { cwd } from 'process'
-
-interface Image {
-  base64Uri: string
-  type: 'image/jpeg' | 'image/png' | 'image/gif'
-}
+import { Image } from '../../types/common'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const resp = await authCheck(req)
@@ -32,33 +28,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(422).send({ name: 'price', message: err.PRICE_INVALID })
   }
 
-  for (const image of req.body.images) {
-    if (!image.base64Uri.includes(',')) {
-      return res
-        .status(422)
-        .send({ name: 'images', message: err.IMAGES_INVALID })
-    }
-
-    if (isBase64ValueTooLarge(image.base64Uri, 1000000)) {
-      return res
-        .status(413)
-        .send({ name: 'images', message: err.IMAGE_TOO_LARGE })
-    }
-  }
-
   try {
     const session = (await getSession({ req })) as Session
     await dbConnect()
 
     const images: string[] = []
 
-    for (const { base64Uri, type } of req.body.images as Image[]) {
-      const filename = nanoid() + '.' + type.split('/')[1]
+    for (const { base64, type } of req.body.images as Image[]) {
+      if (isBase64ValueTooLarge(base64, 1000000)) {
+        const json = { name: 'images', message: err.IMAGE_TOO_LARGE }
+        return res.status(413).send(json)
+      }
+
+      const filename = nanoid() + '.' + type
       const uri = '/static/images/posts/' + filename
       const path = cwd() + '/public/' + uri
 
-      const imageData = Buffer.from(base64Uri.split(',')[1], 'base64')
-      await appendFile(path, imageData)
+      await appendFile(path, Buffer.from(base64, 'base64'))
 
       images.push(uri)
     }

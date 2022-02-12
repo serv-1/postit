@@ -10,11 +10,7 @@ import { createPostClientSchema } from '../lib/joi/createPostSchema'
 import err from '../utils/constants/errors'
 import getApiError from '../utils/functions/getApiError'
 import { useRouter } from 'next/router'
-
-interface Image {
-  base64Uri: string
-  type: 'image/jpeg' | 'image/png' | 'image/gif'
-}
+import { Image } from '../types/common'
 
 interface FormFields {
   name: string
@@ -56,8 +52,8 @@ const CreateAPost = () => {
         if (!e.target?.result) return
 
         encodedImages.push({
-          base64Uri: e.target.result as string,
-          type: image.type as Image['type'],
+          base64: (e.target.result as string).split(',')[1],
+          type: image.type.split('/')[1] as Image['type'],
         })
 
         if (encodedImages.length === images.length) {

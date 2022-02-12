@@ -16,6 +16,7 @@ import { nanoid } from 'nanoid'
 import { cwd } from 'process'
 import { appendFile, unlink } from 'fs/promises'
 import { Buffer } from 'buffer'
+import { Image } from '../../../types/common'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
@@ -73,13 +74,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             return res.status(422).send({ name: details[0].path[0], message })
           }
 
-          const { type, base64Uri } = req.body.image
+          const { type, base64 } = req.body.image as Image
 
-          if (!base64Uri.includes(',')) {
-            return res.status(422).send({ message: err.DATA_INVALID })
-          }
-
-          if (isBase64ValueTooLarge(base64Uri, 1000000)) {
+          if (isBase64ValueTooLarge(base64, 1000000)) {
             return res.status(413).send({ message: err.IMAGE_TOO_LARGE })
           }
 
@@ -93,11 +90,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             await unlink(cwd() + '/public' + user.image)
           }
 
-          const filename = nanoid() + '.' + type.split('/')[1]
+          const filename = nanoid() + '.' + type
           const uri = '/static/images/users/' + filename
           const path = cwd() + '/public' + uri
 
-          const imageData = Buffer.from(base64Uri.split(',')[1], 'base64')
+          const imageData = Buffer.from(base64, 'base64')
           await appendFile(path, imageData)
 
           update = { image: uri }

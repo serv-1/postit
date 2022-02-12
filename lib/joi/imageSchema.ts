@@ -3,20 +3,18 @@ import err from '../../utils/constants/errors'
 import object from './object'
 
 const imageSchema = object({
-  base64Uri: Joi.string().required().messages({
+  base64: Joi.string().base64().required().messages({
+    'string.base': err.IMAGE_INVALID,
+    'string.empty': err.IMAGE_REQUIRED,
+    'string.base64': err.IMAGE_INVALID,
+    'any.required': err.IMAGE_REQUIRED,
+  }),
+  type: Joi.string().required().valid('jpeg', 'png', 'gif').messages({
     'string.base': err.IMAGE_INVALID,
     'string.empty': err.IMAGE_REQUIRED,
     'any.required': err.IMAGE_REQUIRED,
+    'any.only': err.IMAGE_INVALID,
   }),
-  type: Joi.string()
-    .required()
-    .valid('image/jpeg', 'image/png', 'image/gif')
-    .messages({
-      'string.base': err.IMAGE_INVALID,
-      'string.empty': err.IMAGE_REQUIRED,
-      'any.required': err.IMAGE_REQUIRED,
-      'any.only': err.IMAGE_INVALID,
-    }),
 })
 
 export default imageSchema

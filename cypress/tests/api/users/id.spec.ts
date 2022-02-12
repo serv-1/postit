@@ -230,28 +230,11 @@ describe('/api/users/:id', () => {
         cy.signIn(u1.email, u1.password)
 
         const url = `/api/users/${ids.u1Id}`
-        const body = { image: { base64Uri: 'text', type: 'text/plain' } }
+        const body = { image: { base64: 'text', type: 'txt' } }
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(422)
           expect(res.body).to.have.property('message', err.IMAGE_INVALID)
-        })
-      })
-    })
-
-    it('422 - Invalid image base64 uri', function () {
-      cy.task('db:reset')
-
-      cy.task<Ids>('db:seed').then((ids) => {
-        cy.signIn(u1.email, u1.password)
-
-        const url = `/api/users/${ids.u1Id}`
-        const image = { base64Uri: 'not base 64 uri', type: 'image/jpeg' }
-        const body = { image }
-
-        cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
-          expect(res.status).to.eq(422)
-          expect(res.body).to.have.property('message', err.DATA_INVALID)
         })
       })
     })
@@ -263,10 +246,8 @@ describe('/api/users/:id', () => {
         cy.signIn(u1.email, u1.password)
 
         const url = `/api/users/${ids.u1Id}`
-        const type = 'image/jpeg'
         const base64 = Buffer.from(new Uint8Array(1000001)).toString('base64')
-        const image = { base64Uri: `data:${type};base64,${base64}`, type }
-        const body = { image }
+        const body = { image: { base64, type: 'jpeg' } }
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(413)
@@ -282,10 +263,8 @@ describe('/api/users/:id', () => {
         cy.signIn(u1.email, u1.password)
 
         const url = `/api/users/${ids.u1Id}`
-        const type = 'image/jpeg'
         const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
-        const image = { base64Uri: `data:${type};base64,${base64}`, type }
-        const body = { image }
+        const body = { image: { base64, type: 'jpeg' } }
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(200)

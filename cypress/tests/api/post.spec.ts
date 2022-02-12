@@ -70,19 +70,6 @@ describe('/api/post', () => {
       })
     })
 
-    it('422 - Invalid image type', function () {
-      cy.signIn(u1.email, u1.password)
-
-      const image = { ...createImage(0), base64Uri: 'not a base64 uri' }
-      const body = { ...defaultBody, images: [image] }
-
-      cy.req({ url, method: 'POST', csrfToken: true, body }).then((res) => {
-        expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('name', 'images')
-        expect(res.body).to.have.property('message', err.IMAGES_INVALID)
-      })
-    })
-
     it('413 - image too large', function () {
       cy.signIn(u1.email, u1.password)
 
@@ -113,10 +100,12 @@ describe('/api/post', () => {
         expect(res.status).to.eq(200)
 
         cy.task<IPost>('db:getPostByUserId', this.u1Id).then((post) => {
-          expect(post).not.to.eq(null)
+          expect(post.name).to.eq(defaultBody.name)
+          expect(post.description).to.eq(defaultBody.description)
+          expect(post.categories).to.have.members(defaultBody.categories)
           expect(post.price).to.eq(defaultBody.price * 100)
+          expect(post.images).to.have.length(5)
           expect(post.userId).to.eq(this.u1Id)
-          expect(post.images.length).to.eq(5)
         })
       })
     })
@@ -124,11 +113,6 @@ describe('/api/post', () => {
 })
 
 function createImage(size: number) {
-  const data = new Uint8Array(size)
-  const base64 = Buffer.from(data).toString('base64')
-
-  return {
-    base64Uri: 'data:image/jpeg;base64,' + base64,
-    type: 'image/jpeg',
-  }
+  const base64 = Buffer.from(new Uint8Array(size)).toString('base64')
+  return { base64, type: 'jpeg' }
 }
