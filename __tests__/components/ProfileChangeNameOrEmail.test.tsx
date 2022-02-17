@@ -1,5 +1,4 @@
 import ProfileChangeNameOrEmail from '../../components/ProfileChangeNameOrEmail'
-import { mockSession } from '../../mocks/nextAuth'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
@@ -15,13 +14,7 @@ const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 beforeEach(() => useToast.mockReturnValue({}))
 
 test('the user name/email and the form renders correctly', async () => {
-  render(
-    <ProfileChangeNameOrEmail
-      type="name"
-      id={mockSession.id}
-      value="John Doe"
-    />
-  )
+  render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const name = screen.getByText('John Doe')
   expect(name).toBeInTheDocument()
@@ -41,13 +34,7 @@ test('the user name/email and the form renders correctly', async () => {
 })
 
 test('an input with an email type renders', async () => {
-  render(
-    <ProfileChangeNameOrEmail
-      type="email"
-      id={mockSession.id}
-      value="johndoe@test.com"
-    />
-  )
+  render(<ProfileChangeNameOrEmail type="email" value="johndoe@test.com" />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)
@@ -59,13 +46,7 @@ test('an input with an email type renders', async () => {
 })
 
 test('the cancel button cancels the editing process', async () => {
-  render(
-    <ProfileChangeNameOrEmail
-      type="name"
-      id={mockSession.id}
-      value="John Doe"
-    />
-  )
+  render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)
@@ -87,13 +68,7 @@ test('an alert renders if the user name/email is updated and the new user name/e
   const setToast = jest.fn((update: Update) => update.background)
   useToast.mockReturnValue({ setToast })
 
-  render(
-    <ProfileChangeNameOrEmail
-      type="name"
-      id={mockSession.id}
-      value="John Doe"
-    />
-  )
+  render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)
@@ -116,13 +91,7 @@ test('the user name/email does not update if it has not change', async () => {
   const setToast = jest.fn()
   useToast.mockReturnValue({ setToast })
 
-  render(
-    <ProfileChangeNameOrEmail
-      type="name"
-      id={mockSession.id}
-      value="John Doe"
-    />
-  )
+  render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)
@@ -143,18 +112,12 @@ test('the user name/email does not update if it has not change', async () => {
 
 test('an error renders if the server fails to update the user', async () => {
   server.use(
-    rest.put('http://localhost:3000/api/users/:id', (req, res, ctx) => {
+    rest.put('http://localhost:3000/api/user', (req, res, ctx) => {
       return res(ctx.status(422), ctx.json({ message: err.NAME_MAX }))
     })
   )
 
-  render(
-    <ProfileChangeNameOrEmail
-      type="name"
-      id={mockSession.id}
-      value="John Doe"
-    />
-  )
+  render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
   userEvent.click(editBtn)

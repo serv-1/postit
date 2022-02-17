@@ -7,11 +7,7 @@ import Button from './Button'
 import Modal from './Modal'
 import OpenModalButton from './OpenModalButton'
 
-interface ProfileDeleteAccountProps {
-  id: string
-}
-
-const ProfileDeleteAccount = ({ id }: ProfileDeleteAccountProps) => {
+const ProfileDeleteAccount = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const { setToast } = useToast()
@@ -21,7 +17,7 @@ const ProfileDeleteAccount = ({ id }: ProfileDeleteAccountProps) => {
       const res = await axios.get('http://localhost:3000/api/auth/csrf')
 
       const data = { csrfToken: res.data.csrfToken }
-      await axios.delete(`http://localhost:3000/api/users/${id}`, { data })
+      await axios.delete(`http://localhost:3000/api/user`, { data })
 
       await signOut({ callbackUrl: '/' })
     } catch (e) {

@@ -7,11 +7,10 @@ import getAxiosError from '../utils/functions/getAxiosError'
 import err from '../utils/constants/errors'
 
 interface ProfileChangeImageProps {
-  id: string
   image: string
 }
 
-const ProfileChangeImage = ({ id, image: img }: ProfileChangeImageProps) => {
+const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [image, setImage] = useState(img)
   const { setToast } = useToast()
@@ -41,7 +40,7 @@ const ProfileChangeImage = ({ id, image: img }: ProfileChangeImageProps) => {
 
         const base64 = (e.target.result as string).split(',')[1]
 
-        await axios.put<null>(`http://localhost:3000/api/users/${id}`, {
+        await axios.put<null>('http://localhost:3000/api/user', {
           csrfToken: res.data.csrfToken,
           image: { base64, type: files[0].type.split('/')[1] },
         })

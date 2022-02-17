@@ -1,7 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProfileDeleteAccount from '../../components/ProfileDeleteAccount'
-import { mockSession } from '../../mocks/nextAuth'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
@@ -19,7 +18,7 @@ beforeEach(() => {
 })
 
 test('the user is signed out and redirected to the home page after being deleted', async () => {
-  render(<ProfileDeleteAccount id={mockSession.id} />)
+  render(<ProfileDeleteAccount />)
 
   const openModalBtn = screen.getByRole('button')
   userEvent.click(openModalBtn)
@@ -33,7 +32,7 @@ test('the user is signed out and redirected to the home page after being deleted
 })
 
 test('the cancel button closes the modal', () => {
-  render(<ProfileDeleteAccount id={mockSession.id} />)
+  render(<ProfileDeleteAccount />)
 
   const openModalBtn = screen.getByRole('button')
   userEvent.click(openModalBtn)
@@ -50,12 +49,12 @@ test('an error renders if the server fails to delete the user', async () => {
   useToast.mockReturnValue({ setToast })
 
   server.use(
-    rest.delete('http://localhost:3000/api/users/:id', (req, res, ctx) => {
+    rest.delete('http://localhost:3000/api/user', (req, res, ctx) => {
       return res(ctx.status(422), ctx.json({ message: err.PARAMS_INVALID }))
     })
   )
 
-  render(<ProfileDeleteAccount id={mockSession.id} />)
+  render(<ProfileDeleteAccount />)
 
   const openModalBtn = screen.getByRole('button')
   userEvent.click(openModalBtn)

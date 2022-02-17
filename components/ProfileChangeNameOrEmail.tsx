@@ -17,12 +17,11 @@ type FormFields<T> = { csrfToken?: string } & (T extends 'name'
 
 export interface ProfileChangeNameOrEmailProps {
   type: 'name' | 'email'
-  id: string
   value: string
 }
 
 const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
-  const { type, id, value: val } = props
+  const { type, value: val } = props
   type Type = typeof type
 
   const [showForm, setShowForm] = useState(false)
@@ -34,14 +33,15 @@ const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
   const methods = useForm<FormFields<Type>>({ resolver: joiResolver(schema) })
 
   const submitHandler: SubmitHandler<FormFields<Type>> = async (data) => {
-    const newValue = Object.entries(data).filter(
-      ([key]) => key !== 'csrfToken'
-    )[0][1]
+    const csrfToken = data.csrfToken
+    delete data.csrfToken
+
+    const newValue = Object.values(data)[0]
 
     if (newValue === value) return setShowForm(false)
 
     try {
-      await axios.put(`http://localhost:3000/api/users/${id}`, data)
+      await axios.put('http://localhost:3000/api/user', { csrfToken, ...data })
 
       setShowForm(false)
       setValue(newValue)

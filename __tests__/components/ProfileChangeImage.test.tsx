@@ -1,7 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import ProfileChangeImage from '../../components/ProfileChangeImage'
 import userEvent from '@testing-library/user-event'
-import { mockSession } from '../../mocks/nextAuth'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
@@ -17,7 +16,7 @@ const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 beforeEach(() => useToast.mockReturnValue({}))
 
 test('the button trigger a click on the file input', () => {
-  render(<ProfileChangeImage id={mockSession.id} image="/img" />)
+  render(<ProfileChangeImage image="/img" />)
 
   const input = screen.getByTestId('fileInput')
   const click = jest.fn()
@@ -33,7 +32,7 @@ test('an alert renders if the user image is updated and the new user image rende
   const setToast = jest.fn((update: Update) => update.background)
   useToast.mockReturnValue({ setToast })
 
-  render(<ProfileChangeImage id={mockSession.id} image="base64Uri" />)
+  render(<ProfileChangeImage image="base64Uri" />)
 
   const oldImg = screen.getByRole('img')
   const oldSrc = oldImg.getAttribute('src')
@@ -55,7 +54,7 @@ test('an error renders if the user image is invalid', async () => {
   const setToast = jest.fn()
   useToast.mockReturnValue({ setToast })
 
-  render(<ProfileChangeImage id={mockSession.id} image="/img" />)
+  render(<ProfileChangeImage image="/img" />)
 
   const input = screen.getByTestId('fileInput')
   const textFile = new File(['text'], 'text.txt', { type: 'text/plain' })
@@ -81,12 +80,12 @@ test('an error renders if the server fails to update the user image', async () =
   useToast.mockReturnValue({ setToast })
 
   server.use(
-    rest.put('http://localhost:3000/api/users/:id', (req, res, ctx) => {
+    rest.put('http://localhost:3000/api/user', (req, res, ctx) => {
       return res(ctx.status(422), ctx.json({ message: err.IMAGE_INVALID }))
     })
   )
 
-  render(<ProfileChangeImage id={mockSession.id} image="/img" />)
+  render(<ProfileChangeImage image="/img" />)
 
   const input = screen.getByTestId('fileInput')
   userEvent.upload(input, file)

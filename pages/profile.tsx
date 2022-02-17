@@ -27,21 +27,13 @@ const Profile = ({ user }: ProfileProps) => {
   return (
     <main data-cy="profile" className="container-fluid my-4">
       <div className="col-md-6 col-6 m-auto">
-        <ProfileChangeImage id={user.id} image={user.image} />
+        <ProfileChangeImage image={user.image} />
         <div className="my-2 d-flex flex-column">
-          <ProfileChangeNameOrEmail
-            id={user.id}
-            value={user.name}
-            type="name"
-          />
-          <ProfileChangeNameOrEmail
-            id={user.id}
-            value={user.email}
-            type="email"
-          />
+          <ProfileChangeNameOrEmail value={user.name} type="name" />
+          <ProfileChangeNameOrEmail value={user.email} type="email" />
         </div>
-        <ProfileChangePassword id={user.id} />
-        <ProfileDeleteAccount id={user.id} />
+        <ProfileChangePassword />
+        <ProfileDeleteAccount />
       </div>
     </main>
   )

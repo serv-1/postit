@@ -14,11 +14,7 @@ interface FormFields {
   password: string
 }
 
-interface ProfileChangePasswordProps {
-  id: string
-}
-
-const ProfileChangePassword = ({ id }: ProfileChangePasswordProps) => {
+const ProfileChangePassword = () => {
   const { setToast } = useToast()
 
   const resolver = joiResolver(passwordCsrfSchema)
@@ -26,7 +22,7 @@ const ProfileChangePassword = ({ id }: ProfileChangePasswordProps) => {
 
   const submitHandler: SubmitHandler<FormFields> = async (data) => {
     try {
-      await axios.put(`http://localhost:3000/api/users/${id}`, data)
+      await axios.put('http://localhost:3000/api/user', data)
 
       setToast({
         message: 'Your password has been updated! 🎉',
