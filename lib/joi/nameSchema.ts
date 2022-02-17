@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import err from '../../utils/constants/errors'
-import csrfTokenSchema from './csrfTokenSchema'
+import { csrfTokenSchema } from './csrfTokenSchema'
 import object from './object'
 
 export const nameSchema = Joi.string().required().trim().max(90).messages({
@@ -11,6 +11,6 @@ export const nameSchema = Joi.string().required().trim().max(90).messages({
 })
 
 export const nameCsrfSchema = object({
-  name: nameSchema,
   csrfToken: csrfTokenSchema,
+  name: nameSchema,
 })

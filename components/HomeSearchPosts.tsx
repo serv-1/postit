@@ -8,11 +8,11 @@ import categories from '../categories'
 import InputError from './InputError'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import getApiError from '../utils/functions/getApiError'
+import getAxiosError from '../utils/functions/getAxiosError'
 import { useToast } from '../contexts/toast'
 import { joiResolver } from '@hookform/resolvers/joi'
-import searchPostSchema from '../lib/joi/searchPostSchema'
-import axios from 'axios'
+import { searchPostSchema } from '../lib/joi/searchPostSchema'
+import axios, { AxiosError } from 'axios'
 import { Post } from '../types/common'
 
 const options = categories.map((category) => ({
@@ -66,7 +66,8 @@ const HomeSearchPosts = ({
         setTotalPosts(data.totalPosts)
         setTotalPages(data.totalPages)
       } catch (e) {
-        const { name, message } = getApiError<keyof FormFields>(e)
+        type FieldsNames = keyof FormFields
+        const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)
 
         if (name) {
           return methods.setError(name, { message }, { shouldFocus: true })

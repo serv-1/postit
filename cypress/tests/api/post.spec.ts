@@ -42,9 +42,9 @@ describe('/api/post', () => {
     it('422 - Invalid CSRF token', function () {
       cy.signIn(u1.email, u1.password)
 
-      cy.req({ url, method: 'POST' }).then((res) => {
+      cy.req({ url, method: 'POST', body: defaultBody }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', err.DATA_INVALID)
+        expect(res.body).to.have.property('message', err.CSRF_TOKEN_INVALID)
       })
     })
 
@@ -58,19 +58,7 @@ describe('/api/post', () => {
       })
     })
 
-    it('422 - Invalid price', function () {
-      cy.signIn(u1.email, u1.password)
-
-      const body = { ...defaultBody, price: 1.123 }
-
-      cy.req({ url, method: 'POST', csrfToken: true, body }).then((res) => {
-        expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('name', 'price')
-        expect(res.body).to.have.property('message', err.PRICE_INVALID)
-      })
-    })
-
-    it('413 - image too large', function () {
+    it('413 - image too big', function () {
       cy.signIn(u1.email, u1.password)
 
       const body = { ...defaultBody, images: [createImage(1000001)] }
@@ -78,7 +66,7 @@ describe('/api/post', () => {
       cy.req({ url, method: 'POST', csrfToken: true, body }).then((res) => {
         expect(res.status).to.eq(413)
         expect(res.body).to.have.property('name', 'images')
-        expect(res.body).to.have.property('message', err.IMAGE_TOO_LARGE)
+        expect(res.body).to.have.property('message', err.IMAGE_TOO_BIG)
       })
     })
 
@@ -108,6 +96,8 @@ describe('/api/post', () => {
           expect(post.userId).to.eq(this.u1Id)
         })
       })
+
+      cy.task('deleteImages', 'posts')
     })
   })
 })

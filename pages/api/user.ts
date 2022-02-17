@@ -4,17 +4,21 @@ import dbConnect from '../../utils/functions/dbConnect'
 import User from '../../models/User'
 import { MongoError } from 'mongodb'
 import err from '../../utils/constants/errors'
-import registerSchema from '../../lib/joi/registerSchema'
-import validateSchema from '../../utils/functions/validateSchema'
+import validate from '../../utils/functions/validate'
+import { RegisterSchema, registerSchema } from '../../lib/joi/registerSchema'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
-    return res.status(405).send({ message: err.METHOD_NOT_ALLOWED })
+    return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  validateSchema(registerSchema, req.body, res, true)
+  const result = validate(registerSchema, req.body as RegisterSchema)
 
-  const { name, email, password } = req.body
+  if ('message' in result) {
+    return res.status(422).json({ name: result.name, message: result.message })
+  }
+
+  const { name, email, password } = result.value
 
   try {
     const salt = randomBytes(16).toString('hex')
@@ -27,9 +31,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(200).end()
   } catch (e) {
     if ((e as MongoError).code === 11000) {
-      return res.status(422).send({ message: err.EMAIL_USED, name: 'email' })
+      return res.status(422).json({ message: err.EMAIL_USED, name: 'email' })
     }
-    res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
+    res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
   }
 }
 

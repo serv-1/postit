@@ -1,23 +1,31 @@
 import Joi from 'joi'
+import { Categories } from '../../types/common'
 import err from '../../utils/constants/errors'
 import { categoriesSchema } from './categoriesSchema'
 import object from './object'
-import pageSchema from './pageSchema'
+import { pageSchema } from './pageSchema'
 import { priceSchema } from './priceSchema'
-import querySchema from './querySchema'
+import { querySchema } from './querySchema'
 
-const searchPostSchema = object({
+export interface SearchPostsSchema {
+  query: string
+  page?: string
+  minPrice?: string
+  maxPrice?: string
+  categories?: Categories[]
+}
+
+export const searchPostSchema = object<SearchPostsSchema>({
   query: querySchema,
   page: pageSchema,
-  minPrice: priceSchema.default(0),
+  minPrice: priceSchema.optional().min(0).default(0),
   maxPrice: Joi.alternatives().conditional('minPrice', {
     is: '',
-    then: priceSchema,
+    then: priceSchema.optional().min(0),
     otherwise: priceSchema
+      .optional()
       .min(Joi.ref('minPrice'))
       .messages({ 'number.min': err.MAX_PRICE_MIN }),
   }),
-  categories: categoriesSchema.min(0),
+  categories: categoriesSchema.optional().min(0),
 })
-
-export default searchPostSchema

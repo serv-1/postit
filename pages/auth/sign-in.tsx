@@ -11,12 +11,7 @@ import FormField from '../../components/FormField'
 import FormPasswordField from '../../components/FormPasswordField'
 import Button from '../../components/Button'
 import { useToast } from '../../contexts/toast'
-import signInSchema from '../../lib/joi/signInSchema'
-
-interface FormFields {
-  email: string
-  password: string
-}
+import { SignInSchema, signInSchema } from '../../lib/joi/signInSchema'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
@@ -34,11 +29,11 @@ interface SignInProps {
 }
 
 const SignIn = ({ providers }: SignInProps) => {
-  const methods = useForm<FormFields>({ resolver: joiResolver(signInSchema) })
+  const methods = useForm<SignInSchema>({ resolver: joiResolver(signInSchema) })
   const { setToast } = useToast()
   const router = useRouter()
 
-  const submitHandler: SubmitHandler<FormFields> = async (data) => {
+  const submitHandler: SubmitHandler<SignInSchema> = async (data) => {
     const res = await NextAuth.signIn<'credentials'>('credentials', {
       ...data,
       redirect: false,

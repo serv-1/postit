@@ -69,7 +69,7 @@ describe('/api/posts/:id', () => {
 
       cy.req({ url, method: 'PUT', body }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', err.DATA_INVALID)
+        expect(res.body).to.have.property('message', err.CSRF_TOKEN_INVALID)
       })
     })
 
@@ -268,6 +268,23 @@ describe('/api/posts/:id', () => {
         })
       })
 
+      it('413 - image too big', function () {
+        cy.task('db:reset')
+
+        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+          cy.signIn(u1.email, u1.password)
+
+          const url = `/api/posts/${ids.pId}`
+          const base64 = Buffer.from(new Uint8Array(1000001)).toString('base64')
+          const body = { images: [{ base64, type: 'jpeg' }] }
+
+          cy.req({ url, method: 'PUT', csrfToken: true, body }).then((res) => {
+            expect(res.status).to.eq(413)
+            expect(res.body).to.have.property('message', err.IMAGE_TOO_BIG)
+          })
+        })
+      })
+
       it('200 - Images updated', function () {
         cy.task('db:reset')
 
@@ -307,7 +324,7 @@ describe('/api/posts/:id', () => {
             })
           })
 
-          cy.task('deleteImages')
+          cy.task('deleteImages', 'posts')
         })
       })
     })
@@ -331,7 +348,7 @@ describe('/api/posts/:id', () => {
 
       cy.req({ url, method: 'DELETE', body }).then((res) => {
         expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', err.DATA_INVALID)
+        expect(res.body).to.have.property('message', err.CSRF_TOKEN_INVALID)
       })
     })
 

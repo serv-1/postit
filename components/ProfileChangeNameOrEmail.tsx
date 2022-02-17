@@ -1,11 +1,11 @@
 import { joiResolver } from '@hookform/resolvers/joi'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
 import { emailCsrfSchema } from '../lib/joi/emailSchema'
 import { nameCsrfSchema } from '../lib/joi/nameSchema'
-import getApiError from '../utils/functions/getApiError'
+import getAxiosError from '../utils/functions/getAxiosError'
 import Button from './Button'
 import Form from './Form'
 import InputError from './InputError'
@@ -50,7 +50,7 @@ const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
         background: 'success',
       })
     } catch (e) {
-      const { message } = getApiError(e)
+      const { message } = getAxiosError(e as AxiosError)
       methods.setError(type, { message }, { shouldFocus: true })
     }
   }

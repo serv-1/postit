@@ -12,6 +12,7 @@ import env from '../../utils/constants/env'
 import { randomBytes, scryptSync } from 'crypto'
 import { readdir, unlink } from 'fs/promises'
 import { cwd } from 'process'
+import { Post as P } from '../../types/common'
 
 export interface Ids {
   u1Id: string
@@ -21,11 +22,11 @@ export interface Ids {
 
 const pluginConfig: Cypress.PluginConfig = (on, config) => {
   on('task', {
-    async deleteImages() {
-      const files = await readdir(cwd() + '/public/static/images/posts')
+    async deleteImages(dir: string) {
+      const files = await readdir(cwd() + '/public/static/images/' + dir)
 
       for (const file of files) {
-        await unlink(cwd() + '/public/static/images/posts/' + file)
+        await unlink(cwd() + `/public/static/images/${dir}/` + file)
       }
 
       return null
@@ -122,16 +123,22 @@ async function insertAccount(id: string) {
  * @returns first added post's id
  */
 async function insertPosts(id: string): Promise<string> {
-  const posts: Omit<IPost, '_id'>[] = postsJson.map((post) => ({
-    ...post,
-    userId: new Types.ObjectId(post.userId),
-  }))
+  const posts: Omit<IPost, '_id'>[] = (postsJson as Omit<P, 'id'>[]).map(
+    (post) => ({
+      ...post,
+      userId: new Types.ObjectId(post.userId),
+    })
+  )
 
   posts[0].userId = new Types.ObjectId(id)
 
   for (let i = 0; i < 40; i++) {
     const categories =
-      i % 2 === 0 ? ['pet'] : i % 3 === 0 ? ['cat'] : ['pet', 'cat']
+      i % 2 === 0
+        ? ['pet' as const]
+        : i % 3 === 0
+        ? ['cat' as const]
+        : ['pet' as const, 'cat' as const]
 
     posts.push({
       name: 'Cat',

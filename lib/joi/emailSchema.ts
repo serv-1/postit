@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import err from '../../utils/constants/errors'
-import csrfTokenSchema from './csrfTokenSchema'
+import { csrfTokenSchema } from './csrfTokenSchema'
 import object from './object'
 
 export const emailSchema = Joi.string()
@@ -15,6 +15,6 @@ export const emailSchema = Joi.string()
   })
 
 export const emailCsrfSchema = object({
-  email: emailSchema,
   csrfToken: csrfTokenSchema,
+  email: emailSchema,
 })

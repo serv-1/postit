@@ -2,7 +2,7 @@ import Joi from 'joi'
 import err from '../../utils/constants/errors'
 import object from './object'
 
-const imageSchema = object({
+export const imageSchema = object({
   base64: Joi.string().base64().required().messages({
     'string.base': err.IMAGE_INVALID,
     'string.empty': err.IMAGE_REQUIRED,
@@ -16,5 +16,3 @@ const imageSchema = object({
     'any.only': err.IMAGE_INVALID,
   }),
 })
-
-export default imageSchema

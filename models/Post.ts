@@ -1,11 +1,12 @@
 import { models, model, Schema, Model, Types } from 'mongoose'
+import { Categories } from '../types/common'
 import err from '../utils/constants/errors'
 
 export interface IPost {
   _id: Types.ObjectId
   name: string
   description: string
-  categories: string[]
+  categories: Categories[]
   price: number
   images: string[]
   userId: Types.ObjectId

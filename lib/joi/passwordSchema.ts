@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import err from '../../utils/constants/errors'
-import csrfTokenSchema from './csrfTokenSchema'
+import { csrfTokenSchema } from './csrfTokenSchema'
 import object from './object'
 
 export const passwordSchema = Joi.string()
@@ -18,6 +18,6 @@ export const passwordSchema = Joi.string()
   })
 
 export const passwordCsrfSchema = object({
-  password: passwordSchema,
   csrfToken: csrfTokenSchema,
+  password: passwordSchema,
 })

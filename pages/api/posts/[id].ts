@@ -1,40 +1,47 @@
-import isBase64ValueTooLarge from '../../../utils/functions/isBase64ValueTooLarge'
+import isBase64ValueTooBig from '../../../utils/functions/isBase64ValueTooBig'
 import { isValidObjectId } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import Post from '../../../models/Post'
-import authCheck from '../../../utils/functions/authCheck'
 import dbConnect from '../../../utils/functions/dbConnect'
 import err from '../../../utils/constants/errors'
-import validateSchema from '../../../utils/functions/validateSchema'
-import { nanoid } from 'nanoid'
 import { cwd } from 'process'
-import { appendFile, unlink } from 'fs/promises'
-import { Buffer } from 'buffer'
 import { getSession } from 'next-auth/react'
-import { Session } from 'next-auth'
-import { nameCsrfSchema } from '../../../lib/joi/nameSchema'
-import { descriptionCsrfSchema } from '../../../lib/joi/descritptionSchema'
-import { reqCategoriesCsrfSchema } from '../../../lib/joi/categoriesSchema'
-import { reqPriceCsrfSchema } from '../../../lib/joi/priceSchema'
-import { imagesArrayCsrfSchema } from '../../../lib/joi/imagesSchema'
-import { Image } from '../../../types/common'
+import validate from '../../../utils/functions/validate'
+import { csrfTokenSchema } from '../../../lib/joi/csrfTokenSchema'
+import isCsrfTokenValid from '../../../utils/functions/isCsrfTokenValid'
+import createFile from '../../../utils/functions/createFile'
+import { unlink } from 'fs/promises'
+import { Categories } from '../../../types/common'
+import {
+  PostsIdPutSchema,
+  postsIdPutSchema,
+} from '../../../lib/joi/postsIdPutSchema'
+
+type Update =
+  | { name: string }
+  | { description: string }
+  | { categories: Categories[] }
+  | { price: number }
+  | { images: string[] }
+  | undefined
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
+
   if (!isValidObjectId(id)) {
-    return res.status(422).send({ message: err.PARAMS_INVALID })
+    return res.status(422).json({ message: err.PARAMS_INVALID })
   }
 
   switch (req.method) {
-    case 'GET':
+    case 'GET': {
       await dbConnect()
       const post = await Post.findOne({ _id: id }).lean().exec()
 
       if (!post) {
-        return res.status(404).send({ message: err.POST_NOT_FOUND })
+        return res.status(404).json({ message: err.POST_NOT_FOUND })
       }
 
-      res.status(200).send({
+      res.status(200).json({
         id: post._id.toString(),
         name: post.name,
         description: post.description,
@@ -44,107 +51,116 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         userId: post.userId.toString(),
       })
       break
+    }
     case 'PUT': {
-      const resp = await authCheck(req)
-      if (resp) return res.status(resp.status).send({ message: resp.message })
+      const session = await getSession({ req })
 
-      const session = (await getSession({ req })) as Session
+      if (!session) {
+        return res.status(403).json({ message: err.FORBIDDEN })
+      }
+
+      const result = validate(postsIdPutSchema, req.body as PostsIdPutSchema)
+      const reqBody = result.value
+
+      if ('message' in result) {
+        return res.status(422).json({ message: result.message })
+      }
+
+      const csrfTokenCookie = req.cookies['next-auth.csrf-token']
+
+      if (!isCsrfTokenValid(csrfTokenCookie, reqBody.csrfToken)) {
+        return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
+      }
 
       const post = await Post.findOne({ _id: id }).lean().exec()
 
       if (!post) {
-        return res.status(404).send({ message: err.POST_NOT_FOUND })
+        return res.status(404).json({ message: err.POST_NOT_FOUND })
       }
 
       if (session.id !== post.userId.toString()) {
-        return res.status(422).send({ message: err.PARAMS_INVALID })
+        return res.status(422).json({ message: err.PARAMS_INVALID })
       }
 
-      const key = Object.keys(req.body).reduce((prev, next) =>
-        next !== 'csrfToken' ? next : prev
-      )
+      let update: Update
 
-      let update: Record<string, unknown>
+      if ('images' in reqBody) {
+        const images: string[] = []
 
-      switch (key) {
-        case 'name':
-          validateSchema(nameCsrfSchema, req.body, res)
-          update = { name: req.body.name }
-          break
-        case 'description': {
-          validateSchema(descriptionCsrfSchema, req.body, res)
-          update = { description: req.body.description }
-          break
+        for (const { base64, type } of reqBody.images) {
+          if (isBase64ValueTooBig(base64, 1000000)) {
+            return res.status(413).json({ message: err.IMAGE_TOO_BIG })
+          }
+
+          const fname = await createFile(
+            base64,
+            type,
+            '/static/images/posts/',
+            'base64'
+          )
+
+          images.push('/static/images/posts/' + fname)
         }
-        case 'categories': {
-          validateSchema(reqCategoriesCsrfSchema, req.body, res)
-          update = { categories: req.body.categories }
-          break
+
+        const post = await Post.findOne({ _id: id }).lean().exec()
+
+        if (!post) {
+          return res.status(404).json({ message: err.POST_NOT_FOUND })
         }
-        case 'price':
-          validateSchema(reqPriceCsrfSchema, req.body, res)
-          update = { price: req.body.price * 100 }
-          break
-        case 'images':
-          validateSchema(imagesArrayCsrfSchema, req.body, res, true)
 
-          const images: string[] = []
+        for (const image of post.images) {
+          await unlink(cwd() + '/public' + image)
+        }
 
-          for (const { base64, type } of req.body.images as Image[]) {
-            if (isBase64ValueTooLarge(base64, 1000000)) {
-              return res.status(413).send({ message: err.IMAGE_TOO_LARGE })
-            }
-
-            const filename = nanoid() + '.' + type
-            const uri = '/static/images/posts/' + filename
-            const path = cwd() + '/public' + uri
-
-            const imageData = Buffer.from(base64, 'base64')
-            await appendFile(path, imageData)
-
-            images.push(uri)
-          }
-
-          const post = await Post.findOne({ _id: id }).lean().exec()
-
-          if (!post) {
-            return res.status(404).send({ message: err.POST_NOT_FOUND })
-          }
-
-          for (const image of post.images) {
-            await unlink(cwd() + '/public' + image)
-          }
-
-          update = { images }
-          break
-        default:
-          return res.status(422).send({ message: err.DATA_INVALID })
+        update = { images }
+      } else if ('price' in reqBody) {
+        update = { price: reqBody.price * 100 }
+      } else if ('name' in reqBody) {
+        update = { name: reqBody.name }
+      } else if ('description' in reqBody) {
+        update = { description: reqBody.description }
+      } else if ('categories' in reqBody) {
+        update = { categories: reqBody.categories }
       }
 
       try {
         await dbConnect()
         await Post.updateOne({ _id: id }, update).exec()
       } catch (e) {
-        res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
+        res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
       }
 
       res.status(200).end()
       break
     }
     case 'DELETE': {
-      const resp = await authCheck(req)
-      if (resp) return res.status(resp.status).send({ message: resp.message })
+      const session = await getSession({ req })
 
-      const session = (await getSession({ req })) as Session
+      if (!session) {
+        return res.status(403).json({ message: err.FORBIDDEN })
+      }
+
+      const csrfToken: string | undefined = req.body?.csrfToken
+      const result = validate(csrfTokenSchema, csrfToken)
+
+      if ('message' in result) {
+        return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
+      }
+
+      const csrfTokenCookie = req.cookies['next-auth.csrf-token']
+
+      if (!isCsrfTokenValid(csrfTokenCookie, result.value)) {
+        return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
+      }
 
       const post = await Post.findOne({ _id: id }).lean().exec()
 
       if (!post) {
-        return res.status(404).send({ message: err.POST_NOT_FOUND })
+        return res.status(404).json({ message: err.POST_NOT_FOUND })
       }
 
       if (session.id !== post.userId.toString()) {
-        return res.status(422).send({ message: err.PARAMS_INVALID })
+        return res.status(422).json({ message: err.PARAMS_INVALID })
       }
 
       for (const image of post.images) {
@@ -155,14 +171,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await dbConnect()
         await Post.deleteOne({ _id: id }).exec()
       } catch (e) {
-        res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
+        res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
       }
 
       res.status(200).end()
       break
     }
     default:
-      res.status(405).send({ message: err.METHOD_NOT_ALLOWED })
+      res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 }
 

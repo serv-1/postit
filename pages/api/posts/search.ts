@@ -1,37 +1,48 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import err from '../../../utils/constants/errors'
-import searchPostSchema from '../../../lib/joi/searchPostSchema'
+import {
+  searchPostSchema,
+  SearchPostsSchema,
+} from '../../../lib/joi/searchPostSchema'
 import dbConnect from '../../../utils/functions/dbConnect'
-import Post, { IPost } from '../../../models/Post'
-import validateSchema from '../../../utils/functions/validateSchema'
+import Post from '../../../models/Post'
+import validate from '../../../utils/functions/validate'
+import { Categories, Post as IPost } from '../../../types/common'
 
 interface Filter {
   $text: { $search: string }
   price?: { $gte: number; $lte?: number }
-  $and?: { categories: { $in: string[] } }[]
+  $and?: { categories: { $in: Categories[] } }[]
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
-    return res.status(405).send({ message: err.METHOD_NOT_ALLOWED })
+    return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  const data = { ...req.query }
-  const queryCategories = data['categories[]']
+  let queryCategories = req.query['categories[]'] as
+    | SearchPostsSchema['categories']
+    | Categories
 
-  if (queryCategories) {
-    if (Array.isArray(queryCategories)) {
-      data.categories = queryCategories
-    } else {
-      data.categories = [queryCategories]
-    }
-
-    delete data['categories[]']
+  if (queryCategories && !Array.isArray(queryCategories)) {
+    queryCategories = [queryCategories]
   }
 
-  validateSchema(searchPostSchema, data, res, true)
+  const reqQuery = {
+    query: req.query.query,
+    page: req.query.page,
+    minPrice: req.query.minPrice,
+    maxPrice: req.query.maxPrice,
+    categories: queryCategories,
+  } as SearchPostsSchema
 
-  const { query, page, minPrice, maxPrice, categories } = data
+  const result = validate(searchPostSchema, reqQuery)
+
+  if ('message' in result) {
+    return res.status(422).json({ name: result.name, message: result.message })
+  }
+
+  const { query, page, minPrice, maxPrice, categories } = result.value
 
   const filter: Filter = { $text: { $search: `"${query}"` } }
 
@@ -41,7 +52,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   if (categories) {
-    filter.$and = (categories as string[]).map((category) => ({
+    filter.$and = categories.map((category) => ({
       categories: { $in: [category] },
     }))
   }
@@ -54,11 +65,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const skip = page ? (+page - 1) * 20 : 0
     const posts = await Post.find(filter).skip(skip).limit(20).lean().exec()
-    const formatedPosts: (Omit<IPost, 'images' | 'userId'> & {
-      id: string
-      images: string[]
-      userId: string
-    })[] = []
+    const formatedPosts: IPost[] = []
 
     for (const post of posts) {
       formatedPosts.push({
@@ -69,9 +76,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       })
     }
 
-    res.status(200).send({ posts: formatedPosts, totalPages, totalPosts })
+    res.status(200).json({ posts: formatedPosts, totalPages, totalPosts })
   } catch (e) {
-    res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
+    res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
   }
 }
 

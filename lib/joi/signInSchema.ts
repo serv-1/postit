@@ -2,9 +2,12 @@ import { emailSchema } from './emailSchema'
 import object from './object'
 import { passwordSchema } from './passwordSchema'
 
-const signInSchema = object({
+export interface SignInSchema {
+  email: string
+  password: string
+}
+
+export const signInSchema = object<SignInSchema>({
   email: emailSchema,
   password: passwordSchema,
 })
-
-export default signInSchema

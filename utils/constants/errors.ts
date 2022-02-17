@@ -16,7 +16,7 @@ const err = {
   PASSWORD_SAME: 'The password cannot be the same as the other fields\' value.' as const,
 	/* User image */
 	IMAGE_INVALID: 'An image is expected. (.jpeg, .jpg, .png, .gif)' as const,
-	IMAGE_TOO_LARGE: 'The image\'s size cannot exceed 1 megabyte.' as const,
+	IMAGE_TOO_BIG: 'The image\'s size cannot exceed 1 megabyte.' as const,
 	IMAGE_REQUIRED: 'The image is required.' as const,
 	/* Description */
 	DESCRIPTION_INVALID: 'The description is invalid.' as const,
@@ -47,7 +47,6 @@ const err = {
   DATA_INVALID: 'The given data are invalid.' as const,
 	/* Server */
 	PARAMS_INVALID: 'One or many parameters are invalid.' as const,
-	DEFAULT_SERVER_ERROR: 'Something go boom! Be sure to have read the rules (if any) before sending your request again.' as const,
 	INTERNAL_SERVER_ERROR: 'Server go boom! Try to refresh the page or come back later.' as const,
 	METHOD_NOT_ALLOWED: 'Request go boom! This method is not handled.' as const,
 	FORBIDDEN: 'You are not authorized.' as const,
@@ -57,7 +56,9 @@ const err = {
 	IMAGE_NOT_FOUND: 'Image not found.' as const,
 	POST_NOT_FOUND: 'Post not found.' as const,
 	/* csrf token */
-	CSRF_TOKEN_INVALID: 'Something weird happen! Try to refresh the page or sign out and sign in again.' as const
+	CSRF_TOKEN_INVALID: 'Something weird happen! Try to refresh the page or sign out and sign in again.' as const,
+	/* Default */
+	DEFAULT: 'Something go boom! Try your action again or just wait if it still doesn\'t work.' as const,
 }
 
 export default err

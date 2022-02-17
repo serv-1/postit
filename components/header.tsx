@@ -3,8 +3,8 @@ import Image from 'next/image'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Button from './Button'
 import { useEffect, useState } from 'react'
-import axios from 'axios'
-import getApiError from '../utils/functions/getApiError'
+import axios, { AxiosError } from 'axios'
+import getAxiosError from '../utils/functions/getAxiosError'
 import { useToast } from '../contexts/toast'
 import { useRouter } from 'next/router'
 import BoxArrowRight from '../public/static/images/box-arrow-right.svg'
@@ -24,7 +24,7 @@ const Header = () => {
         const res = await axios.get(`http://localhost:3000/api/users/${id}`)
         setImage(res.data.image)
       } catch (e) {
-        const { message } = getApiError(e)
+        const { message } = getAxiosError(e as AxiosError)
         setToast({ message, background: 'danger' })
       }
     }

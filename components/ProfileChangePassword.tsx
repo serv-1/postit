@@ -1,5 +1,5 @@
 import { joiResolver } from '@hookform/resolvers/joi'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
 import { passwordCsrfSchema } from '../lib/joi/passwordSchema'
@@ -7,7 +7,7 @@ import Form from './Form'
 import InputError from './InputError'
 import Label from './Label'
 import PasswordInput from './PasswordInput'
-import getApiError from '../utils/functions/getApiError'
+import getAxiosError from '../utils/functions/getAxiosError'
 
 interface FormFields {
   csrfToken?: string
@@ -33,7 +33,7 @@ const ProfileChangePassword = ({ id }: ProfileChangePasswordProps) => {
         background: 'success',
       })
     } catch (e) {
-      const { message } = getApiError(e)
+      const { message } = getAxiosError(e as AxiosError)
       methods.setError('password', { message }, { shouldFocus: true })
     }
   }

@@ -1,8 +1,8 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { signOut } from 'next-auth/react'
 import { useState } from 'react'
 import { useToast } from '../contexts/toast'
-import getApiError from '../utils/functions/getApiError'
+import getAxiosError from '../utils/functions/getAxiosError'
 import Button from './Button'
 import Modal from './Modal'
 import OpenModalButton from './OpenModalButton'
@@ -25,7 +25,7 @@ const ProfileDeleteAccount = ({ id }: ProfileDeleteAccountProps) => {
 
       await signOut({ callbackUrl: '/' })
     } catch (e) {
-      const { message } = getApiError(e)
+      const { message } = getAxiosError(e as AxiosError)
       setToast({ message, background: 'danger' })
     }
   }

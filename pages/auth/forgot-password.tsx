@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { signIn } from 'next-auth/react'
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -7,8 +7,8 @@ import Send from '../../public/static/images/send.svg'
 import Form from '../../components/Form'
 import FormField from '../../components/FormField'
 import Button from '../../components/Button'
-import getApiError from '../../utils/functions/getApiError'
-import forgotPasswordSchema from '../../lib/joi/forgotPasswordSchema'
+import getAxiosError from '../../utils/functions/getAxiosError'
+import { forgotPasswordSchema } from '../../lib/joi/forgotPasswordSchema'
 
 interface FormFields {
   email: string
@@ -27,7 +27,7 @@ const ForgotPassword = () => {
         callbackUrl: 'http://localhost:3000/profile',
       })
     } catch (e) {
-      const { message } = getApiError(e)
+      const { message } = getAxiosError(e as AxiosError)
       methods.setError('email', { message }, { shouldFocus: true })
     }
   }

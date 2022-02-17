@@ -29,7 +29,7 @@ export default NextAuth({
           if (!res) {
             throw new Error(err.NO_RESPONSE)
           }
-          throw new Error(res.data.message || err.DEFAULT_SERVER_ERROR)
+          throw new Error(res.data.message || err.DEFAULT)
         }
       },
     }),

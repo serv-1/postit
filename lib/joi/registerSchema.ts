@@ -4,10 +4,14 @@ import { nameSchema } from './nameSchema'
 import { emailSchema } from './emailSchema'
 import { passwordSchema } from './passwordSchema'
 
-const registerSchema = object({
+export interface RegisterSchema {
+  name: string
+  email: string
+  password: string
+}
+
+export const registerSchema = object<RegisterSchema>({
   name: nameSchema,
   email: emailSchema,
   password: passwordSchema.invalid(Joi.ref('email'), Joi.ref('name')),
 })
-
-export default registerSchema

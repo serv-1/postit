@@ -1,28 +1,25 @@
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
 import { signIn } from 'next-auth/react'
 import Form from '../components/Form'
 import FormField from '../components/FormField'
 import FormPasswordField from '../components/FormPasswordField'
-import getApiError from '../utils/functions/getApiError'
+import getAxiosError from '../utils/functions/getAxiosError'
 import { useToast } from '../contexts/toast'
-import registerSchema from '../lib/joi/registerSchema'
-
-interface FormFields {
-  name: string
-  email: string
-  password: string
-}
+import { RegisterSchema, registerSchema } from '../lib/joi/registerSchema'
 
 const Register = () => {
-  const methods = useForm<FormFields>({ resolver: joiResolver(registerSchema) })
+  const methods = useForm<RegisterSchema>({
+    resolver: joiResolver(registerSchema),
+  })
+
   const { setToast } = useToast()
   const router = useRouter()
 
-  const submitHandler: SubmitHandler<FormFields> = async (data) => {
+  const submitHandler: SubmitHandler<RegisterSchema> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/user', data)
 
@@ -42,7 +39,8 @@ const Register = () => {
 
       router.push('/profile')
     } catch (e) {
-      const { name, message } = getApiError<'name' | 'email' | 'password'>(e)
+      type FieldsNames = keyof RegisterSchema
+      const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)
 
       if (name) {
         return methods.setError(name, { message }, { shouldFocus: true })

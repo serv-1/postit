@@ -4,24 +4,28 @@ import dbConnect from '../../utils/functions/dbConnect'
 import crypto from 'crypto'
 import { Buffer } from 'buffer'
 import err from '../../utils/constants/errors'
-import signInSchema from '../../lib/joi/signInSchema'
-import validateSchema from '../../utils/functions/validateSchema'
+import { signInSchema, SignInSchema } from '../../lib/joi/signInSchema'
+import validate from '../../utils/functions/validate'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
-    return res.status(405).send({ message: err.METHOD_NOT_ALLOWED })
+    return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  validateSchema(signInSchema, req.body, res)
+  const result = validate(signInSchema, req.body as SignInSchema)
 
-  const { email, password } = req.body
+  if ('message' in result) {
+    return res.status(422).json({ message: result.message })
+  }
+
+  const { email, password } = result.value
 
   try {
     await dbConnect()
     const user = await User.findOne({ email }).exec()
 
     if (!user) {
-      return res.status(422).send({ message: err.EMAIL_UNKNOWN })
+      return res.status(422).json({ message: err.EMAIL_UNKNOWN })
     }
 
     const [salt, hash] = (user.password as string).split(':')
@@ -29,16 +33,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const givenHash = crypto.scryptSync(password, salt, 64)
 
     if (!crypto.timingSafeEqual(dbHash, givenHash)) {
-      return res.status(422).send({ message: err.PASSWORD_INVALID })
+      return res.status(422).json({ message: err.PASSWORD_INVALID })
     }
 
-    res.status(200).send({
+    res.status(200).json({
       id: user._id,
       name: user.name,
       email: user.email,
     })
   } catch (e) {
-    res.status(500).send({ message: err.INTERNAL_SERVER_ERROR })
+    res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
   }
 }
 

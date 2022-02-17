@@ -1,9 +1,9 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { ChangeEvent, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useToast } from '../contexts/toast'
 import Button from './Button'
-import getApiError from '../utils/functions/getApiError'
+import getAxiosError from '../utils/functions/getAxiosError'
 import err from '../utils/constants/errors'
 
 interface ProfileChangeImageProps {
@@ -27,7 +27,7 @@ const ProfileChangeImage = ({ id, image: img }: ProfileChangeImageProps) => {
 
     if (files[0].size > 1000000) {
       return setToast({
-        message: err.IMAGE_TOO_LARGE,
+        message: err.IMAGE_TOO_BIG,
         background: 'danger',
       })
     }
@@ -52,7 +52,7 @@ const ProfileChangeImage = ({ id, image: img }: ProfileChangeImageProps) => {
           background: 'success',
         })
       } catch (e) {
-        const { message } = getApiError(e)
+        const { message } = getAxiosError(e as AxiosError)
         setToast({ message, background: 'danger' })
       }
     }

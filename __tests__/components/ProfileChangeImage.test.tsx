@@ -71,7 +71,7 @@ test('an error renders if the user image is invalid', async () => {
   userEvent.upload(input, tooLargeFile)
 
   await waitFor(() => {
-    const toast = { message: err.IMAGE_TOO_LARGE, background: 'danger' }
+    const toast = { message: err.IMAGE_TOO_BIG, background: 'danger' }
     expect(setToast).toHaveBeenNthCalledWith(2, toast)
   })
 })
