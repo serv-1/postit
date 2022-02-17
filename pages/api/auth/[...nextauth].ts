@@ -59,17 +59,11 @@ export default NextAuth({
       if (account && user) {
         token.id = user.id
 
-        if (
-          account.provider === 'google' &&
-          !user.image.includes('/static/images/')
-        ) {
+        if (account.provider === 'google' && user.image.includes('https://')) {
           await dbConnect()
           await User.updateOne(
             { _id: user.id },
-            {
-              emailVerified: new Date(),
-              image: '/static/images/default.jpg',
-            }
+            { emailVerified: new Date(), image: 'default.jpg' }
           ).exec()
         }
       }

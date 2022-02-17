@@ -29,7 +29,7 @@ const userSchema = new Schema<IUser>({
   emailVerified: Date,
   image: {
     type: String,
-    default: '/static/images/default.jpg',
+    default: 'default.jpg',
   },
 })
 

@@ -2,5 +2,5 @@
   "name": "John Doe",
   "email": "johndoe@test.com",
   "password": "english tile rigole",
-  "image": "/static/images/default.jpg"
+  "image": "default.jpg"
 }

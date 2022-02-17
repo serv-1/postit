@@ -52,14 +52,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(413).json(json)
       }
 
-      const fname = await createFile(
-        base64,
-        type,
-        '/static/images/posts/',
-        'base64'
-      )
+      const path = '/public/static/images/posts/'
+      const fname = await createFile(base64, type, path, 'base64')
 
-      imagesUri.push('/static/images/posts/' + fname)
+      imagesUri.push(fname)
     }
 
     const post = new Post({

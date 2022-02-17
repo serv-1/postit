@@ -41,11 +41,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(404).json({ message: err.USER_NOT_FOUND })
       }
 
+      const fname = user.image.split('.')[0]
+      const path = '/static/images' + (fname === 'default' ? '/' : '/users/')
+
       res.status(200).json({
         id: user._id.toString(),
         name: user.name,
         email: user.email,
-        image: user.image,
+        image: path + user.image,
       })
       break
     case 'PUT':
@@ -87,18 +90,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           return res.status(404).json({ message: err.USER_NOT_FOUND })
         }
 
-        if (user.image !== '/static/images/default.jpg') {
-          await unlink(cwd() + '/public' + user.image)
+        const path = '/public/static/images/users/'
+
+        if (user.image.split('.')[0] !== 'default') {
+          await unlink(cwd() + path + user.image)
         }
 
-        const fname = await createFile(
-          base64,
-          type,
-          '/static/images/users/',
-          'base64'
-        )
+        const fname = await createFile(base64, type, path, 'base64')
 
-        update = { image: '/static/images/users/' + fname }
+        update = { image: fname }
       } else if ('password' in reqBody) {
         const salt = randomBytes(16).toString('hex')
         const hash = scryptSync(reqBody.password, salt, 64)
@@ -141,6 +141,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       if (!isCsrfTokenValid(csrfTokenCookie, result.value)) {
         return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
+      }
+
+      const user = await User.findOne({ _id: id }).lean().exec()
+
+      if (!user) {
+        return res.status(404).json({ message: err.USER_NOT_FOUND })
+      }
+
+      if (user.image.split('.')[0] !== 'default') {
+        await unlink(cwd() + '/public/static/images/users/' + user.image)
       }
 
       try {

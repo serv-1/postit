@@ -16,7 +16,7 @@ async function createFile(data: Buffer, ext: string, dir: string): Promise<strin
 async function createFile(data: string, ext: string, dir: string, encoding?: BufferEncoding): Promise<string>
 async function createFile(data: string | Buffer, ext: string, dir: string, encoding: BufferEncoding = 'utf8') {
   const filename = nanoid() + '.' + ext
-  const path = cwd() + '/public' + dir + filename
+  const path = cwd() + dir + filename
 
   if (Buffer.isBuffer(data)) {
     await appendFile(path, data)

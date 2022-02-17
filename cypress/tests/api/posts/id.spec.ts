@@ -3,8 +3,8 @@ import { Ids } from '../../../plugins'
 import { IPost } from '../../../../models/Post'
 import u1 from '../../../fixtures/user1.json'
 import u2 from '../../../fixtures/user2.json'
-const post = require('../../../fixtures/posts.json')[0]
-import { Image } from '../../../../types/common'
+const post: Post = require('../../../fixtures/posts.json')[0]
+import { Image, Post } from '../../../../types/common'
 
 describe('/api/posts/:id', () => {
   it('405 - Method not allowed', function () {
@@ -41,7 +41,8 @@ describe('/api/posts/:id', () => {
           expect(res.body).to.have.property('description', post.description)
           expect(res.body).to.have.deep.property('categories', post.categories)
           expect(res.body).to.have.property('price', post.price / 100)
-          expect(res.body).to.have.deep.property('images', post.images)
+          const images = post.images.map((img) => '/static/images/posts/' + img)
+          expect(res.body).to.have.deep.property('images', images)
           expect(res.body).to.have.property('userId', ids.u1Id)
         })
       })
@@ -171,9 +172,10 @@ describe('/api/posts/:id', () => {
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
-            cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
-              expect(post.description).to.eq('Breathtaking table')
-            })
+          })
+
+          cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+            expect(post.description).to.eq('Breathtaking table')
           })
         })
       })
@@ -207,9 +209,10 @@ describe('/api/posts/:id', () => {
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
-            cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
-              expect(post.categories).to.deep.eq(['furniture'])
-            })
+          })
+
+          cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+            expect(post.categories).to.deep.eq(['furniture'])
           })
         })
       })
@@ -243,9 +246,10 @@ describe('/api/posts/:id', () => {
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
-            cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
-              expect(post.price).to.eq(5000)
-            })
+          })
+
+          cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+            expect(post.price).to.eq(5000)
           })
         })
       })
@@ -316,12 +320,14 @@ describe('/api/posts/:id', () => {
 
             cy.req(options).then((res) => {
               expect(res.status).to.eq(200)
-
-              cy.task<IPost>('db:getPostByUserId', ids.u2Id).then((post) => {
-                expect(post.images).to.have.length(5)
-                expect(post.images).to.not.have.members(body.images)
-              })
             })
+
+            cy.task<IPost>('db:getPostByUserId', ids.u2Id).then(
+              (updatedPost) => {
+                expect(updatedPost.images).to.have.length(5)
+                expect(updatedPost.images).to.not.have.members(post.images)
+              }
+            )
           })
 
           cy.task('deleteImages', 'posts')
@@ -387,10 +393,10 @@ describe('/api/posts/:id', () => {
 
           cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
+          })
 
-            cy.task<null>('db:getPostByUserId', ids.u2Id).then((post) => {
-              expect(post).to.eq(null)
-            })
+          cy.task('db:getPostByUserId', ids.u2Id).then((post) => {
+            expect(post).to.eq(null)
           })
         })
       })

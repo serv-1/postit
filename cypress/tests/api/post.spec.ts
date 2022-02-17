@@ -86,15 +86,15 @@ describe('/api/post', () => {
 
       cy.req({ url, method: 'POST', csrfToken: true, body }).then((res) => {
         expect(res.status).to.eq(200)
+      })
 
-        cy.task<IPost>('db:getPostByUserId', this.u1Id).then((post) => {
-          expect(post.name).to.eq(defaultBody.name)
-          expect(post.description).to.eq(defaultBody.description)
-          expect(post.categories).to.have.members(defaultBody.categories)
-          expect(post.price).to.eq(defaultBody.price * 100)
-          expect(post.images).to.have.length(5)
-          expect(post.userId).to.eq(this.u1Id)
-        })
+      cy.task<IPost>('db:getPostByUserId', this.u1Id).then((post) => {
+        expect(post.name).to.eq(defaultBody.name)
+        expect(post.description).to.eq(defaultBody.description)
+        expect(post.categories).to.have.members(defaultBody.categories)
+        expect(post.price).to.eq(defaultBody.price * 100)
+        expect(post.images).to.have.length(5)
+        expect(post.userId).to.eq(this.u1Id)
       })
 
       cy.task('deleteImages', 'posts')

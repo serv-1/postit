@@ -36,9 +36,12 @@ describe('/api/users/:id', () => {
         cy.req({ url: `/api/users/${ids.u1Id}` }).then((res) => {
           expect(res.status).to.eq(200)
           expect(res.body).to.have.property('id', ids.u1Id)
-          expect(res.body).to.have.ownProperty('name')
-          expect(res.body).to.have.ownProperty('email')
-          expect(res.body).to.have.ownProperty('image')
+          expect(res.body).to.have.property('name', 'John Doe')
+          expect(res.body).to.have.property('email', 'johndoe@test.com')
+          expect(res.body).to.have.property(
+            'image',
+            '/static/images/default.jpg'
+          )
         })
       })
     })
@@ -81,10 +84,10 @@ describe('/api/users/:id', () => {
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(422)
+        })
 
-          cy.task<IUser>('db:getUser', ids.u2Id).then((user) => {
-            expect(user.name).to.not.eq('Yes, I have renamed you!')
-          })
+        cy.task<IUser>('db:getUser', ids.u2Id).then((user) => {
+          expect(user.name).to.not.eq('Yes, I have renamed you!')
         })
       })
     })
@@ -134,10 +137,10 @@ describe('/api/users/:id', () => {
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(200)
+        })
 
-          cy.task<IUser>('db:getUser', ids.u1Id).then((user) => {
-            expect(user.name).to.eq(body.name)
-          })
+        cy.task<IUser>('db:getUser', ids.u1Id).then((user) => {
+          expect(user.name).to.eq(body.name)
         })
       })
     })
@@ -171,10 +174,10 @@ describe('/api/users/:id', () => {
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(200)
+        })
 
-          cy.task<IUser>('db:getUser', ids.u1Id).then((user) => {
-            expect(user.email).to.eq('superemail@test.com')
-          })
+        cy.task<IUser>('db:getUser', ids.u1Id).then((user) => {
+          expect(user.email).to.eq('superemail@test.com')
         })
       })
     })
@@ -210,12 +213,12 @@ describe('/api/users/:id', () => {
           const body = { password: 'super oh nooo! pw' }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
-            cy.task<IUser>('db:getUser', ids.u1Id).then((user) => {
-              const newHash = (user.password as string).split(':')[1]
+            expect(res.status).to.eq(200)
+          })
 
-              expect(res.status).to.eq(200)
-              expect(oldHash).to.not.eq(newHash)
-            })
+          cy.task<IUser>('db:getUser', ids.u1Id).then((user) => {
+            const newHash = (user.password as string).split(':')[1]
+            expect(oldHash).to.not.eq(newHash)
           })
         })
       })
@@ -268,10 +271,10 @@ describe('/api/users/:id', () => {
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(200)
+        })
 
-          cy.task<IUser>('db:getUser', ids.u1Id).then((u) => {
-            expect(u.image).to.not.eq(u1.image)
-          })
+        cy.task<IUser>('db:getUser', ids.u1Id).then((u) => {
+          expect(u.image).to.not.eq(u1.image)
         })
       })
 
@@ -316,15 +319,15 @@ describe('DELETE', () => {
 
       cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
         expect(res.status).to.eq(422)
+      })
 
-        cy.task<IUser>('db:getUser', ids.u2Id).then((user) => {
-          expect(user).to.not.be.null
-        })
+      cy.task<IUser>('db:getUser', ids.u2Id).then((user) => {
+        expect(user).to.not.be.null
       })
     })
   })
 
-  it("200 - Delete the user and it's related account", function () {
+  it("200 - Delete the user and it's image with it's related account", function () {
     cy.task('db:reset')
 
     cy.task<Ids>('db:seed').then((ids) => {
@@ -332,16 +335,21 @@ describe('DELETE', () => {
 
       const url = `/api/users/${ids.u1Id}`
 
+      const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
+      const body = { image: { base64, type: 'jpeg' } }
+
+      cy.req({ url, method: 'PUT', body, csrfToken: true })
+
       cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
         expect(res.status).to.eq(200)
+      })
 
-        cy.task('db:getUser', ids.u1Id).then((user) => {
-          expect(user).to.eq(null)
-        })
+      cy.task('db:getUser', ids.u1Id).then((user) => {
+        expect(user).to.eq(null)
+      })
 
-        cy.task('db:getAccountByUserId', ids.u1Id).then((account) => {
-          expect(account).to.eq(null)
-        })
+      cy.task('db:getAccountByUserId', ids.u1Id).then((account) => {
+        expect(account).to.eq(null)
       })
     })
   })

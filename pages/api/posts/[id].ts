@@ -47,7 +47,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         description: post.description,
         categories: post.categories,
         price: post.price / 100,
-        images: post.images,
+        images: post.images.map((image) => '/static/images/posts/' + image),
         userId: post.userId.toString(),
       })
       break
@@ -86,20 +86,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       if ('images' in reqBody) {
         const images: string[] = []
+        const path = '/public/static/images/posts/'
 
         for (const { base64, type } of reqBody.images) {
           if (isBase64ValueTooBig(base64, 1000000)) {
             return res.status(413).json({ message: err.IMAGE_TOO_BIG })
           }
 
-          const fname = await createFile(
-            base64,
-            type,
-            '/static/images/posts/',
-            'base64'
-          )
+          const fname = await createFile(base64, type, path, 'base64')
 
-          images.push('/static/images/posts/' + fname)
+          images.push(fname)
         }
 
         const post = await Post.findOne({ _id: id }).lean().exec()
@@ -109,7 +105,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         for (const image of post.images) {
-          await unlink(cwd() + '/public' + image)
+          await unlink(cwd() + path + image)
         }
 
         update = { images }
@@ -164,7 +160,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       for (const image of post.images) {
-        await unlink(cwd() + '/public' + image)
+        await unlink(cwd() + '/public/static/images/posts/' + image)
       }
 
       try {

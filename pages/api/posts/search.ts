@@ -72,6 +72,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         ...post,
         id: post._id.toString(),
         price: post.price / 100,
+        images: post.images.map((image) => '/static/images/posts/' + image),
         userId: post.userId.toString(),
       })
     }

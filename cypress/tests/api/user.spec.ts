@@ -43,13 +43,13 @@ describe('/api/user', () => {
 
       cy.req({ url, method: 'POST', body }).then((res) => {
         expect(res.status).to.eq(200)
+      })
 
-        cy.task<IUser>('db:getUser', email).then((user) => {
-          expect(user.name).to.eq(name)
-          expect(user.email).to.eq(email)
-          expect(user.password).to.not.eq(undefined)
-          expect(user.image).to.eq(image)
-        })
+      cy.task<IUser>('db:getUser', email).then((user) => {
+        expect(user.name).to.eq(name)
+        expect(user.email).to.eq(email)
+        expect(user.password).to.not.eq(undefined)
+        expect(user.image).to.eq(image)
       })
     })
   })
