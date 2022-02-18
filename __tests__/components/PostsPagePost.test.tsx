@@ -4,12 +4,12 @@ import { render, screen } from '@testing-library/react'
 const defaultPost = {
   id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
   name: 'Cat',
-  price: 50,
+  price: 5000,
   image: 'data:image/jpeg;base64,base64=',
 }
 
 test('the post renders correctly', () => {
-  const { id, name, price, image } = defaultPost
+  const { id, name, image } = defaultPost
 
   render(<PostsPagePost {...defaultPost} />)
 
@@ -23,7 +23,7 @@ test('the post renders correctly', () => {
   const href = `/posts/${id}/${name.replaceAll(' ', '-')}`
   expect(link).toHaveAttribute('href', href)
 
-  const priceText = screen.getByText(price + '€')
+  const priceText = screen.getByText('5,000€')
   expect(priceText).toBeInTheDocument()
 })
 

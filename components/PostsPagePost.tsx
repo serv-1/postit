@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import ArrowRight from '../public/static/images/arrow-right.svg'
 import Link from 'next/link'
+import addCommasToNb from '../utils/functions/addCommasToNb'
 
 export interface PostsPagePostProps {
   id: string
@@ -36,7 +37,7 @@ const PostsPagePost = ({ id, name, price, image }: PostsPagePostProps) => {
         </h5>
       </div>
       <span className="position-absolute end-0 bg-white p-1 m-2 rounded fw-bold">
-        {price}€
+        {addCommasToNb(price)}€
       </span>
     </div>
   )

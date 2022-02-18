@@ -7,7 +7,7 @@ test('the informations about the post render', () => {
       name="Table"
       description="Magnificent table"
       categories={['furniture', 'cat']}
-      price={50}
+      price={5000}
       username="John Doe"
     />
   )
@@ -24,7 +24,7 @@ test('the informations about the post render', () => {
   const category2 = screen.getByText(/cat/i)
   expect(category2).toBeInTheDocument()
 
-  const price = screen.getByText(/50/)
+  const price = screen.getByText(/5,000/)
   expect(price).toBeInTheDocument()
 
   const username = screen.getByText(/john doe/i)

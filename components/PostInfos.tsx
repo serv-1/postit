@@ -1,3 +1,5 @@
+import addCommasToNb from '../utils/functions/addCommasToNb'
+
 interface PostInfosProps {
   name: string
   description: string
@@ -26,7 +28,7 @@ const PostInfos = (props: PostInfosProps) => {
           </div>
         </div>
         <div className="col text-end">
-          <span className="fs-4 fw-bold">{price}€</span>
+          <span className="fs-4 fw-bold">{addCommasToNb(price)}€</span>
         </div>
       </div>
       <div className="row mt-4">
