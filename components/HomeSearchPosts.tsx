@@ -7,87 +7,49 @@ import Search from '../public/static/images/search.svg'
 import categories from '../categories'
 import InputError from './InputError'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import getAxiosError from '../utils/functions/getAxiosError'
-import { useToast } from '../contexts/toast'
 import { joiResolver } from '@hookform/resolvers/joi'
-import { searchPostSchema } from '../lib/joi/searchPostSchema'
-import axios, { AxiosError } from 'axios'
-import { Post } from '../types/common'
+import {
+  searchPostsSchema,
+  SearchPostsSchema,
+} from '../lib/joi/searchPostsSchema'
+import { useEffect } from 'react'
+import { Categories } from '../types/common'
 
 const options = categories.map((category) => ({
   label: category,
   value: category,
 }))
 
-interface Response {
-  posts: Post[]
-  totalPages: number
-  totalPosts: number
-}
-
-interface FormFields {
-  query: string
-  minPrice?: number
-  maxPrice?: number
-  categories?: typeof categories
-}
-
-interface HomeSearchPostsProps {
-  setPosts: Dispatch<SetStateAction<Post[] | undefined>>
-  setTotalPosts: Dispatch<SetStateAction<number>>
-  setTotalPages: Dispatch<SetStateAction<number>>
-  currentPage: number
-}
-
-const HomeSearchPosts = ({
-  setPosts,
-  setTotalPosts,
-  setTotalPages,
-  currentPage,
-}: HomeSearchPostsProps) => {
-  const methods = useForm<FormFields>({
-    resolver: joiResolver(searchPostSchema),
+const HomeSearchPosts = () => {
+  const methods = useForm<SearchPostsSchema>({
+    resolver: joiResolver(searchPostsSchema),
   })
 
-  const { setToast } = useToast()
+  const submitHandler: SubmitHandler<SearchPostsSchema> = (data) => {
+    const { query, minPrice, maxPrice, categories } = data
 
-  const [formData, setFormData] = useState<FormFields>()
+    const url = new URLSearchParams({ query: query })
+
+    if (minPrice) url.append('minPrice', minPrice)
+    if (maxPrice) url.append('maxPrice', maxPrice)
+    if (categories) categories.forEach((c) => url.append('categories', c))
+
+    window.history.pushState('', '', '?' + url.toString())
+
+    document.dispatchEvent(new CustomEvent('queryStringChange'))
+  }
 
   useEffect(() => {
-    const getPosts = async () => {
-      try {
-        const { data } = await axios.get<Response>(
-          'http://localhost:3000/api/posts/search',
-          { params: { ...formData, page: currentPage } }
-        )
+    if (!window.location.search) return
 
-        setPosts(data.posts)
-        setTotalPosts(data.totalPosts)
-        setTotalPages(data.totalPages)
-      } catch (e) {
-        type FieldsNames = keyof FormFields
-        const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)
+    const queryString = new URLSearchParams(window.location.search)
+    const categories = queryString.getAll('categories') as Categories[]
 
-        if (name) {
-          return methods.setError(name, { message }, { shouldFocus: true })
-        }
-
-        setToast({ message, background: 'danger' })
-      }
-    }
-    if (formData) getPosts()
-  }, [
-    formData,
-    currentPage,
-    methods,
-    setToast,
-    setPosts,
-    setTotalPosts,
-    setTotalPages,
-  ])
-
-  const submitHandler: SubmitHandler<FormFields> = (data) => setFormData(data)
+    methods.setValue('categories', categories)
+    methods.setValue('query', queryString.get('query') as string)
+    methods.setValue('minPrice', queryString.get('minPrice') || undefined)
+    methods.setValue('maxPrice', queryString.get('maxPrice') || undefined)
+  }, [methods])
 
   return (
     <Form

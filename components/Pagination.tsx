@@ -2,7 +2,7 @@ import ChevronLeft from '../public/static/images/chevron-left.svg'
 import ChevronRight from '../public/static/images/chevron-right.svg'
 import ChevronDoubleLeft from '../public/static/images/chevron-double-left.svg'
 import ChevronDoubleRight from '../public/static/images/chevron-double-right.svg'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface liAttributes {
   className: string
@@ -12,17 +12,31 @@ interface liAttributes {
 
 interface PaginationProps {
   totalPages: number
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
-  currentPage: number
 }
 
-const Pagination = ({
-  totalPages,
-  setCurrentPage,
-  currentPage,
-}: PaginationProps) => {
+const Pagination = ({ totalPages }: PaginationProps) => {
+  const [currentPage, setCurrentPage] = useState<number>()
+
+  useEffect(() => {
+    const queryString = new URLSearchParams(window.location.search)
+    const queryPage = queryString.get('page')
+
+    setCurrentPage(queryPage ? +queryPage : 1)
+  }, [setCurrentPage])
+
+  if (!currentPage) return null
+
   const onClick = (e: React.MouseEvent<HTMLAnchorElement>, page: number) => {
     e.preventDefault()
+
+    const queryString = new URLSearchParams(window.location.search)
+
+    queryString.set('page', String(page))
+    const url = '?' + queryString.toString()
+
+    window.history.pushState({ ...window.history.state }, '', url)
+
+    document.dispatchEvent(new CustomEvent('queryStringChange'))
     setCurrentPage(page)
   }
 

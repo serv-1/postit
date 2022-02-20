@@ -1,18 +1,9 @@
 import Head from 'next/head'
-import { useState } from 'react'
 import HomeSearchPosts from '../components/HomeSearchPosts'
-import HomePostsPage from '../components/HomePostsPage'
-import { Post } from '../types/common'
 import Particles from 'react-tsparticles'
-import HomePostsFoundNumber from '../components/HomePostsFoundNumber'
-import Pagination from '../components/Pagination'
+import HomePosts from '../components/HomePosts'
 
 const Home = () => {
-  const [posts, setPosts] = useState<Post[]>()
-  const [totalPosts, setTotalPosts] = useState<number>(0)
-  const [totalPages, setTotalPages] = useState<number>(0)
-  const [currentPage, setCurrentPage] = useState<number>(1)
-
   return (
     <>
       <Head>
@@ -44,34 +35,10 @@ const Home = () => {
               pauseOnOutsideViewport: true,
             }}
           />
-          <HomeSearchPosts
-            setPosts={setPosts}
-            setTotalPages={setTotalPages}
-            setTotalPosts={setTotalPosts}
-            currentPage={currentPage}
-          />
+          <HomeSearchPosts />
         </div>
         <div className="container-fluid mb-4">
-          <div className="row justify-content-center position-relative">
-            <div className="col-md-8">
-              <HomePostsFoundNumber totalPosts={totalPosts} />
-              <Pagination
-                totalPages={totalPages}
-                setCurrentPage={setCurrentPage}
-                currentPage={currentPage}
-              />
-            </div>
-          </div>
-          <div className="row py-4 justify-content-center">
-            <HomePostsPage posts={posts} />
-          </div>
-          <div className="row">
-            <Pagination
-              totalPages={totalPages}
-              setCurrentPage={setCurrentPage}
-              currentPage={currentPage}
-            />
-          </div>
+          <HomePosts />
         </div>
       </main>
     </>

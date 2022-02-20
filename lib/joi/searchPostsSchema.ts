@@ -15,7 +15,7 @@ export interface SearchPostsSchema {
   categories?: Categories[]
 }
 
-export const searchPostSchema = object<SearchPostsSchema>({
+export const searchPostsSchema = object<SearchPostsSchema>({
   query: querySchema,
   page: pageSchema,
   minPrice: priceSchema.optional().min(0).default(0),

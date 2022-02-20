@@ -14,9 +14,9 @@ test('the posts render', () => {
       id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
       name: 'Cat',
       description: 'Awesome Cat',
-      categories: ['pet', 'cat'],
+      categories: ['pet' as const, 'cat' as const],
       price: 50,
-      images: ['data:image/jpeg;base64,base64='],
+      images: ['LSDklsjLS.jpeg'],
       userId: 'f1f1f1f1f1f1f1f1f1f1f1f1',
     },
   ]

@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import err from '../../../utils/constants/errors'
 import {
-  searchPostSchema,
+  searchPostsSchema,
   SearchPostsSchema,
-} from '../../../lib/joi/searchPostSchema'
+} from '../../../lib/joi/searchPostsSchema'
 import dbConnect from '../../../utils/functions/dbConnect'
 import Post from '../../../models/Post'
 import validate from '../../../utils/functions/validate'
@@ -20,7 +20,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  let queryCategories = req.query['categories[]'] as
+  let queryCategories = req.query.categories as
     | SearchPostsSchema['categories']
     | Categories
 
@@ -36,7 +36,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     categories: queryCategories,
   } as SearchPostsSchema
 
-  const result = validate(searchPostSchema, reqQuery)
+  const result = validate(searchPostsSchema, reqQuery)
 
   if ('message' in result) {
     return res.status(422).json({ name: result.name, message: result.message })

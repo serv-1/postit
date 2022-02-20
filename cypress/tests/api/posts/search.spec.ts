@@ -93,7 +93,7 @@ describe('/api/posts/search', () => {
   })
 
   it('200 - Posts found by category', () => {
-    const url = '/api/posts/search?query=Cat&categories[]=pet'
+    const url = '/api/posts/search?query=Cat&categories=pet'
 
     cy.req<Response>({ url }).then((res) => {
       expect(res.status).to.eq(200)
@@ -107,7 +107,7 @@ describe('/api/posts/search', () => {
   })
 
   it('200 - Posts found by categories', () => {
-    const url = '/api/posts/search?query=Cat&categories[]=pet&categories[]=cat'
+    const url = '/api/posts/search?query=Cat&categories=pet&categories=cat'
 
     cy.req<Response>({ url }).then((res) => {
       expect(res.status).to.eq(200)
