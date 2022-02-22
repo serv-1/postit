@@ -16,6 +16,7 @@ import {
   PostsIdPutSchema,
   postsIdPutSchema,
 } from '../../../lib/joi/postsIdPutSchema'
+import User from '../../../models/User'
 
 type Update =
   | { name: string }
@@ -166,6 +167,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       try {
         await dbConnect()
         await Post.deleteOne({ _id: id }).exec()
+        await User.findByIdAndUpdate(session.id, { $pull: { postsIds: id } })
       } catch (e) {
         res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
       }

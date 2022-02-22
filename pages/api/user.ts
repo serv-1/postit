@@ -18,6 +18,7 @@ import { cwd } from 'process'
 import createFile from '../../utils/functions/createFile'
 import { csrfTokenSchema } from '../../lib/joi/csrfTokenSchema'
 import Account from '../../models/Account'
+import Post from '../../models/Post'
 
 type Update =
   | { name: string }
@@ -155,6 +156,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await dbConnect()
         await User.deleteOne({ _id: session.id }).exec()
         await Account.deleteOne({ userId: session.id }).exec()
+        await Post.deleteMany({ userId: session.id }).exec()
       } catch (e) {
         res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
       }

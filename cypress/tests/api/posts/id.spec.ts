@@ -1,6 +1,7 @@
 import err from '../../../../utils/constants/errors'
 import { Ids } from '../../../plugins'
 import { IPost } from '../../../../models/Post'
+import { IUser } from '../../../../models/User'
 import u1 from '../../../fixtures/user1.json'
 import u2 from '../../../fixtures/user2.json'
 const post: Post = require('../../../fixtures/posts.json')[0]
@@ -397,6 +398,10 @@ describe('/api/posts/:id', () => {
 
           cy.task('db:getPostByUserId', ids.u2Id).then((post) => {
             expect(post).to.eq(null)
+          })
+
+          cy.task<IUser>('db:getUser', ids.u2Id).then((user) => {
+            expect(user.postsIds).to.not.include(post._id)
           })
         })
       })

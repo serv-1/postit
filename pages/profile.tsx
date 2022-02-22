@@ -2,10 +2,11 @@ import ProfileDeleteAccount from '../components/ProfileDeleteAccount'
 import ProfileChangeImage from '../components/ProfileChangeImage'
 import ProfileChangeNameOrEmail from '../components/ProfileChangeNameOrEmail'
 import ProfileChangePassword from '../components/ProfileChangePassword'
-import { User } from 'next-auth'
 import axios from 'axios'
 import { getSession } from 'next-auth/react'
 import { GetServerSideProps } from 'next'
+import ProfilePostsList from '../components/ProfilePostsList'
+import { Post, User } from '../types/common'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx)
@@ -14,13 +15,23 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return { notFound: true }
   }
 
-  const res = await axios.get(`http://localhost:3000/api/users/${session.id}`)
+  const url = `http://localhost:3000/api/users/${session.id}`
+  const res = await axios.get<User>(url)
 
-  return { props: { user: res.data } }
+  const { postsIds, ...rest } = res.data
+
+  const user: typeof rest & { posts: Post[] } = { ...rest, posts: [] }
+
+  for (const id of postsIds) {
+    const res = await axios.get<Post>(`http://localhost:3000/api/posts/${id}`)
+    user.posts.push(res.data)
+  }
+
+  return { props: { user } }
 }
 
 interface ProfileProps {
-  user: User
+  user: Omit<User, 'postsIds'> & { posts: Post[] }
 }
 
 const Profile = ({ user }: ProfileProps) => {
@@ -32,6 +43,7 @@ const Profile = ({ user }: ProfileProps) => {
           <ProfileChangeNameOrEmail value={user.name} type="name" />
           <ProfileChangeNameOrEmail value={user.email} type="email" />
         </div>
+        <ProfilePostsList posts={user.posts} />
         <ProfileChangePassword />
         <ProfileDeleteAccount />
       </div>

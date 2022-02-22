@@ -11,6 +11,7 @@ import {
   CreatePostServerSchema,
   createPostServerSchema,
 } from '../../lib/joi/createPostSchema'
+import User from '../../models/User'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getSession({ req })
@@ -66,6 +67,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     })
 
     await post.save()
+    await User.findByIdAndUpdate(session.id, { $push: { postsIds: post._id } })
   } catch (e) {
     res.status(500).json({ message: err.DEFAULT })
   }

@@ -3,6 +3,7 @@ import { Buffer } from 'buffer'
 import { Ids } from '../../plugins'
 import { IPost } from '../../../models/Post'
 import u1 from '../../fixtures/user1.json'
+import { IUser } from '../../../models/User'
 
 const url = '/api/post'
 
@@ -95,6 +96,10 @@ describe('/api/post', () => {
         expect(post.price).to.eq(defaultBody.price * 100)
         expect(post.images).to.have.length(5)
         expect(post.userId).to.eq(this.u1Id)
+
+        cy.task<IUser>('db:getUser', this.u1Id).then((user) => {
+          expect(user.postsIds).to.include(post._id)
+        })
       })
 
       cy.task('deleteImages', 'posts')

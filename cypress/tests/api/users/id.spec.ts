@@ -1,5 +1,7 @@
 import err from '../../../../utils/constants/errors'
 import { Ids } from '../../../plugins'
+import u1 from '../../../fixtures/user1.json'
+import { IPost } from '../../../../models/Post'
 
 describe('/api/users/:id', () => {
   it('405 - Method not allowed', function () {
@@ -26,19 +28,36 @@ describe('/api/users/:id', () => {
       })
     })
 
-    it('200 - Get the user', function () {
+    it.only('200 - Get the user', function () {
       cy.task('db:reset')
 
       cy.task<Ids>('db:seed').then((ids) => {
         cy.req({ url: `/api/users/${ids.u1Id}` }).then((res) => {
-          expect(res.status).to.eq(200)
-          expect(res.body).to.have.property('id', ids.u1Id)
-          expect(res.body).to.have.property('name', 'John Doe')
-          expect(res.body).to.have.property('email', 'johndoe@test.com')
-          expect(res.body).to.have.property(
-            'image',
-            '/static/images/default.jpg'
-          )
+          const { body, status } = res
+          expect(status).to.eq(200)
+          expect(body).to.have.property('id', ids.u1Id)
+          expect(body).to.have.property('name', 'John Doe')
+          expect(body).to.have.property('email', 'johndoe@test.com')
+          expect(body).to.have.property('image', '/static/images/default.jpg')
+          expect(body).to.have.deep.property('postsIds', [])
+        })
+
+        const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
+        const body = {
+          name: 'Cat',
+          description: 'Magnificent cat',
+          categories: ['cat'],
+          price: 50,
+          images: [{ base64, type: 'jpeg' }],
+        }
+
+        cy.signIn(u1.email, u1.password)
+        cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })
+
+        cy.req({ url: `/api/users/${ids.u1Id}` }).then((res) => {
+          cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+            expect(res.body).to.have.deep.property('postsIds', [post._id])
+          })
         })
       })
     })

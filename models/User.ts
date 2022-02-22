@@ -7,6 +7,7 @@ export interface IUser {
   email: string
   password?: string
   emailVerified?: Date
+  postsIds: Types.ObjectId[]
   image: string
 }
 
@@ -27,6 +28,7 @@ const userSchema = new Schema<IUser>({
     max: [20, err.PASSWORD_MAX],
   },
   emailVerified: Date,
+  postsIds: [Schema.Types.ObjectId],
   image: {
     type: String,
     default: 'default.jpg',

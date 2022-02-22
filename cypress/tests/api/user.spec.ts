@@ -284,18 +284,26 @@ describe('/api/user', () => {
       })
     })
 
-    it("200 - Delete the user and it's image with it's related account", function () {
+    it("200 - Delete the user and it's posts", function () {
       cy.task('db:reset')
 
       cy.task<Ids>('db:seed').then((ids) => {
         cy.signIn(u1.email, u1.password)
 
-        const url = '/api/user'
-
+        // Change the user image
         const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
-        const body = { image: { base64, type: 'jpeg' } }
+        const img = { image: { base64, type: 'jpeg' } }
+        cy.req({ url: '/api/user', method: 'PUT', body: img, csrfToken: true })
 
-        cy.req({ url, method: 'PUT', body, csrfToken: true })
+        // Create a post with the user
+        const body = {
+          name: 'Cat',
+          description: 'Magnificent cat',
+          categories: ['cat'],
+          price: 50,
+          images: [img.image],
+        }
+        cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })
 
         cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
           expect(res.status).to.eq(200)
@@ -307,6 +315,10 @@ describe('/api/user', () => {
 
         cy.task('db:getAccountByUserId', ids.u1Id).then((account) => {
           expect(account).to.eq(null)
+        })
+
+        cy.task('db:getPostByUserId', ids.u1Id).then((post) => {
+          expect(post).to.eq(null)
         })
       })
     })

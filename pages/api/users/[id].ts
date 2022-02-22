@@ -25,12 +25,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const fname = user.image.split('.')[0]
     const path = '/static/images' + (fname === 'default' ? '/' : '/users/')
-
     res.status(200).json({
       id: user._id.toString(),
       name: user.name,
       email: user.email,
       image: path + user.image,
+      postsIds: user.postsIds,
     })
   } catch (e) {
     res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
