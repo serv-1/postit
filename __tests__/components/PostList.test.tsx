@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react'
-import HomePostsPage from '../../components/HomePostsPage'
+import PostList from '../../components/PostList'
 
 test('an informative text renders if there is no posts', () => {
-  render(<HomePostsPage />)
+  render(<PostList />)
 
   const text = screen.getByRole('status')
   expect(text).toHaveTextContent(/search something/i)
@@ -21,14 +21,15 @@ test('the posts render', () => {
     },
   ]
 
-  render(<HomePostsPage posts={defaultPosts} />)
+  render(<PostList posts={defaultPosts} />)
 
-  const post = screen.getByText(defaultPosts[0].name)
+  const regex = new RegExp(defaultPosts[0].name, 'i')
+  const post = screen.getByText(regex)
   expect(post).toBeInTheDocument()
 })
 
 test('an informative text renders if no posts has been found', () => {
-  render(<HomePostsPage posts={[]} />)
+  render(<PostList posts={[]} />)
 
   const text = screen.getByRole('status')
   expect(text).toHaveTextContent(/no posts found/i)

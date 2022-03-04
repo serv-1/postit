@@ -46,9 +46,7 @@ test('everything render correctly', () => {
     const page = screen.getByRole('link', { name: regex })
 
     if (i === 10) {
-      expect(page.parentElement).toHaveClass('active')
       expect(page.parentElement).toHaveAttribute('aria-current', 'page')
-      expect(page.parentElement).toHaveStyle({ 'z-index': 0 })
     } else {
       expect(page).not.toHaveClass('active')
       expect(page).not.toHaveAttribute('aria-current')

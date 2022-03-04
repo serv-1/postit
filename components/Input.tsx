@@ -28,8 +28,12 @@ function Input({
   const { isSubmitted, errors } = formState
 
   const _className = classNames(
-    'form-control',
-    isSubmitted && (errors[name] ? 'is-invalid' : 'is-valid'),
+    'border rounded p-4 w-full',
+    isSubmitted
+      ? errors[name]
+        ? 'border-red-600'
+        : 'border-indigo-600'
+      : 'border-indigo-600',
     className
   )
 

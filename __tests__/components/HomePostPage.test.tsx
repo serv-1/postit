@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { rest } from 'msw'
-import HomePosts from '../../components/HomePosts'
+import HomePostPage from '../../components/HomePostPage'
 import server from '../../mocks/server'
 import err from '../../utils/constants/errors'
 
@@ -13,7 +13,7 @@ const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 beforeEach(() => useToast.mockReturnValue({ setToast: () => null }))
 
 test('no posts render if there is no query parameters', () => {
-  render(<HomePosts />)
+  render(<HomePostPage />)
 
   const post = screen.queryByRole('link', { name: /blue cat/i })
   expect(post).not.toBeInTheDocument()
@@ -23,7 +23,7 @@ test('a request is send to fetch the posts matching the query parameters', async
   const search = '?query=cat'
   Object.defineProperty(window, 'location', { get: () => ({ search }) })
 
-  render(<HomePosts />)
+  render(<HomePostPage />)
 
   const post1 = await screen.findByRole('link', { name: /blue cat/i })
   expect(post1).toBeInTheDocument()
@@ -45,7 +45,7 @@ test('an error renders if the server fails to fetch the posts', async () => {
   const search = '?oh=no'
   Object.defineProperty(window, 'location', { get: () => ({ search }) })
 
-  render(<HomePosts />)
+  render(<HomePostPage />)
 
   await waitFor(() => {
     expect(setToast).toHaveBeenNthCalledWith(1, {

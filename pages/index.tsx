@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import HomeSearchPosts from '../components/HomeSearchPosts'
-import Particles from 'react-tsparticles'
-import HomePosts from '../components/HomePosts'
+import HomePostPage from '../components/HomePostPage'
 
 const Home = () => {
   return (
@@ -9,36 +8,15 @@ const Home = () => {
       <Head>
         <title>Filanad - Home</title>
       </Head>
-      <main data-cy="home">
-        <div className="container-fluid py-4 mb-4 position-relative">
-          <Particles
-            className="position-absolute top-0 start-0 w-100 h-100"
-            loaded={async (container) => {
-              const style = container.canvas.element?.style
-              if (style) style.position = 'absolute'
-            }}
-            options={{
-              autoPlay: true,
-              background: { color: { value: '#000423' } },
-              fpsLimit: 60,
-              particles: {
-                color: { value: ['#5669FF', '#001CEF', '#0014AB'] },
-                move: { enable: true },
-                number: {
-                  density: { enable: true, area: 400 },
-                  value: 20,
-                },
-                shape: { type: 'circle' },
-                size: { value: 30 },
-              },
-              pauseOnBlur: true,
-              pauseOnOutsideViewport: true,
-            }}
-          />
+      <main data-cy="home" className="py-32 flex-grow flex flex-col">
+        <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-16 justify-center">
+          <h1 className="text-4xl md:text-t-4xl lg:text-d-4xl font-bold pb-16 col-span-full">
+            Search posts
+          </h1>
           <HomeSearchPosts />
         </div>
-        <div className="container-fluid mb-4">
-          <HomePosts />
+        <div className="my-auto grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-16 justify-center">
+          <HomePostPage />
         </div>
       </main>
     </>

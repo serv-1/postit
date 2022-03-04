@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body,
+#__next {
+  min-height: 100vh;
+}
+
+#__next {
+  display: flex;
+  flex-flow: column nowrap;
+}

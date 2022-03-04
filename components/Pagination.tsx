@@ -1,8 +1,9 @@
-import ChevronLeft from '../public/static/images/chevron-left.svg'
-import ChevronRight from '../public/static/images/chevron-right.svg'
-import ChevronDoubleLeft from '../public/static/images/chevron-double-left.svg'
-import ChevronDoubleRight from '../public/static/images/chevron-double-right.svg'
+// import ChevronLeft from '../public/static/images/chevron-left.svg'
+// import ChevronRight from '../public/static/images/chevron-right.svg'
+// import ChevronDoubleLeft from '../public/static/images/chevron-double-left.svg'
+// import ChevronDoubleRight from '../public/static/images/chevron-double-right.svg'
 import React, { useEffect, useState } from 'react'
+import Link from './Link'
 
 interface liAttributes {
   className: string
@@ -46,80 +47,79 @@ const Pagination = ({ totalPages }: PaginationProps) => {
   const end = currentPage < totalPages - 1 ? currentPage + 2 : totalPages
 
   for (let i = start; i <= end; i++) {
-    const attr: liAttributes = {
-      className: 'page-item',
-    }
+    let ariaCurrent: 'page' | undefined = undefined
+    let linkClass =
+      'border border-indigo-600 rounded px-8 py-4 text-s hover:bg-indigo-600 hover:text-white'
 
     if (i === currentPage) {
-      attr.className += ' active'
-      attr['aria-current'] = 'page'
-      attr.style = { zIndex: 0 }
+      linkClass += ' bg-indigo-600 text-white'
+      ariaCurrent = 'page'
     }
 
     pagesLinks.push(
-      <li key={i} {...attr}>
-        <a
+      <li key={i} className="mr-4" aria-current={ariaCurrent}>
+        <Link
           href="#"
-          className="page-link"
+          className={linkClass}
           aria-label={`Page ${i}`}
           onClick={(e) => onClick(e, i)}
         >
           {i}
-        </a>
+        </Link>
       </li>
     )
   }
 
   return totalPages > 0 ? (
-    <nav aria-label="Pages">
-      <ul className="pagination justify-content-center m-0">
+    <nav aria-label="Pages" className="col-span-full">
+      <ul className="flex justify-center">
         {currentPage > 3 && (
-          <li className="page-item">
-            <a
+          <li>
+            <Link
               href="#"
-              className="page-link"
+              className="border border-indigo-600 rounded px-8 py-4 text-s mr-4 hover:bg-indigo-600 hover:text-white"
               aria-label="First page"
               onClick={(e) => onClick(e, 1)}
             >
-              <ChevronDoubleLeft />
-            </a>
+              &lt;&lt; {/* <ChevronDoubleLeft /> */}
+            </Link>
           </li>
         )}
         {currentPage > 1 && (
-          <li className="page-item">
-            <a
+          <li>
+            <Link
               href="#"
-              className="page-link"
+              className="border border-indigo-600 rounded px-8 py-4 text-s mr-4 hover:bg-indigo-600 hover:text-white"
               aria-label="Previous page"
               onClick={(e) => onClick(e, currentPage - 1)}
             >
-              <ChevronLeft />
-            </a>
+              &lt; {/* <ChevronLeft /> */}
+            </Link>
           </li>
         )}
         {pagesLinks}
         {currentPage < totalPages && (
-          <li className="page-item">
-            <a
+          <li>
+            <Link
               href="#"
-              className="page-link"
+              className="border border-indigo-600 rounded px-8 py-4 text-s mr-4 hover:bg-indigo-600 hover:text-white"
               aria-label="Next page"
               onClick={(e) => onClick(e, currentPage + 1)}
             >
-              <ChevronRight />
-            </a>
+              &gt; {/* <ChevronRight /> */}
+            </Link>
           </li>
         )}
         {currentPage < totalPages - 2 && (
-          <li className="page-item">
-            <a
+          <li>
+            <Link
               href="#"
-              className="page-link"
+              className="border border-indigo-600 rounded px-8 py-4 text-s hover:bg-indigo-600 hover:text-white"
               aria-label="Last page"
               onClick={(e) => onClick(e, totalPages)}
             >
-              <ChevronDoubleRight />
-            </a>
+              &gt;&gt; {/* <ChevronDoubleRight /> */}
+            </Link>
           </li>
         )}
       </ul>

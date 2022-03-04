@@ -1,4 +1,4 @@
-import PostsPagePost from '../../components/PostsPagePost'
+import Post from '../../components/Post'
 import { render, screen } from '@testing-library/react'
 
 const defaultPost = {
@@ -11,7 +11,7 @@ const defaultPost = {
 test('the post renders correctly', () => {
   const { id, name, image } = defaultPost
 
-  render(<PostsPagePost {...defaultPost} />)
+  render(<Post {...defaultPost} />)
 
   const img = screen.getByRole('img')
   expect(img).toHaveAttribute('src', image)
@@ -29,7 +29,7 @@ test('the post renders correctly', () => {
 
 test("post's name should be truncated if it is too long", () => {
   const name = new Uint8Array(90).join('')
-  render(<PostsPagePost {...defaultPost} name={name} />)
+  render(<Post {...defaultPost} name={name} />)
 
   const text = screen.queryByText(name)
   expect(text).not.toBeInTheDocument()

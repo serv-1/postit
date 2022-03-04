@@ -38,7 +38,7 @@ test('the input renders', () => {
   expect(input).toHaveAttribute('id', 'username')
   expect(input).toHaveAttribute('name', 'username')
   expect(input).toHaveClass('red')
-  expect(input).not.toHaveClass('is-invalid', 'is-valid')
+  expect(input).toHaveClass('border-indigo-600')
 
   userEvent.type(input, 'a')
   expect(handleChange).toHaveBeenCalledTimes(1)
@@ -80,7 +80,7 @@ test('the input do not have the focus', () => {
   expect(setFocus).not.toHaveBeenCalled()
 })
 
-test('the input have is-invalid class if the form is submitted and there is an error', () => {
+test('the input have a red border if the form is submitted and there is an error', () => {
   useFormContext.mockReturnValueOnce(setFormContext(true, 'Error'))
 
   render(
@@ -93,11 +93,10 @@ test('the input have is-invalid class if the form is submitted and there is an e
   )
 
   const input = screen.getByRole('textbox')
-  expect(input).toHaveClass('is-invalid')
-  expect(input).not.toHaveClass('is-valid')
+  expect(input).toHaveClass('border-red-600')
 })
 
-test('the input have is-valid class if the form is submitted and there is no error', () => {
+test('the input do not have a red border if the form is submitted and there is no error', () => {
   useFormContext.mockReturnValueOnce(setFormContext(true))
 
   render(
@@ -110,6 +109,5 @@ test('the input have is-valid class if the form is submitted and there is no err
   )
 
   const input = screen.getByRole('textbox')
-  expect(input).toHaveClass('is-valid')
-  expect(input).not.toHaveClass('is-invalid')
+  expect(input).toHaveClass('border-indigo-600')
 })

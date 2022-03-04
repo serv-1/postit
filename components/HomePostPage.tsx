@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import { useToast } from '../contexts/toast'
 import { Post } from '../types/common'
 import getAxiosError from '../utils/functions/getAxiosError'
-import HomePostsTotalNumber from './HomePostsTotalNumber'
-import HomePostsPage from './HomePostsPage'
+import PostsFoundNumber from './PostsFoundNumber'
+import PostList from './PostList'
 import Pagination from './Pagination'
 
 interface Response {
@@ -13,7 +13,7 @@ interface Response {
   totalPosts: number
 }
 
-const HomePosts = () => {
+const HomePostPage = () => {
   const [posts, setPosts] = useState<Post[]>()
   const [totalPosts, setTotalPosts] = useState<number>(0)
   const [totalPages, setTotalPages] = useState<number>(0)
@@ -49,20 +49,11 @@ const HomePosts = () => {
 
   return (
     <>
-      <div className="row justify-content-center position-relative">
-        <div className="col-md-8">
-          <HomePostsTotalNumber totalPosts={totalPosts} />
-          <Pagination totalPages={totalPages} />
-        </div>
-      </div>
-      <div className="row py-4 justify-content-center">
-        <HomePostsPage posts={posts} />
-      </div>
-      <div className="row">
-        <Pagination totalPages={totalPages} />
-      </div>
+      <PostsFoundNumber nb={totalPosts} />
+      <PostList posts={posts} />
+      <Pagination totalPages={totalPages} />
     </>
   )
 }
 
-export default HomePosts
+export default HomePostPage

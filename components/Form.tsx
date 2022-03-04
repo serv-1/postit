@@ -19,7 +19,7 @@ const Form = <TFieldValues extends RHF.FieldValues>(
 ) => {
   const [csrfToken, setCsrfToken] = useState<string | undefined>()
 
-  const className = classNames('p-2', props.className)
+  const className = classNames('', props.className)
   const { submitHandler, submitErrorHandler } = props.submitHandlers
 
   useEffect(() => {

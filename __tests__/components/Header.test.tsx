@@ -4,6 +4,7 @@ import { mockSession } from '../../mocks/nextAuth'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
+import userEvent from '@testing-library/user-event'
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
@@ -22,7 +23,7 @@ beforeEach(() => {
 test('nothing render while the session is loading', () => {
   render(<Header />)
 
-  const list = screen.getByRole('list')
+  const list = screen.getByRole('navigation')
   expect(list).toBeEmptyDOMElement()
 })
 
@@ -38,7 +39,24 @@ test('the user image loads then renders if the user is authenticated', async () 
   expect(image).toBeInTheDocument()
 })
 
-test("if the user is on it's profile the dropdown menu does not render but the sign out link renders", () => {
+test('clicking on the user image open the dropdown menu and a second click close it', async () => {
+  useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
+
+  render(<Header />)
+
+  const image = await screen.findByRole('img')
+  userEvent.click(image)
+
+  let menu: HTMLElement | null = screen.getAllByRole('list')[1]
+  expect(menu).toBeInTheDocument()
+
+  userEvent.click(image)
+
+  menu = screen.getAllByRole('list')[1]
+  expect(menu).toBeUndefined()
+})
+
+test("if the user is on it's profile, the sign out link renders in place of the dropdown menu", () => {
   const setToast = jest.fn()
   useToast.mockReturnValue({ setToast })
 

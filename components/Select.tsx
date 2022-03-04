@@ -18,15 +18,36 @@ const Select = ({ name, options, className, ...props }: SelectProps) => {
     <Controller
       name={name}
       render={({ field, formState: { isSubmitted, errors } }) => {
-        const selectClass = classNames('form-control py-0', className, {
-          'is-invalid': isSubmitted && errors.categories,
-          'is-valid': isSubmitted && !errors.categories,
-        })
+        const selectClass = classNames(
+          'border border-indigo-600 rounded',
+          className,
+          {
+            'is-invalid': isSubmitted && errors.categories,
+            'is-valid': isSubmitted && !errors.categories,
+          }
+        )
 
         const styles: StylesConfig<Option> = {
-          control: () => ({ display: 'flex', minHeight: 36 }),
-          menu: (provided) => ({ ...provided, marginLeft: -12 }),
-          valueContainer: (provided) => ({ ...provided, paddingLeft: 0 }),
+          control: () => ({ display: 'flex', minHeight: 32 }),
+          menu: (provided) => ({ ...provided, border: '1px solid #4f46e5' }),
+          valueContainer: (provided) => ({
+            ...provided,
+            paddingLeft: 0,
+            height: 32,
+          }),
+          placeholder: (provided) => ({ ...provided, paddingLeft: 4 }),
+          input: (provided) => ({ ...provided, paddingLeft: 4 }),
+          indicatorsContainer: (provided) => ({ ...provided, height: 32 }),
+          option: (provided, state) => {
+            const backgroundColor = state.isFocused
+              ? '#c7d2fe'
+              : provided.backgroundColor
+            return {
+              ...provided,
+              backgroundColor,
+              '&:hover': { backgroundColor: '#c7d2fe' },
+            }
+          },
         }
 
         const selectValue = options.filter(({ value }) =>
