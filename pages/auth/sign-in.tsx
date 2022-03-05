@@ -61,7 +61,7 @@ const SignIn = ({ providers }: SignInProps) => {
         data-cy="signIn"
         className="py-32 grid grid-cols-4 gap-x-16 justify-center"
       >
-        <h1 className="col-span-full mb-16 text-4xl md:text-t-4xl lg:text-d-4xl font-bold flex justify-between items-end">
+        <h1 className="col-span-full mb-16 text-4xl md:text-t-4xl lg:text-d-4xl font-bold">
           Sign in
         </h1>
         <Form

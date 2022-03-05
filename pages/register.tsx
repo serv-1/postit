@@ -10,6 +10,7 @@ import FormPasswordField from '../components/FormPasswordField'
 import getAxiosError from '../utils/functions/getAxiosError'
 import { useToast } from '../contexts/toast'
 import { RegisterSchema, registerSchema } from '../lib/joi/registerSchema'
+import Button from '../components/Button'
 
 const Register = () => {
   const methods = useForm<RegisterSchema>({
@@ -55,19 +56,23 @@ const Register = () => {
       <Head>
         <title>Filanad - Register</title>
       </Head>
-      <main className="w-25 my-4 m-auto shadow rounded">
-        <h1 className="bg-primary text-light rounded-top p-2 m-0">Register</h1>
+      <main className="py-32 grid grid-cols-4 gap-x-16 justify-center">
+        <h1 className="text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16 col-span-full">
+          Register
+        </h1>
         <Form
           name="register"
           method="post"
           submitHandlers={{ submitHandler }}
           methods={methods}
-          className="text-end"
+          className="col-span-full"
         >
           <FormField labelText="Name" inputName="name" type="text" needFocus />
           <FormField labelText="Email" inputName="email" type="email" />
-          <FormPasswordField showForgotPasswordLink showStrength showRules />
-          <input type="submit" value="Register" className="btn btn-primary" />
+          <FormPasswordField showStrength showRules />
+          <Button type="submit" className="w-full">
+            Register
+          </Button>
         </Form>
       </main>
     </>
