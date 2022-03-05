@@ -15,34 +15,65 @@ const setFormContext = (isSubmitted: boolean = false, error?: string) => ({
   formState: { isSubmitted, errors: error ? { password: error } : {} },
 })
 
-test('the open eye button and the input render', () => {
+test('the input render and is hidden by default', () => {
   useFormContext.mockReturnValue(setFormContext())
 
   render(
     <>
       <Label htmlFor="password" labelText="Password" />
-      <PasswordInput showStrength hasRules />
+      <PasswordInput />
     </>
   )
+
+  const container = screen.getByTestId('container')
+  expect(container).toHaveClass('border-indigo-600')
 
   const btn = screen.getByRole('button')
   expect(btn).toHaveAccessibleName(/show/i)
 
   const openEye = screen.getByTestId('openEye')
   expect(openEye).toBeInTheDocument()
-  expect(openEye).not.toHaveClass('border-danger', 'border-success')
-
-  const closeEye = screen.queryByTestId('closeEye')
-  expect(closeEye).not.toBeInTheDocument()
 
   const input = screen.getByLabelText(/^password$/i)
   expect(input).toHaveAttribute('type', 'password')
 
   const inputAriaDescr = input.getAttribute('aria-describedby')
-  expect(inputAriaDescr).toContain('passwordRules')
+  expect(inputAriaDescr).not.toContain('passwordRules')
+
+  const strengthMeter = screen.queryByRole('status')
+  expect(strengthMeter).not.toBeInTheDocument()
 })
 
-test('the eye button shows the password', () => {
+test("the container's border is red if the form is submitted and there is an error", () => {
+  useFormContext.mockReturnValue(setFormContext(true, 'error'))
+
+  render(
+    <>
+      <Label htmlFor="password" labelText="Password" />
+      <PasswordInput />
+    </>
+  )
+
+  const container = screen.getByTestId('container')
+  expect(container).toHaveClass('border-red-600')
+})
+
+test('the password input has "passwordRules" to aria-describedby if there is some rules', () => {
+  useFormContext.mockReturnValue(setFormContext())
+
+  render(
+    <>
+      <Label htmlFor="password" labelText="Password" />
+      <PasswordInput hasRules />
+    </>
+  )
+
+  const input = screen.getByLabelText(/^password$/i)
+  const ariaDescribedby = input.getAttribute('aria-describedby')
+  expect(ariaDescribedby).toContain('passwordRules')
+})
+
+test('the password can be shown', () => {
   useFormContext.mockReturnValue(setFormContext())
 
   render(
@@ -70,36 +101,6 @@ test('the eye button shows the password', () => {
   expect(inputAriaDescr).not.toContain('passwordRules')
 })
 
-test('the eye button border is red if the form is Submitted and there is an error', () => {
-  useFormContext.mockReturnValue(setFormContext(true, 'error'))
-
-  render(
-    <>
-      <Label htmlFor="password" labelText="Password" />
-      <PasswordInput />
-    </>
-  )
-
-  const btn = screen.getByRole('button')
-  expect(btn).toHaveClass('border-danger')
-  expect(btn).not.toHaveClass('border-success')
-})
-
-test('the eye button border is green if the form is Submitted and there is no error', () => {
-  useFormContext.mockReturnValue(setFormContext(true))
-
-  render(
-    <>
-      <Label htmlFor="password" labelText="Password" />
-      <PasswordInput />
-    </>
-  )
-
-  const btn = screen.getByRole('button')
-  expect(btn).toHaveClass('border-success')
-  expect(btn).not.toHaveClass('border-danger')
-})
-
 test("the password strength renders and take into account the other fields' values", () => {
   useFormContext.mockReturnValue(setFormContext())
 
@@ -111,34 +112,34 @@ test("the password strength renders and take into account the other fields' valu
   )
 
   const input = screen.getByLabelText(/^password$/i)
-  const redDot = screen.getByTestId('redDot')
-  const yellowDot = screen.getByTestId('yellowDot')
-  const greenDot = screen.getByTestId('greenDot')
+  const red = screen.getByTestId('red')
+  const yellow = screen.getByTestId('yellow')
+  const green = screen.getByTestId('green')
 
   userEvent.type(input, 'english')
 
-  expect(redDot).toHaveClass('bg-danger')
-  expect(yellowDot).not.toHaveClass('bg-warning')
-  expect(greenDot).not.toHaveClass('bg-success')
+  expect(red).toHaveClass('bg-red-500')
+  expect(yellow).not.toHaveClass('bg-yellow-500')
+  expect(green).not.toHaveClass('bg-green-500')
 
   userEvent.clear(input)
   userEvent.type(input, 'english rigole')
 
-  expect(redDot).not.toHaveClass('bg-danger')
-  expect(yellowDot).toHaveClass('bg-warning')
-  expect(greenDot).not.toHaveClass('bg-success')
+  expect(red).not.toHaveClass('bg-red-500')
+  expect(yellow).toHaveClass('bg-yellow-500')
+  expect(green).not.toHaveClass('bg-green-500')
 
   userEvent.clear(input)
   userEvent.type(input, 'english rigole tile')
 
-  expect(redDot).not.toHaveClass('bg-danger')
-  expect(yellowDot).not.toHaveClass('bg-warning')
-  expect(greenDot).toHaveClass('bg-success')
+  expect(red).not.toHaveClass('bg-red-500')
+  expect(yellow).not.toHaveClass('bg-yellow-500')
+  expect(green).toHaveClass('bg-green-500')
 
   userEvent.clear(input)
   userEvent.type(input, 'John Doe') // value of another field
 
-  expect(redDot).toHaveClass('bg-danger')
-  expect(yellowDot).not.toHaveClass('bg-warning')
-  expect(greenDot).not.toHaveClass('bg-success')
+  expect(red).toHaveClass('bg-red-500')
+  expect(yellow).not.toHaveClass('bg-yellow-500')
+  expect(green).not.toHaveClass('bg-green-500')
 })

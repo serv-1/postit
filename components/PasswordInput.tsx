@@ -8,8 +8,8 @@ import Button from './Button'
 import Input from './Input'
 
 interface Strength {
-  text: string
-  color: string
+  text: 'weak' | 'good but not strong' | 'strong'
+  color: 'red' | 'yellow' | 'green'
 }
 
 export interface PasswordInputProps extends ComponentPropsWithoutRef<'input'> {
@@ -22,10 +22,11 @@ const PasswordInput = ({
   showStrength,
   needFocus,
   hasRules,
+  className,
   ...props
 }: PasswordInputProps) => {
   const [showPassword, setShowPassword] = useState(false)
-  const defaultStrength = { text: 'weak', color: 'danger' }
+  const defaultStrength = { text: 'weak' as const, color: 'red' as const }
   const [strength, setStrength] = useState<Strength>(defaultStrength)
   const { getValues, formState } = useFormContext()
   const { isSubmitted, errors } = formState
@@ -38,73 +39,79 @@ const PasswordInput = ({
     const { score } = zxcvbn(e.target.value, Object.values(userInputs))
 
     if (score <= 2) {
-      return setStrength({ text: 'weak', color: 'danger' })
+      return setStrength({ text: 'weak', color: 'red' })
     } else if (score === 3) {
-      return setStrength({ text: 'good but not strong', color: 'warning' })
+      return setStrength({ text: 'good but not strong', color: 'yellow' })
     }
 
-    setStrength({ text: 'strong', color: 'success' })
+    setStrength({ text: 'strong', color: 'green' })
   }
 
-  const getClassNames = (color: 'danger' | 'warning' | 'success') => {
-    return classNames('rounded-circle', {
-      'me-2': color !== 'success',
-      [`bg-${color}`]: strength?.color === color,
-    })
-  }
-
-  const btnClass = classNames('text-secondary rounded-end border-start-0', {
-    'border-danger': isSubmitted && errors.password,
-    'border-success': isSubmitted && !errors.password,
-  })
+  const containerClass = classNames(
+    'border rounded',
+    isSubmitted
+      ? errors.password
+        ? 'border-red-600'
+        : 'border-indigo-600'
+      : 'border-indigo-600',
+    className
+  )
 
   return (
-    <>
-      <Input
-        {...props}
-        name="password"
-        type={showPassword ? 'text' : 'password'}
-        onChange={showStrength ? onPasswordChange : undefined}
-        aria-describedby={ariaDescr}
-        needFocus={needFocus}
-        className="rounded-start border-end-0"
-      />
-      <Button
-        type="button"
-        className={btnClass}
-        style={{ border: '1px solid #ced4da' }}
-        onClick={() => setShowPassword(!showPassword)}
-        aria-label={(showPassword ? 'Hide' : 'Show') + ' password'}
-      >
-        {showPassword ? (
-          <EyeSlash data-testid="closeEye" width="20" height="20" />
-        ) : (
-          <Eye data-testid="openEye" width="20" height="20" />
-        )}
-      </Button>
+    <div data-testid="container" className={containerClass}>
+      <div className="flex">
+        <Input
+          {...props}
+          name="password"
+          type={showPassword ? 'text' : 'password'}
+          onChange={showStrength ? onPasswordChange : undefined}
+          aria-describedby={ariaDescr}
+          needFocus={needFocus}
+          className="border-0"
+        />
+        <Button
+          needDefaultClassNames={false}
+          className="px-4 text-indigo-600"
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          aria-label={(showPassword ? 'Hide' : 'Show') + ' password'}
+        >
+          {showPassword ? (
+            <EyeSlash data-testid="closeEye" width="20" height="20" />
+          ) : (
+            <Eye data-testid="openEye" width="20" height="20" />
+          )}
+        </Button>
+      </div>
       {showStrength && (
-        <div className="input-group-text bg-white border-0" role="status">
+        <div className="flex bg-green-500" role="status">
           <div
-            data-testid="redDot"
-            className={getClassNames('danger')}
-            style={{ width: 18, height: 18, backgroundColor: '#931a26' }}
+            data-testid="red"
+            className={
+              'h-4 flex-grow ' +
+              (strength.color === 'red' ? 'bg-red-500' : 'bg-red-700')
+            }
           ></div>
           <div
-            data-testid="yellowDot"
-            className={getClassNames('warning')}
-            style={{ width: 18, height: 18, backgroundColor: '#9e7700' }}
+            data-testid="yellow"
+            className={
+              'h-4 flex-grow ' +
+              (strength.color === 'yellow' ? 'bg-yellow-500' : 'bg-yellow-700')
+            }
           ></div>
           <div
-            data-testid="greenDot"
-            className={getClassNames('success')}
-            style={{ width: 18, height: 18, backgroundColor: '#115a38' }}
+            data-testid="green"
+            className={
+              'h-4 flex-grow ' +
+              (strength.color === 'green' ? 'bg-green-500' : 'bg-green-700')
+            }
           ></div>
-          <span id="passwordStrength" className="d-none">
+          <span id="passwordStrength" className="sr-only">
             Your password is {strength.text}.
           </span>
         </div>
       )}
-    </>
+    </div>
   )
 }
 

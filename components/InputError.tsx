@@ -10,7 +10,12 @@ const InputError = ({ inputName, ...props }: InputErrorProps) => {
   const { isSubmitted, errors } = formState
 
   return isSubmitted && errors[inputName] ? (
-    <div {...props} id={`${inputName}Feedback`} role="alert">
+    <div
+      {...props}
+      id={`${inputName}Feedback`}
+      role="alert"
+      className="text-s text-red-600"
+    >
       {errors[inputName].message}
     </div>
   ) : null

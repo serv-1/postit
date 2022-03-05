@@ -141,7 +141,7 @@ const Header = () => {
           <Link
             href="/api/auth/signin"
             needButtonStyle
-            className="md:px-16 md:py-8"
+            className="md:px-16 md:py-8 font-bold"
             onClick={(e) => {
               e.preventDefault()
               signIn()

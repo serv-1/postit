@@ -4,7 +4,7 @@ import * as NextAuth from 'next-auth/react'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
+import Link from '../../components/Link'
 import { BuiltInProviderType } from 'next-auth/providers'
 import Form from '../../components/Form'
 import FormField from '../../components/FormField'
@@ -57,34 +57,30 @@ const SignIn = ({ providers }: SignInProps) => {
       <Head>
         <title>Filanad - Sign in</title>
       </Head>
-      <main data-cy="signIn" className="my-4">
-        <section className="w-25 m-auto shadow rounded">
-          <h1 className="bg-primary text-light rounded-top p-2 m-0">Sign in</h1>
-          <Form
-            name="signin"
-            method="post"
-            submitHandlers={{ submitHandler }}
-            methods={methods}
-          >
-            <FormField
-              labelText="Email"
-              inputName="email"
-              type="email"
-              needFocus
-            />
-            <FormPasswordField showForgotPasswordLink />
-            <div className="d-flex justify-content-between align-items-end">
-              <Link href="/register">
-                <a className="text-decoration-none">Create an account</a>
-              </Link>
-              <input
-                type="submit"
-                value="Sign in"
-                className="btn btn-primary"
-              />
-            </div>
-          </Form>
-        </section>
+      <main
+        data-cy="signIn"
+        className="py-32 grid grid-cols-4 gap-x-16 justify-center"
+      >
+        <h1 className="col-span-full mb-16 text-4xl md:text-t-4xl lg:text-d-4xl font-bold flex justify-between items-end">
+          Sign in
+        </h1>
+        <Form
+          name="signin"
+          method="post"
+          submitHandlers={{ submitHandler }}
+          methods={methods}
+          className="col-span-full"
+        >
+          <FormField
+            labelText="Email"
+            inputName="email"
+            type="email"
+            needFocus
+          />
+          <FormPasswordField />
+          <Button className="w-full">Sign in</Button>
+        </Form>
+        <div className="my-32 col-span-full text-center">Or</div>
         {providers &&
           Object.values(providers).map(
             (provider) =>
@@ -93,17 +89,33 @@ const SignIn = ({ providers }: SignInProps) => {
                 <Button
                   key={provider.id}
                   data-cy={`${provider.id}Btn`}
-                  className="btn-primary d-block m-auto w-25 mt-4"
+                  className="col-span-full"
                   onClick={() =>
                     NextAuth.signIn(provider.id, {
                       callbackUrl: 'http://localhost:3000/profile',
                     })
                   }
                 >
-                  Sign in with <span className="fw-bold">{provider.name}</span>
+                  Sign in with{' '}
+                  <span className="font-bold">{provider.name}</span>
                 </Button>
               )
           )}
+        <div className="col-span-full mt-32 text-center">
+          <Link
+            href="/register"
+            className="text-indigo-600 text-base font-normal"
+          >
+            Create an account
+          </Link>
+          <span className="mx-16">•</span>
+          <Link
+            href="/auth/forgot-password"
+            className="text-indigo-600 text-base font-normal"
+          >
+            Forgot password?
+          </Link>
+        </div>
       </main>
     </>
   )

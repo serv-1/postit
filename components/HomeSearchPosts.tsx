@@ -58,7 +58,7 @@ const HomeSearchPosts = () => {
       role="search"
       className="col-span-full grid grid-cols-[repeat(2,1fr)] gap-8 md:grid-cols-[repeat(6,1fr)] lg:grid-cols-[repeat(5,1fr)]"
     >
-      <div className="col-span-full text-s text-red-600">
+      <div className="col-span-full">
         <InputError inputName="query" />
         <InputError inputName="minPrice" />
         <InputError inputName="maxPrice" />

@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import {
   ChangeEventHandler,
   ComponentPropsWithoutRef,
@@ -32,17 +33,23 @@ interface InputProps extends FormFieldProps, InputHtmlProps {
 const FormField = ({
   labelText,
   inputName,
+  className,
   ...props
-}: TextareaProps | InputProps) => (
-  <div className="mb-3 text-start">
-    <Label htmlFor={inputName} labelText={labelText} />
-    <Input
-      name={inputName}
-      aria-describedby={`${inputName}Feedback`}
-      {...props}
-    />
-    <InputError inputName={inputName} />
-  </div>
-)
+}: TextareaProps | InputProps) => {
+  const containerClass = classNames('mb-16', className)
+
+  return (
+    <div className={containerClass}>
+      <Label htmlFor={inputName} labelText={labelText} />
+      <Input
+        name={inputName}
+        aria-describedby={`${inputName}Feedback`}
+        {...props}
+        className="mb-4"
+      />
+      <InputError inputName={inputName} />
+    </div>
+  )
+}
 
 export default FormField
