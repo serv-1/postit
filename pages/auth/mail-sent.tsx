@@ -9,20 +9,15 @@ const MailSent = () => {
       </Head>
       <main
         data-cy="mailSent"
-        className="w-50 m-auto my-4 p-4 shadow border border-success border-2 rounded text-center"
+        className="py-32 grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-16 justify-center m-auto"
       >
-        <div
-          className="rounded-circle d-inline-block mb-4"
-          style={{ backgroundColor: '#cfe' }}
-        >
-          <SendCheck className="text-success" width="200" height="200" />
+        <div className="col-start-2 md:col-start-4 lg:col-start-6 col-span-2 mb-16 relative">
+          <div className="w-full h-full bg-indigo-200 rounded-full absolute top-0 start-0 z-[-1]"></div>
+          <SendCheck className="text-indigo-600 w-full h-full" />
         </div>
-        <h1>A mail should have been sent.</h1>
-        <p>
-          A mail should have been sent to your email address with a link that
-          will connect you once clicked. Don&apos;t forget to check your spam if
-          you don&apos;t see it or you can just wait until it arrives.
-        </p>
+        <h1 className="col-span-full text-4xl md:text-4xl lg:text-4xl font-bold text-center">
+          A mail should have been sent.
+        </h1>
       </main>
     </>
   )

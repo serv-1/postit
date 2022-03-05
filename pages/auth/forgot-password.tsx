@@ -3,7 +3,6 @@ import { signIn } from 'next-auth/react'
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
-import Send from '../../public/static/images/send.svg'
 import Form from '../../components/Form'
 import FormField from '../../components/FormField'
 import Button from '../../components/Button'
@@ -37,11 +36,11 @@ const ForgotPassword = () => {
       <Head>
         <title>Filanad - Forgot password</title>
       </Head>
-      <main className="w-25 my-4 m-auto shadow rounded">
-        <h1 className="bg-primary text-light rounded-top p-2 m-0">
+      <main className="py-32 grid grid-cols-4 gap-x-16 justify-center">
+        <h1 className="text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16 col-span-full">
           Sign in with your email
         </h1>
-        <p className="m-0 pt-2 ps-2">
+        <p className="col-span-full mb-16">
           We will send you an email with a link that will sign you. Once signed,
           you will be able to change your password.
         </p>
@@ -50,7 +49,7 @@ const ForgotPassword = () => {
           method="post"
           submitHandlers={{ submitHandler }}
           methods={methods}
-          className="text-end"
+          className="col-span-full"
         >
           <FormField
             labelText="Email"
@@ -58,8 +57,8 @@ const ForgotPassword = () => {
             type="email"
             needFocus
           />
-          <Button type="submit" className="btn-primary">
-            <Send /> Send
+          <Button type="submit" className="w-full">
+            Send
           </Button>
         </Form>
       </main>
