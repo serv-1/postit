@@ -5,11 +5,11 @@ const Page404 = () => (
     <Head>
       <title>Filanad - Not found</title>
     </Head>
-    <main className="w-50 m-auto my-4 p-4 shadow border border-danger border-2 rounded text-center">
-      <div style={{ fontSize: '5rem' }}>¯\_(ツ)_/¯</div>
-      <h1>
-        <span className="text-danger">404</span> - Not found
-      </h1>
+    <main className="py-32 grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-16 justify-center flex-grow">
+      <div className="col-span-full text-center font-bold my-auto">
+        <div className="text-indigo-600 text-[72px] leading-[72px]">404</div>
+        <div className="text-[48px] leading-[48px]">Not Found</div>
+      </div>
     </main>
   </>
 )
