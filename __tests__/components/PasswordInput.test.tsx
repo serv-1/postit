@@ -15,7 +15,7 @@ const setFormContext = (isSubmitted: boolean = false, error?: string) => ({
   formState: { isSubmitted, errors: error ? { password: error } : {} },
 })
 
-test('the input render and is hidden by default', () => {
+test('the input renders and is hidden by default', () => {
   useFormContext.mockReturnValue(setFormContext())
 
   render(

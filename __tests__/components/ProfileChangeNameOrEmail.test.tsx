@@ -13,7 +13,7 @@ const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 beforeEach(() => useToast.mockReturnValue({}))
 
-test('the user name/email and the form renders correctly', async () => {
+test('the user name/email and the form render correctly', async () => {
   render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const name = screen.getByText('John Doe')

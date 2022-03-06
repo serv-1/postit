@@ -14,7 +14,7 @@ const InputError = ({ inputName, ...props }: InputErrorProps) => {
       {...props}
       id={`${inputName}Feedback`}
       role="alert"
-      className="text-s text-red-600"
+      className="text-s text-red-600 mt-4"
     >
       {errors[inputName].message}
     </div>

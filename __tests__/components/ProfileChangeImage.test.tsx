@@ -15,7 +15,7 @@ const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 beforeEach(() => useToast.mockReturnValue({}))
 
-test('the button trigger a click on the file input', () => {
+test('the button triggers a click on the file input', () => {
   render(<ProfileChangeImage image="/img" />)
 
   const input = screen.getByTestId('fileInput')

@@ -16,18 +16,13 @@ const FormPasswordField = ({
   <div className="mb-16">
     <Label htmlFor="password" labelText="Password" />
     {showRules && (
-      <div className="text-xs mb-4" id="passwordRules" role="note">
+      <div className="text-s mb-4" id="passwordRules" role="note">
         It must be 10-20 characters long. It must not equal the others
         fields&apos; value. There is no characters restriction so you can use
         emojis, cyrillic, etc.
       </div>
     )}
-    <PasswordInput
-      showStrength={showStrength}
-      needFocus={needFocus}
-      hasRules
-      className="mb-4"
-    />
+    <PasswordInput showStrength={showStrength} needFocus={needFocus} hasRules />
     <InputError inputName="password" />
   </div>
 )

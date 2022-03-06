@@ -75,8 +75,8 @@ const CreateAPost = () => {
   }
 
   return (
-    <main className="w-25 my-4 m-auto shadow rounded">
-      <h1 className="bg-primary text-light rounded-top p-2 m-0">
+    <main className="py-32 grid grid-cols-4 gap-x-16 justify-center">
+      <h1 className="col-span-full text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16">
         Create a post
       </h1>
       <Form
@@ -85,7 +85,7 @@ const CreateAPost = () => {
         submitHandlers={{ submitHandler }}
         methods={methods}
         needCsrfToken
-        className="text-end"
+        className="col-span-full"
       >
         <FormField labelText="Name" inputName="name" type="text" needFocus />
 
@@ -97,7 +97,7 @@ const CreateAPost = () => {
 
         <FormField type="file" labelText="Images" inputName="images" multiple />
 
-        <Button type="submit" className="bg-primary text-white">
+        <Button type="submit" className="w-full">
           Create
         </Button>
       </Form>

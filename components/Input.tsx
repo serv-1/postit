@@ -11,6 +11,7 @@ export interface InputProps extends React.ComponentPropsWithoutRef<'input'> {
 
 export interface TextAreaProps
   extends React.ComponentPropsWithoutRef<'textarea'> {
+  type?: undefined
   name: string
   needFocus?: boolean
   isTextArea: true
@@ -28,12 +29,18 @@ function Input({
   const { isSubmitted, errors } = formState
 
   const _className = classNames(
-    'border rounded p-4 w-full',
+    'border rounded p-4 w-full align-top',
+    {
+      'file:border-none file:py-4 file:px-8 file:mr-8 p-0':
+        props.type === 'file',
+    },
     isSubmitted
       ? errors[name]
-        ? 'border-red-600'
-        : 'border-indigo-600'
-      : 'border-indigo-600',
+        ? 'border-red-600' + (props.type === 'file' ? ' file:bg-red-200' : '')
+        : 'border-indigo-600' +
+          (props.type === 'file' ? ' file:bg-indigo-200' : '')
+      : 'border-indigo-600' +
+          (props.type === 'file' ? ' file:bg-indigo-200' : ''),
     className
   )
 

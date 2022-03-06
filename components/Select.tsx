@@ -21,23 +21,17 @@ const Select = ({ name, options, className, ...props }: SelectProps) => {
         const selectClass = classNames(
           'border border-indigo-600 rounded',
           className,
-          {
-            'is-invalid': isSubmitted && errors.categories,
-            'is-valid': isSubmitted && !errors.categories,
-          }
+          isSubmitted && errors.categories
+            ? 'border-red-600'
+            : 'border-indigo-600'
         )
 
         const styles: StylesConfig<Option> = {
-          control: () => ({ display: 'flex', minHeight: 32 }),
+          control: () => ({ display: 'flex' }),
           menu: (provided) => ({ ...provided, border: '1px solid #4f46e5' }),
-          valueContainer: (provided) => ({
-            ...provided,
-            paddingLeft: 0,
-            height: 32,
-          }),
+          valueContainer: (provided) => ({ ...provided, padding: '0 8px 0 0' }),
           placeholder: (provided) => ({ ...provided, paddingLeft: 4 }),
           input: (provided) => ({ ...provided, paddingLeft: 4 }),
-          indicatorsContainer: (provided) => ({ ...provided, height: 32 }),
           option: (provided, state) => {
             const backgroundColor = state.isFocused
               ? '#c7d2fe'

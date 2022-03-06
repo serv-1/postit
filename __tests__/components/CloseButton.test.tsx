@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import CloseButton from '../../components/CloseButton'
 
-test('the button have btn-close-white class', () => {
+test('the button has btn-close-white class', () => {
   render(<CloseButton isWhite />)
 
   const btn = screen.getByRole('button')

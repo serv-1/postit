@@ -9,7 +9,7 @@ const options = categories.map((category) => ({
 }))
 
 const FormCategoriesField = () => (
-  <div className="mb-3 text-start">
+  <div className="mb-16">
     <Label labelText="Categories" htmlFor="categories" />
     <Select name="categories" options={options} />
     <InputError inputName="categories" />

@@ -24,7 +24,7 @@ test('the alert renders and is removed on click on the close button', async () =
   })
 })
 
-test('the alert do not render if there is no message to display', () => {
+test('the alert does not render if there is no message to display', () => {
   useToast.mockReturnValue({ toast: { message: null } })
 
   render(<Toast />)
@@ -33,7 +33,7 @@ test('the alert do not render if there is no message to display', () => {
   expect(alert).not.toBeInTheDocument()
 })
 
-test('the alert use the given background color with the related text color', () => {
+test('the alert uses the given background color with the related text color', () => {
   useToast.mockReturnValue({
     toast: { message: 'My toast', background: 'white' },
   })

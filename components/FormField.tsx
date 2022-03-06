@@ -45,7 +45,6 @@ const FormField = ({
         name={inputName}
         aria-describedby={`${inputName}Feedback`}
         {...props}
-        className="mb-4"
       />
       <InputError inputName={inputName} />
     </div>

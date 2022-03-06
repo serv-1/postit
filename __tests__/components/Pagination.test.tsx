@@ -60,7 +60,7 @@ test('everything render correctly', () => {
   expect(lastPage).toBeInTheDocument()
 })
 
-test('first page link send to the first page', () => {
+test('first page link sends to the first page', () => {
   const pushState = setPushState()
   const onQueryStringChange = setOnQueryStringChange()
 
@@ -76,7 +76,7 @@ test('first page link send to the first page', () => {
   removeOnQueryStringChange(onQueryStringChange)
 })
 
-test('first page link do not render if it is already visible', () => {
+test('first page link does not render if it is already visible', () => {
   setPage(1)
   const { rerender } = render(<Pagination totalPages={20} />)
 
@@ -96,7 +96,7 @@ test('first page link do not render if it is already visible', () => {
   expect(firstPage).not.toBeInTheDocument()
 })
 
-test('last page link send to the last page', () => {
+test('last page link sends to the last page', () => {
   const pushState = setPushState()
   const onQueryStringChange = setOnQueryStringChange()
 
@@ -112,7 +112,7 @@ test('last page link send to the last page', () => {
   removeOnQueryStringChange(onQueryStringChange)
 })
 
-test('last page link do not render if it is already visible', () => {
+test('last page link does not render if it is already visible', () => {
   setPage(18)
   const { rerender } = render(<Pagination totalPages={20} />)
 
@@ -132,7 +132,7 @@ test('last page link do not render if it is already visible', () => {
   expect(lastPage).not.toBeInTheDocument()
 })
 
-test('previous page link send to the previous page', () => {
+test('previous page link sends to the previous page', () => {
   const pushState = setPushState()
   const onQueryStringChange = setOnQueryStringChange()
 
@@ -148,7 +148,7 @@ test('previous page link send to the previous page', () => {
   removeOnQueryStringChange(onQueryStringChange)
 })
 
-test('previous page link do not render if there is no previous page', () => {
+test('previous page link does not render if there is no previous page', () => {
   setPage(1)
   render(<Pagination totalPages={20} />)
 
@@ -156,7 +156,7 @@ test('previous page link do not render if there is no previous page', () => {
   expect(previousPage).not.toBeInTheDocument()
 })
 
-test('next page link send to the next page', () => {
+test('next page link sends to the next page', () => {
   const pushState = setPushState()
   const onQueryStringChange = setOnQueryStringChange()
 
@@ -172,7 +172,7 @@ test('next page link send to the next page', () => {
   removeOnQueryStringChange(onQueryStringChange)
 })
 
-test('next page link do not render if there is no next page', () => {
+test('next page link does not render if there is no next page', () => {
   setPage(20)
   render(<Pagination totalPages={20} />)
 
@@ -214,7 +214,7 @@ test('there is no additional pages with the last and second to last page', () =>
   expect(page22).not.toBeInTheDocument()
 })
 
-test('numbered page send to the matching numbered page', () => {
+test('a numbered page sends to the matching numbered page', () => {
   const pushState = setPushState()
   const onQueryStringChange = setOnQueryStringChange()
 
