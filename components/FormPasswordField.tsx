@@ -6,15 +6,19 @@ export interface FormPasswordFieldProps {
   showStrength?: boolean
   showRules?: boolean
   needFocus?: boolean
+  labelText?: string
+  inputName?: string
 }
 
 const FormPasswordField = ({
   showStrength,
   showRules,
   needFocus,
+  labelText = 'Password',
+  inputName = 'password',
 }: FormPasswordFieldProps) => (
   <div className="mb-16">
-    <Label htmlFor="password" labelText="Password" />
+    <Label htmlFor={inputName} labelText={labelText} />
     {showRules && (
       <div className="text-s mb-4" id="passwordRules" role="note">
         It must be 10-20 characters long. It must not equal the others
@@ -23,7 +27,7 @@ const FormPasswordField = ({
       </div>
     )}
     <PasswordInput showStrength={showStrength} needFocus={needFocus} hasRules />
-    <InputError inputName="password" />
+    <InputError inputName={inputName} />
   </div>
 )
 

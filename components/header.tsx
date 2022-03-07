@@ -6,7 +6,7 @@ import axios, { AxiosError } from 'axios'
 import getAxiosError from '../utils/functions/getAxiosError'
 import { useToast } from '../contexts/toast'
 import { useRouter } from 'next/router'
-import BoxArrowRight from '../public/static/images/box-arrow-right.svg'
+import SignOut from '../public/static/images/sign-out.svg'
 import Link from './Link'
 import Spinner from './Spinner'
 import { usePopper } from 'react-popper'
@@ -61,7 +61,7 @@ const Header = () => {
       </Link>
       <nav>
         {status === 'authenticated' ? (
-          <ul className="flex h-32 md:h-40">
+          <ul className="flex items-center h-32 md:h-40">
             <li>
               <Link
                 href="/create-a-post"
@@ -132,7 +132,7 @@ const Header = () => {
                   aria-label="Sign out"
                   title="Sign out"
                 >
-                  <BoxArrowRight width={32} height={32} />
+                  <SignOut width={32} height={32} />
                 </Link>
               </li>
             )}

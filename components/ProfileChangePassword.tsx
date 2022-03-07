@@ -4,10 +4,9 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
 import { passwordCsrfSchema } from '../lib/joi/passwordSchema'
 import Form from './Form'
-import InputError from './InputError'
-import Label from './Label'
-import PasswordInput from './PasswordInput'
 import getAxiosError from '../utils/functions/getAxiosError'
+import Button from './Button'
+import FormPasswordField from './FormPasswordField'
 
 interface FormFields {
   csrfToken?: string
@@ -35,27 +34,20 @@ const ProfileChangePassword = () => {
   }
 
   return (
-    <div className="my-4">
-      <Form
-        name="updateUserPassword"
-        method="post"
-        submitHandlers={{ submitHandler }}
-        methods={methods}
-        className="p-2 rounded border border-1"
-        needCsrfToken
-      >
-        <Label htmlFor="password" labelText="Change your password" />
-        <div className="input-group">
-          <PasswordInput showStrength />
-          <input
-            className="btn btn-primary rounded"
-            type="submit"
-            value="Change"
-          />
-          <InputError inputName="password" />
-        </div>
-      </Form>
-    </div>
+    <Form
+      name="updateUserPassword"
+      method="post"
+      submitHandlers={{ submitHandler }}
+      methods={methods}
+      needCsrfToken
+    >
+      <FormPasswordField showStrength labelText="New password" />
+      <div className="md:text-right">
+        <Button type="submit" className="w-full md:w-auto">
+          Change
+        </Button>
+      </div>
+    </Form>
   )
 }
 

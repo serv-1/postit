@@ -5,7 +5,6 @@ import { useToast } from '../contexts/toast'
 import getAxiosError from '../utils/functions/getAxiosError'
 import Button from './Button'
 import Modal from './Modal'
-import OpenModalButton from './OpenModalButton'
 
 const ProfileDeleteAccount = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -27,36 +26,37 @@ const ProfileDeleteAccount = () => {
   }
 
   return (
-    <div className="text-center">
-      <OpenModalButton
-        name="Delete your account"
-        className="btn-danger"
-        setIsModalOpen={setIsModalOpen}
-      />
+    <>
+      <Button
+        className="col-span-2 col-start-2 md:col-start-3 bg-red-500"
+        onClick={() => setIsModalOpen(true)}
+      >
+        Delete account
+      </Button>
       {isModalOpen && (
-        <Modal
-          title="Do you really want to delete your account?"
-          setIsModalOpen={setIsModalOpen}
-        >
-          <p>
-            You are about to delete your account thats means you will no longer
-            be available to sign in with it. Please take your time to think
-            about it because this action is definitive.
+        <Modal title="Delete account" setIsOpen={setIsModalOpen}>
+          <p className="mb-16">
+            Your account and all the posts created with it will be deleted
+            permanently. Please take your time to think about it because this
+            action is irreversible.
           </p>
-          <div className="text-end">
+          <div className="flex">
             <Button
-              className="btn-secondary me-2"
+              className="flex-grow mr-16"
               onClick={() => setIsModalOpen(false)}
             >
               Cancel
             </Button>
-            <Button className="btn-danger" onClick={() => deleteUser()}>
+            <Button
+              className="flex-grow bg-red-500"
+              onClick={() => deleteUser()}
+            >
               Delete
             </Button>
           </div>
         </Modal>
       )}
-    </div>
+    </>
   )
 }
 

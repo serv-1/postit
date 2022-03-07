@@ -62,17 +62,16 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
   return (
     <>
       <Button
-        className="d-block m-auto p-0 bg-white border-0 shadow rounded-circle"
-        style={{ width: 200, height: 200 }}
+        needDefaultClassNames={false}
+        className="mb-16 w-full"
         onClick={() => fileInputRef.current?.click()}
       >
         <Image
           src={image}
-          width={200}
-          height={200}
+          width={160}
+          height={160}
           alt="Your profile image"
           title="Click to change your profile image"
-          className="rounded-circle"
         />
       </Button>
       <input
@@ -83,7 +82,7 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
         name="image"
         id="image"
         aria-label="Change your profile image"
-        className="d-none"
+        className="hidden"
       />
     </>
   )

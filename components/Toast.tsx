@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import { useToast } from '../contexts/toast'
-import CloseButton from './CloseButton'
+import Button from './Button'
+import X from '../public/static/images/x.svg'
 
 const needWhiteText = ['success', 'danger', 'primary', 'secondary', 'dark']
 
@@ -28,11 +29,9 @@ const Toast = () => {
       role="alert"
     >
       <div>{toast.message}</div>
-      <CloseButton
-        className="ms-2"
-        isWhite={needWhite}
-        onClick={() => setToast({ message: null })}
-      />
+      <Button onClick={() => setToast({ message: null })}>
+        <X />
+      </Button>
     </div>
   ) : null
 }

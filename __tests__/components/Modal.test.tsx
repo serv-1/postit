@@ -6,7 +6,7 @@ test('the modal renders and can be closed', () => {
   const setIsModalOpen = jest.fn()
 
   render(
-    <Modal title={'This is a super modal!'} setIsModalOpen={setIsModalOpen}>
+    <Modal title={'This is a super modal!'} setIsOpen={setIsModalOpen}>
       <a href="#">Modality</a>
     </Modal>
   )

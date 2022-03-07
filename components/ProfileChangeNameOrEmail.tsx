@@ -10,6 +10,9 @@ import Button from './Button'
 import Form from './Form'
 import InputError from './InputError'
 import Input from './Input'
+import Pencil from '../public/static/images/pencil.svg'
+import Check from '../public/static/images/check.svg'
+import X from '../public/static/images/x.svg'
 
 type FormFields<T> = { csrfToken?: string } & (T extends 'name'
   ? { name: string }
@@ -62,34 +65,37 @@ const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
       submitHandlers={{ submitHandler }}
       methods={methods}
       needCsrfToken
+      className="flex first-of-type:mb-8"
     >
-      <div className="input-group">
-        <Input
-          className="rounded"
-          type={type === 'name' ? 'text' : 'email'}
-          defaultValue={value}
-          name={type}
-          needFocus
-        />
-        <Button
-          type="button"
-          className="p-0 ms-2"
-          aria-label="Cancel"
-          onClick={() => setShowForm(false)}
-        >
-          ❌
-        </Button>
-        <Button className="p-0 ms-2" aria-label="Submit" type="submit">
-          ✔
-        </Button>
-        <InputError inputName={type} />
-      </div>
+      <Input
+        className="leading-[16px] flex-grow"
+        type={type === 'name' ? 'text' : 'email'}
+        defaultValue={value}
+        name={type}
+        needFocus
+      />
+      <Button
+        type="button"
+        needDefaultClassNames={false}
+        aria-label="Cancel"
+        onClick={() => setShowForm(false)}
+      >
+        <X className="w-24 h-24 md:w-32 md:h-32" />
+      </Button>
+      <Button needDefaultClassNames={false} aria-label="Submit" type="submit">
+        <Check className="w-24 h-24 md:w-32 md:h-32" />
+      </Button>
+      <InputError inputName={type} />
     </Form>
   ) : (
-    <div className="input-group d-flex align-items-center">
-      <span className={type === 'name' ? 'fw-bold fs-1' : 'fs-5'}>{value}</span>
-      <Button aria-label="Edit" onClick={() => setShowForm(true)}>
-        ✏
+    <div className="flex justify-between first-of-type:mb-8">
+      <span className="text-xl md:text-t-xl lg:text-d-xl">{value}</span>
+      <Button
+        needDefaultClassNames={false}
+        aria-label="Edit"
+        onClick={() => setShowForm(true)}
+      >
+        <Pencil className="w-24 h-24 md:w-32 md:h-32" />
       </Button>
     </div>
   )

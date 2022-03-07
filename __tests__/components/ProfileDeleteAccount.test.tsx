@@ -37,8 +37,8 @@ test('the cancel button closes the modal', () => {
   const openModalBtn = screen.getByRole('button')
   userEvent.click(openModalBtn)
 
-  const closeModalBtn = screen.getByRole('button', { name: /close/i })
-  userEvent.click(closeModalBtn)
+  const cancelBtn = screen.getByRole('button', { name: /cancel/i })
+  userEvent.click(cancelBtn)
 
   const deleteBtn = screen.queryByRole('button', { name: /^delete$/i })
   expect(deleteBtn).not.toBeInTheDocument()

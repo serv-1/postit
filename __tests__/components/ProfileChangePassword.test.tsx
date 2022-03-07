@@ -20,7 +20,7 @@ test('an alert renders if the user password is updated', async () => {
 
   await screen.findByTestId('csrfToken')
 
-  const input = screen.getByLabelText(/change your password/i)
+  const input = screen.getByLabelText(/new password/i)
   userEvent.type(input, 'my new password')
 
   const submitBtn = screen.getByRole('button', { name: /change/i })
@@ -42,7 +42,7 @@ test('an error renders if the server fails to update the user', async () => {
 
   await screen.findByTestId('csrfToken')
 
-  const input = screen.getByLabelText(/change your password/i)
+  const input = screen.getByLabelText(/new password/i)
   userEvent.type(input, 'pw')
 
   const submitBtn = screen.getByRole('button', { name: /change/i })
