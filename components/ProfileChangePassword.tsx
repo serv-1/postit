@@ -23,10 +23,7 @@ const ProfileChangePassword = () => {
     try {
       await axios.put('http://localhost:3000/api/user', data)
 
-      setToast({
-        message: 'Your password has been updated! 🎉',
-        background: 'success',
-      })
+      setToast({ message: 'Your password has been updated! 🎉' })
     } catch (e) {
       const { message } = getAxiosError(e as AxiosError)
       methods.setError('password', { message }, { shouldFocus: true })

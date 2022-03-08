@@ -43,7 +43,7 @@ const Header = () => {
         setImage(res.data.image)
       } catch (e) {
         const { message } = getAxiosError(e as AxiosError)
-        setToast({ message, background: 'danger' })
+        setToast({ message, error: true })
       }
     }
     if (status === 'authenticated' && pathname !== '/profile') getImage()

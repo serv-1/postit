@@ -96,7 +96,7 @@ test('an error renders if the server fails to fetch the user image', async () =>
   render(<Header />)
 
   await waitFor(() => {
-    const update = { message: err.USER_NOT_FOUND, background: 'danger' }
+    const update = { message: err.USER_NOT_FOUND, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, update)
   })
 

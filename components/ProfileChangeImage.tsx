@@ -21,14 +21,11 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
     if (!files || files.length === 0) return
 
     if (!['image/jpeg', 'image/png', 'image/gif'].includes(files[0].type)) {
-      return setToast({ message: err.IMAGE_INVALID, background: 'danger' })
+      return setToast({ message: err.IMAGE_INVALID, error: true })
     }
 
     if (files[0].size > 1000000) {
-      return setToast({
-        message: err.IMAGE_TOO_BIG,
-        background: 'danger',
-      })
+      return setToast({ message: err.IMAGE_TOO_BIG, error: true })
     }
 
     const reader = new FileReader()
@@ -46,13 +43,10 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
         })
 
         setImage(e.target.result as string)
-        setToast({
-          message: 'The image has been updated! 🎉',
-          background: 'success',
-        })
+        setToast({ message: 'The image has been updated! 🎉' })
       } catch (e) {
         const { message } = getAxiosError(e as AxiosError)
-        setToast({ message, background: 'danger' })
+        setToast({ message, error: true })
       }
     }
 
@@ -72,6 +66,7 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
           height={160}
           alt="Your profile image"
           title="Click to change your profile image"
+          className="rounded-full"
         />
       </Button>
       <input

@@ -4,6 +4,7 @@ import ProfileChangePassword from '../../components/ProfileChangePassword'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
+import { ToastState } from '../../contexts/toast'
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
@@ -12,8 +13,7 @@ afterAll(() => server.close())
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 test('an alert renders if the user password is updated', async () => {
-  type Update = { message: string; background: string }
-  const setToast = jest.fn((update: Update) => update.background)
+  const setToast = jest.fn((update: ToastState) => update.error)
   useToast.mockReturnValue({ setToast })
 
   render(<ProfileChangePassword />)
@@ -26,7 +26,7 @@ test('an alert renders if the user password is updated', async () => {
   const submitBtn = screen.getByRole('button', { name: /change/i })
   userEvent.click(submitBtn)
 
-  await waitFor(() => expect(setToast).toHaveNthReturnedWith(1, 'success'))
+  await waitFor(() => expect(setToast).toHaveNthReturnedWith(1, undefined))
 })
 
 test('an error renders if the server fails to update the user', async () => {

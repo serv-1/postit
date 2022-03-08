@@ -33,7 +33,7 @@ const HomePostPage = () => {
         setTotalPages(data.totalPages)
       } catch (e) {
         const { message } = getAxiosError(e as AxiosError)
-        setToast({ message, background: 'danger' })
+        setToast({ message, error: true })
       }
     }
 

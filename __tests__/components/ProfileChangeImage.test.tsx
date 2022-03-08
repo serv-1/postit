@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
+import { ToastState } from '../../contexts/toast'
 
 const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
 
@@ -28,8 +29,7 @@ test('the button triggers a click on the file input', () => {
 })
 
 test('an alert renders if the user image is updated and the new user image renders', async () => {
-  type Update = { message: string; background: string }
-  const setToast = jest.fn((update: Update) => update.background)
+  const setToast = jest.fn((update: ToastState) => update.error)
   useToast.mockReturnValue({ setToast })
 
   render(<ProfileChangeImage image="base64Uri" />)
@@ -40,7 +40,7 @@ test('an alert renders if the user image is updated and the new user image rende
   const input = screen.getByTestId('fileInput')
   userEvent.upload(input, file)
 
-  await waitFor(() => expect(setToast).toHaveNthReturnedWith(1, 'success'))
+  await waitFor(() => expect(setToast).toHaveNthReturnedWith(1, undefined))
 
   const newImg = screen.getByRole('img')
   const newSrc = newImg.getAttribute('src')
@@ -61,7 +61,7 @@ test('an error renders if the user image is invalid', async () => {
   userEvent.upload(input, textFile)
 
   await waitFor(() => {
-    const toast = { message: err.IMAGE_INVALID, background: 'danger' }
+    const toast = { message: err.IMAGE_INVALID, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 
@@ -70,7 +70,7 @@ test('an error renders if the user image is invalid', async () => {
   userEvent.upload(input, tooLargeFile)
 
   await waitFor(() => {
-    const toast = { message: err.IMAGE_TOO_BIG, background: 'danger' }
+    const toast = { message: err.IMAGE_TOO_BIG, error: true }
     expect(setToast).toHaveBeenNthCalledWith(2, toast)
   })
 })
@@ -91,7 +91,7 @@ test('an error renders if the server fails to update the user image', async () =
   userEvent.upload(input, file)
 
   await waitFor(() => {
-    const toast = { message: err.IMAGE_INVALID, background: 'danger' }
+    const toast = { message: err.IMAGE_INVALID, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })

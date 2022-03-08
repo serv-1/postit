@@ -78,7 +78,7 @@ test('an error renders if the server fails to fetch the posts', async () => {
   await waitFor(() => {
     expect(setToast).toHaveBeenNthCalledWith(1, {
       message: err.QUERY_REQUIRED,
-      background: 'danger',
+      error: true,
     })
   })
 })

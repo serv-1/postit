@@ -47,7 +47,7 @@ const Register = () => {
         return methods.setError(name, { message }, { shouldFocus: true })
       }
 
-      setToast({ message, background: 'danger' })
+      setToast({ message, error: true })
     }
   }
 

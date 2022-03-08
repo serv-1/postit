@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
+import { ToastState } from '../../contexts/toast'
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
@@ -64,8 +65,7 @@ test('the cancel button cancels the editing process', async () => {
 })
 
 test('an alert renders if the user name/email is updated and the new user name/email renders', async () => {
-  type Update = { message: string; background: string }
-  const setToast = jest.fn((update: Update) => update.background)
+  const setToast = jest.fn((update: ToastState) => update.error)
   useToast.mockReturnValue({ setToast })
 
   render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
@@ -84,7 +84,7 @@ test('an alert renders if the user name/email is updated and the new user name/e
   const name = await screen.findByText('John Doe' + ' edited')
   expect(name).toBeInTheDocument()
 
-  await waitFor(() => expect(setToast).toHaveNthReturnedWith(1, 'success'))
+  await waitFor(() => expect(setToast).toHaveNthReturnedWith(1, undefined))
 })
 
 test('the user name/email does not update if it has not change', async () => {

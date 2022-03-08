@@ -140,11 +140,8 @@ test('an error renders if the server fails to create the post', async () => {
   const submitBtn = screen.getByRole('button', { name: /create/i })
   userEvent.click(submitBtn)
 
-  // const toast = await screen.findByRole('alert')
-  // expect(toast).toHaveTextContent(err.FORBIDDEN)
-  // expect(toast).toHaveClass('bg-danger')
   await waitFor(() => {
-    const toast = { message: err.FORBIDDEN, background: 'danger' }
+    const toast = { message: err.FORBIDDEN, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })

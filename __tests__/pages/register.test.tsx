@@ -93,11 +93,8 @@ test('an error renders if the server fails to register the user', async () => {
   const submitBtn = screen.getByRole('button', { name: /register/i })
   userEvent.click(submitBtn)
 
-  // const toast = await screen.findByRole('alert')
-  // expect(toast).toHaveTextContent(err.METHOD_NOT_ALLOWED)
-  // expect(toast).toHaveClass('bg-danger')
   await waitFor(() => {
-    const toast = { message: err.METHOD_NOT_ALLOWED, background: 'danger' }
+    const toast = { message: err.METHOD_NOT_ALLOWED, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })

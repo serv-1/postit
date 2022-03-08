@@ -63,7 +63,7 @@ test('an error renders if the server fails to delete the user', async () => {
   userEvent.click(deleteBtn)
 
   await waitFor(() => {
-    const toast = { message: err.PARAMS_INVALID, background: 'danger' }
+    const toast = { message: err.PARAMS_INVALID, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })

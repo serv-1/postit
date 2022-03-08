@@ -21,7 +21,7 @@ const ProfileDeleteAccount = () => {
       await signOut({ callbackUrl: '/' })
     } catch (e) {
       const { message } = getAxiosError(e as AxiosError)
-      setToast({ message, background: 'danger' })
+      setToast({ message, error: true })
     }
   }
 
