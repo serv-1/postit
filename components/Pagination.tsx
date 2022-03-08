@@ -1,15 +1,5 @@
-// import ChevronLeft from '../public/static/images/chevron-left.svg'
-// import ChevronRight from '../public/static/images/chevron-right.svg'
-// import ChevronDoubleLeft from '../public/static/images/chevron-double-left.svg'
-// import ChevronDoubleRight from '../public/static/images/chevron-double-right.svg'
 import React, { useEffect, useState } from 'react'
 import Link from './Link'
-
-interface liAttributes {
-  className: string
-  'aria-current'?: 'page'
-  style?: React.CSSProperties
-}
 
 interface PaginationProps {
   totalPages: number
@@ -70,7 +60,7 @@ const Pagination = ({ totalPages }: PaginationProps) => {
     )
   }
 
-  return totalPages > 0 ? (
+  return (
     <nav aria-label="Pages" className="col-span-full">
       <ul className="flex justify-center">
         {currentPage > 3 && (
@@ -81,7 +71,7 @@ const Pagination = ({ totalPages }: PaginationProps) => {
               aria-label="First page"
               onClick={(e) => onClick(e, 1)}
             >
-              &lt;&lt; {/* <ChevronDoubleLeft /> */}
+              &lt;&lt;
             </Link>
           </li>
         )}
@@ -93,7 +83,7 @@ const Pagination = ({ totalPages }: PaginationProps) => {
               aria-label="Previous page"
               onClick={(e) => onClick(e, currentPage - 1)}
             >
-              &lt; {/* <ChevronLeft /> */}
+              &lt;
             </Link>
           </li>
         )}
@@ -106,7 +96,7 @@ const Pagination = ({ totalPages }: PaginationProps) => {
               aria-label="Next page"
               onClick={(e) => onClick(e, currentPage + 1)}
             >
-              &gt; {/* <ChevronRight /> */}
+              &gt;
             </Link>
           </li>
         )}
@@ -118,13 +108,13 @@ const Pagination = ({ totalPages }: PaginationProps) => {
               aria-label="Last page"
               onClick={(e) => onClick(e, totalPages)}
             >
-              &gt;&gt; {/* <ChevronDoubleRight /> */}
+              &gt;&gt;
             </Link>
           </li>
         )}
       </ul>
     </nav>
-  ) : null
+  )
 }
 
 export default Pagination

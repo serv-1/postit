@@ -15,9 +15,7 @@ const Home = () => {
           </h1>
           <HomeSearchPosts />
         </div>
-        <div className="my-auto grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-16 justify-center">
-          <HomePostPage />
-        </div>
+        <HomePostPage />
       </main>
     </>
   )

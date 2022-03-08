@@ -6,6 +6,7 @@ import getAxiosError from '../utils/functions/getAxiosError'
 import PostsFoundNumber from './PostsFoundNumber'
 import PostList from './PostList'
 import Pagination from './Pagination'
+import classNames from 'classnames'
 
 interface Response {
   posts: Post[]
@@ -47,12 +48,28 @@ const HomePostPage = () => {
     }
   }, [setToast])
 
+  const containerClass = classNames(
+    'grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-16 justify-center',
+    { 'my-auto': !posts || posts.length === 0 }
+  )
+
   return (
-    <>
-      <PostsFoundNumber nb={totalPosts} />
-      <PostList posts={posts} />
-      <Pagination totalPages={totalPages} />
-    </>
+    <div className={containerClass}>
+      {posts && posts.length > 0 ? (
+        <>
+          <PostsFoundNumber nb={totalPosts} />
+          <PostList posts={posts} />
+          <Pagination totalPages={totalPages} />
+        </>
+      ) : (
+        <div
+          className="col-span-full text-center text-4xl md:text-t-4xl lg:text-d-4xl"
+          role="status"
+        >
+          {!posts ? 'Search something ☝' : 'No posts found 😮'}
+        </div>
+      )}
+    </div>
   )
 }
 

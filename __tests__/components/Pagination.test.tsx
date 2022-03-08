@@ -23,14 +23,6 @@ const removeOnQueryStringChange = (onQueryStringChange: EventListener) => {
   document.removeEventListener('queryStringChange', onQueryStringChange)
 }
 
-test('nothing render if there is no pages', () => {
-  setPage(2)
-  render(<Pagination totalPages={0} />)
-
-  const navigation = screen.queryByRole('navigation')
-  expect(navigation).not.toBeInTheDocument()
-})
-
 test('everything render correctly', () => {
   setPage(10)
   render(<Pagination totalPages={20} />)

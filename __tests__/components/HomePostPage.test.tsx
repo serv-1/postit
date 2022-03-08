@@ -12,11 +12,30 @@ const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 beforeEach(() => useToast.mockReturnValue({ setToast: () => null }))
 
-test('no posts render if there is no query parameters', () => {
+test('an informative text renders if the user have not search something yet', () => {
   render(<HomePostPage />)
 
-  const post = screen.queryByRole('link', { name: /blue cat/i })
-  expect(post).not.toBeInTheDocument()
+  const text = screen.getByRole('status')
+  expect(text).toHaveTextContent(/search something/i)
+})
+
+test('an informative text renders if no posts have been found', async () => {
+  server.use(
+    rest.get('http://localhost:3000/api/posts/search', (req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json({ posts: [], totalPosts: 0, totalPages: 0 })
+      )
+    })
+  )
+
+  const search = '?query=ohNooo'
+  Object.defineProperty(window, 'location', { get: () => ({ search }) })
+
+  render(<HomePostPage />)
+
+  const text = screen.getByRole('status')
+  await waitFor(() => expect(text).toHaveTextContent(/no posts found/i))
 })
 
 test('a request is send to fetch the posts matching the query parameters', async () => {

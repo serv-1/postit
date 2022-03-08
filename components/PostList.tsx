@@ -2,11 +2,11 @@ import { Post as IPost } from '../types/common'
 import Post from './Post'
 
 export interface PostListProps {
-  posts?: IPost[]
+  posts: IPost[]
 }
 
 const PostList = ({ posts }: PostListProps) => {
-  return posts && posts.length > 0 ? (
+  return (
     <>
       {posts.map((post) => (
         <Post
@@ -18,13 +18,6 @@ const PostList = ({ posts }: PostListProps) => {
         />
       ))}
     </>
-  ) : (
-    <div
-      className="col-span-full text-center text-4xl md:text-t-4xl lg:text-d-4xl"
-      role="status"
-    >
-      {!posts ? 'Search something ☝' : 'No posts found 😮'}
-    </div>
   )
 }
 
