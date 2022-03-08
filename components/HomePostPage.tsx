@@ -54,7 +54,7 @@ const HomePostPage = () => {
   )
 
   return (
-    <div className={containerClass}>
+    <div data-testid="container" className={containerClass}>
       {posts && posts.length > 0 ? (
         <>
           <PostsFoundNumber nb={totalPosts} />
