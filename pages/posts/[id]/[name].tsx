@@ -2,7 +2,7 @@ import axios from 'axios'
 import { GetServerSideProps } from 'next'
 import { IPost } from '../../../models/Post'
 import PostImages from '../../../components/PostImages'
-import PostInfos from '../../../components/PostInfos'
+import addCommasToNb from '../../../utils/functions/addCommasToNb'
 
 interface Post extends Omit<IPost, '_id' | 'userId'> {
   id: string
@@ -42,20 +42,33 @@ interface PostProps {
 
 const Post = ({ post }: PostProps) => {
   return (
-    <main className="container-fluid my-4">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="row">
-            <PostImages images={post.images} />
-            <PostInfos
-              name={post.name}
-              description={post.description}
-              price={post.price}
-              username={post.username}
-              categories={post.categories}
-            />
-          </div>
-        </div>
+    <main className="py-32 grid grid-cols-4 md:grid-cols-[repeat(6,72px)] gap-x-16 justify-center">
+      <h1 className="col-span-full text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16">
+        {post.name}
+      </h1>
+      <div className="col-span-full mb-8">
+        categorized in{' '}
+        {post.categories.map((category) => (
+          <span
+            key={category}
+            className="border border-black rounded px-8 py-4 mr-4"
+          >
+            {category}
+          </span>
+        ))}
+      </div>
+      <div className="col-span-full mb-8">
+        for{' '}
+        <span className="text-indigo-600 text-4xl md:text-t-4xl lg:text-d-4xl font-bold ">
+          {addCommasToNb(post.price)}€
+        </span>
+      </div>
+      <PostImages images={post.images} />
+      <div className="col-span-full bg-indigo-200 rounded p-8 mt-8 relative">
+        <span className="italic text-s absolute top-0 start-8 -translate-y-1/2">
+          <span className="font-bold">{post.username}</span> says
+        </span>
+        <p>{post.description}</p>
       </div>
     </main>
   )
