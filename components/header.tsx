@@ -72,10 +72,10 @@ const Header = () => {
               </Link>
             </li>
             {pathname !== '/profile' ? (
-              <li>
+              <li className="w-32 h-32 md:w-40 md:h-40">
                 <Button
                   needDefaultClassNames={false}
-                  className="w-32 h-32 md:w-40 md:h-40"
+                  className="w-full h-full"
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   ref={(r) => setReferenceElement(r)}
                 >
@@ -86,6 +86,7 @@ const Header = () => {
                       layout="responsive"
                       width={32}
                       height={32}
+                      className="rounded-full"
                     />
                   ) : (
                     <Spinner />
@@ -141,7 +142,7 @@ const Header = () => {
           <Link
             href="/api/auth/signin"
             needButtonStyle
-            className="md:px-16 md:py-8 font-bold"
+            className="md:px-16 md:py-8 font-bold inline-block"
             onClick={(e) => {
               e.preventDefault()
               signIn()

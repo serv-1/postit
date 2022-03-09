@@ -12,7 +12,8 @@ const Link = (props: LinkProps) => {
 
   const _className = classNames(
     {
-      'bg-indigo-600 text-white px-8 py-4 rounded': needButtonStyle,
+      'bg-indigo-600 hover:bg-indigo-800 transition-colors duration-200 text-white px-8 py-4 rounded':
+        needButtonStyle,
     },
     className
   )

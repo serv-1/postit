@@ -28,7 +28,7 @@ const ProfileDeleteAccount = () => {
   return (
     <>
       <Button
-        className="col-span-2 col-start-2 md:col-start-3 bg-red-500"
+        className="col-span-2 col-start-2 md:col-start-3 bg-red-500 hover:bg-red-700"
         onClick={() => setIsModalOpen(true)}
       >
         Delete account
@@ -48,7 +48,7 @@ const ProfileDeleteAccount = () => {
               Cancel
             </Button>
             <Button
-              className="flex-grow bg-red-500"
+              className="flex-grow bg-red-500 hover:bg-red-700"
               onClick={() => deleteUser()}
             >
               Delete
