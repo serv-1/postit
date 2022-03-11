@@ -208,14 +208,14 @@ describe('/api/user', () => {
   })
 
   describe('image', () => {
-    it('422 - Invalid image type', function () {
+    it('422 - Invalid image extension', function () {
       cy.task('db:reset')
       cy.task<Ids>('db:seed')
 
       cy.signIn(u1.email, u1.password)
 
       const url = '/api/user'
-      const body = { image: { base64: 'text', type: 'txt' } }
+      const body = { image: { base64: 'text', ext: 'txt' } }
 
       cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
         expect(res.status).to.eq(422)
@@ -231,7 +231,7 @@ describe('/api/user', () => {
 
       const url = '/api/user'
       const base64 = Buffer.from(new Uint8Array(1000001)).toString('base64')
-      const body = { image: { base64, type: 'jpeg' } }
+      const body = { image: { base64, ext: 'jpeg' } }
 
       cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
         expect(res.status).to.eq(413)
@@ -247,7 +247,7 @@ describe('/api/user', () => {
 
         const url = '/api/user'
         const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
-        const body = { image: { base64, type: 'jpeg' } }
+        const body = { image: { base64, ext: 'jpeg' } }
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(200)
@@ -292,7 +292,7 @@ describe('/api/user', () => {
 
         // Change the user image
         const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
-        const img = { image: { base64, type: 'jpeg' } }
+        const img = { image: { base64, ext: 'jpeg' } }
         cy.req({ url: '/api/user', method: 'PUT', body: img, csrfToken: true })
 
         // Create a post with the user

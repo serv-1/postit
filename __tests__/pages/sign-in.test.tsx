@@ -53,7 +53,7 @@ test('an error renders if the server fails to sign in the user', async () => {
   userEvent.click(submitBtn)
 
   await waitFor(() => {
-    const toast = { message: 'Error', background: 'danger' }
+    const toast = { message: 'Error', error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })

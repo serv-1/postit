@@ -10,10 +10,11 @@ import {
   createPostClientSchema,
   CreatePostClientSchema,
 } from '../lib/joi/createPostSchema'
-import err from '../utils/constants/errors'
 import getAxiosError from '../utils/functions/getAxiosError'
 import { useRouter } from 'next/router'
 import { Image } from '../types/common'
+import isImageValid from '../utils/functions/isImageValid'
+import readAsDataUrl from '../utils/functions/readAsDataUrl'
 
 const CreateAPost = () => {
   const resolver = joiResolver(createPostClientSchema)
@@ -26,51 +27,36 @@ const CreateAPost = () => {
     const encodedImages: Image[] = []
 
     for (const image of Array.from(images)) {
-      if (!['image/jpeg', 'image/png', 'image/gif'].includes(image.type)) {
-        return methods.setError(
-          'images',
-          { message: err.IMAGE_INVALID },
-          { shouldFocus: true }
-        )
-      } else if (image.size > 1000000) {
-        return methods.setError(
-          'images',
-          { message: err.IMAGE_TOO_BIG },
-          { shouldFocus: true }
-        )
+      const message = isImageValid(image)
+
+      if (message) {
+        return methods.setError('images', { message }, { shouldFocus: true })
       }
 
-      const reader = new FileReader()
+      const result = await readAsDataUrl<'jpeg' | 'png' | 'gif'>(image)
 
-      reader.onload = async (e) => {
-        if (!e.target?.result) return
+      if (typeof result === 'string') {
+        methods.setError('images', { message: result }, { shouldFocus: true })
+      } else {
+        encodedImages.push(result)
+      }
+    }
 
-        encodedImages.push({
-          base64: (e.target.result as string).split(',')[1],
-          type: image.type.split('/')[1] as Image['type'],
-        })
+    try {
+      await axios.post('http://localhost:3000/api/post', {
+        ...data,
+        images: encodedImages,
+      })
+      router.push('/profile')
+    } catch (e) {
+      type FieldsNames = keyof CreatePostClientSchema
+      const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)
 
-        if (encodedImages.length !== images.length) return
-
-        try {
-          await axios.post('http://localhost:3000/api/post', {
-            ...data,
-            images: encodedImages,
-          })
-          router.push('/profile')
-        } catch (e) {
-          type FieldsNames = keyof CreatePostClientSchema
-          const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)
-
-          if (name) {
-            return methods.setError(name, { message }, { shouldFocus: true })
-          }
-
-          setToast({ message, error: true })
-        }
+      if (name) {
+        return methods.setError(name, { message }, { shouldFocus: true })
       }
 
-      reader.readAsDataURL(image)
+      setToast({ message, error: true })
     }
   }
 

@@ -4,6 +4,7 @@ import usersIdHandlers from './users/[id]'
 import nextAuthHandlers from './nextAuth'
 import verifyEmailHandlers from './verifyEmail'
 import postHandlers from './post'
+import postsIdHandlers from './posts/[id]'
 import searchPostsHandlers from './posts/search'
 
 const server = setupServer(
@@ -12,6 +13,7 @@ const server = setupServer(
   ...nextAuthHandlers,
   ...verifyEmailHandlers,
   ...postHandlers,
+  ...postsIdHandlers,
   ...searchPostsHandlers
 )
 

@@ -5,6 +5,13 @@ import selectEvent from 'react-select-event'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
+import readAsDataUrl from '../../utils/functions/readAsDataUrl'
+
+jest.mock('../../utils/functions/readAsDataUrl')
+
+const mockReadAsDataUrl = readAsDataUrl as jest.MockedFunction<
+  typeof readAsDataUrl
+>
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
@@ -81,7 +88,9 @@ test('an error renders for the images field if an image is invalid', async () =>
   expect(error).toHaveTextContent(err.IMAGE_INVALID)
 })
 
-test('an error renders for the images field if an image is too large', async () => {
+test('an error renders for the images field if an image cannot be read as data url', async () => {
+  mockReadAsDataUrl.mockResolvedValue('error')
+
   render(<CreateAPost />)
 
   await screen.findByTestId('csrfToken')
@@ -89,7 +98,9 @@ test('an error renders for the images field if an image is too large', async () 
   const nameInput = screen.getByRole('textbox', { name: /name/i })
   userEvent.type(nameInput, 'Modern table')
 
-  const descriptionInput = screen.getByRole('textbox', { name: /description/i })
+  const descriptionInput = screen.getByRole('textbox', {
+    name: /description/i,
+  })
   userEvent.type(descriptionInput, 'A magnificent modern table.')
 
   await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
@@ -97,16 +108,15 @@ test('an error renders for the images field if an image is too large', async () 
   const priceInput = screen.getByRole('spinbutton', { name: /price/i })
   userEvent.type(priceInput, '40')
 
-  const data = new Uint8Array(1000001)
-  const largeFile = new File([data], 'tooLarge.jpeg')
+  const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
   const imagesInput = screen.getByLabelText(/images/i)
-  userEvent.upload(imagesInput, largeFile)
+  userEvent.upload(imagesInput, image)
 
   const submitBtn = screen.getByRole('button', { name: /create/i })
   userEvent.click(submitBtn)
 
   const error = await screen.findByRole('alert')
-  expect(error).toHaveTextContent(err.IMAGE_INVALID)
+  expect(error).toHaveTextContent('error')
 })
 
 test('an error renders if the server fails to create the post', async () => {

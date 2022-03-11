@@ -48,7 +48,7 @@ const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
 
       setShowForm(false)
       setValue(newValue)
-      setToast({ message: `The ${type} has been successfully updated! 🎉` })
+      setToast({ message: `The ${type} has been updated! 🎉` })
     } catch (e) {
       const { message } = getAxiosError(e as AxiosError)
       methods.setError(type, { message }, { shouldFocus: true })

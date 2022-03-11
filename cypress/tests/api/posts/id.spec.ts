@@ -281,7 +281,7 @@ describe('/api/posts/:id', () => {
 
           const url = `/api/posts/${ids.pId}`
           const base64 = Buffer.from(new Uint8Array(1000001)).toString('base64')
-          const body = { images: [{ base64, type: 'jpeg' }] }
+          const body = { images: [{ base64, ext: 'jpeg' }] }
 
           cy.req({ url, method: 'PUT', csrfToken: true, body }).then((res) => {
             expect(res.status).to.eq(413)
@@ -302,7 +302,7 @@ describe('/api/posts/:id', () => {
             description: 'Incredible chair',
             categories: ['furniture'],
             price: 20,
-            images: [{ base64, type: 'jpeg' }],
+            images: [{ base64, ext: 'jpeg' }],
           }
 
           cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })
@@ -312,7 +312,7 @@ describe('/api/posts/:id', () => {
 
             for (let i = 0; i < 5; i++) {
               const base64 = Buffer.from(new Uint8Array(1000000))
-              images.push({ base64: base64.toString('base64'), type: 'jpeg' })
+              images.push({ base64: base64.toString('base64'), ext: 'jpeg' })
             }
 
             const url = `/api/posts/${post._id}`
@@ -332,6 +332,26 @@ describe('/api/posts/:id', () => {
           })
 
           cy.task('deleteImages', 'posts')
+        })
+      })
+    })
+
+    it('Do multiple updates at the same time', function () {
+      cy.task('db:reset')
+
+      cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.signIn(u1.email, u1.password)
+
+        const url = `/api/posts/${ids.pId}`
+        const body = { name: 'Trumpet', price: 50 }
+
+        cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
+          expect(res.status).to.eq(200)
+        })
+
+        cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+          expect(post.name).to.eq('Trumpet')
+          expect(post.price).to.eq(5000)
         })
       })
     })
@@ -384,7 +404,7 @@ describe('/api/posts/:id', () => {
           description: 'Incredible chair',
           categories: ['furniture'],
           price: 20,
-          images: [{ base64, type: 'jpeg' }],
+          images: [{ base64, ext: 'jpeg' }],
         }
 
         cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })

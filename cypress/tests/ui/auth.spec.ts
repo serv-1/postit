@@ -50,7 +50,7 @@ describe('User sign in and register', () => {
     cy.get('#name').type(u1.name)
     cy.get('#email').type(u1.email)
     cy.get('#password').type(u1.password)
-    cy.get('input[type="submit"]').click()
+    cy.get('[type="submit"]').click()
 
     cy.get('[data-cy="profile"]', { timeout: 10000 }).should('exist')
     cy.contains(u1.email).should('exist')
@@ -74,7 +74,7 @@ describe('User sign in and register', () => {
 
     cy.get('#email').type(u1.email)
     cy.get('#password').type(u1.password)
-    cy.get('input[type="submit"]').click()
+    cy.get('[type="submit"]').click()
 
     cy.get('[data-cy="profile"]').should('exist')
     cy.contains(u1.email).should('exist')

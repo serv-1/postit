@@ -28,7 +28,7 @@ describe('/api/users/:id', () => {
       })
     })
 
-    it.only('200 - Get the user', function () {
+    it('200 - Get the user', function () {
       cy.task('db:reset')
 
       cy.task<Ids>('db:seed').then((ids) => {
@@ -48,7 +48,7 @@ describe('/api/users/:id', () => {
           description: 'Magnificent cat',
           categories: ['cat'],
           price: 50,
-          images: [{ base64, type: 'jpeg' }],
+          images: [{ base64, ext: 'jpeg' }],
         }
 
         cy.signIn(u1.email, u1.password)

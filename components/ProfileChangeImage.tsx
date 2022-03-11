@@ -4,7 +4,8 @@ import Image from 'next/image'
 import { useToast } from '../contexts/toast'
 import Button from './Button'
 import getAxiosError from '../utils/functions/getAxiosError'
-import err from '../utils/constants/errors'
+import isImageValid from '../utils/functions/isImageValid'
+import readAsDataUrl from '../utils/functions/readAsDataUrl'
 
 interface ProfileChangeImageProps {
   image: string
@@ -15,42 +16,37 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
   const [image, setImage] = useState(img)
   const { setToast } = useToast()
 
-  const updateImage = (e: ChangeEvent<HTMLInputElement>) => {
+  const updateImage = async (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
 
     if (!files || files.length === 0) return
 
-    if (!['image/jpeg', 'image/png', 'image/gif'].includes(files[0].type)) {
-      return setToast({ message: err.IMAGE_INVALID, error: true })
+    const message = isImageValid(files[0])
+
+    if (message) {
+      return setToast({ message, error: true })
     }
 
-    if (files[0].size > 1000000) {
-      return setToast({ message: err.IMAGE_TOO_BIG, error: true })
-    }
+    const result = await readAsDataUrl<'jpeg' | 'png' | 'gif'>(files[0])
 
-    const reader = new FileReader()
-
-    reader.onload = async (e) => {
-      if (!e.target?.result) return
+    if (typeof result === 'string') {
+      setToast({ message: result, error: true })
+    } else {
       try {
         const res = await axios.get('http://localhost:3000/api/auth/csrf')
 
-        const base64 = (e.target.result as string).split(',')[1]
-
-        await axios.put<null>('http://localhost:3000/api/user', {
+        await axios.put('http://localhost:3000/api/user', {
           csrfToken: res.data.csrfToken,
-          image: { base64, type: files[0].type.split('/')[1] },
+          image: result,
         })
 
-        setImage(e.target.result as string)
+        setImage(`data:image/${result.ext};base64,${result.base64}`)
         setToast({ message: 'The image has been updated! 🎉' })
       } catch (e) {
         const { message } = getAxiosError(e as AxiosError)
         setToast({ message, error: true })
       }
     }
-
-    reader.readAsDataURL(files[0])
   }
 
   return (
@@ -72,7 +68,6 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
       <input
         onChange={updateImage}
         ref={fileInputRef}
-        data-testid="fileInput"
         type="file"
         name="image"
         id="image"

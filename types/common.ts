@@ -15,7 +15,7 @@ export interface User
 
 export interface Image {
   base64: string
-  type: 'jpeg' | 'png' | 'gif'
+  ext: 'jpeg' | 'png' | 'gif'
 }
 
 export type Categories = typeof categories[0]

@@ -13,18 +13,18 @@ import createFile from '../../../utils/functions/createFile'
 import { unlink } from 'fs/promises'
 import { Categories } from '../../../types/common'
 import {
-  PostsIdPutSchema,
-  postsIdPutSchema,
+  PostsIdPutServerSchema,
+  postsIdPutServerSchema,
 } from '../../../lib/joi/postsIdPutSchema'
 import User from '../../../models/User'
 
-type Update =
-  | { name: string }
-  | { description: string }
-  | { categories: Categories[] }
-  | { price: number }
-  | { images: string[] }
-  | undefined
+interface Update {
+  name?: string
+  description?: string
+  categories?: Categories[]
+  price?: number
+  images?: string[]
+}
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
@@ -60,7 +60,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(403).json({ message: err.FORBIDDEN })
       }
 
-      const result = validate(postsIdPutSchema, req.body as PostsIdPutSchema)
+      const result = validate(
+        postsIdPutServerSchema,
+        req.body as PostsIdPutServerSchema
+      )
       const reqBody = result.value
 
       if ('message' in result) {
@@ -83,18 +86,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(422).json({ message: err.PARAMS_INVALID })
       }
 
-      let update: Update
+      const update: Update = {}
 
-      if ('images' in reqBody) {
+      if (reqBody.images) {
         const images: string[] = []
         const path = '/public/static/images/posts/'
 
-        for (const { base64, type } of reqBody.images) {
+        for (const { base64, ext } of reqBody.images) {
           if (isBase64ValueTooBig(base64, 1000000)) {
             return res.status(413).json({ message: err.IMAGE_TOO_BIG })
           }
 
-          const fname = await createFile(base64, type, path, 'base64')
+          const fname = await createFile(base64, ext, path, 'base64')
 
           images.push(fname)
         }
@@ -109,16 +112,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           await unlink(cwd() + path + image)
         }
 
-        update = { images }
-      } else if ('price' in reqBody) {
-        update = { price: reqBody.price * 100 }
-      } else if ('name' in reqBody) {
-        update = { name: reqBody.name }
-      } else if ('description' in reqBody) {
-        update = { description: reqBody.description }
-      } else if ('categories' in reqBody) {
-        update = { categories: reqBody.categories }
+        update.images = images
       }
+      if (reqBody.price) update.price = reqBody.price * 100
+      if (reqBody.name) update.name = reqBody.name
+      if (reqBody.description) update.description = reqBody.description
+      if (reqBody.categories) update.categories = reqBody.categories
 
       try {
         await dbConnect()

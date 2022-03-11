@@ -109,5 +109,5 @@ describe('/api/post', () => {
 
 function createImage(size: number) {
   const base64 = Buffer.from(new Uint8Array(size)).toString('base64')
-  return { base64, type: 'jpeg' }
+  return { base64, ext: 'jpeg' }
 }

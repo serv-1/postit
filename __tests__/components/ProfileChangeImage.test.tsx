@@ -5,21 +5,27 @@ import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
 import { ToastState } from '../../contexts/toast'
+import readAsDataUrl from '../../utils/functions/readAsDataUrl'
 
-const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
+jest.mock('../../utils/functions/readAsDataUrl')
 
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+const mockReadAsDataUrl = readAsDataUrl as jest.MockedFunction<
+  typeof readAsDataUrl
+>
 
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 beforeEach(() => useToast.mockReturnValue({}))
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
+const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
 
 test('the button triggers a click on the file input', () => {
   render(<ProfileChangeImage image="/img" />)
 
-  const input = screen.getByTestId('fileInput')
+  const input = screen.getByLabelText(/image/i)
   const click = jest.fn()
   input.click = click
 
@@ -32,22 +38,19 @@ test('an alert renders if the user image is updated and the new user image rende
   const setToast = jest.fn((update: ToastState) => update.error)
   useToast.mockReturnValue({ setToast })
 
-  render(<ProfileChangeImage image="base64Uri" />)
+  mockReadAsDataUrl.mockResolvedValue({ base64: 'slfjsl', ext: 'jpeg' })
 
-  const oldImg = screen.getByRole('img')
-  const oldSrc = oldImg.getAttribute('src')
+  render(<ProfileChangeImage image="/img" />)
 
-  const input = screen.getByTestId('fileInput')
+  const input = screen.getByLabelText(/image/i)
   userEvent.upload(input, file)
 
-  await waitFor(() => expect(setToast).toHaveNthReturnedWith(1, undefined))
-
-  const newImg = screen.getByRole('img')
-  const newSrc = newImg.getAttribute('src')
-
   await waitFor(() => {
-    expect(newSrc).not.toBe(oldSrc)
+    expect(setToast).toHaveNthReturnedWith(1, undefined)
   })
+
+  const image = screen.getByRole('img')
+  expect(image).not.toHaveAttribute('src', '/img')
 })
 
 test('an error renders if the user image is invalid', async () => {
@@ -56,7 +59,7 @@ test('an error renders if the user image is invalid', async () => {
 
   render(<ProfileChangeImage image="/img" />)
 
-  const input = screen.getByTestId('fileInput')
+  const input = screen.getByLabelText(/image/i)
   const textFile = new File(['text'], 'text.txt', { type: 'text/plain' })
   userEvent.upload(input, textFile)
 
@@ -64,14 +67,22 @@ test('an error renders if the user image is invalid', async () => {
     const toast = { message: err.IMAGE_INVALID, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
+})
 
-  const data = new ArrayBuffer(1000001)
-  const tooLargeFile = new File([data], file.name, { type: file.type })
-  userEvent.upload(input, tooLargeFile)
+test('an error renders if the image cannot be read as data url', async () => {
+  mockReadAsDataUrl.mockResolvedValue('error')
+
+  const setToast = jest.fn()
+  useToast.mockReturnValue({ setToast })
+
+  render(<ProfileChangeImage image="/img" />)
+
+  const input = screen.getByLabelText(/image/i)
+  userEvent.upload(input, file)
 
   await waitFor(() => {
-    const toast = { message: err.IMAGE_TOO_BIG, error: true }
-    expect(setToast).toHaveBeenNthCalledWith(2, toast)
+    const toast = { message: 'error', error: true }
+    expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })
 
@@ -87,7 +98,7 @@ test('an error renders if the server fails to update the user image', async () =
 
   render(<ProfileChangeImage image="/img" />)
 
-  const input = screen.getByTestId('fileInput')
+  const input = screen.getByLabelText(/image/i)
   userEvent.upload(input, file)
 
   await waitFor(() => {

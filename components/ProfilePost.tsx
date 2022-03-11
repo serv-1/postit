@@ -1,4 +1,4 @@
-import { Post } from '../types/common'
+import { Image as IImage, Post } from '../types/common'
 import X from '../public/static/images/x.svg'
 import Pencil from '../public/static/images/pencil.svg'
 import { useState } from 'react'
@@ -12,6 +12,16 @@ import InputError from './InputError'
 import Select from './Select'
 import Image from 'next/image'
 import categories from '../categories'
+import { joiResolver } from '@hookform/resolvers/joi'
+import {
+  PostsIdPutClientSchema,
+  postsIdPutClientSchema,
+} from '../lib/joi/postsIdPutSchema'
+import isImageValid from '../utils/functions/isImageValid'
+import { useToast } from '../contexts/toast'
+import axios, { AxiosError } from 'axios'
+import getAxiosError from '../utils/functions/getAxiosError'
+import readAsDataUrl from '../utils/functions/readAsDataUrl'
 
 const options = categories.map((category) => ({
   label: category,
@@ -25,9 +35,63 @@ interface ProfilePostProps {
 const ProfilePost = ({ post }: ProfilePostProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const methods = useForm()
+  const { setToast } = useToast()
 
-  const submitHandler: SubmitHandler<{}> = (data) => console.log(data)
+  const methods = useForm<PostsIdPutClientSchema>({
+    resolver: joiResolver(postsIdPutClientSchema),
+  })
+
+  const submitHandler: SubmitHandler<PostsIdPutClientSchema> = async (data) => {
+    const purifiedData: Omit<PostsIdPutClientSchema, 'images'> & {
+      images?: IImage[]
+    } = { csrfToken: data.csrfToken }
+
+    if (data.images) {
+      for (let i = 0; i < data.images.length; i++) {
+        const image = data.images[i]
+
+        const message = isImageValid(image)
+
+        if (message) {
+          return methods.setError('images', { message }, { shouldFocus: true })
+        }
+
+        const result = await readAsDataUrl<'jpeg' | 'png' | 'gif'>(image)
+
+        if (typeof result === 'string') {
+          methods.setError('images', { message: result }, { shouldFocus: true })
+          return
+        } else if (purifiedData.images) {
+          purifiedData.images.push(result)
+        } else {
+          purifiedData.images = [result]
+        }
+      }
+    }
+
+    try {
+      if (data.name) purifiedData.name = data.name
+      if (data.description) purifiedData.description = data.description
+      if (data.categories) purifiedData.categories = data.categories
+      if (data.price) purifiedData.price = data.price
+
+      await axios.put(
+        'http://localhost:3000/api/posts/' + post.id,
+        purifiedData
+      )
+
+      setToast({ message: 'The post has been updated! 🎉' })
+    } catch (e) {
+      type FieldsNames = keyof Required<PostsIdPutClientSchema>
+      const { message, name } = getAxiosError<FieldsNames>(e as AxiosError)
+
+      if (name) {
+        return methods.setError(name, { message }, { shouldFocus: true })
+      }
+
+      setToast({ message, error: true })
+    }
+  }
 
   return (
     <>
@@ -50,6 +114,7 @@ const ProfilePost = ({ post }: ProfilePostProps) => {
             method="post"
             methods={methods}
             submitHandlers={{ submitHandler }}
+            needCsrfToken
           >
             <div className="mb-16">
               <Label htmlFor="name" labelText="New name" />
@@ -80,7 +145,7 @@ const ProfilePost = ({ post }: ProfilePostProps) => {
                   </span>
                 ))}
               </p>
-              <Select name="catgories" options={options} />
+              <Select name="categories" options={options} />
               <InputError inputName="categories" />
             </div>
             <div className="mb-16">

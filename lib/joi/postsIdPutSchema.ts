@@ -4,24 +4,39 @@ import { nameSchema } from './nameSchema'
 import { descriptionSchema } from './descriptionSchema'
 import { categoriesSchema } from './categoriesSchema'
 import { priceSchema } from './priceSchema'
-import { imagesArraySchema } from './imagesSchema'
-import err from '../../utils/constants/errors'
+import { imagesArraySchema, imagesObjectSchema } from './imagesSchema'
 import { Categories, Image } from '../../types/common'
 
-export type PostsIdPutSchema =
-  | { csrfToken: string; name: string }
-  | { csrfToken: string; description: string }
-  | { csrfToken: string; categories: Categories[] }
-  | { csrfToken: string; price: number }
-  | { csrfToken: string; images: Image[] }
+interface PostsIdPutSchema {
+  csrfToken: string
+  name?: string
+  description?: string
+  categories?: Categories[]
+  price?: number
+}
 
-export const postsIdPutSchema = object<PostsIdPutSchema>({
+export interface PostsIdPutClientSchema extends PostsIdPutSchema {
+  images?: FileList
+}
+
+export interface PostsIdPutServerSchema extends PostsIdPutSchema {
+  images?: Image[]
+}
+
+const postsIdPutSchema = {
   csrfToken: csrfTokenSchema,
-  name: nameSchema.optional(),
-  description: descriptionSchema.optional(),
-  categories: categoriesSchema.optional(),
+  name: nameSchema.allow('').optional(),
+  description: descriptionSchema.allow('').optional(),
+  categories: categoriesSchema.min(0).optional(),
   price: priceSchema.optional(),
-  images: imagesArraySchema.optional(),
+}
+
+export const postsIdPutClientSchema = object<PostsIdPutClientSchema>({
+  ...postsIdPutSchema,
+  images: imagesObjectSchema.min(0).optional(),
 })
-  .xor('name', 'description', 'categories', 'price', 'images')
-  .messages({ 'object.xor': err.DATA_INVALID })
+
+export const postsIdPutServerSchema = object<PostsIdPutServerSchema>({
+  ...postsIdPutSchema,
+  images: imagesArraySchema.min(0).optional(),
+})

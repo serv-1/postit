@@ -47,14 +47,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const imagesUri: string[] = []
 
-    for (const { base64, type } of images) {
+    for (const { base64, ext } of images) {
       if (isBase64ValueTooBig(base64, 1000000)) {
         const json = { name: 'images', message: err.IMAGE_TOO_BIG }
         return res.status(413).json(json)
       }
 
       const path = '/public/static/images/posts/'
-      const fname = await createFile(base64, type, path, 'base64')
+      const fname = await createFile(base64, ext, path, 'base64')
 
       imagesUri.push(fname)
     }

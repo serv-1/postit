@@ -45,7 +45,7 @@ const SignIn = ({ providers }: SignInProps) => {
       } else if (new RegExp(/password/i).test(err)) {
         methods.setError('password', { message: err }, { shouldFocus: true })
       } else {
-        setToast({ message: err, background: 'danger' })
+        setToast({ message: err, error: true })
       }
       return
     }
@@ -78,7 +78,9 @@ const SignIn = ({ providers }: SignInProps) => {
             needFocus
           />
           <FormPasswordField />
-          <Button className="w-full">Sign in</Button>
+          <Button type="submit" className="w-full">
+            Sign in
+          </Button>
         </Form>
         <div className="my-32 col-span-full text-center">Or</div>
         {providers &&
