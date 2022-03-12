@@ -6,6 +6,7 @@ import Button from './Button'
 import getAxiosError from '../utils/functions/getAxiosError'
 import isImageValid from '../utils/functions/isImageValid'
 import readAsDataUrl from '../utils/functions/readAsDataUrl'
+import { IImage } from '../types/common'
 
 interface ProfileChangeImageProps {
   image: string
@@ -27,7 +28,7 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
       return setToast({ message, error: true })
     }
 
-    const result = await readAsDataUrl<'jpeg' | 'png' | 'gif'>(files[0])
+    const result = await readAsDataUrl<IImage['ext']>(files[0])
 
     if (typeof result === 'string') {
       setToast({ message: result, error: true })

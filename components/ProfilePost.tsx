@@ -1,4 +1,4 @@
-import { IImage, IPost } from '../types/common'
+import { Entries, IImage, IPost } from '../types/common'
 import X from '../public/static/images/x.svg'
 import Pencil from '../public/static/images/pencil.svg'
 import { useState } from 'react'
@@ -22,18 +22,25 @@ import { useToast } from '../contexts/toast'
 import axios, { AxiosError } from 'axios'
 import getAxiosError from '../utils/functions/getAxiosError'
 import readAsDataUrl from '../utils/functions/readAsDataUrl'
+import { getCsrfToken } from 'next-auth/react'
 
 const options = categories.map((category) => ({
   label: category,
   value: category,
 }))
 
+type FilteredData = Omit<PostsIdPutClientSchema, 'images'> & {
+  images?: IImage[]
+}
+
 interface ProfilePostProps {
   post: IPost
 }
 
-const ProfilePost = ({ post }: ProfilePostProps) => {
+const ProfilePost = (props: ProfilePostProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [post, setPost] = useState(props.post)
+  const [isDeleted, setIsDeleted] = useState(false)
 
   const { setToast } = useToast()
 
@@ -41,45 +48,59 @@ const ProfilePost = ({ post }: ProfilePostProps) => {
     resolver: joiResolver(postsIdPutClientSchema),
   })
 
-  const submitHandler: SubmitHandler<PostsIdPutClientSchema> = async (data) => {
-    const purifiedData: Omit<PostsIdPutClientSchema, 'images'> & {
-      images?: IImage[]
-    } = { csrfToken: data.csrfToken }
+  const submitHandler: SubmitHandler<PostsIdPutClientSchema> = async ({
+    images,
+    ...data
+  }) => {
+    const filteredData: FilteredData = data
 
-    if (data.images) {
-      for (let i = 0; i < data.images.length; i++) {
-        const image = data.images[i]
+    const newPost = post
 
-        const message = isImageValid(image)
+    type E = Entries<typeof filteredData>
+    for (const [key, value] of Object.entries(filteredData) as E) {
+      if (!value) delete filteredData[key]
+    }
+
+    if (images) {
+      for (let i = 0; i < images.length; i++) {
+        const message = isImageValid(images[i])
 
         if (message) {
           return methods.setError('images', { message }, { shouldFocus: true })
         }
 
-        const result = await readAsDataUrl<'jpeg' | 'png' | 'gif'>(image)
+        const result = await readAsDataUrl<IImage['ext']>(images[i])
 
         if (typeof result === 'string') {
           methods.setError('images', { message: result }, { shouldFocus: true })
           return
-        } else if (purifiedData.images) {
-          purifiedData.images.push(result)
+        }
+
+        if (filteredData.images) {
+          filteredData.images.push(result)
         } else {
-          purifiedData.images = [result]
+          filteredData.images = [result]
+        }
+
+        const dataUrl = `data:image/${result.ext};base64,${result.base64}`
+
+        if (i === 0) {
+          newPost.images = [dataUrl]
+        } else {
+          newPost.images.push(dataUrl)
         }
       }
     }
 
     try {
-      if (data.name) purifiedData.name = data.name
-      if (data.description) purifiedData.description = data.description
-      if (data.categories) purifiedData.categories = data.categories
-      if (data.price) purifiedData.price = data.price
-
       await axios.put(
         'http://localhost:3000/api/posts/' + post.id,
-        purifiedData
+        filteredData
       )
 
+      const { images, csrfToken, ...data } = filteredData
+
+      setPost({ ...newPost, ...data })
       setToast({ message: 'The post has been updated! 🎉' })
     } catch (e) {
       type FieldsNames = keyof Required<PostsIdPutClientSchema>
@@ -93,10 +114,27 @@ const ProfilePost = ({ post }: ProfilePostProps) => {
     }
   }
 
-  return (
+  const deletePost = async () => {
+    try {
+      const config = { data: { csrfToken: await getCsrfToken() } }
+      await axios.delete(`http://localhost:3000/api/posts/${post.id}`, config)
+
+      setIsDeleted(true)
+      setToast({ message: 'The post has been deleted.' })
+    } catch (e) {
+      const { message } = getAxiosError(e as AxiosError)
+      setToast({ message, error: true })
+    }
+  }
+
+  return !isDeleted ? (
     <>
       <div className="bg-indigo-600 text-white flex justify-between p-8 rounded mb-8 last-of-type:mb-0">
-        <Button needDefaultClassNames={false} aria-label="Delete">
+        <Button
+          needDefaultClassNames={false}
+          aria-label="Delete"
+          onClick={deletePost}
+        >
           <X className="text-white" />
         </Button>
         <span className="leading-[16px]">{post.name}</span>
@@ -138,12 +176,12 @@ const ProfilePost = ({ post }: ProfilePostProps) => {
               <Label htmlFor="categories" labelText="New categories" />
               <p className="text-s mb-4">
                 Actual categories:{' '}
-                {post.categories.map((category, i) => (
-                  <span key={category} className="text-indigo-600">
-                    {category}
-                    {i === post.categories.length - 1 ? '' : ','}
-                  </span>
-                ))}
+                <span className="text-indigo-600">
+                  {post.categories.map(
+                    (category, i) =>
+                      category + (i !== post.categories.length - 1 ? ', ' : '')
+                  )}
+                </span>
               </p>
               <Select name="categories" options={options} />
               <InputError inputName="categories" />
@@ -183,7 +221,7 @@ const ProfilePost = ({ post }: ProfilePostProps) => {
         </Modal>
       )}
     </>
-  )
+  ) : null
 }
 
 export default ProfilePost

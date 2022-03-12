@@ -19,3 +19,7 @@ export interface IImage {
 }
 
 export type Categories = typeof categories[0]
+
+export type Entries<O> = {
+  [K in keyof O]-?: [K, O[K]]
+}[keyof O][]

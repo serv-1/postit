@@ -34,7 +34,7 @@ const CreateAPost = () => {
         return methods.setError('images', { message }, { shouldFocus: true })
       }
 
-      const result = await readAsDataUrl<'jpeg' | 'png' | 'gif'>(image)
+      const result = await readAsDataUrl<IImage['ext']>(image)
 
       if (typeof result === 'string') {
         methods.setError('images', { message: result }, { shouldFocus: true })
