@@ -1,7 +1,7 @@
 import { connect, connection as conn, Types } from 'mongoose'
-import User, { IUser } from '../../models/User'
-import Account, { IAccount } from '../../models/Account'
-import Post, { IPost } from '../../models/Post'
+import User, { UserModel } from '../../models/User'
+import Account, { AccountModel } from '../../models/Account'
+import Post, { PostModel } from '../../models/Post'
 import { faker } from '@faker-js/faker'
 import u1Json from '../fixtures/user1.json'
 import postsJson from '../fixtures/posts.json'
@@ -12,7 +12,7 @@ import env from '../../utils/constants/env'
 import { randomBytes, scryptSync } from 'crypto'
 import { readdir, unlink } from 'fs/promises'
 import { cwd } from 'process'
-import { Post as P } from '../../types/common'
+import { IPost } from '../../types/common'
 
 export interface Ids {
   u1Id: string
@@ -31,7 +31,7 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
       return null
     },
-    async 'db:reset'() {
+    async reset() {
       await connect(env.MONGODB_URI)
       const colls = await conn.db.collections()
 
@@ -41,7 +41,7 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
       return null
     },
-    async 'db:seed'({ posts }: { posts?: boolean } = {}): Promise<Ids> {
+    async seed({ posts }: { posts?: boolean } = {}): Promise<Ids> {
       await connect(env.MONGODB_URI)
 
       const ids = await insertUsers()
@@ -51,7 +51,7 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
       return ids
     },
-    async 'db:getUser'(idOrEmail: string): Promise<IUser | null> {
+    async getUser(idOrEmail: string): Promise<UserModel | null> {
       await connect(env.MONGODB_URI)
 
       if (idOrEmail.includes('@')) {
@@ -60,11 +60,11 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
         return await User.findOne({ _id: idOrEmail }).lean().exec()
       }
     },
-    async 'db:getAccountByUserId'(id: string): Promise<IAccount | null> {
+    async getAccountByUserId(id: string): Promise<AccountModel | null> {
       await connect(env.MONGODB_URI)
       return await Account.findOne({ userId: id }).lean().exec()
     },
-    async 'db:getPostByUserId'(id: string): Promise<IPost | null> {
+    async getPostByUserId(id: string): Promise<PostModel | null> {
       await connect(env.MONGODB_URI)
       return await Post.findOne({ userId: id }).lean().exec()
     },
@@ -99,7 +99,7 @@ async function insertUsers(): Promise<Ids> {
  * @param id User's id
  */
 async function insertAccount(id: string) {
-  const account: IAccount = {
+  const account: AccountModel = {
     type: 'oauth',
     provider: 'google',
     providerAccountId: String(faker.datatype.number()),
@@ -123,12 +123,12 @@ async function insertAccount(id: string) {
  * @returns first added post's id
  */
 async function insertPosts(id: string): Promise<string> {
-  const posts: Omit<IPost, '_id'>[] = (postsJson as Omit<P, 'id'>[]).map(
-    (post) => ({
-      ...post,
-      userId: new Types.ObjectId(post.userId),
-    })
-  )
+  const posts: Omit<PostModel, '_id'>[] = (
+    postsJson as Omit<IPost, 'id'>[]
+  ).map((post) => ({
+    ...post,
+    userId: new Types.ObjectId(post.userId),
+  }))
 
   posts[0].userId = new Types.ObjectId(id)
 

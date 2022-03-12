@@ -2,7 +2,7 @@ import { Dispatch, ReactNode, SetStateAction } from 'react'
 import Button from './Button'
 import X from '../public/static/images/x.svg'
 
-export interface ModalProps {
+interface ModalProps {
   children: ReactNode
   title: string
   setIsOpen: Dispatch<SetStateAction<boolean>>

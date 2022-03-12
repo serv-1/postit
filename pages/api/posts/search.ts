@@ -7,7 +7,7 @@ import {
 import dbConnect from '../../../utils/functions/dbConnect'
 import Post from '../../../models/Post'
 import validate from '../../../utils/functions/validate'
-import { Categories, Post as IPost } from '../../../types/common'
+import { Categories, IPost } from '../../../types/common'
 
 interface Filter {
   $text: { $search: string }

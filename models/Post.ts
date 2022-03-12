@@ -2,7 +2,7 @@ import { models, model, Schema, Model, Types } from 'mongoose'
 import { Categories } from '../types/common'
 import err from '../utils/constants/errors'
 
-export interface IPost {
+export interface PostModel {
   _id: Types.ObjectId
   name: string
   description: string
@@ -12,7 +12,7 @@ export interface IPost {
   userId: Types.ObjectId
 }
 
-const postSchema = new Schema<IPost>({
+const postSchema = new Schema<PostModel>({
   name: {
     type: String,
     required: [true, err.NAME_REQUIRED],
@@ -46,7 +46,8 @@ const postSchema = new Schema<IPost>({
   },
 })
 
-export default (models.Post as Model<IPost>) || model<IPost>('Post', postSchema)
+export default (models.Post as Model<PostModel>) ||
+  model<PostModel>('Post', postSchema)
 
 function validateCategories(value: string[]) {
   if (value.length < 1) return false

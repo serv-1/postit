@@ -1,7 +1,7 @@
-import { Post as IPost } from '../types/common'
+import { IPost } from '../types/common'
 import Post from './Post'
 
-export interface PostListProps {
+interface PostListProps {
   posts: IPost[]
 }
 

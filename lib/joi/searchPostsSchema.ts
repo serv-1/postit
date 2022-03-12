@@ -18,12 +18,13 @@ export interface SearchPostsSchema {
 export const searchPostsSchema = object<SearchPostsSchema>({
   query: querySchema,
   page: pageSchema,
-  minPrice: priceSchema.optional().min(0).default(0),
+  minPrice: priceSchema.optional().allow('').min(0).default(0),
   maxPrice: Joi.alternatives().conditional('minPrice', {
     is: '',
-    then: priceSchema.optional().min(0),
+    then: priceSchema.optional().allow('').min(0),
     otherwise: priceSchema
       .optional()
+      .allow('')
       .min(Joi.ref('minPrice'))
       .messages({ 'number.min': err.MAX_PRICE_MIN }),
   }),

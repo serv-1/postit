@@ -1,4 +1,4 @@
-import { Image as IImage, Post } from '../types/common'
+import { IImage, IPost } from '../types/common'
 import X from '../public/static/images/x.svg'
 import Pencil from '../public/static/images/pencil.svg'
 import { useState } from 'react'
@@ -29,7 +29,7 @@ const options = categories.map((category) => ({
 }))
 
 interface ProfilePostProps {
-  post: Post
+  post: IPost
 }
 
 const ProfilePost = ({ post }: ProfilePostProps) => {

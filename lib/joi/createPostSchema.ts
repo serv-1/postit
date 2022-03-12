@@ -1,4 +1,4 @@
-import { Categories, Image } from '../../types/common'
+import { Categories, IImage } from '../../types/common'
 import { categoriesSchema } from './categoriesSchema'
 import { csrfTokenSchema } from './csrfTokenSchema'
 import { descriptionSchema } from './descriptionSchema'
@@ -20,7 +20,7 @@ export interface CreatePostClientSchema extends CreatePostSchema {
 }
 
 export interface CreatePostServerSchema extends CreatePostSchema {
-  images: Image[]
+  images: IImage[]
 }
 
 const createPostSchema = {

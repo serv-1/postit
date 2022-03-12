@@ -1,4 +1,4 @@
-import { IUser } from '../../../models/User'
+import { UserModel } from '../../../models/User'
 import err from '../../../utils/constants/errors'
 import u1 from '../../fixtures/user1.json'
 import { Ids } from '../../plugins'
@@ -24,8 +24,8 @@ describe('/api/user', () => {
     })
 
     it('422 - Email already used', function () {
-      cy.task('db:reset')
-      cy.task('db:seed')
+      cy.task('reset')
+      cy.task('seed')
 
       const { name, email, password } = u1
       const body = { name, email, password }
@@ -38,7 +38,7 @@ describe('/api/user', () => {
     })
 
     it('200 - User created', function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
       const { name, email, password, image } = u1
       const body = { name, email, password }
@@ -47,7 +47,7 @@ describe('/api/user', () => {
         expect(res.status).to.eq(200)
       })
 
-      cy.task<IUser>('db:getUser', email).then((user) => {
+      cy.task<UserModel>('getUser', email).then((user) => {
         expect(user.name).to.eq(name)
         expect(user.email).to.eq(email)
         expect(user.password).to.not.eq(undefined)
@@ -65,8 +65,8 @@ describe('/api/user', () => {
     })
 
     it('422 - Invalid CSRF token', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed')
+      cy.task('reset')
+      cy.task<Ids>('seed')
 
       cy.signIn(u1.email, u1.password)
 
@@ -79,8 +79,8 @@ describe('/api/user', () => {
     })
 
     it('422 - Invalid request body', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed')
+      cy.task('reset')
+      cy.task<Ids>('seed')
 
       cy.signIn(u1.email, u1.password)
 
@@ -96,8 +96,8 @@ describe('/api/user', () => {
 
   describe('name', () => {
     it('422 - Invalid name', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed')
+      cy.task('reset')
+      cy.task<Ids>('seed')
 
       cy.signIn(u1.email, u1.password)
 
@@ -111,9 +111,9 @@ describe('/api/user', () => {
     })
 
     it('200 - Name updated', function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
-      cy.task<Ids>('db:seed').then((ids) => {
+      cy.task<Ids>('seed').then((ids) => {
         cy.signIn(u1.email, u1.password)
 
         const url = '/api/user'
@@ -123,7 +123,7 @@ describe('/api/user', () => {
           expect(res.status).to.eq(200)
         })
 
-        cy.task<IUser>('db:getUser', ids.u1Id).then((user) => {
+        cy.task<UserModel>('getUser', ids.u1Id).then((user) => {
           expect(user.name).to.eq(body.name)
         })
       })
@@ -132,8 +132,8 @@ describe('/api/user', () => {
 
   describe('email', () => {
     it('422 - Invalid email', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed')
+      cy.task('reset')
+      cy.task<Ids>('seed')
 
       cy.signIn(u1.email, u1.password)
 
@@ -147,9 +147,9 @@ describe('/api/user', () => {
     })
 
     it('200 - Email updated', function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
-      cy.task<Ids>('db:seed').then((ids) => {
+      cy.task<Ids>('seed').then((ids) => {
         cy.signIn(u1.email, u1.password)
 
         const url = '/api/user'
@@ -159,7 +159,7 @@ describe('/api/user', () => {
           expect(res.status).to.eq(200)
         })
 
-        cy.task<IUser>('db:getUser', ids.u1Id).then((user) => {
+        cy.task<UserModel>('getUser', ids.u1Id).then((user) => {
           expect(user.email).to.eq('superemail@test.com')
         })
       })
@@ -168,8 +168,8 @@ describe('/api/user', () => {
 
   describe('password', () => {
     it('422 - Invalid password', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed')
+      cy.task('reset')
+      cy.task<Ids>('seed')
 
       cy.signIn(u1.email, u1.password)
 
@@ -183,12 +183,12 @@ describe('/api/user', () => {
     })
 
     it('200 - Password updated', function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
-      cy.task<Ids>('db:seed').then((ids) => {
+      cy.task<Ids>('seed').then((ids) => {
         cy.signIn(u1.email, u1.password)
 
-        cy.task<IUser>('db:getUser', ids.u1Id).then((user) => {
+        cy.task<UserModel>('getUser', ids.u1Id).then((user) => {
           const oldHash = (user.password as string).split(':')[1]
 
           const url = '/api/user'
@@ -198,7 +198,7 @@ describe('/api/user', () => {
             expect(res.status).to.eq(200)
           })
 
-          cy.task<IUser>('db:getUser', ids.u1Id).then((user) => {
+          cy.task<UserModel>('getUser', ids.u1Id).then((user) => {
             const newHash = (user.password as string).split(':')[1]
             expect(oldHash).to.not.eq(newHash)
           })
@@ -209,8 +209,8 @@ describe('/api/user', () => {
 
   describe('image', () => {
     it('422 - Invalid image extension', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed')
+      cy.task('reset')
+      cy.task<Ids>('seed')
 
       cy.signIn(u1.email, u1.password)
 
@@ -224,8 +224,8 @@ describe('/api/user', () => {
     })
 
     it('413 - Image too big', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed')
+      cy.task('reset')
+      cy.task<Ids>('seed')
 
       cy.signIn(u1.email, u1.password)
 
@@ -240,9 +240,9 @@ describe('/api/user', () => {
     })
 
     it('200 - Image updated', function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
-      cy.task<Ids>('db:seed').then((ids) => {
+      cy.task<Ids>('seed').then((ids) => {
         cy.signIn(u1.email, u1.password)
 
         const url = '/api/user'
@@ -253,7 +253,7 @@ describe('/api/user', () => {
           expect(res.status).to.eq(200)
         })
 
-        cy.task<IUser>('db:getUser', ids.u1Id).then((u) => {
+        cy.task<UserModel>('getUser', ids.u1Id).then((u) => {
           expect(u.image).to.not.eq(u1.image)
         })
       })
@@ -271,8 +271,8 @@ describe('/api/user', () => {
     })
 
     it('422 - Invalid CSRF token', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed')
+      cy.task('reset')
+      cy.task<Ids>('seed')
 
       cy.signIn(u1.email, u1.password)
 
@@ -285,9 +285,9 @@ describe('/api/user', () => {
     })
 
     it("200 - Delete the user and it's posts", function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
-      cy.task<Ids>('db:seed').then((ids) => {
+      cy.task<Ids>('seed').then((ids) => {
         cy.signIn(u1.email, u1.password)
 
         // Change the user image
@@ -309,15 +309,15 @@ describe('/api/user', () => {
           expect(res.status).to.eq(200)
         })
 
-        cy.task('db:getUser', ids.u1Id).then((user) => {
+        cy.task('getUser', ids.u1Id).then((user) => {
           expect(user).to.eq(null)
         })
 
-        cy.task('db:getAccountByUserId', ids.u1Id).then((account) => {
+        cy.task('getAccountByUserId', ids.u1Id).then((account) => {
           expect(account).to.eq(null)
         })
 
-        cy.task('db:getPostByUserId', ids.u1Id).then((post) => {
+        cy.task('getPostByUserId', ids.u1Id).then((post) => {
           expect(post).to.eq(null)
         })
       })

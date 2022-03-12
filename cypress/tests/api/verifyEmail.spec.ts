@@ -6,7 +6,7 @@ const url = '/api/verifyEmail'
 describe('/api/verifyEmail', () => {
   describe('POST', () => {
     it('422 - Email unknown', function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
       const body = { email: u1.email }
 
@@ -26,8 +26,8 @@ describe('/api/verifyEmail', () => {
     })
 
     it('200 - Email verified', function () {
-      cy.task('db:reset')
-      cy.task('db:seed')
+      cy.task('reset')
+      cy.task('seed')
 
       const body = { email: u1.email }
 

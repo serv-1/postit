@@ -55,7 +55,7 @@ const SignIn = ({ providers }: SignInProps) => {
   return (
     <>
       <Head>
-        <title>Filanad - Sign in</title>
+        <title>Sign in - Filanad</title>
       </Head>
       <main
         data-cy="signIn"

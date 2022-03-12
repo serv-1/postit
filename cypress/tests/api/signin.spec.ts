@@ -34,9 +34,9 @@ describe('/api/signIn', () => {
     })
 
     it('200 - Should sign in a user', function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
-      cy.task<Ids>('db:seed').then((ids) => {
+      cy.task<Ids>('seed').then((ids) => {
         const body = { email: u1.email, password: u1.password }
 
         cy.req({ url, method: 'POST', body }).then((res) => {

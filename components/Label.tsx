@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef } from 'react'
 
-export interface LabelProps extends ComponentPropsWithoutRef<'label'> {
+interface LabelProps extends ComponentPropsWithoutRef<'label'> {
   labelText: string
 }
 

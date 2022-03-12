@@ -1,7 +1,7 @@
 import { signIn, useSession } from 'next-auth/react'
 import { ReactNode, useEffect } from 'react'
 
-export interface AuthGuardProps {
+interface AuthGuardProps {
   children: ReactNode
 }
 

@@ -1,9 +1,9 @@
 import err from '../../../utils/constants/errors'
 import { Buffer } from 'buffer'
 import { Ids } from '../../plugins'
-import { IPost } from '../../../models/Post'
+import { PostModel } from '../../../models/Post'
 import u1 from '../../fixtures/user1.json'
-import { IUser } from '../../../models/User'
+import { UserModel } from '../../../models/User'
 
 const url = '/api/post'
 
@@ -17,8 +17,8 @@ const defaultBody = {
 
 describe('/api/post', () => {
   before(() => {
-    cy.task('db:reset')
-    cy.task<Ids>('db:seed').then((result) => {
+    cy.task('reset')
+    cy.task<Ids>('seed').then((result) => {
       cy.wrap(result.u1Id).as('u1Id')
     })
   })
@@ -89,7 +89,7 @@ describe('/api/post', () => {
         expect(res.status).to.eq(200)
       })
 
-      cy.task<IPost>('db:getPostByUserId', this.u1Id).then((post) => {
+      cy.task<PostModel>('getPostByUserId', this.u1Id).then((post) => {
         expect(post.name).to.eq(defaultBody.name)
         expect(post.description).to.eq(defaultBody.description)
         expect(post.categories).to.have.members(defaultBody.categories)
@@ -97,7 +97,7 @@ describe('/api/post', () => {
         expect(post.images).to.have.length(5)
         expect(post.userId).to.eq(this.u1Id)
 
-        cy.task<IUser>('db:getUser', this.u1Id).then((user) => {
+        cy.task<UserModel>('getUser', this.u1Id).then((user) => {
           expect(user.postsIds).to.include(post._id)
         })
       })

@@ -6,7 +6,7 @@ const Home = () => {
   return (
     <>
       <Head>
-        <title>Filanad - Home</title>
+        <title>Home - Filanad</title>
       </Head>
       <main data-cy="home" className="py-32 flex-grow flex flex-col">
         <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-16 justify-center">

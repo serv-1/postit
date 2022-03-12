@@ -3,7 +3,6 @@ import err from '../../utils/constants/errors'
 
 export const priceSchema = Joi.number()
   .required()
-  .allow('')
   .min(1)
   .precision(2)
   .messages({

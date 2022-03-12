@@ -5,7 +5,7 @@ const MailSent = () => {
   return (
     <>
       <Head>
-        <title>Filanad - Mail sent!</title>
+        <title>Mail sent! - Filanad</title>
       </Head>
       <main
         data-cy="mailSent"

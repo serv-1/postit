@@ -54,7 +54,7 @@ const Register = () => {
   return (
     <>
       <Head>
-        <title>Filanad - Register</title>
+        <title>Register - Filanad</title>
       </Head>
       <main className="py-32 grid grid-cols-4 gap-x-16 justify-center">
         <h1 className="text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16 col-span-full">

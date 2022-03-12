@@ -4,7 +4,9 @@ export interface ToastState {
   message?: string
   error?: boolean
 }
+
 type SetToast = React.Dispatch<React.SetStateAction<ToastState>>
+
 interface ToastProviderProps {
   children: React.ReactNode
 }

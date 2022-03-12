@@ -1,7 +1,7 @@
 import err from '../../../../utils/constants/errors'
 import { Ids } from '../../../plugins'
 import u1 from '../../../fixtures/user1.json'
-import { IPost } from '../../../../models/Post'
+import { PostModel } from '../../../../models/Post'
 
 describe('/api/users/:id', () => {
   it('405 - Method not allowed', function () {
@@ -29,9 +29,9 @@ describe('/api/users/:id', () => {
     })
 
     it('200 - Get the user', function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
-      cy.task<Ids>('db:seed').then((ids) => {
+      cy.task<Ids>('seed').then((ids) => {
         cy.req({ url: `/api/users/${ids.u1Id}` }).then((res) => {
           const { body, status } = res
           expect(status).to.eq(200)
@@ -55,7 +55,7 @@ describe('/api/users/:id', () => {
         cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })
 
         cy.req({ url: `/api/users/${ids.u1Id}` }).then((res) => {
-          cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+          cy.task<PostModel>('getPostByUserId', ids.u1Id).then((post) => {
             expect(res.body).to.have.deep.property('postsIds', [post._id])
           })
         })

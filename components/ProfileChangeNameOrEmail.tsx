@@ -18,7 +18,7 @@ type FormFields<T> = { csrfToken?: string } & (T extends 'name'
   ? { name: string }
   : { email: string })
 
-export interface ProfileChangeNameOrEmailProps {
+interface ProfileChangeNameOrEmailProps {
   type: 'name' | 'email'
   value: string
 }

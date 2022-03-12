@@ -43,7 +43,7 @@ describe('User sign in and register', () => {
 
   it('Register, send a verification mail with credentials and sign out', function () {
     cy.request('PATCH', cleanInboxUrl)
-    cy.task('db:reset')
+    cy.task('reset')
 
     cy.visit('/register')
 
@@ -67,8 +67,8 @@ describe('User sign in and register', () => {
   })
 
   it('Sign in with credentials and sign out', function () {
-    cy.task('db:reset')
-    cy.task('db:seed')
+    cy.task('reset')
+    cy.task('seed')
 
     cy.visit('/auth/sign-in')
 
@@ -87,8 +87,8 @@ describe('User sign in and register', () => {
 
   it('Forgot password', function () {
     cy.request('PATCH', cleanInboxUrl)
-    cy.task('db:reset')
-    cy.task('db:seed')
+    cy.task('reset')
+    cy.task('seed')
 
     cy.visit('/auth/forgot-password')
 

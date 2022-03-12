@@ -1,7 +1,7 @@
 import { ComponentPropsWithRef, forwardRef } from 'react'
 import classNames from 'classnames'
 
-export interface ButtonProps extends ComponentPropsWithRef<'button'> {
+interface ButtonProps extends ComponentPropsWithRef<'button'> {
   needDefaultClassNames?: boolean
 }
 

@@ -12,9 +12,10 @@ import {
 } from '../lib/joi/createPostSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
 import { useRouter } from 'next/router'
-import { Image } from '../types/common'
+import { IImage } from '../types/common'
 import isImageValid from '../utils/functions/isImageValid'
 import readAsDataUrl from '../utils/functions/readAsDataUrl'
+import Head from 'next/head'
 
 const CreateAPost = () => {
   const resolver = joiResolver(createPostClientSchema)
@@ -24,7 +25,7 @@ const CreateAPost = () => {
 
   const submitHandler: SubmitHandler<CreatePostClientSchema> = async (data) => {
     const { images } = data
-    const encodedImages: Image[] = []
+    const encodedImages: IImage[] = []
 
     for (const image of Array.from(images)) {
       const message = isImageValid(image)
@@ -61,33 +62,47 @@ const CreateAPost = () => {
   }
 
   return (
-    <main className="py-32 grid grid-cols-4 gap-x-16 justify-center">
-      <h1 className="col-span-full text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16">
-        Create a post
-      </h1>
-      <Form
-        name="createPost"
-        method="post"
-        submitHandlers={{ submitHandler }}
-        methods={methods}
-        needCsrfToken
-        className="col-span-full"
-      >
-        <FormField labelText="Name" inputName="name" type="text" needFocus />
+    <>
+      <Head>
+        <title>Create a post - Filanad</title>
+      </Head>
+      <main className="py-32 grid grid-cols-4 gap-x-16 justify-center">
+        <h1 className="col-span-full text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16">
+          Create a post
+        </h1>
+        <Form
+          name="createPost"
+          method="post"
+          submitHandlers={{ submitHandler }}
+          methods={methods}
+          needCsrfToken
+          className="col-span-full"
+        >
+          <FormField labelText="Name" inputName="name" type="text" needFocus />
 
-        <FormField labelText="Description" inputName="description" isTextArea />
+          <FormField
+            labelText="Description"
+            inputName="description"
+            isTextArea
+          />
 
-        <FormCategoriesField />
+          <FormCategoriesField />
 
-        <FormField labelText="Price (euro)" inputName="price" type="number" />
+          <FormField labelText="Price (euro)" inputName="price" type="number" />
 
-        <FormField type="file" labelText="Images" inputName="images" multiple />
+          <FormField
+            type="file"
+            labelText="Images"
+            inputName="images"
+            multiple
+          />
 
-        <Button type="submit" className="w-full">
-          Create
-        </Button>
-      </Form>
-    </main>
+          <Button type="submit" className="w-full">
+            Create
+          </Button>
+        </Form>
+      </main>
+    </>
   )
 }
 

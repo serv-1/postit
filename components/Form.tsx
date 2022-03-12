@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import React, { useEffect, useState } from 'react'
 import * as RHF from 'react-hook-form'
 
-export interface FormProps<TFieldValues>
+interface FormProps<TFieldValues>
   extends React.ComponentPropsWithoutRef<'form'> {
   children: React.ReactNode
   methods: RHF.UseFormReturn<TFieldValues>

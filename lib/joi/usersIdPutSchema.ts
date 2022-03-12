@@ -1,4 +1,4 @@
-import { Image } from '../../types/common'
+import { IImage } from '../../types/common'
 import err from '../../utils/constants/errors'
 import { csrfTokenSchema } from './csrfTokenSchema'
 import { emailSchema } from './emailSchema'
@@ -11,7 +11,7 @@ export type UsersIdPutSchema =
   | { csrfToken: string; name: string }
   | { csrfToken: string; email: string }
   | { csrfToken: string; password: string }
-  | { csrfToken: string; image: Image }
+  | { csrfToken: string; image: IImage }
 
 export const usersIdPutSchema = object<UsersIdPutSchema>({
   csrfToken: csrfTokenSchema,

@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef } from 'react'
 import { useFormContext } from 'react-hook-form'
 
-export interface InputErrorProps extends ComponentPropsWithoutRef<'div'> {
+interface InputErrorProps extends ComponentPropsWithoutRef<'div'> {
   inputName: string
 }
 

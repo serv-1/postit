@@ -2,7 +2,7 @@ import InputError from './InputError'
 import Label from './Label'
 import PasswordInput from './PasswordInput'
 
-export interface FormPasswordFieldProps {
+interface FormPasswordFieldProps {
   showStrength?: boolean
   showRules?: boolean
   needFocus?: boolean

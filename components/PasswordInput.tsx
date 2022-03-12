@@ -12,7 +12,7 @@ interface Strength {
   color: 'red' | 'yellow' | 'green'
 }
 
-export interface PasswordInputProps extends ComponentPropsWithoutRef<'input'> {
+interface PasswordInputProps extends ComponentPropsWithoutRef<'input'> {
   needFocus?: boolean
   showStrength?: boolean
   hasRules?: boolean

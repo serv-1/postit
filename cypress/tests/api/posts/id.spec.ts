@@ -33,8 +33,8 @@ describe('/api/posts/:id', () => {
     })
 
     it('200 - Get the post', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+      cy.task('reset')
+      cy.task<Ids>('seed', { posts: true }).then((ids) => {
         cy.req({ url: `/api/posts/${ids.pId}` }).then((res) => {
           expect(res.status).to.eq(200)
           expect(res.body).to.have.property('id', ids.pId)
@@ -61,8 +61,8 @@ describe('/api/posts/:id', () => {
     })
 
     it('422 - Invalid CSRF token', function () {
-      cy.task('db:reset')
-      cy.task('db:seed')
+      cy.task('reset')
+      cy.task('seed')
 
       cy.signIn(u1.email, u1.password)
 
@@ -76,8 +76,8 @@ describe('/api/posts/:id', () => {
     })
 
     it('422 - Cannot update a post created by another user', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+      cy.task('reset')
+      cy.task<Ids>('seed', { posts: true }).then((ids) => {
         cy.signIn(u2.email, u2.password)
 
         const url = `/api/posts/${ids.pId}`
@@ -91,9 +91,9 @@ describe('/api/posts/:id', () => {
     })
 
     it('422 - Invalid request body', function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
-      cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+      cy.task<Ids>('seed', { posts: true }).then((ids) => {
         cy.signIn(u1.email, u1.password)
 
         const url = `/api/posts/${ids.pId}`
@@ -108,9 +108,9 @@ describe('/api/posts/:id', () => {
 
     describe('name', () => {
       it('422 - Invalid name', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${ids.pId}`
@@ -124,9 +124,9 @@ describe('/api/posts/:id', () => {
       })
 
       it('200 - Name updated', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${ids.pId}`
@@ -134,7 +134,7 @@ describe('/api/posts/:id', () => {
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
-            cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+            cy.task<IPost>('getPostByUserId', ids.u1Id).then((post) => {
               expect(post.name).to.eq('Tebla')
             })
           })
@@ -144,9 +144,9 @@ describe('/api/posts/:id', () => {
 
     describe('description', () => {
       it('422 - Invalid description', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${ids.pId}`
@@ -163,9 +163,9 @@ describe('/api/posts/:id', () => {
       })
 
       it('200 - Description updated', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${ids.pId}`
@@ -175,7 +175,7 @@ describe('/api/posts/:id', () => {
             expect(res.status).to.eq(200)
           })
 
-          cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+          cy.task<IPost>('getPostByUserId', ids.u1Id).then((post) => {
             expect(post.description).to.eq('Breathtaking table')
           })
         })
@@ -184,9 +184,9 @@ describe('/api/posts/:id', () => {
 
     describe('categories', () => {
       it('422 - Invalid categories', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${ids.pId}`
@@ -200,9 +200,9 @@ describe('/api/posts/:id', () => {
       })
 
       it('200 - Categories updated', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${ids.pId}`
@@ -212,7 +212,7 @@ describe('/api/posts/:id', () => {
             expect(res.status).to.eq(200)
           })
 
-          cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+          cy.task<IPost>('getPostByUserId', ids.u1Id).then((post) => {
             expect(post.categories).to.deep.eq(['furniture'])
           })
         })
@@ -221,9 +221,9 @@ describe('/api/posts/:id', () => {
 
     describe('price', () => {
       it('422 - Invalid price', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${ids.pId}`
@@ -237,9 +237,9 @@ describe('/api/posts/:id', () => {
       })
 
       it('200 - Price updated', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${ids.pId}`
@@ -249,7 +249,7 @@ describe('/api/posts/:id', () => {
             expect(res.status).to.eq(200)
           })
 
-          cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+          cy.task<IPost>('getPostByUserId', ids.u1Id).then((post) => {
             expect(post.price).to.eq(5000)
           })
         })
@@ -258,9 +258,9 @@ describe('/api/posts/:id', () => {
 
     describe('images', () => {
       it('422 - Invalid images', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${ids.pId}`
@@ -274,9 +274,9 @@ describe('/api/posts/:id', () => {
       })
 
       it('413 - image too big', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${ids.pId}`
@@ -291,9 +291,9 @@ describe('/api/posts/:id', () => {
       })
 
       it('200 - Images updated', function () {
-        cy.task('db:reset')
+        cy.task('reset')
 
-        cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+        cy.task<Ids>('seed', { posts: true }).then((ids) => {
           cy.signIn(u2.email, u2.password)
 
           const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
@@ -307,7 +307,7 @@ describe('/api/posts/:id', () => {
 
           cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })
 
-          cy.task<IPost>('db:getPostByUserId', ids.u2Id).then((post) => {
+          cy.task<IPost>('getPostByUserId', ids.u2Id).then((post) => {
             const images: Image[] = []
 
             for (let i = 0; i < 5; i++) {
@@ -323,12 +323,10 @@ describe('/api/posts/:id', () => {
               expect(res.status).to.eq(200)
             })
 
-            cy.task<IPost>('db:getPostByUserId', ids.u2Id).then(
-              (updatedPost) => {
-                expect(updatedPost.images).to.have.length(5)
-                expect(updatedPost.images).to.not.have.members(post.images)
-              }
-            )
+            cy.task<IPost>('getPostByUserId', ids.u2Id).then((updatedPost) => {
+              expect(updatedPost.images).to.have.length(5)
+              expect(updatedPost.images).to.not.have.members(post.images)
+            })
           })
 
           cy.task('deleteImages', 'posts')
@@ -337,9 +335,9 @@ describe('/api/posts/:id', () => {
     })
 
     it('Do multiple updates at the same time', function () {
-      cy.task('db:reset')
+      cy.task('reset')
 
-      cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+      cy.task<Ids>('seed', { posts: true }).then((ids) => {
         cy.signIn(u1.email, u1.password)
 
         const url = `/api/posts/${ids.pId}`
@@ -349,7 +347,7 @@ describe('/api/posts/:id', () => {
           expect(res.status).to.eq(200)
         })
 
-        cy.task<IPost>('db:getPostByUserId', ids.u1Id).then((post) => {
+        cy.task<IPost>('getPostByUserId', ids.u1Id).then((post) => {
           expect(post.name).to.eq('Trumpet')
           expect(post.price).to.eq(5000)
         })
@@ -380,8 +378,8 @@ describe('/api/posts/:id', () => {
     })
 
     it('422 - Cannot delete a post created by another user', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+      cy.task('reset')
+      cy.task<Ids>('seed', { posts: true }).then((ids) => {
         cy.signIn(u2.email, u2.password)
 
         const url = `/api/posts/${ids.pId}`
@@ -394,8 +392,8 @@ describe('/api/posts/:id', () => {
     })
 
     it('200 - Post deleted', function () {
-      cy.task('db:reset')
-      cy.task<Ids>('db:seed', { posts: true }).then((ids) => {
+      cy.task('reset')
+      cy.task<Ids>('seed', { posts: true }).then((ids) => {
         cy.signIn(u2.email, u2.password)
 
         const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
@@ -409,18 +407,18 @@ describe('/api/posts/:id', () => {
 
         cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })
 
-        cy.task<IPost>('db:getPostByUserId', ids.u2Id).then((post) => {
+        cy.task<IPost>('getPostByUserId', ids.u2Id).then((post) => {
           const url = `/api/posts/${post._id}`
 
           cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
           })
 
-          cy.task('db:getPostByUserId', ids.u2Id).then((post) => {
+          cy.task('getPostByUserId', ids.u2Id).then((post) => {
             expect(post).to.eq(null)
           })
 
-          cy.task<IUser>('db:getUser', ids.u2Id).then((user) => {
+          cy.task<IUser>('getUser', ids.u2Id).then((user) => {
             expect(user.postsIds).to.not.include(post._id)
           })
         })

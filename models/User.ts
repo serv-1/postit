@@ -1,7 +1,7 @@
 import { models, model, Schema, Model, Types } from 'mongoose'
 import err from '../utils/constants/errors'
 
-export interface IUser {
+export interface UserModel {
   _id: Types.ObjectId
   name: string
   email: string
@@ -11,7 +11,7 @@ export interface IUser {
   image: string
 }
 
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema<UserModel>({
   name: {
     type: String,
     required: [true, err.NAME_REQUIRED],
@@ -35,4 +35,5 @@ const userSchema = new Schema<IUser>({
   },
 })
 
-export default (models.User as Model<IUser>) || model<IUser>('User', userSchema)
+export default (models.User as Model<UserModel>) ||
+  model<UserModel>('User', userSchema)

@@ -2,7 +2,7 @@ import Image from 'next/image'
 import addCommasToNb from '../utils/functions/addCommasToNb'
 import Link from './Link'
 
-export interface PostProps {
+interface PostProps {
   id: string
   name: string
   price: number

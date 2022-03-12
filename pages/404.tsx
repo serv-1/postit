@@ -3,7 +3,7 @@ import Head from 'next/head'
 const Page404 = () => (
   <>
     <Head>
-      <title>Filanad - Not found</title>
+      <title>Not found - Filanad</title>
     </Head>
     <main className="py-32 grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-16 justify-center flex-grow">
       <div className="col-span-full text-center font-bold my-auto">

@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { useToast } from '../contexts/toast'
-import { Post } from '../types/common'
+import { IPost } from '../types/common'
 import getAxiosError from '../utils/functions/getAxiosError'
 import PostsFoundNumber from './PostsFoundNumber'
 import PostList from './PostList'
@@ -9,13 +9,13 @@ import Pagination from './Pagination'
 import classNames from 'classnames'
 
 interface Response {
-  posts: Post[]
+  posts: IPost[]
   totalPages: number
   totalPosts: number
 }
 
 const HomePostPage = () => {
-  const [posts, setPosts] = useState<Post[]>()
+  const [posts, setPosts] = useState<IPost[]>()
   const [totalPosts, setTotalPosts] = useState<number>(0)
   const [totalPages, setTotalPages] = useState<number>(0)
 

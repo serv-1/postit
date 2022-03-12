@@ -1,17 +1,17 @@
 import { Types } from 'mongoose'
-import { IPost } from '../../../../models/Post'
+import { PostModel } from '../../../../models/Post'
 import err from '../../../../utils/constants/errors'
 
 interface Response {
-  posts: (IPost & { _id: Types.ObjectId })[]
+  posts: (PostModel & { _id: Types.ObjectId })[]
   totalPages: number
   totalPosts: number
 }
 
 describe('/api/posts/search', () => {
   before(() => {
-    cy.task('db:reset')
-    cy.task('db:seed', { posts: true })
+    cy.task('reset')
+    cy.task('seed', { posts: true })
   })
 
   it('405 - Method not allowed', () => {

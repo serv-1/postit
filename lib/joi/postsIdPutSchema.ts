@@ -5,7 +5,7 @@ import { descriptionSchema } from './descriptionSchema'
 import { categoriesSchema } from './categoriesSchema'
 import { priceSchema } from './priceSchema'
 import { imagesArraySchema, imagesObjectSchema } from './imagesSchema'
-import { Categories, Image } from '../../types/common'
+import { Categories, IImage } from '../../types/common'
 
 interface PostsIdPutSchema {
   csrfToken: string
@@ -20,7 +20,7 @@ export interface PostsIdPutClientSchema extends PostsIdPutSchema {
 }
 
 export interface PostsIdPutServerSchema extends PostsIdPutSchema {
-  images?: Image[]
+  images?: IImage[]
 }
 
 const postsIdPutSchema = {
@@ -28,7 +28,7 @@ const postsIdPutSchema = {
   name: nameSchema.allow('').optional(),
   description: descriptionSchema.allow('').optional(),
   categories: categoriesSchema.min(0).optional(),
-  price: priceSchema.optional(),
+  price: priceSchema.allow('').optional(),
 }
 
 export const postsIdPutClientSchema = object<PostsIdPutClientSchema>({
