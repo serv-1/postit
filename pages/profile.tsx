@@ -13,7 +13,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx)
 
   if (!session) {
-    return { notFound: true }
+    return { redirect: { permanent: false, destination: '/auth/sign-in' } }
   }
 
   const url = `http://localhost:3000/api/users/${session.id}`

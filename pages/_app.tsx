@@ -9,7 +9,7 @@ import Toast from '../components/Toast'
 import '../styles/globals.css'
 
 export type PageType = ComponentType<{}> & {
-  needAuth: boolean
+  needAuth?: boolean
 }
 
 type NextAppProps = AppProps & { Component: PageType }
@@ -25,8 +25,8 @@ const App = ({ Component, pageProps }: NextAppProps) => {
         <ToastProvider>
           <Header />
           <Toast />
-          {Component.needAuth ? (
-            <AuthGuard>
+          {typeof Component.needAuth === 'boolean' ? (
+            <AuthGuard needAuth={Component.needAuth}>
               <Component {...pageProps} />
             </AuthGuard>
           ) : (

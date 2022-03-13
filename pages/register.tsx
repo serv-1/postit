@@ -79,4 +79,6 @@ const Register = () => {
   )
 }
 
+Register.needAuth = false
+
 export default Register

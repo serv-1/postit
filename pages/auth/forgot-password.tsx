@@ -66,4 +66,6 @@ const ForgotPassword = () => {
   )
 }
 
+ForgotPassword.needAuth = false
+
 export default ForgotPassword

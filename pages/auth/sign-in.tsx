@@ -123,4 +123,6 @@ const SignIn = ({ providers }: SignInProps) => {
   )
 }
 
+SignIn.needAuth = false
+
 export default SignIn
