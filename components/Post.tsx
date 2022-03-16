@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import addCommasToNb from '../utils/functions/addCommasToNb'
+import formatForUrl from '../utils/functions/formatForUrl'
 import Link from './Link'
 
 interface PostProps {
@@ -11,8 +12,6 @@ interface PostProps {
 
 const Post = ({ id, name, price, image }: PostProps) => {
   const truncatedName = name.length > 23 ? name.slice(0, 22) + '...' : name
-  const allowedChars = /[^a-zA-Z0-9-_.~]/g
-  const urlFriendlyName = name.replaceAll(' ', '-').replaceAll(allowedChars, '')
 
   return (
     <div className="odd:col-start-2 col-span-3 relative flex flex-col h-[248px] border border-indigo-600 rounded mb-16 md:odd:col-start-auto md:col-start-2 lg:col-start-auto">
@@ -20,7 +19,10 @@ const Post = ({ id, name, price, image }: PostProps) => {
         <Image src={image} alt={name} layout="fill" />
       </div>
       <div className="px-8 py-4 bg-indigo-600">
-        <Link href={`/posts/${id}/${urlFriendlyName}`} className="text-white">
+        <Link
+          href={`/posts/${id}/${formatForUrl(name)}`}
+          className="text-white"
+        >
           {truncatedName} →
         </Link>
       </div>

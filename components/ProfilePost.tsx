@@ -22,6 +22,8 @@ import axios, { AxiosError } from 'axios'
 import getAxiosError from '../utils/functions/getAxiosError'
 import readAsDataUrl from '../utils/functions/readAsDataUrl'
 import { getCsrfToken } from 'next-auth/react'
+import Link from './Link'
+import formatForUrl from '../utils/functions/formatForUrl'
 
 const options = categories.map((category) => ({
   label: category,
@@ -137,7 +139,12 @@ const ProfilePost = (props: ProfilePostProps) => {
           >
             <X className="text-white" />
           </Button>
-          <span className="leading-[16px]">{post.name}</span>
+          <Link
+            href={`/posts/${post.id}/${formatForUrl(post.name)}`}
+            className="leading-[16px]"
+          >
+            {post.name}
+          </Link>
           <Button
             needDefaultClassNames={false}
             onClick={() => setIsOpen(true)}
