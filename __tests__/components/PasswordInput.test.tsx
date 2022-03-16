@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { RegisterOptions } from 'react-hook-form'
-import Label from '../../components/Label'
 import PasswordInput from '../../components/PasswordInput'
 
 const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
@@ -15,13 +14,17 @@ const setFormContext = (isSubmitted: boolean = false, error?: string) => ({
   formState: { isSubmitted, errors: error ? { password: error } : {} },
 })
 
+interface FormFields {
+  password: string
+}
+
 test('the input renders and is hidden by default', () => {
   useFormContext.mockReturnValue(setFormContext())
 
   render(
     <>
-      <Label htmlFor="password" labelText="Password" />
-      <PasswordInput />
+      <label htmlFor="password">Password</label>
+      <PasswordInput<FormFields> />
     </>
   )
 
@@ -49,8 +52,8 @@ test("the container's border is red if the form is submitted and there is an err
 
   render(
     <>
-      <Label htmlFor="password" labelText="Password" />
-      <PasswordInput />
+      <label htmlFor="password">Password</label>
+      <PasswordInput<FormFields> />
     </>
   )
 
@@ -58,19 +61,18 @@ test("the container's border is red if the form is submitted and there is an err
   expect(container).toHaveClass('border-red-600')
 })
 
-test('the password input has "passwordRules" to aria-describedby if there is some rules', () => {
-  useFormContext.mockReturnValue(setFormContext())
+test("the container's border is not red if the form is submitted and there is no error", () => {
+  useFormContext.mockReturnValue(setFormContext(true))
 
   render(
     <>
-      <Label htmlFor="password" labelText="Password" />
-      <PasswordInput hasRules />
+      <label htmlFor="password">Password</label>
+      <PasswordInput<FormFields> />
     </>
   )
 
-  const input = screen.getByLabelText(/^password$/i)
-  const ariaDescribedby = input.getAttribute('aria-describedby')
-  expect(ariaDescribedby).toContain('passwordRules')
+  const container = screen.getByTestId('container')
+  expect(container).toHaveClass('border-indigo-600')
 })
 
 test('the password can be shown', () => {
@@ -78,8 +80,8 @@ test('the password can be shown', () => {
 
   render(
     <>
-      <Label htmlFor="password" labelText="Password" />
-      <PasswordInput />
+      <label htmlFor="password">Password</label>
+      <PasswordInput<FormFields> />
     </>
   )
 
@@ -106,8 +108,8 @@ test("the password strength renders and take into account the other fields' valu
 
   render(
     <>
-      <Label htmlFor="password" labelText="Password" />
-      <PasswordInput showStrength />
+      <label htmlFor="password">Password</label>
+      <PasswordInput<FormFields> showStrength />
     </>
   )
 

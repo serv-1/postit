@@ -7,11 +7,12 @@ import { useRouter } from 'next/router'
 import Link from '../../components/Link'
 import { BuiltInProviderType } from 'next-auth/providers'
 import Form from '../../components/Form'
-import FormField from '../../components/FormField'
-import FormPasswordField from '../../components/FormPasswordField'
 import Button from '../../components/Button'
 import { useToast } from '../../contexts/toast'
 import { SignInSchema, signInSchema } from '../../lib/joi/signInSchema'
+import Input from '../../components/Input'
+import InputError from '../../components/InputError'
+import PasswordInput from '../../components/PasswordInput'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
@@ -30,6 +31,7 @@ interface SignInProps {
 
 const SignIn = ({ providers }: SignInProps) => {
   const methods = useForm<SignInSchema>({ resolver: joiResolver(signInSchema) })
+
   const { setToast } = useToast()
   const router = useRouter()
 
@@ -67,17 +69,22 @@ const SignIn = ({ providers }: SignInProps) => {
         <Form
           name="signin"
           method="post"
-          submitHandlers={{ submitHandler }}
           methods={methods}
+          submitHandler={submitHandler}
           className="col-span-full"
         >
-          <FormField
-            labelText="Email"
-            inputName="email"
-            type="email"
-            needFocus
-          />
-          <FormPasswordField />
+          <div className="mb-16">
+            <label htmlFor="email">Email</label>
+            <Input<SignInSchema> type="email" name="email" />
+            <InputError<SignInSchema> inputName="email" />
+          </div>
+
+          <div className="mb-16">
+            <label htmlFor="password">Password</label>
+            <PasswordInput<SignInSchema> />
+            <InputError<SignInSchema> inputName="password" />
+          </div>
+
           <Button type="submit" className="w-full">
             Sign in
           </Button>

@@ -38,18 +38,6 @@ test("the post's name renders", () => {
   expect(postName).toBeInTheDocument()
 })
 
-test('the edit button opens the update post modal', async () => {
-  render(<ProfilePost post={post} />)
-
-  const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
-
-  await screen.findByTestId('csrfToken')
-
-  const modalTitle = screen.getByRole('heading')
-  expect(modalTitle).toBeInTheDocument()
-})
-
 test('the delete button deletes the post', async () => {
   const setToast = jest.fn((update: ToastState) => update.error)
   useToast.mockReturnValue({ setToast })

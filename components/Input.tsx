@@ -1,45 +1,44 @@
 import classNames from 'classnames'
 import React from 'react'
-import { useFormContext } from 'react-hook-form'
+import { FieldPath, FieldValues, useFormContext } from 'react-hook-form'
 
-interface InputProps extends React.ComponentPropsWithoutRef<'input'> {
+interface InputProps<FormFields extends FieldValues = FieldValues>
+  extends React.ComponentPropsWithoutRef<'input'> {
   type: 'text' | 'email' | 'number' | 'file' | 'password' | 'search'
-  name: string
+  name: FieldPath<FormFields>
   needFocus?: boolean
   isTextArea?: false
 }
 
-interface TextAreaProps extends React.ComponentPropsWithoutRef<'textarea'> {
+interface TextAreaProps<FormFields extends FieldValues = FieldValues>
+  extends React.ComponentPropsWithoutRef<'textarea'> {
   type?: undefined
-  name: string
+  name: FieldPath<FormFields>
   needFocus?: boolean
   isTextArea: true
 }
 
-function Input({
+const Input = <FormFields extends FieldValues = FieldValues>({
   name,
   onBlur,
   onChange,
   needFocus,
   className,
   ...props
-}: InputProps | TextAreaProps) {
-  const { register, setFocus, formState } = useFormContext()
+}: InputProps<FormFields> | TextAreaProps<FormFields>) => {
+  const { isTextArea, type } = props
+
+  const { register, setFocus, formState } = useFormContext<FormFields>()
   const { isSubmitted, errors } = formState
 
   const _className = classNames(
     'border rounded p-4 w-full align-top',
     {
-      'file:border-none file:py-4 file:px-8 file:mr-8 p-0':
-        props.type === 'file',
+      'file:border-none file:py-4 file:px-8 file:mr-8 p-0': type === 'file',
     },
-    isSubmitted
-      ? errors[name]
-        ? 'border-red-600' + (props.type === 'file' ? ' file:bg-red-200' : '')
-        : 'border-indigo-600' +
-          (props.type === 'file' ? ' file:bg-indigo-200' : '')
-      : 'border-indigo-600' +
-          (props.type === 'file' ? ' file:bg-indigo-200' : ''),
+    isSubmitted && errors[name]
+      ? 'border-red-600' + (type === 'file' ? ' file:bg-red-200' : '')
+      : 'border-indigo-600' + (type === 'file' ? ' file:bg-indigo-200' : ''),
     className
   )
 
@@ -51,9 +50,9 @@ function Input({
     ...register(name, { onBlur, onChange }),
     className: _className,
     id: name,
+    'aria-describedby': name + 'Feedback',
   }
 
-  const { isTextArea } = props
   delete props.isTextArea
 
   return isTextArea ? (

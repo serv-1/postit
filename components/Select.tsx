@@ -1,5 +1,5 @@
 import ReactSelect, { StylesConfig, MultiValue } from 'react-select'
-import { useController } from 'react-hook-form'
+import { useController, FieldValues, FieldPath } from 'react-hook-form'
 import classNames from 'classnames'
 import { StateManagerProps } from 'react-select/dist/declarations/src/useStateManager'
 import { Categories } from '../types/common'
@@ -9,17 +9,19 @@ interface Option {
   value: Categories
 }
 
-interface FieldValues {
-  [x: string]: Categories[]
-}
-
-interface SelectProps extends StateManagerProps<Option, true> {
-  name: string
+interface SelectProps<FormFields extends FieldValues = FieldValues>
+  extends StateManagerProps<Option, true> {
+  name: FieldPath<FormFields>
   options: Option[]
 }
 
-const Select = ({ name, options, className, ...props }: SelectProps) => {
-  const { field, formState } = useController<FieldValues>({ name })
+const Select = <FormFields extends FieldValues = FieldValues>({
+  name,
+  options,
+  className,
+  ...props
+}: SelectProps<FormFields>) => {
+  const { field, formState } = useController<FormFields>({ name })
   const { isSubmitted, errors } = formState
 
   const selectClass = classNames(

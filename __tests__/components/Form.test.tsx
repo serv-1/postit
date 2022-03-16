@@ -1,35 +1,29 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BaseSyntheticEvent } from 'react'
-import { SubmitHandler, UseFormReturn } from 'react-hook-form'
+import { UseFormReturn } from 'react-hook-form'
 import Form from '../../components/Form'
-import server from '../../mocks/server'
 
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+const getCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 
-const submitHandler = jest.fn()
-
-const submitHandlers = {
-  submitHandler: (e: BaseSyntheticEvent) => {
-    e.preventDefault()
-    submitHandler()
-  },
-} as unknown as { submitHandler: SubmitHandler<{}> }
-
-const methods = {
-  handleSubmit: (fn: () => void) => fn,
-  register: (name: string) => ({ name }),
-} as unknown as UseFormReturn
+beforeEach(() => getCsrfToken.mockResolvedValue('csrfToken'))
 
 test('the form renders', async () => {
+  const submitHandler = jest.fn()
+  const methods = {
+    handleSubmit: jest.fn(() => (e: BaseSyntheticEvent) => {
+      e.preventDefault()
+      submitHandler()
+    }),
+    register: jest.fn(),
+  } as unknown as UseFormReturn<{ csrfToken: string }>
+
   render(
-    <Form
+    <Form<{ csrfToken: string }>
       name="register"
       method="post"
-      submitHandlers={submitHandlers}
       methods={methods}
+      submitHandler={submitHandler}
       needCsrfToken
     >
       <input type="submit" />
@@ -40,26 +34,30 @@ test('the form renders', async () => {
   expect(form).toHaveAttribute('name', 'register')
   expect(form).toHaveAttribute('method', 'post')
 
+  const csrfTokenInput = await screen.findByTestId('csrfToken')
+  expect(csrfTokenInput).toHaveValue('csrfToken')
+
   const submitBtn = screen.getByRole('button')
   expect(submitBtn).toBeInTheDocument()
 
   userEvent.click(submitBtn)
-  expect(submitHandler).toHaveBeenCalledTimes(1)
 
-  const csrfToken = await screen.findByTestId('csrfToken')
-  expect(csrfToken).toBeInTheDocument()
+  await waitFor(() => expect(submitHandler).toHaveBeenCalledTimes(1))
 })
 
-test('the csrfToken input does not renders', () => {
+test('the csrfToken input does not render if we do not need it', () => {
+  const methods = {
+    handleSubmit: jest.fn(),
+    register: jest.fn(),
+  } as unknown as UseFormReturn
+
   render(
     <Form
       name="register"
       method="post"
-      submitHandlers={submitHandlers}
       methods={methods}
-    >
-      <input type="submit" />
-    </Form>
+      submitHandler={jest.fn()}
+    ></Form>
   )
 
   const csrfToken = screen.queryByTestId('csrfToken')

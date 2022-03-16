@@ -4,21 +4,21 @@ import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import Form from '../../components/Form'
-import FormField from '../../components/FormField'
 import Button from '../../components/Button'
 import getAxiosError from '../../utils/functions/getAxiosError'
-import { forgotPasswordSchema } from '../../lib/joi/forgotPasswordSchema'
-
-interface FormFields {
-  email: string
-}
+import {
+  ForgotPasswordSchema,
+  forgotPasswordSchema,
+} from '../../lib/joi/forgotPasswordSchema'
+import Input from '../../components/Input'
+import InputError from '../../components/InputError'
 
 const ForgotPassword = () => {
-  const methods = useForm<FormFields>({
+  const methods = useForm<ForgotPasswordSchema>({
     resolver: joiResolver(forgotPasswordSchema),
   })
 
-  const submitHandler: SubmitHandler<FormFields> = async (data) => {
+  const submitHandler: SubmitHandler<ForgotPasswordSchema> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/verifyEmail', data)
       await signIn('email', {
@@ -47,16 +47,16 @@ const ForgotPassword = () => {
         <Form
           name="sendMail"
           method="post"
-          submitHandlers={{ submitHandler }}
           methods={methods}
+          submitHandler={submitHandler}
           className="col-span-full"
         >
-          <FormField
-            labelText="Email"
-            inputName="email"
-            type="email"
-            needFocus
-          />
+          <div className="mb-16">
+            <label htmlFor="email">Email</label>
+            <Input<ForgotPasswordSchema> type="email" name="email" needFocus />
+            <InputError<ForgotPasswordSchema> inputName="email" />
+          </div>
+
           <Button type="submit" className="w-full">
             Send
           </Button>

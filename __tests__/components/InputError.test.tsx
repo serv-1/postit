@@ -9,10 +9,14 @@ const setFormContext = (isSubmitted: boolean, message?: string) => ({
   setFocus: jest.fn(),
 })
 
+interface FormFields {
+  email: string
+}
+
 test('the alert renders if the form is submitted an there is an error', () => {
   useFormContext.mockReturnValue(setFormContext(true, 'Error'))
 
-  render(<InputError inputName="email" />)
+  render(<InputError<FormFields> inputName="email" />)
 
   const alert = screen.getByRole('alert')
   expect(alert).toHaveTextContent('Error')
@@ -22,7 +26,7 @@ test('the alert renders if the form is submitted an there is an error', () => {
 test('the alert does not render if the form is not submitted even if there is an error', () => {
   useFormContext.mockReturnValue(setFormContext(false, 'Error'))
 
-  render(<InputError inputName="email" />)
+  render(<InputError<FormFields> inputName="email" />)
 
   const alert = screen.queryByRole('alert')
   expect(alert).not.toBeInTheDocument()

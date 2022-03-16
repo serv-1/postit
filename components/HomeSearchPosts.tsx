@@ -54,37 +54,37 @@ const HomeSearchPosts = () => {
       name="searchPost"
       method="get"
       methods={methods}
-      submitHandlers={{ submitHandler }}
+      submitHandler={submitHandler}
       role="search"
       className="col-span-full grid grid-cols-[repeat(2,1fr)] gap-8 md:grid-cols-[repeat(6,1fr)] lg:grid-cols-[repeat(5,1fr)]"
     >
       <div className="col-span-full">
-        <InputError inputName="query" />
-        <InputError inputName="minPrice" />
-        <InputError inputName="maxPrice" />
-        <InputError inputName="categories" />
+        <InputError<SearchPostsSchema> inputName="query" />
+        <InputError<SearchPostsSchema> inputName="minPrice" />
+        <InputError<SearchPostsSchema> inputName="maxPrice" />
+        <InputError<SearchPostsSchema> inputName="categories" />
       </div>
-      <Input
+      <Input<SearchPostsSchema>
         name="query"
         type="search"
         placeholder="Nimbus 2000, invisibility cloak, ..."
         className="col-span-full lg:col-span-2"
       />
-      <Input
+      <Input<SearchPostsSchema>
         name="minPrice"
         type="number"
         placeholder="Min. price"
         aria-label="Minimum price"
         className="col-span-1 md:col-span-3 lg:col-span-2"
       />
-      <Input
+      <Input<SearchPostsSchema>
         name="maxPrice"
         type="number"
         placeholder="Max. price"
         aria-label="Maximum price"
         className="col-span-1 md:col-span-3 lg:col-span-2"
       />
-      <Select
+      <Select<SearchPostsSchema>
         name="categories"
         options={options}
         aria-label="Categories"

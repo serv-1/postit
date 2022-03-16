@@ -17,7 +17,12 @@ export const passwordSchema = Joi.string()
     'any.required': err.PASSWORD_REQUIRED,
   })
 
-export const passwordCsrfSchema = object({
+export interface PasswordCsrfSchema {
+  csrfToken: string
+  password: string
+}
+
+export const passwordCsrfSchema = object<PasswordCsrfSchema>({
   csrfToken: csrfTokenSchema,
   password: passwordSchema,
 })

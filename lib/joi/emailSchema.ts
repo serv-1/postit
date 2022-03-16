@@ -14,7 +14,12 @@ export const emailSchema = Joi.string()
     'any.required': err.EMAIL_REQUIRED,
   })
 
-export const emailCsrfSchema = object({
+export interface EmailCsrfSchema {
+  csrfToken: string
+  email: string
+}
+
+export const emailCsrfSchema = object<EmailCsrfSchema>({
   csrfToken: csrfTokenSchema,
   email: emailSchema,
 })

@@ -1,58 +1,51 @@
-import axios from 'axios'
-import classNames from 'classnames'
-import React, { useEffect, useState } from 'react'
+import { getCsrfToken } from 'next-auth/react'
+import { ComponentPropsWithoutRef, useEffect, useState } from 'react'
 import * as RHF from 'react-hook-form'
 
-interface FormProps<TFieldValues>
-  extends React.ComponentPropsWithoutRef<'form'> {
-  children: React.ReactNode
-  methods: RHF.UseFormReturn<TFieldValues>
-  needCsrfToken?: boolean
-  submitHandlers: {
-    submitHandler: RHF.SubmitHandler<TFieldValues>
-    submitErrorHandler?: RHF.SubmitErrorHandler<TFieldValues>
-  }
-}
+type FormProps<FormFields extends RHF.FieldValues = RHF.FieldValues> =
+  ComponentPropsWithoutRef<'form'> & {
+    methods: RHF.UseFormReturn<FormFields>
+    submitHandler: RHF.SubmitHandler<FormFields>
+    submitErrorHandler?: RHF.SubmitErrorHandler<FormFields>
+  } & (FormFields extends { csrfToken: string }
+      ? { needCsrfToken: true }
+      : { needCsrfToken?: false })
 
-const Form = <TFieldValues extends RHF.FieldValues>(
-  props: FormProps<TFieldValues>
-) => {
-  const [csrfToken, setCsrfToken] = useState<string | undefined>()
+const Form = <FormFields extends RHF.FieldValues = RHF.FieldValues>({
+  methods,
+  submitHandler,
+  submitErrorHandler,
+  needCsrfToken,
+  children,
+  ...props
+}: FormProps<FormFields>) => {
+  const { handleSubmit, register } = methods
 
-  const className = classNames('', props.className)
-  const { submitHandler, submitErrorHandler } = props.submitHandlers
+  const [csrfToken, setCsrfToken] = useState<string>()
 
   useEffect(() => {
-    const getCsrfToken = async () => {
-      if (props.needCsrfToken) {
-        const res = await axios.get('http://localhost:3000/api/auth/csrf')
-        setCsrfToken(res.data.csrfToken)
-      }
-    }
-    getCsrfToken()
-  }, [props.needCsrfToken])
+    const csrf = async () => setCsrfToken(await getCsrfToken())
+    if (needCsrfToken) csrf()
+  }, [needCsrfToken])
 
   return (
-    <RHF.FormProvider {...props.methods}>
+    <RHF.FormProvider {...methods}>
       <form
-        name={props.name}
+        {...props}
         id={props.name}
-        className={className}
-        style={props.style}
         action=""
-        method={props.method}
         noValidate
-        onSubmit={props.methods.handleSubmit(submitHandler, submitErrorHandler)}
+        onSubmit={handleSubmit(submitHandler, submitErrorHandler)}
       >
         {csrfToken && (
           <input
             data-testid="csrfToken"
-            {...props.methods.register('csrfToken' as any)}
+            {...register('csrfToken' as any)}
             type="hidden"
             value={csrfToken}
           />
         )}
-        {props.children}
+        {children}
       </form>
     </RHF.FormProvider>
   )

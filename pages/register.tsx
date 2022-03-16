@@ -5,12 +5,13 @@ import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
 import { signIn } from 'next-auth/react'
 import Form from '../components/Form'
-import FormField from '../components/FormField'
-import FormPasswordField from '../components/FormPasswordField'
 import getAxiosError from '../utils/functions/getAxiosError'
 import { useToast } from '../contexts/toast'
 import { RegisterSchema, registerSchema } from '../lib/joi/registerSchema'
 import Button from '../components/Button'
+import Input from '../components/Input'
+import InputError from '../components/InputError'
+import PasswordInput from '../components/PasswordInput'
 
 const Register = () => {
   const methods = useForm<RegisterSchema>({
@@ -63,13 +64,36 @@ const Register = () => {
         <Form
           name="register"
           method="post"
-          submitHandlers={{ submitHandler }}
           methods={methods}
+          submitHandler={submitHandler}
           className="col-span-full"
         >
-          <FormField labelText="Name" inputName="name" type="text" needFocus />
-          <FormField labelText="Email" inputName="email" type="email" />
-          <FormPasswordField showStrength showRules />
+          <div className="mb-16">
+            <label htmlFor="name">Name</label>
+            <Input<RegisterSchema> type="text" name="name" needFocus />
+            <InputError<RegisterSchema> inputName="name" />
+          </div>
+
+          <div className="mb-16">
+            <label htmlFor="email">Email</label>
+            <Input<RegisterSchema> type="email" name="email" />
+            <InputError<RegisterSchema> inputName="email" />
+          </div>
+
+          <div className="mb-16">
+            <label htmlFor="password">Password</label>
+            <div className="text-s mb-4" id="passwordRules" role="note">
+              It must be 10-20 characters long. It must not equal the others
+              fields&apos; value. There is no characters restriction so you can
+              use emojis, cyrillic, etc.
+            </div>
+            <PasswordInput<RegisterSchema>
+              showStrength
+              aria-describedby="passwordRules"
+            />
+            <InputError<RegisterSchema> inputName="password" />
+          </div>
+
           <Button type="submit" className="w-full">
             Register
           </Button>

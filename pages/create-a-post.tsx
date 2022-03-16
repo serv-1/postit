@@ -2,9 +2,7 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import axios, { AxiosError } from 'axios'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import Button from '../components/Button'
-import FormCategoriesField from '../components/FormCategoriesField'
 import Form from '../components/Form'
-import FormField from '../components/FormField'
 import { useToast } from '../contexts/toast'
 import {
   createPostClientSchema,
@@ -16,6 +14,15 @@ import { IImage } from '../types/common'
 import isImageValid from '../utils/functions/isImageValid'
 import readAsDataUrl from '../utils/functions/readAsDataUrl'
 import Head from 'next/head'
+import Input from '../components/Input'
+import InputError from '../components/InputError'
+import Select from '../components/Select'
+import categories from '../categories'
+
+const options = categories.map((category) => ({
+  label: category,
+  value: category,
+}))
 
 const CreateAPost = () => {
   const resolver = joiResolver(createPostClientSchema)
@@ -73,29 +80,43 @@ const CreateAPost = () => {
         <Form
           name="createPost"
           method="post"
-          submitHandlers={{ submitHandler }}
           methods={methods}
+          submitHandler={submitHandler}
           needCsrfToken
           className="col-span-full"
         >
-          <FormField labelText="Name" inputName="name" type="text" needFocus />
+          <div className="mb-16">
+            <label htmlFor="name">Name</label>
+            <Input<CreatePostClientSchema> type="text" name="name" needFocus />
+            <InputError<CreatePostClientSchema> inputName="name" />
+          </div>
 
-          <FormField
-            labelText="Description"
-            inputName="description"
-            isTextArea
-          />
+          <div className="mb-16">
+            <label htmlFor="description">Description</label>
+            <Input<CreatePostClientSchema> isTextArea name="description" />
+            <InputError<CreatePostClientSchema> inputName="description" />
+          </div>
 
-          <FormCategoriesField />
+          <div className="mb-16">
+            <label htmlFor="categories">Categories</label>
+            <Select<CreatePostClientSchema>
+              name="categories"
+              options={options}
+            />
+            <InputError<CreatePostClientSchema> inputName="categories" />
+          </div>
 
-          <FormField labelText="Price (euro)" inputName="price" type="number" />
+          <div className="mb-16">
+            <label htmlFor="price">Price (euros)</label>
+            <Input<CreatePostClientSchema> type="number" name="price" />
+            <InputError<CreatePostClientSchema> inputName="price" />
+          </div>
 
-          <FormField
-            type="file"
-            labelText="Images"
-            inputName="images"
-            multiple
-          />
+          <div className="mb-16">
+            <label htmlFor="images">Images</label>
+            <Input<CreatePostClientSchema> type="file" name="images" multiple />
+            <InputError<CreatePostClientSchema> inputName="images" />
+          </div>
 
           <Button type="submit" className="w-full">
             Create

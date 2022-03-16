@@ -3,8 +3,8 @@ import axios, { AxiosError } from 'axios'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
-import { emailCsrfSchema } from '../lib/joi/emailSchema'
-import { nameCsrfSchema } from '../lib/joi/nameSchema'
+import { EmailCsrfSchema, emailCsrfSchema } from '../lib/joi/emailSchema'
+import { NameCsrfSchema, nameCsrfSchema } from '../lib/joi/nameSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
 import Button from './Button'
 import Form from './Form'
@@ -14,9 +14,7 @@ import Pencil from '../public/static/images/pencil.svg'
 import Check from '../public/static/images/check.svg'
 import X from '../public/static/images/x.svg'
 
-type FormFields<T> = { csrfToken?: string } & (T extends 'name'
-  ? { name: string }
-  : { email: string })
+type FormFields<T> = T extends 'name' ? NameCsrfSchema : EmailCsrfSchema
 
 interface ProfileChangeNameOrEmailProps {
   type: 'name' | 'email'
@@ -24,11 +22,11 @@ interface ProfileChangeNameOrEmailProps {
 }
 
 const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
-  const { type, value: val } = props
+  const { type } = props
   type Type = typeof type
 
   const [showForm, setShowForm] = useState(false)
-  const [value, setValue] = useState(val)
+  const [value, setValue] = useState(props.value)
 
   const { setToast } = useToast()
 
@@ -36,15 +34,12 @@ const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
   const methods = useForm<FormFields<Type>>({ resolver: joiResolver(schema) })
 
   const submitHandler: SubmitHandler<FormFields<Type>> = async (data) => {
-    const csrfToken = data.csrfToken
-    delete data.csrfToken
-
-    const newValue = Object.values(data)[0]
+    const newValue = 'name' in data ? data.name : data.email
 
     if (newValue === value) return setShowForm(false)
 
     try {
-      await axios.put('http://localhost:3000/api/user', { csrfToken, ...data })
+      await axios.put('http://localhost:3000/api/user', data)
 
       setShowForm(false)
       setValue(newValue)
@@ -59,12 +54,12 @@ const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
     <Form
       name={`updateUser${type[0].toUpperCase() + type.slice(1)}`}
       method="post"
-      submitHandlers={{ submitHandler }}
       methods={methods}
+      submitHandler={submitHandler}
       needCsrfToken
       className="flex first-of-type:mb-8"
     >
-      <Input
+      <Input<FormFields<Type>>
         className="leading-[16px] flex-grow"
         type={type === 'name' ? 'text' : 'email'}
         defaultValue={value}
@@ -82,7 +77,7 @@ const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
       <Button needDefaultClassNames={false} aria-label="Submit" type="submit">
         <Check className="w-24 h-24 md:w-32 md:h-32" />
       </Button>
-      <InputError inputName={type} />
+      <InputError<FormFields<Type>> inputName={type} />
     </Form>
   ) : (
     <div className="flex justify-between first-of-type:mb-8">

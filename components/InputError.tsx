@@ -1,12 +1,16 @@
 import { ComponentPropsWithoutRef } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { FieldPath, FieldValues, useFormContext } from 'react-hook-form'
 
-interface InputErrorProps extends ComponentPropsWithoutRef<'div'> {
-  inputName: string
+interface InputErrorProps<FormFields extends FieldValues = FieldValues>
+  extends ComponentPropsWithoutRef<'div'> {
+  inputName: FieldPath<FormFields>
 }
 
-const InputError = ({ inputName, ...props }: InputErrorProps) => {
-  const { formState } = useFormContext()
+const InputError = <FormFields extends FieldValues = FieldValues>({
+  inputName,
+  ...props
+}: InputErrorProps<FormFields>) => {
+  const { formState } = useFormContext<FormFields>()
   const { isSubmitted, errors } = formState
 
   return isSubmitted && errors[inputName] ? (

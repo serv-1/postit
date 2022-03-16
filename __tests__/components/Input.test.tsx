@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { RegisterOptions } from 'react-hook-form'
 import Input from '../../components/Input'
-import Label from '../../components/Label'
 
 const setFocus = jest.fn()
 
@@ -21,11 +20,15 @@ const setFormContext = (isSubmitted: boolean, message?: string) => ({
 const handleChange = jest.fn()
 const handleBlur = jest.fn()
 
+interface FormFields {
+  test: string
+}
+
 test('the input renders', () => {
   useFormContext.mockReturnValue(setFormContext(false))
 
   render(
-    <Input
+    <Input<FormFields>
       type="text"
       name="test"
       onChange={handleChange}
@@ -52,7 +55,12 @@ test('the textarea renders', () => {
   useFormContext.mockReturnValue(setFormContext(false))
 
   render(
-    <Input name="test" onChange={handleChange} onBlur={handleBlur} isTextArea />
+    <Input<FormFields>
+      name="test"
+      onChange={handleChange}
+      onBlur={handleBlur}
+      isTextArea
+    />
   )
 
   const textarea = screen.getByRole('textbox')
@@ -63,7 +71,7 @@ test('the input has the focus', () => {
   useFormContext.mockReturnValue(setFormContext(false))
 
   render(
-    <Input
+    <Input<FormFields>
       type="text"
       name="test"
       onChange={handleChange}
@@ -79,7 +87,7 @@ test("the input's border is red if the form is submitted and there is an error",
   useFormContext.mockReturnValueOnce(setFormContext(true, 'Error'))
 
   render(
-    <Input
+    <Input<FormFields>
       type="text"
       name="test"
       onChange={handleChange}
@@ -95,7 +103,7 @@ test("the input's border is not red if the form is submitted and there is no err
   useFormContext.mockReturnValueOnce(setFormContext(true))
 
   render(
-    <Input
+    <Input<FormFields>
       type="text"
       name="test"
       onChange={handleChange}
@@ -112,8 +120,8 @@ test('the file input is red if the form is submitted and there is an error', () 
 
   render(
     <>
-      <Label labelText="Test" htmlFor="test" />
-      <Input type="file" name="test" />
+      <label htmlFor="test">Test</label>
+      <Input<FormFields> type="file" name="test" />
     </>
   )
 
@@ -126,8 +134,8 @@ test('the file input is not red if the form is submitted and there is no error',
 
   render(
     <>
-      <Label labelText="Test" htmlFor="test" />
-      <Input type="file" name="test" />
+      <label htmlFor="test">Test</label>
+      <Input<FormFields> type="file" name="test" />
     </>
   )
 
@@ -140,8 +148,8 @@ test('the file input is not red if the form is not submitted', () => {
 
   render(
     <>
-      <Label labelText="Test" htmlFor="test" />
-      <Input type="file" name="test" />
+      <label htmlFor="test">Test</label>
+      <Input<FormFields> type="file" name="test" />
     </>
   )
 

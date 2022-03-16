@@ -10,7 +10,12 @@ export const nameSchema = Joi.string().required().trim().max(90).messages({
   'string.max': err.NAME_MAX,
 })
 
-export const nameCsrfSchema = object({
+export interface NameCsrfSchema {
+  csrfToken: string
+  name: string
+}
+
+export const nameCsrfSchema = object<NameCsrfSchema>({
   csrfToken: csrfTokenSchema,
   name: nameSchema,
 })

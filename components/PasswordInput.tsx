@@ -15,28 +15,30 @@ interface Strength {
 interface PasswordInputProps extends ComponentPropsWithoutRef<'input'> {
   needFocus?: boolean
   showStrength?: boolean
-  hasRules?: boolean
 }
 
-const PasswordInput = ({
+const PasswordInput = <
+  FormFields extends { password: string } = { password: string }
+>({
   showStrength,
   needFocus,
-  hasRules,
   className,
   ...props
 }: PasswordInputProps) => {
   const [showPassword, setShowPassword] = useState(false)
   const defaultStrength = { text: 'weak' as const, color: 'red' as const }
   const [strength, setStrength] = useState<Strength>(defaultStrength)
-  const { getValues, formState } = useFormContext()
+  const { getValues, formState } = useFormContext<FormFields>()
   const { isSubmitted, errors } = formState
-  const userInputs = getValues()
-  delete userInputs.password
 
-  const ariaDescr = classNames('passwordStrength', { passwordRules: hasRules })
+  const ariaDescr = classNames('passwordStrength', props['aria-describedby'])
 
   const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { score } = zxcvbn(e.target.value, Object.values(userInputs))
+    const userInputs = Object.values(
+      Object.keys(getValues()).filter((key) => key !== 'password')
+    )
+
+    const { score } = zxcvbn(e.target.value, userInputs)
 
     if (score <= 2) {
       return setStrength({ text: 'weak', color: 'red' })
@@ -49,18 +51,14 @@ const PasswordInput = ({
 
   const containerClass = classNames(
     'border rounded',
-    isSubmitted
-      ? errors.password
-        ? 'border-red-600'
-        : 'border-indigo-600'
-      : 'border-indigo-600',
+    isSubmitted && errors.password ? 'border-red-600' : 'border-indigo-600',
     className
   )
 
   return (
     <div data-testid="container" className={containerClass}>
       <div className="flex">
-        <Input
+        <Input<{ password: string }>
           {...props}
           name="password"
           type={showPassword ? 'text' : 'password'}

@@ -29,7 +29,7 @@ test('set the url query string parameters with the form data', async () => {
   userEvent.clear(maxPriceInput)
   userEvent.type(maxPriceInput, '200')
 
-  const form = screen.getByRole('form')
+  const form = screen.getByRole('search')
   expect(form).toHaveFormValues({ categories: ['pet', 'cat'] })
 
   const categoriesSelect = screen.getByRole('combobox')

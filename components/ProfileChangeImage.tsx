@@ -7,6 +7,7 @@ import getAxiosError from '../utils/functions/getAxiosError'
 import isImageValid from '../utils/functions/isImageValid'
 import readAsDataUrl from '../utils/functions/readAsDataUrl'
 import { IImage } from '../types/common'
+import { getCsrfToken } from 'next-auth/react'
 
 interface ProfileChangeImageProps {
   image: string
@@ -34,10 +35,8 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
       setToast({ message: result, error: true })
     } else {
       try {
-        const res = await axios.get('http://localhost:3000/api/auth/csrf')
-
         await axios.put('http://localhost:3000/api/user', {
-          csrfToken: res.data.csrfToken,
+          csrfToken: await getCsrfToken(),
           image: result,
         })
 
