@@ -5,6 +5,7 @@ import PostImages from '../../../components/PostImages'
 import addCommasToNb from '../../../utils/functions/addCommasToNb'
 import Head from 'next/head'
 import Link from '../../../components/Link'
+import PostList from '../../../components/PostList'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id
@@ -28,40 +29,50 @@ const Post = ({ post }: PostProps) => {
         <title>{post.name} - Filanad</title>
       </Head>
       <main className="py-32 grid grid-cols-4 md:grid-cols-[repeat(6,72px)] gap-x-16 justify-center">
-        <h1 className="col-span-full text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16">
-          {post.name}
-        </h1>
-        <div className="col-span-full mb-8">
-          categorized in{' '}
-          {post.categories.map((category) => (
-            <span
-              key={category}
-              className="border border-black rounded px-8 py-4 mr-4"
-            >
-              {category}
+        <section className="col-span-full mb-32">
+          <h1 className="text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16">
+            {post.name}
+          </h1>
+          <div className="mb-8">
+            categorized in{' '}
+            {post.categories.map((category) => (
+              <span
+                key={category}
+                className="border border-black rounded px-8 py-4 mr-4"
+              >
+                {category}
+              </span>
+            ))}
+          </div>
+          <div className="mb-8">
+            for{' '}
+            <span className="text-indigo-600 text-4xl md:text-t-4xl lg:text-d-4xl font-bold ">
+              {addCommasToNb(post.price)}€
             </span>
-          ))}
-        </div>
-        <div className="col-span-full mb-8">
-          for{' '}
-          <span className="text-indigo-600 text-4xl md:text-t-4xl lg:text-d-4xl font-bold ">
-            {addCommasToNb(post.price)}€
-          </span>
-        </div>
-        <PostImages images={post.images} />
-        <div className="col-span-full bg-indigo-200 rounded p-8 mt-8 relative">
-          <span className="italic text-s absolute top-0 start-8 -translate-y-1/2">
-            <Link
-              href={`/users/${post.user.id}`}
-              className="font-bold hover:underline"
-              title={`${post.user.name}'s profile`}
-            >
-              {post.user.name}
-            </Link>{' '}
-            says
-          </span>
-          <p>{post.description}</p>
-        </div>
+          </div>
+          <PostImages images={post.images} />
+          <div className="bg-indigo-200 rounded p-8 mt-8 relative">
+            <span className="italic text-s absolute top-0 start-8 -translate-y-1/2">
+              <Link
+                href={`/users/${post.user.id}`}
+                className="font-bold hover:underline"
+                title={`${post.user.name}'s profile`}
+              >
+                {post.user.name}
+              </Link>{' '}
+              says
+            </span>
+            <p>{post.description}</p>
+          </div>
+        </section>
+        <section className="col-span-full">
+          <h2 className="text-3xl md:text-t-3xl lg:text-d-3xl font-bold mb-16">
+            {post.user.name}&apos;s other posts
+          </h2>
+          <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-[repeat(6,72px)] gap-x-16 justify-center">
+            <PostList posts={post.user.posts} />
+          </div>
+        </section>
       </main>
     </>
   )

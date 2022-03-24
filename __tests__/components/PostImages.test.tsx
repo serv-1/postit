@@ -32,3 +32,17 @@ test('only 1 image render', () => {
 
   expect(images).toHaveLength(1)
 })
+
+test('if the given images are updated then the default selected image is updated too', () => {
+  const { rerender } = render(<PostImages images={['/img1']} />)
+
+  let selectedImage = screen.getByRole('img')
+
+  expect(selectedImage).toHaveAttribute('src', '/img1')
+
+  rerender(<PostImages images={['/img2']} />)
+
+  selectedImage = screen.getByRole('img')
+
+  expect(selectedImage).toHaveAttribute('src', '/img2')
+})

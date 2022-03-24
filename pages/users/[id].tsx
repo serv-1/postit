@@ -46,7 +46,7 @@ const User = ({ user }: UserProps) => {
             <h2 className="col-span-full md:col-start-2 text-3xl md:text-t-3xl lg:text-d-3xl font-bold mb-16">
               <span className="text-indigo-600">{user.posts.length}</span> Posts
             </h2>
-            <div className="col-span-full  grid grid-cols-4 md:grid-cols-8 lg:grid-cols-[repeat(6,72px)] gap-x-16 justify-center">
+            <div className="col-span-full grid grid-cols-4 md:grid-cols-8 lg:grid-cols-[repeat(6,72px)] gap-x-16 justify-center">
               <PostList posts={user.posts} />
             </div>
           </section>

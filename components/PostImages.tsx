@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface PostImagesProps {
   images: string[]
@@ -7,6 +7,8 @@ interface PostImagesProps {
 
 const PostImages = ({ images }: PostImagesProps) => {
   const [selectedImage, setSelectedImage] = useState(images[0])
+
+  useEffect(() => setSelectedImage(images[0]), [images])
 
   return (
     <div className="col-span-full mb-16 rounded overflow-clip md:flex md:flex-row md:flex-nowrap">

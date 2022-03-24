@@ -141,7 +141,7 @@ const ProfilePost = (props: ProfilePostProps) => {
           </Button>
           <Link
             href={`/posts/${post.id}/${formatForUrl(post.name)}`}
-            className="leading-[16px]"
+            className="leading-[16px] hover:underline"
           >
             {post.name}
           </Link>
