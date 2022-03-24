@@ -16,23 +16,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return { redirect: { permanent: false, destination: '/auth/sign-in' } }
   }
 
-  const url = `http://localhost:3000/api/users/${session.id}`
-  const res = await axios.get<IUser>(url)
-
-  const { postsIds, ...rest } = res.data
-
-  const user: typeof rest & { posts: IPost[] } = { ...rest, posts: [] }
-
-  if (postsIds) {
-    for (const id of postsIds) {
-      const res = await axios.get<IPost>(
-        `http://localhost:3000/api/posts/${id}`
-      )
-      user.posts.push(res.data)
-    }
+  try {
+    const { id } = session
+    const res = await axios.get<IUser>(`http://localhost:3000/api/users/${id}`)
+    return { props: { user: res.data } }
+  } catch (e) {
+    return { notFound: true }
   }
-
-  return { props: { user } }
 }
 
 interface ProfileProps {

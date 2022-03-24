@@ -4,8 +4,8 @@ import createFile from '../../utils/functions/createFile'
 
 const dir = '/public/static/'
 
-describe('returns the name of the created file', () => {
-  test('with string data', async () => {
+describe('returns the name of the file created with', () => {
+  test('string data', async () => {
     const fname = await createFile('file data', 'txt', dir)
 
     expect(await access(cwd() + dir + fname)).toBeUndefined()
@@ -13,9 +13,16 @@ describe('returns the name of the created file', () => {
     await unlink(cwd() + dir + fname)
   })
 
-  test('with string data and an encoding', async () => {
-    const fileData = Buffer.from('file data', 'base64').toString('base64')
-    const fname = await createFile(fileData, 'txt', dir)
+  test('buffer data', async () => {
+    const fname = await createFile(Buffer.from('file data'), 'txt', dir)
+
+    expect(await access(cwd() + dir + fname)).toBeUndefined()
+
+    await unlink(cwd() + dir + fname)
+  })
+
+  test('string data and an encoding', async () => {
+    const fname = await createFile('file data', 'txt', dir, { enc: 'base64' })
 
     const data = await readFile(cwd() + dir + fname, 'base64')
 
@@ -24,9 +31,10 @@ describe('returns the name of the created file', () => {
     await unlink(cwd() + dir + fname)
   })
 
-  test('with Buffer data', async () => {
-    const fname = await createFile(Buffer.from('file data'), 'txt', dir)
+  test('a custom name', async () => {
+    const fname = await createFile('file data', 'txt', dir, { name: 'hello' })
 
+    expect(fname).toBe('hello.txt')
     expect(await access(cwd() + dir + fname)).toBeUndefined()
 
     await unlink(cwd() + dir + fname)

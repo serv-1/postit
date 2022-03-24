@@ -27,7 +27,7 @@ describe('/api/verifyEmail', () => {
 
     it('200 - Email verified', function () {
       cy.task('reset')
-      cy.task('seed')
+      cy.task('addUser', u1)
 
       const body = { email: u1.email }
 

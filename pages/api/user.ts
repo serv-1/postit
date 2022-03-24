@@ -52,13 +52,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       let update: Update
 
       if ('image' in reqBody) {
-        const { type, base64 } = reqBody.image
+        const { ext, base64 } = reqBody.image
 
         if (isBase64ValueTooBig(base64, 1000000)) {
           return res.status(413).json({ message: err.IMAGE_TOO_BIG })
         }
 
-        const user = await User.findOne({ _id: session.id }).lean().exec()
+        const user = await User.findById(session.id).lean().exec()
 
         if (!user) {
           return res.status(404).json({ message: err.USER_NOT_FOUND })
@@ -70,7 +70,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           await unlink(cwd() + path + user.image)
         }
 
-        const fname = await createFile(base64, type, path, 'base64')
+        const fname = await createFile(base64, ext, path, { enc: 'base64' })
 
         update = { image: fname }
       } else if ('password' in reqBody) {
@@ -102,16 +102,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(422).json({ name, message })
       }
 
-      const { name, email, password } = result.value
-
       try {
-        const salt = randomBytes(16).toString('hex')
-        const hash = scryptSync(password, salt, 64).toString('hex')
-
         await dbConnect()
-        const user = new User({ name, email, password: `${salt}:${hash}` })
-        await user.save()
-
+        await new User(result.value).save()
         res.status(200).end()
       } catch (e) {
         if ((e as MongoError).code === 11000) {
@@ -142,7 +135,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
       }
 
-      const user = await User.findOne({ _id: session.id }).lean().exec()
+      const user = await User.findById(session.id).lean().exec()
 
       if (!user) {
         return res.status(404).json({ message: err.USER_NOT_FOUND })
@@ -155,8 +148,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       try {
         await dbConnect()
         await User.deleteOne({ _id: session.id }).exec()
-        await Account.deleteOne({ userId: session.id }).exec()
-        await Post.deleteMany({ userId: session.id }).exec()
       } catch (e) {
         res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
       }

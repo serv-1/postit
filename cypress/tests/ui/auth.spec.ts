@@ -68,7 +68,7 @@ describe('User sign in and register', () => {
 
   it('Sign in with credentials and sign out', function () {
     cy.task('reset')
-    cy.task('seed')
+    cy.task('addUser', u1)
 
     cy.visit('/auth/sign-in')
 
@@ -88,7 +88,7 @@ describe('User sign in and register', () => {
   it('Forgot password', function () {
     cy.request('PATCH', cleanInboxUrl)
     cy.task('reset')
-    cy.task('seed')
+    cy.task('addUser', u1)
 
     cy.visit('/auth/forgot-password')
 

@@ -1,5 +1,5 @@
 import isBase64ValueTooBig from '../../../utils/functions/isBase64ValueTooBig'
-import { isValidObjectId } from 'mongoose'
+import { isValidObjectId, Types } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import Post from '../../../models/Post'
 import dbConnect from '../../../utils/functions/dbConnect'
@@ -16,7 +16,6 @@ import {
   PostsIdPutServerSchema,
   postsIdPutServerSchema,
 } from '../../../lib/joi/postsIdPutSchema'
-import User from '../../../models/User'
 
 interface Update {
   name?: string
@@ -36,21 +35,77 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case 'GET': {
       await dbConnect()
-      const post = await Post.findOne({ _id: id }).lean().exec()
 
-      if (!post) {
+      const $set = {
+        id: { $toString: '$_id' },
+        price: { $divide: ['$price', 100] },
+        images: {
+          $map: {
+            input: '$images',
+            as: 'image',
+            in: { $concat: ['/static/images/posts/', '$$image'] },
+          },
+        },
+      }
+
+      const post = await Post.aggregate(
+        [
+          { $match: { _id: new Types.ObjectId(id) } },
+          {
+            $lookup: {
+              from: 'users',
+              let: { userId: '$userId', postId: '$_id' },
+              pipeline: [
+                { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
+                {
+                  $lookup: {
+                    from: 'posts',
+                    let: { postsIds: '$postsIds' },
+                    pipeline: [
+                      {
+                        $match: {
+                          $expr: {
+                            $and: [
+                              { $ne: ['$_id', '$$postId'] },
+                              { $in: ['$_id', '$$postsIds'] },
+                            ],
+                          },
+                        },
+                      },
+                      { $set },
+                      { $unset: ['_id', 'userId', '__v'] },
+                    ],
+                    as: 'posts',
+                  },
+                },
+                {
+                  $set: {
+                    id: { $toString: '$_id' },
+                    image: {
+                      $cond: [
+                        { $regexMatch: { input: '$image', regex: /default/ } },
+                        { $concat: ['/static/images/', '$image'] },
+                        { $concat: ['/static/images/users/', '$image'] },
+                      ],
+                    },
+                  },
+                },
+                { $unset: ['_id', 'postsIds', '__v', 'password'] },
+              ],
+              as: 'user',
+            },
+          },
+          { $set: { ...$set, user: { $arrayElemAt: ['$user', 0] } } },
+          { $unset: ['_id', 'userId', '__v'] },
+        ],
+        {}
+      ).exec()
+
+      if (!post.length) {
         return res.status(404).json({ message: err.POST_NOT_FOUND })
       }
 
-      res.status(200).json({
-        id: post._id.toString(),
-        name: post.name,
-        description: post.description,
-        categories: post.categories,
-        price: post.price / 100,
-        images: post.images.map((image) => '/static/images/posts/' + image),
-        userId: post.userId.toString(),
-      })
+      res.status(200).json(post[0])
       break
     }
     case 'PUT': {
@@ -76,7 +131,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
       }
 
-      const post = await Post.findOne({ _id: id }).lean().exec()
+      const post = await Post.findById(id).lean().exec()
 
       if (!post) {
         return res.status(404).json({ message: err.POST_NOT_FOUND })
@@ -97,12 +152,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             return res.status(413).json({ message: err.IMAGE_TOO_BIG })
           }
 
-          const fname = await createFile(base64, ext, path, 'base64')
+          const fname = await createFile(base64, ext, path, { enc: 'base64' })
 
           images.push(fname)
         }
 
-        const post = await Post.findOne({ _id: id }).lean().exec()
+        const post = await Post.findById(id).lean().exec()
 
         if (!post) {
           return res.status(404).json({ message: err.POST_NOT_FOUND })
@@ -149,7 +204,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
       }
 
-      const post = await Post.findOne({ _id: id }).lean().exec()
+      const post = await Post.findById(id).lean().exec()
 
       if (!post) {
         return res.status(404).json({ message: err.POST_NOT_FOUND })
@@ -166,7 +221,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       try {
         await dbConnect()
         await Post.deleteOne({ _id: id }).exec()
-        await User.findByIdAndUpdate(session.id, { $pull: { postsIds: id } })
       } catch (e) {
         res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
       }

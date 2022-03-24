@@ -1,11 +1,12 @@
 import err from '../../../../utils/constants/errors'
-import { Ids } from '../../../plugins'
-import { IPost } from '../../../../models/Post'
-import { IUser } from '../../../../models/User'
+import { PostModel } from '../../../../models/Post'
+import { UserModel } from '../../../../models/User'
 import u1 from '../../../fixtures/user1.json'
 import u2 from '../../../fixtures/user2.json'
-const post: Post = require('../../../fixtures/posts.json')[0]
-import { Image, Post } from '../../../../types/common'
+import { IImage, IPost } from '../../../../types/common'
+
+type Posts = Omit<IPost, 'id' | 'userId'>[]
+const [p1, p2]: Posts = require('../../../fixtures/posts.json')
 
 describe('/api/posts/:id', () => {
   it('405 - Method not allowed', function () {
@@ -34,53 +35,93 @@ describe('/api/posts/:id', () => {
 
     it('200 - Get the post', function () {
       cy.task('reset')
-      cy.task<Ids>('seed', { posts: true }).then((ids) => {
-        cy.req({ url: `/api/posts/${ids.pId}` }).then((res) => {
-          expect(res.status).to.eq(200)
-          expect(res.body).to.have.property('id', ids.pId)
-          expect(res.body).to.have.property('name', post.name)
-          expect(res.body).to.have.property('description', post.description)
-          expect(res.body).to.have.deep.property('categories', post.categories)
-          expect(res.body).to.have.property('price', post.price / 100)
-          const images = post.images.map((img) => '/static/images/posts/' + img)
-          expect(res.body).to.have.deep.property('images', images)
-          expect(res.body).to.have.property('userId', ids.u1Id)
-        })
-      })
+
+      cy.task<string[]>('addUsers', JSON.stringify([u1, u2])).then(
+        ([userId]) => {
+          const posts = [
+            { ...p1, userId },
+            { ...p2, userId },
+          ]
+
+          cy.task<string[]>('addPosts', JSON.stringify(posts)).then((pIds) => {
+            cy.req<IPost>({ url: `/api/posts/${pIds[0]}` }).then((res) => {
+              const { body, status } = res
+
+              expect(status).to.eq(200)
+
+              const p1Images = p1.images.map(
+                (img) => '/static/images/posts/' + img
+              )
+              const p2Images = p2.images.map(
+                (img) => '/static/images/posts/' + img
+              )
+
+              expect(body).to.eql({
+                id: pIds[0],
+                name: p1.name,
+                description: p1.description,
+                categories: p1.categories,
+                price: p1.price / 100,
+                images: p1Images,
+                user: {
+                  id: userId,
+                  name: u1.name,
+                  email: u1.email,
+                  image: '/static/images/' + u1.image,
+                  posts: [
+                    {
+                      id: pIds[1],
+                      name: p2.name,
+                      description: p2.description,
+                      categories: p2.categories,
+                      price: p2.price / 100,
+                      images: p2Images,
+                    },
+                  ],
+                },
+              })
+            })
+          })
+        }
+      )
+    })
+  })
+})
+
+describe('PUT', () => {
+  it('403 - Forbidden', function () {
+    const url = '/api/posts/f0f0f0f0f0f0f0f0f0f0f0f0'
+
+    cy.req({ url, method: 'PUT' }).then((res) => {
+      expect(res.status).to.eq(403)
+      expect(res.body).to.have.property('message', err.FORBIDDEN)
     })
   })
 
-  describe('PUT', () => {
-    it('403 - Forbidden', function () {
-      const url = '/api/posts/f0f0f0f0f0f0f0f0f0f0f0f0'
+  it('422 - Invalid CSRF token', function () {
+    cy.task('reset')
+    cy.task('addUser', u1)
+    cy.signIn(u1.email, u1.password)
 
-      cy.req({ url, method: 'PUT' }).then((res) => {
-        expect(res.status).to.eq(403)
-        expect(res.body).to.have.property('message', err.FORBIDDEN)
-      })
+    const url = '/api/posts/f0f0f0f0f0f0f0f0f0f0f0f0'
+    const body = { csrfToken: 'very invalid', name: 'Carloman' }
+
+    cy.req({ url, method: 'PUT', body }).then((res) => {
+      expect(res.status).to.eq(422)
+      expect(res.body).to.have.property('message', err.CSRF_TOKEN_INVALID)
     })
+  })
 
-    it('422 - Invalid CSRF token', function () {
-      cy.task('reset')
-      cy.task('seed')
+  it('422 - Cannot update a post created by another user', function () {
+    cy.task('reset')
 
-      cy.signIn(u1.email, u1.password)
+    cy.task<string[]>('addUsers', JSON.stringify([u1, u2])).then(([u1Id]) => {
+      const p = { ...p1, userId: u1Id }
 
-      const url = '/api/posts/f0f0f0f0f0f0f0f0f0f0f0f0'
-      const body = { csrfToken: 'very invalid', name: 'Carloman' }
-
-      cy.req({ url, method: 'PUT', body }).then((res) => {
-        expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', err.CSRF_TOKEN_INVALID)
-      })
-    })
-
-    it('422 - Cannot update a post created by another user', function () {
-      cy.task('reset')
-      cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addPost', p).then((pId) => {
         cy.signIn(u2.email, u2.password)
 
-        const url = `/api/posts/${ids.pId}`
+        const url = `/api/posts/${pId}`
         const body = { name: 'Elbat' }
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
@@ -89,14 +130,18 @@ describe('/api/posts/:id', () => {
         })
       })
     })
+  })
 
-    it('422 - Invalid request body', function () {
-      cy.task('reset')
+  it('422 - Invalid request body', function () {
+    cy.task('reset')
 
-      cy.task<Ids>('seed', { posts: true }).then((ids) => {
+    cy.task('addUser', u1).then((userId) => {
+      const p = { ...p1, userId }
+
+      cy.task<string>('addPost', p).then((pId) => {
         cy.signIn(u1.email, u1.password)
 
-        const url = `/api/posts/${ids.pId}`
+        const url = `/api/posts/${pId}`
         const body = { oh: 'nooo!' }
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
@@ -105,15 +150,19 @@ describe('/api/posts/:id', () => {
         })
       })
     })
+  })
 
-    describe('name', () => {
-      it('422 - Invalid name', function () {
-        cy.task('reset')
+  describe('name', () => {
+    it('422 - Invalid name', function () {
+      cy.task('reset')
 
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
           cy.signIn(u1.email, u1.password)
 
-          const url = `/api/posts/${ids.pId}`
+          const url = `/api/posts/${pId}`
           const body = { name: 1 }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
@@ -122,34 +171,43 @@ describe('/api/posts/:id', () => {
           })
         })
       })
+    })
 
-      it('200 - Name updated', function () {
-        cy.task('reset')
+    it('200 - Name updated', function () {
+      cy.task('reset')
 
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
           cy.signIn(u1.email, u1.password)
 
-          const url = `/api/posts/${ids.pId}`
+          const url = `/api/posts/${pId}`
           const body = { name: 'Tebla' }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
-            cy.task<IPost>('getPostByUserId', ids.u1Id).then((post) => {
+
+            cy.task<PostModel>('getPostByUserId', userId).then((post) => {
               expect(post.name).to.eq('Tebla')
             })
           })
         })
       })
     })
+  })
 
-    describe('description', () => {
-      it('422 - Invalid description', function () {
-        cy.task('reset')
+  describe('description', () => {
+    it('422 - Invalid description', function () {
+      cy.task('reset')
 
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
           cy.signIn(u1.email, u1.password)
 
-          const url = `/api/posts/${ids.pId}`
+          const url = `/api/posts/${pId}`
           const body = { description: 1 }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
@@ -161,35 +219,43 @@ describe('/api/posts/:id', () => {
           })
         })
       })
+    })
 
-      it('200 - Description updated', function () {
-        cy.task('reset')
+    it('200 - Description updated', function () {
+      cy.task('reset')
 
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
           cy.signIn(u1.email, u1.password)
 
-          const url = `/api/posts/${ids.pId}`
+          const url = `/api/posts/${pId}`
           const body = { description: 'Breathtaking table' }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
           })
 
-          cy.task<IPost>('getPostByUserId', ids.u1Id).then((post) => {
+          cy.task<PostModel>('getPostByUserId', userId).then((post) => {
             expect(post.description).to.eq('Breathtaking table')
           })
         })
       })
     })
+  })
 
-    describe('categories', () => {
-      it('422 - Invalid categories', function () {
-        cy.task('reset')
+  describe('categories', () => {
+    it('422 - Invalid categories', function () {
+      cy.task('reset')
 
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
           cy.signIn(u1.email, u1.password)
 
-          const url = `/api/posts/${ids.pId}`
+          const url = `/api/posts/${pId}`
           const body = { categories: 1 }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
@@ -198,35 +264,43 @@ describe('/api/posts/:id', () => {
           })
         })
       })
+    })
+  })
 
-      it('200 - Categories updated', function () {
-        cy.task('reset')
+  it('200 - Categories updated', function () {
+    cy.task('reset')
 
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
-          cy.signIn(u1.email, u1.password)
+    cy.task<string>('addUser', u1).then((userId) => {
+      const p = { ...p1, userId }
 
-          const url = `/api/posts/${ids.pId}`
-          const body = { categories: ['furniture'] }
+      cy.task<string>('addPost', p).then((pId) => {
+        cy.signIn(u1.email, u1.password)
 
-          cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
-            expect(res.status).to.eq(200)
-          })
+        const url = `/api/posts/${pId}`
+        const body = { categories: ['furniture'] }
 
-          cy.task<IPost>('getPostByUserId', ids.u1Id).then((post) => {
-            expect(post.categories).to.deep.eq(['furniture'])
-          })
+        cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
+          expect(res.status).to.eq(200)
+        })
+
+        cy.task<PostModel>('getPostByUserId', userId).then((post) => {
+          expect(post.categories).to.deep.eq(['furniture'])
         })
       })
     })
+  })
 
-    describe('price', () => {
-      it('422 - Invalid price', function () {
-        cy.task('reset')
+  describe('price', () => {
+    it('422 - Invalid price', function () {
+      cy.task('reset')
 
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
           cy.signIn(u1.email, u1.password)
 
-          const url = `/api/posts/${ids.pId}`
+          const url = `/api/posts/${pId}`
           const body = { price: 'yes' }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
@@ -235,35 +309,43 @@ describe('/api/posts/:id', () => {
           })
         })
       })
+    })
 
-      it('200 - Price updated', function () {
-        cy.task('reset')
+    it('200 - Price updated', function () {
+      cy.task('reset')
 
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
           cy.signIn(u1.email, u1.password)
 
-          const url = `/api/posts/${ids.pId}`
+          const url = `/api/posts/${pId}`
           const body = { price: 50 }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
           })
 
-          cy.task<IPost>('getPostByUserId', ids.u1Id).then((post) => {
+          cy.task<PostModel>('getPostByUserId', userId).then((post) => {
             expect(post.price).to.eq(5000)
           })
         })
       })
     })
+  })
 
-    describe('images', () => {
-      it('422 - Invalid images', function () {
-        cy.task('reset')
+  describe('images', () => {
+    it('422 - Invalid images', function () {
+      cy.task('reset')
 
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
           cy.signIn(u1.email, u1.password)
 
-          const url = `/api/posts/${ids.pId}`
+          const url = `/api/posts/${pId}`
           const body = { images: 'yes' }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
@@ -272,14 +354,18 @@ describe('/api/posts/:id', () => {
           })
         })
       })
+    })
 
-      it('413 - image too big', function () {
-        cy.task('reset')
+    it('413 - image too big', function () {
+      cy.task('reset')
 
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
           cy.signIn(u1.email, u1.password)
 
-          const url = `/api/posts/${ids.pId}`
+          const url = `/api/posts/${pId}`
           const base64 = Buffer.from(new Uint8Array(1000001)).toString('base64')
           const body = { images: [{ base64, ext: 'jpeg' }] }
 
@@ -289,100 +375,108 @@ describe('/api/posts/:id', () => {
           })
         })
       })
-
-      it('200 - Images updated', function () {
-        cy.task('reset')
-
-        cy.task<Ids>('seed', { posts: true }).then((ids) => {
-          cy.signIn(u2.email, u2.password)
-
-          const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
-          const body = {
-            name: 'Chair',
-            description: 'Incredible chair',
-            categories: ['furniture'],
-            price: 20,
-            images: [{ base64, ext: 'jpeg' }],
-          }
-
-          cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })
-
-          cy.task<IPost>('getPostByUserId', ids.u2Id).then((post) => {
-            const images: Image[] = []
-
-            for (let i = 0; i < 5; i++) {
-              const base64 = Buffer.from(new Uint8Array(1000000))
-              images.push({ base64: base64.toString('base64'), ext: 'jpeg' })
-            }
-
-            const url = `/api/posts/${post._id}`
-            const body = { images }
-            const options = { url, method: 'PUT', body, csrfToken: true }
-
-            cy.req(options).then((res) => {
-              expect(res.status).to.eq(200)
-            })
-
-            cy.task<IPost>('getPostByUserId', ids.u2Id).then((updatedPost) => {
-              expect(updatedPost.images).to.have.length(5)
-              expect(updatedPost.images).to.not.have.members(post.images)
-            })
-          })
-
-          cy.task('deleteImages', 'posts')
-        })
-      })
     })
 
-    it('Do multiple updates at the same time', function () {
+    it('200 - Images updated', function () {
       cy.task('reset')
 
-      cy.task<Ids>('seed', { posts: true }).then((ids) => {
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
+          cy.task('createFile', {
+            data: 'data',
+            ext: 'jpeg',
+            dir: '/public/static/images/posts/',
+            name: 'table',
+          })
+
+          cy.signIn(u1.email, u1.password)
+
+          const images: IImage[] = []
+
+          for (let i = 0; i < 5; i++) {
+            const base64 = Buffer.from(new Uint8Array(1000000))
+            images.push({ base64: base64.toString('base64'), ext: 'jpeg' })
+          }
+
+          const url = `/api/posts/${pId}`
+          const body = { images }
+
+          cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
+            expect(res.status).to.eq(200)
+          })
+
+          cy.task<PostModel>('getPostByUserId', userId).then((updatedPost) => {
+            expect(updatedPost.images).to.have.length(5)
+            expect(updatedPost.images).to.not.have.members(p1.images)
+          })
+        })
+
+        cy.task('deleteImages', 'posts')
+      })
+    })
+  })
+
+  it('Do multiple updates at the same time', function () {
+    cy.task('reset')
+
+    cy.task<string>('addUser', u1).then((userId) => {
+      const p = { ...p1, userId }
+
+      cy.task<string>('addPost', p).then((pId) => {
         cy.signIn(u1.email, u1.password)
 
-        const url = `/api/posts/${ids.pId}`
+        const url = `/api/posts/${pId}`
         const body = { name: 'Trumpet', price: 50 }
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(200)
         })
 
-        cy.task<IPost>('getPostByUserId', ids.u1Id).then((post) => {
+        cy.task<PostModel>('getPostByUserId', userId).then((post) => {
           expect(post.name).to.eq('Trumpet')
           expect(post.price).to.eq(5000)
         })
       })
     })
   })
+})
 
-  describe('DELETE', () => {
-    it('403 - Forbidden', function () {
-      const url = '/api/posts/f0f0f0f0f0f0f0f0f0f0f0f0'
+describe('DELETE', () => {
+  it('403 - Forbidden', function () {
+    const url = '/api/posts/f0f0f0f0f0f0f0f0f0f0f0f0'
 
-      cy.req({ url, method: 'DELETE' }).then((res) => {
-        expect(res.status).to.eq(403)
-        expect(res.body).to.have.property('message', err.FORBIDDEN)
-      })
+    cy.req({ url, method: 'DELETE' }).then((res) => {
+      expect(res.status).to.eq(403)
+      expect(res.body).to.have.property('message', err.FORBIDDEN)
     })
+  })
 
-    it('422 - Invalid CSRF token', function () {
-      cy.signIn(u1.email, u1.password)
+  it('422 - Invalid CSRF token', function () {
+    cy.task('reset')
+    cy.task('addUser', u1)
+    cy.signIn(u1.email, u1.password)
 
-      const url = '/api/posts/f0f0f0f0f0f0f0f0f0f0f0f0'
-      const body = { csrfToken: 'very invalid' }
+    const url = '/api/posts/f0f0f0f0f0f0f0f0f0f0f0f0'
+    const body = { csrfToken: 'very invalid' }
 
-      cy.req({ url, method: 'DELETE', body }).then((res) => {
-        expect(res.status).to.eq(422)
-        expect(res.body).to.have.property('message', err.CSRF_TOKEN_INVALID)
-      })
+    cy.req({ url, method: 'DELETE', body }).then((res) => {
+      expect(res.status).to.eq(422)
+      expect(res.body).to.have.property('message', err.CSRF_TOKEN_INVALID)
     })
+  })
 
-    it('422 - Cannot delete a post created by another user', function () {
-      cy.task('reset')
-      cy.task<Ids>('seed', { posts: true }).then((ids) => {
+  it('422 - Cannot delete a post created by another user', function () {
+    cy.task('reset')
+
+    cy.task<string[]>('addUsers', JSON.stringify([u1, u2])).then(([u1Id]) => {
+      const p = { ...p1, userId: u1Id }
+
+      cy.task<string>('addPost', p).then((pId) => {
         cy.signIn(u2.email, u2.password)
 
-        const url = `/api/posts/${ids.pId}`
+        const url = `/api/posts/${pId}`
 
         cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
           expect(res.status).to.eq(422)
@@ -390,37 +484,36 @@ describe('/api/posts/:id', () => {
         })
       })
     })
+  })
 
-    it('200 - Post deleted', function () {
-      cy.task('reset')
-      cy.task<Ids>('seed', { posts: true }).then((ids) => {
-        cy.signIn(u2.email, u2.password)
+  it('200 - Post deleted', function () {
+    cy.task('reset')
 
-        const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
-        const body = {
-          name: 'Chair',
-          description: 'Incredible chair',
-          categories: ['furniture'],
-          price: 20,
-          images: [{ base64, ext: 'jpeg' }],
-        }
+    cy.task<string>('addUser', u1).then((userId) => {
+      const p = { ...p1, userId }
 
-        cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })
+      cy.task<string>('addPost', p).then((pId) => {
+        cy.task('createFile', {
+          data: 'data',
+          ext: 'jpeg',
+          dir: '/public/static/images/posts/',
+          name: 'table',
+        })
 
-        cy.task<IPost>('getPostByUserId', ids.u2Id).then((post) => {
-          const url = `/api/posts/${post._id}`
+        cy.signIn(u1.email, u1.password)
 
-          cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
-            expect(res.status).to.eq(200)
-          })
+        const url = `/api/posts/${pId}`
 
-          cy.task('getPostByUserId', ids.u2Id).then((post) => {
-            expect(post).to.eq(null)
-          })
+        cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
+          expect(res.status).to.eq(200)
+        })
 
-          cy.task<IUser>('getUser', ids.u2Id).then((user) => {
-            expect(user.postsIds).to.not.include(post._id)
-          })
+        cy.task('getPostByUserId', userId).then((post) => {
+          expect(post).to.eq(null)
+        })
+
+        cy.task<UserModel>('getUser', userId).then((user) => {
+          expect(user.postsIds).to.not.include(pId)
         })
       })
     })

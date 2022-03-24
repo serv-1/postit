@@ -1,6 +1,7 @@
 import { models, model, Schema, Model, Types } from 'mongoose'
 import { Categories } from '../types/common'
 import err from '../utils/constants/errors'
+import User from './User'
 
 export interface PostModel {
   _id: Types.ObjectId
@@ -44,6 +45,31 @@ const postSchema = new Schema<PostModel>({
     type: Schema.Types.ObjectId,
     required: true,
   },
+})
+
+postSchema.pre('save', async function (next) {
+  const update = { $push: { postsIds: this._id } }
+  await User.updateOne({ _id: this.userId }, update).lean().exec()
+  next()
+})
+
+postSchema.post('insertMany', async function (posts, next) {
+  for (const post of posts) {
+    const update = { $push: { postsIds: post._id } }
+    await User.updateOne({ _id: post.userId }, update).lean().exec()
+  }
+  next()
+})
+
+postSchema.post('deleteOne', async function (res, next) {
+  const id = this.getFilter()._id
+
+  User.updateOne(
+    { postsIds: { $all: [id] } },
+    { $pull: { postsIds: id } }
+  ).exec()
+
+  next()
 })
 
 export default (models.Post as Model<PostModel>) ||

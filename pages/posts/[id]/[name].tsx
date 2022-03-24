@@ -4,40 +4,21 @@ import { IPost } from '../../../types/common'
 import PostImages from '../../../components/PostImages'
 import addCommasToNb from '../../../utils/functions/addCommasToNb'
 import Head from 'next/head'
-
-interface Post extends Omit<IPost, 'userId'> {
-  username: string
-}
+import Link from '../../../components/Link'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id
 
   try {
-    const postsRes = await axios.get(`http://localhost:3000/api/posts/${id}`)
-    const post = postsRes.data
-
-    const usersRes = await axios.get(
-      `http://localhost:3000/api/users/${post.userId}`
-    )
-    const user = usersRes.data
-
-    delete post.userId
-
-    return {
-      props: {
-        post: {
-          ...post,
-          username: user.name,
-        },
-      },
-    }
+    const res = await axios.get<IPost>(`http://localhost:3000/api/posts/${id}`)
+    return { props: { post: res.data } }
   } catch (e) {
     return { notFound: true }
   }
 }
 
 interface PostProps {
-  post: Post
+  post: IPost
 }
 
 const Post = ({ post }: PostProps) => {
@@ -70,7 +51,14 @@ const Post = ({ post }: PostProps) => {
         <PostImages images={post.images} />
         <div className="col-span-full bg-indigo-200 rounded p-8 mt-8 relative">
           <span className="italic text-s absolute top-0 start-8 -translate-y-1/2">
-            <span className="font-bold">{post.username}</span> says
+            <Link
+              href={`/users/${post.user.id}`}
+              className="font-bold hover:underline"
+              title={`${post.user.name}'s profile`}
+            >
+              {post.user.name}
+            </Link>{' '}
+            says
           </span>
           <p>{post.description}</p>
         </div>

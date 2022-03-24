@@ -42,9 +42,10 @@ const HomeSearchPosts = () => {
 
     const queryString = new URLSearchParams(window.location.search)
     const categories = queryString.getAll('categories') as Categories[]
+    const query = queryString.get('query')
 
+    if (query) methods.setValue('query', query)
     methods.setValue('categories', categories)
-    methods.setValue('query', queryString.get('query') as string)
     methods.setValue('minPrice', queryString.get('minPrice') || undefined)
     methods.setValue('maxPrice', queryString.get('maxPrice') || undefined)
   }, [methods])

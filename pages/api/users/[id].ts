@@ -1,4 +1,4 @@
-import { isValidObjectId } from 'mongoose'
+import { isValidObjectId, Types } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import User from '../../../models/User'
 import dbConnect from '../../../utils/functions/dbConnect'
@@ -6,7 +6,7 @@ import err from '../../../utils/constants/errors'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
-    res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
+    return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
   const id = req.query.id as string
@@ -17,21 +17,53 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     await dbConnect()
-    const user = await User.findOne({ _id: id }).lean().exec()
 
-    if (!user) {
+    const user = await User.aggregate([
+      { $match: { _id: new Types.ObjectId(id) } },
+      {
+        $lookup: {
+          from: 'posts',
+          let: { postsIds: '$postsIds' },
+          pipeline: [
+            { $match: { $expr: { $in: ['$_id', '$$postsIds'] } } },
+            {
+              $set: {
+                id: { $toString: '$_id' },
+                price: { $divide: ['$price', 100] },
+                images: {
+                  $map: {
+                    input: '$images',
+                    as: 'image',
+                    in: { $concat: ['/static/images/posts/', '$$image'] },
+                  },
+                },
+              },
+            },
+            { $unset: ['_id', '__v', 'userId'] },
+          ],
+          as: 'posts',
+        },
+      },
+      {
+        $set: {
+          id: { $toString: '$_id' },
+          image: {
+            $cond: [
+              { $regexMatch: { input: '$image', regex: /default/ } },
+              { $concat: ['/static/images/', '$image'] },
+              { $concat: ['/static/images/users/', '$image'] },
+            ],
+          },
+        },
+      },
+      { $unset: ['_id', '__v', 'password', 'emailVerified', 'postsIds'] },
+    ]).exec()
+
+    if (!user.length) {
       return res.status(404).json({ message: err.USER_NOT_FOUND })
     }
 
-    const fname = user.image.split('.')[0]
-    const path = '/static/images' + (fname === 'default' ? '/' : '/users/')
-    res.status(200).json({
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-      image: path + user.image,
-      postsIds: user.postsIds,
-    })
+    res.status(200).json(user[0])
   } catch (e) {
     res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
   }

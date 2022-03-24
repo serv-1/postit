@@ -1,6 +1,5 @@
 import err from '../../../utils/constants/errors'
 import { Buffer } from 'buffer'
-import { Ids } from '../../plugins'
 import { PostModel } from '../../../models/Post'
 import u1 from '../../fixtures/user1.json'
 import { UserModel } from '../../../models/User'
@@ -18,9 +17,7 @@ const defaultBody = {
 describe('/api/post', () => {
   before(() => {
     cy.task('reset')
-    cy.task<Ids>('seed').then((result) => {
-      cy.wrap(result.u1Id).as('u1Id')
-    })
+    cy.task<string>('addUser', u1).then((uId) => cy.wrap(uId).as('uId'))
   })
 
   it('405 - Method not allowed', function () {
@@ -89,15 +86,15 @@ describe('/api/post', () => {
         expect(res.status).to.eq(200)
       })
 
-      cy.task<PostModel>('getPostByUserId', this.u1Id).then((post) => {
+      cy.task<PostModel>('getPostByUserId', this.uId).then((post) => {
         expect(post.name).to.eq(defaultBody.name)
         expect(post.description).to.eq(defaultBody.description)
         expect(post.categories).to.have.members(defaultBody.categories)
         expect(post.price).to.eq(defaultBody.price * 100)
         expect(post.images).to.have.length(5)
-        expect(post.userId).to.eq(this.u1Id)
+        expect(post.userId).to.eq(this.uId)
 
-        cy.task<UserModel>('getUser', this.u1Id).then((user) => {
+        cy.task<UserModel>('getUser', this.uId).then((user) => {
           expect(user.postsIds).to.include(post._id)
         })
       })

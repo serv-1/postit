@@ -1,6 +1,7 @@
 import { models, model, Schema, Model, Types } from 'mongoose'
 
 export interface AccountModel {
+  _id: Types.ObjectId
   type: string
   provider: string
   providerAccountId: string

@@ -1,5 +1,4 @@
 import err from '../../../utils/constants/errors'
-import { Ids } from '../../plugins'
 import u1 from '../../fixtures/user1.json'
 
 const url = '/api/signIn'
@@ -16,6 +15,9 @@ describe('/api/signIn', () => {
     })
 
     it('422 - Password invalid', function () {
+      cy.task('reset')
+      cy.task('addUser', u1)
+
       const body = { email: u1.email, password: 'wrong password' }
 
       cy.req({ url, method: 'POST', body }).then((res) => {
@@ -36,12 +38,12 @@ describe('/api/signIn', () => {
     it('200 - Should sign in a user', function () {
       cy.task('reset')
 
-      cy.task<Ids>('seed').then((ids) => {
+      cy.task<string>('addUser', u1).then((uId) => {
         const body = { email: u1.email, password: u1.password }
 
         cy.req({ url, method: 'POST', body }).then((res) => {
           expect(res.status).to.eq(200)
-          expect(res.body).to.have.property('id', ids.u1Id)
+          expect(res.body).to.have.property('id', uId)
           expect(res.body).to.have.property('name', u1.name)
           expect(res.body).to.have.property('email', u1.email)
         })

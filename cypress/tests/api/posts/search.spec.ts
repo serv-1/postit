@@ -1,9 +1,10 @@
 import { Types } from 'mongoose'
 import { PostModel } from '../../../../models/Post'
+import { IPost } from '../../../../types/common'
 import err from '../../../../utils/constants/errors'
 
 interface Response {
-  posts: (PostModel & { _id: Types.ObjectId })[]
+  posts: Omit<IPost, 'user'>[]
   totalPages: number
   totalPosts: number
 }
@@ -11,7 +12,23 @@ interface Response {
 describe('/api/posts/search', () => {
   before(() => {
     cy.task('reset')
-    cy.task('seed', { posts: true })
+
+    const posts: Omit<PostModel, '_id'>[] = []
+
+    for (let i = 1; i < 41; i++) {
+      const color = i <= 4 ? 'Blue' : 'Red'
+
+      posts.push({
+        name: `${color} Cat ${i}`,
+        description: `Awesome ${color} Cat ${i}`,
+        categories: i <= 4 ? ['pet'] : ['pet', 'cat'],
+        price: i <= 4 ? i * 2 * 1000 : i * 10000,
+        images: ['cat' + i + '.jpeg'],
+        userId: new Types.ObjectId('f0f0f0f0f0f0f0f0f0f0f0f0'),
+      })
+    }
+
+    cy.task('addPosts', JSON.stringify(posts))
   })
 
   it('405 - Method not allowed', () => {
@@ -32,63 +49,53 @@ describe('/api/posts/search', () => {
   it('200 - No posts found', () => {
     cy.req<Response>({ url: '/api/posts/search?query=sofa' }).then((res) => {
       expect(res.status).to.eq(200)
-      expect(res.body.totalPages).to.eq(0)
-      expect(res.body.totalPosts).to.eq(0)
-      expect(res.body.posts.length).to.eq(0)
+      expect(res.body).to.eql({ totalPages: 0, totalPosts: 0, posts: [] })
     })
   })
 
   it('200 - Posts found by query', () => {
-    cy.req<Response>({ url: '/api/posts/search?query=Table' }).then((res) => {
+    cy.req<Response>({ url: '/api/posts/search?query=Blue' }).then((res) => {
       expect(res.status).to.eq(200)
       expect(res.body.totalPages).to.eq(1)
-      expect(res.body.totalPosts).to.eq(2)
-      for (const post of res.body.posts) {
-        expect(post.name).to.have.string('Table')
-      }
+      expect(res.body.totalPosts).to.eq(4)
+      expect(res.body.posts[0].name).to.eq('Blue Cat 1')
     })
   })
 
   it('200 - Posts found by maxPrice', () => {
-    const url = '/api/posts/search?query=Cat&maxPrice=30'
+    const url = '/api/posts/search?query=Blue&maxPrice=40'
 
     cy.req<Response>({ url }).then((res) => {
       expect(res.status).to.eq(200)
-      expect(res.body.totalPages).to.be.at.least(1)
-      expect(res.body.totalPosts).to.be.at.least(1)
-
-      for (const post of res.body.posts) {
-        expect(post.price).to.be.at.most(30)
-      }
+      expect(res.body.totalPages).to.eq(1)
+      expect(res.body.totalPosts).to.eq(2)
+      expect(res.body.posts[0].price).to.eq(20)
+      expect(res.body.posts[1].price).to.eq(40)
     })
   })
 
   it('200 - Posts found by minPrice', () => {
-    const url = '/api/posts/search?query=Cat&minPrice=50'
+    const url = '/api/posts/search?query=Blue&minPrice=60'
 
     cy.req<Response>({ url }).then((res) => {
       expect(res.status).to.eq(200)
-      expect(res.body.totalPages).to.be.at.least(1)
-      expect(res.body.totalPosts).to.be.at.least(1)
-
-      for (const post of res.body.posts) {
-        expect(post.price).to.be.at.least(50)
-      }
+      expect(res.body.totalPages).to.eq(1)
+      expect(res.body.totalPosts).to.eq(2)
+      expect(res.body.posts[0].price).to.eq(60)
+      expect(res.body.posts[1].price).to.eq(80)
     })
   })
 
   it('200 - Posts found by minPrice and maxPrice', () => {
-    const url = '/api/posts/search?query=Cat&minPrice=30&maxPrice=60'
+    const url = '/api/posts/search?query=Blue&minPrice=20&maxPrice=60'
 
     cy.req<Response>({ url }).then((res) => {
       expect(res.status).to.eq(200)
-      expect(res.body.totalPages).to.be.at.least(1)
-      expect(res.body.totalPosts).to.be.at.least(1)
-
-      for (const post of res.body.posts) {
-        expect(post.price).to.be.at.most(60)
-        expect(post.price).to.be.at.least(30)
-      }
+      expect(res.body.totalPages).to.eq(1)
+      expect(res.body.totalPosts).to.eq(3)
+      expect(res.body.posts[0].price).to.eq(20)
+      expect(res.body.posts[1].price).to.eq(40)
+      expect(res.body.posts[2].price).to.eq(60)
     })
   })
 
@@ -97,12 +104,8 @@ describe('/api/posts/search', () => {
 
     cy.req<Response>({ url }).then((res) => {
       expect(res.status).to.eq(200)
-      expect(res.body.totalPages).to.be.at.least(1)
-      expect(res.body.totalPosts).to.be.at.least(1)
-
-      for (const post of res.body.posts) {
-        expect(post.categories).to.include('pet')
-      }
+      expect(res.body.totalPages).to.eq(2)
+      expect(res.body.totalPosts).to.eq(40)
     })
   })
 
@@ -111,12 +114,8 @@ describe('/api/posts/search', () => {
 
     cy.req<Response>({ url }).then((res) => {
       expect(res.status).to.eq(200)
-      expect(res.body.totalPages).to.be.at.least(1)
-      expect(res.body.totalPosts).to.be.at.least(1)
-
-      for (const post of res.body.posts) {
-        expect(post.categories).to.have.members(['pet', 'cat'])
-      }
+      expect(res.body.totalPages).to.eq(2)
+      expect(res.body.totalPosts).to.eq(36)
     })
   })
 
@@ -125,17 +124,17 @@ describe('/api/posts/search', () => {
 
     cy.req<Response>({ url }).then((res) => {
       expect(res.status).to.eq(200)
-      expect(res.body.totalPages).to.be.at.least(1)
-      expect(res.body.totalPosts).to.be.at.least(1)
+      expect(res.body.totalPages).to.eq(2)
+      expect(res.body.totalPosts).to.eq(40)
 
-      const page1 = res.body.posts.map((post) => post._id.toString())
+      const page1 = res.body.posts.map((post) => post.id)
 
       cy.req<Response>({ url: url + '&page=2' }).then((res) => {
         expect(res.status).to.eq(200)
-        expect(res.body.totalPages).to.be.at.least(1)
-        expect(res.body.totalPosts).to.be.at.least(1)
+        expect(res.body.totalPages).to.eq(2)
+        expect(res.body.totalPosts).to.eq(40)
 
-        const page2 = res.body.posts.map((post) => post._id.toString())
+        const page2 = res.body.posts.map((post) => post.id)
 
         expect(page1).to.not.have.members(page2)
       })

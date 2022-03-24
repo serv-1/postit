@@ -33,21 +33,23 @@ const PasswordInput = <
 
   const ariaDescr = classNames('passwordStrength', props['aria-describedby'])
 
-  const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const userInputs = Object.values(
-      Object.keys(getValues()).filter((key) => key !== 'password')
-    )
+  const onChange = showStrength
+    ? (e: ChangeEvent<HTMLInputElement>) => {
+        const userInputs = Object.values(
+          Object.keys(getValues()).filter((key) => key !== 'password')
+        )
 
-    const { score } = zxcvbn(e.target.value, userInputs)
+        const { score } = zxcvbn(e.target.value, userInputs)
 
-    if (score <= 2) {
-      return setStrength({ text: 'weak', color: 'red' })
-    } else if (score === 3) {
-      return setStrength({ text: 'good but not strong', color: 'yellow' })
-    }
+        if (score <= 2) {
+          return setStrength({ text: 'weak', color: 'red' })
+        } else if (score === 3) {
+          return setStrength({ text: 'good but not strong', color: 'yellow' })
+        }
 
-    setStrength({ text: 'strong', color: 'green' })
-  }
+        setStrength({ text: 'strong', color: 'green' })
+      }
+    : undefined
 
   const containerClass = classNames(
     'border rounded',
@@ -62,7 +64,7 @@ const PasswordInput = <
           {...props}
           name="password"
           type={showPassword ? 'text' : 'password'}
-          onChange={showStrength ? onPasswordChange : undefined}
+          registerOptions={{ onChange }}
           aria-describedby={ariaDescr}
           needFocus={needFocus}
           className="border-0"

@@ -1,27 +1,33 @@
 import classNames from 'classnames'
 import React from 'react'
-import { FieldPath, FieldValues, useFormContext } from 'react-hook-form'
+import {
+  FieldPath,
+  FieldValues,
+  RegisterOptions,
+  useFormContext,
+} from 'react-hook-form'
 
 interface InputProps<FormFields extends FieldValues = FieldValues>
   extends React.ComponentPropsWithoutRef<'input'> {
-  type: 'text' | 'email' | 'number' | 'file' | 'password' | 'search'
   name: FieldPath<FormFields>
+  registerOptions?: RegisterOptions<FormFields>
+  type: 'text' | 'email' | 'number' | 'file' | 'password' | 'search'
   needFocus?: boolean
   isTextArea?: false
 }
 
 interface TextAreaProps<FormFields extends FieldValues = FieldValues>
   extends React.ComponentPropsWithoutRef<'textarea'> {
-  type?: undefined
   name: FieldPath<FormFields>
+  registerOptions?: RegisterOptions<FormFields>
+  type?: undefined
   needFocus?: boolean
   isTextArea: true
 }
 
 const Input = <FormFields extends FieldValues = FieldValues>({
   name,
-  onBlur,
-  onChange,
+  registerOptions,
   needFocus,
   className,
   ...props
@@ -47,7 +53,7 @@ const Input = <FormFields extends FieldValues = FieldValues>({
   }, [needFocus, setFocus, name])
 
   const attributes = {
-    ...register(name, { onBlur, onChange }),
+    ...register(name, registerOptions),
     className: _className,
     id: name,
     'aria-describedby': name + 'Feedback',

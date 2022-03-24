@@ -63,7 +63,7 @@ export default NextAuth({
           await dbConnect()
           await User.updateOne(
             { _id: user.id },
-            { emailVerified: new Date(), image: 'default.jpg' }
+            { emailVerified: new Date(), image: 'default.jpg', postsIds: [] }
           ).exec()
         }
       }

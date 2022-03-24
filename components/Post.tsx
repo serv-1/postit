@@ -14,14 +14,14 @@ const Post = ({ id, name, price, image }: PostProps) => {
   const truncatedName = name.length > 23 ? name.slice(0, 22) + '...' : name
 
   return (
-    <div className="odd:col-start-2 col-span-3 relative flex flex-col h-[248px] border border-indigo-600 rounded mb-16 md:odd:col-start-auto md:col-start-2 lg:col-start-auto">
+    <div className="even:col-start-2 col-span-3 relative flex flex-col h-[248px] border border-indigo-600 rounded mb-16 md:even:col-start-auto md:col-start-2 lg:col-start-auto">
       <div className="flex-grow relative">
         <Image src={image} alt={name} layout="fill" />
       </div>
       <div className="px-8 py-4 bg-indigo-600">
         <Link
           href={`/posts/${id}/${formatForUrl(name)}`}
-          className="text-white"
+          className="text-white hover:underline"
         >
           {truncatedName} →
         </Link>

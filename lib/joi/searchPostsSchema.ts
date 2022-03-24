@@ -17,7 +17,7 @@ export interface SearchPostsSchema {
 
 export const searchPostsSchema = object<SearchPostsSchema>({
   query: querySchema,
-  page: pageSchema,
+  page: pageSchema.optional(),
   minPrice: priceSchema.optional().allow('').min(0).default(0),
   maxPrice: Joi.alternatives().conditional('minPrice', {
     is: '',

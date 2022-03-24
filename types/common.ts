@@ -4,14 +4,21 @@ import { UserModel } from '../models/User'
 
 export interface IPost extends Omit<PostModel, '_id' | 'userId'> {
   id: string
-  userId: string
+  user: IUser
+}
+
+export interface ISearchedPost
+  extends Omit<IPost, 'user' | 'categories' | 'description' | 'images'> {
+  image: string
 }
 
 export interface IUser
   extends Omit<UserModel, '_id' | 'postsIds' | 'password' | 'emailVerified'> {
   id: string
-  postsIds: string[]
+  posts: IUserPost[]
 }
+
+export type IUserPost = Omit<IPost, 'user'>
 
 export interface IImage {
   base64: string

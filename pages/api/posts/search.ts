@@ -7,12 +7,11 @@ import {
 import dbConnect from '../../../utils/functions/dbConnect'
 import Post from '../../../models/Post'
 import validate from '../../../utils/functions/validate'
-import { Categories, IPost } from '../../../types/common'
+import { Categories } from '../../../types/common'
 
-interface Filter {
-  $text: { $search: string }
-  price?: { $gte: number; $lte?: number }
-  $and?: { categories: { $in: Categories[] } }[]
+interface Match {
+  price?: { $gte?: number; $lte?: number }
+  categories?: { $all: Categories[] }
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -30,9 +29,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const reqQuery = {
     query: req.query.query,
-    page: req.query.page,
-    minPrice: req.query.minPrice,
-    maxPrice: req.query.maxPrice,
+    page: +req.query.page || undefined,
+    minPrice: +req.query.minPrice || undefined,
+    maxPrice: +req.query.maxPrice || undefined,
     categories: queryCategories,
   } as SearchPostsSchema
 
@@ -44,40 +43,65 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const { query, page, minPrice, maxPrice, categories } = result.value
 
-  const filter: Filter = { $text: { $search: `"${query}"` } }
-
-  if (minPrice || maxPrice) {
-    filter.price = { $gte: (minPrice ? +minPrice : 0) * 100 }
-    if (maxPrice && maxPrice !== '0') filter.price.$lte = +maxPrice * 100
-  }
-
-  if (categories) {
-    filter.$and = categories.map((category) => ({
-      categories: { $in: [category] },
-    }))
-  }
-
   try {
     await dbConnect()
 
-    const totalPosts = await Post.countDocuments(filter).exec()
-    const totalPages = Math.ceil(totalPosts / 20)
+    const $match: Match = {}
 
-    const skip = page ? (+page - 1) * 20 : 0
-    const posts = await Post.find(filter).skip(skip).limit(20).lean().exec()
-    const formatedPosts: IPost[] = []
-
-    for (const post of posts) {
-      formatedPosts.push({
-        ...post,
-        id: post._id.toString(),
-        price: post.price / 100,
-        images: post.images.map((image) => '/static/images/posts/' + image),
-        userId: post.userId.toString(),
-      })
+    if (minPrice && minPrice !== '0') {
+      $match.price = { $gte: +minPrice * 100 }
     }
 
-    res.status(200).json({ posts: formatedPosts, totalPages, totalPosts })
+    if (maxPrice && maxPrice !== '0') {
+      $match.price = { ...$match.price, $lte: +maxPrice * 100 }
+    }
+
+    if (categories) {
+      $match.categories = { $all: categories }
+    }
+
+    const result = await Post.aggregate([
+      { $search: { text: { query, path: 'name' } } },
+      { $match },
+      {
+        $facet: {
+          posts: [
+            { $sort: { name: 1, _id: 1 } },
+            { $skip: page ? (+page - 1) * 10 : 0 },
+            {
+              $set: {
+                id: { $toString: '$_id' },
+                price: { $divide: ['$price', 100] },
+                image: {
+                  $concat: [
+                    '/static/images/posts/',
+                    { $arrayElemAt: ['$images', 0] },
+                  ],
+                },
+              },
+            },
+            {
+              $unset: [
+                '_id',
+                '__v',
+                'userId',
+                'description',
+                'categories',
+                'images',
+              ],
+            },
+            { $limit: 20 },
+          ],
+          totalPosts: [{ $count: 'total' }],
+        },
+      },
+    ]).exec()
+
+    res.status(200).json({
+      posts: result[0].posts,
+      totalPosts: result[0].totalPosts[0]?.total || 0,
+      totalPages: Math.ceil(result[0].totalPosts[0]?.total / 20) || 0,
+    })
   } catch (e) {
     res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
   }

@@ -9,30 +9,27 @@ const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
 
 const setFormContext = (isSubmitted: boolean, message?: string) => ({
   formState: { isSubmitted, errors: message ? { test: { message } } : {} },
-  register: jest.fn((name: string, options: RegisterOptions) => ({
+  register: jest.fn((name: string, opt: RegisterOptions) => ({
     name,
-    onBlur: options.onBlur,
-    onChange: options.onChange,
+    onChange: opt?.onChange,
   })),
   setFocus,
 })
-
-const handleChange = jest.fn()
-const handleBlur = jest.fn()
 
 interface FormFields {
   test: string
 }
 
 test('the input renders', () => {
+  const onChange = jest.fn()
+
   useFormContext.mockReturnValue(setFormContext(false))
 
   render(
     <Input<FormFields>
       type="text"
       name="test"
-      onChange={handleChange}
-      onBlur={handleBlur}
+      registerOptions={{ onChange }}
       className="red"
     />
   )
@@ -43,10 +40,7 @@ test('the input renders', () => {
   expect(input).toHaveClass('red', 'border-indigo-600')
 
   userEvent.type(input, 'a')
-  expect(handleChange).toHaveBeenCalledTimes(1)
-
-  userEvent.tab()
-  expect(handleBlur).toHaveBeenCalledTimes(1)
+  expect(onChange).toHaveBeenCalledTimes(1)
 
   expect(setFocus).not.toHaveBeenCalled()
 })
@@ -54,14 +48,7 @@ test('the input renders', () => {
 test('the textarea renders', () => {
   useFormContext.mockReturnValue(setFormContext(false))
 
-  render(
-    <Input<FormFields>
-      name="test"
-      onChange={handleChange}
-      onBlur={handleBlur}
-      isTextArea
-    />
-  )
+  render(<Input<FormFields> name="test" isTextArea />)
 
   const textarea = screen.getByRole('textbox')
   expect(textarea.tagName).toBe('TEXTAREA')
@@ -70,15 +57,7 @@ test('the textarea renders', () => {
 test('the input has the focus', () => {
   useFormContext.mockReturnValue(setFormContext(false))
 
-  render(
-    <Input<FormFields>
-      type="text"
-      name="test"
-      onChange={handleChange}
-      onBlur={handleBlur}
-      needFocus
-    />
-  )
+  render(<Input<FormFields> type="text" name="test" needFocus />)
 
   expect(setFocus).toHaveBeenNthCalledWith(1, 'test')
 })
@@ -86,14 +65,7 @@ test('the input has the focus', () => {
 test("the input's border is red if the form is submitted and there is an error", () => {
   useFormContext.mockReturnValueOnce(setFormContext(true, 'Error'))
 
-  render(
-    <Input<FormFields>
-      type="text"
-      name="test"
-      onChange={handleChange}
-      onBlur={handleBlur}
-    />
-  )
+  render(<Input<FormFields> type="text" name="test" />)
 
   const input = screen.getByRole('textbox')
   expect(input).toHaveClass('border-red-600')
@@ -102,14 +74,7 @@ test("the input's border is red if the form is submitted and there is an error",
 test("the input's border is not red if the form is submitted and there is no error", () => {
   useFormContext.mockReturnValueOnce(setFormContext(true))
 
-  render(
-    <Input<FormFields>
-      type="text"
-      name="test"
-      onChange={handleChange}
-      onBlur={handleBlur}
-    />
-  )
+  render(<Input<FormFields> type="text" name="test" />)
 
   const input = screen.getByRole('textbox')
   expect(input).toHaveClass('border-indigo-600')

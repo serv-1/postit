@@ -1,7 +1,9 @@
 import err from '../../../../utils/constants/errors'
-import { Ids } from '../../../plugins'
 import u1 from '../../../fixtures/user1.json'
-import { PostModel } from '../../../../models/Post'
+import { IPost, IUser } from '../../../../types/common'
+
+type Post = Omit<IPost, 'userId' | 'id'>
+const p1: Post = require('../../../fixtures/posts.json')[0]
 
 describe('/api/users/:id', () => {
   it('405 - Method not allowed', function () {
@@ -31,32 +33,37 @@ describe('/api/users/:id', () => {
     it('200 - Get the user', function () {
       cy.task('reset')
 
-      cy.task<Ids>('seed').then((ids) => {
-        cy.req({ url: `/api/users/${ids.u1Id}` }).then((res) => {
+      cy.task('addUser', u1).then((userId) => {
+        cy.req<IUser>({ url: `/api/users/${userId}` }).then((res) => {
           const { body, status } = res
+
           expect(status).to.eq(200)
-          expect(body).to.have.property('id', ids.u1Id)
-          expect(body).to.have.property('name', 'John Doe')
-          expect(body).to.have.property('email', 'johndoe@test.com')
-          expect(body).to.have.property('image', '/static/images/default.jpg')
-          expect(body).to.have.deep.property('postsIds', [])
+
+          expect(body).to.eql({
+            id: userId,
+            name: u1.name,
+            email: u1.email,
+            image: '/static/images/' + u1.image,
+            posts: [],
+          })
         })
 
-        const base64 = Buffer.from(new Uint8Array(1)).toString('base64')
-        const body = {
-          name: 'Cat',
-          description: 'Magnificent cat',
-          categories: ['cat'],
-          price: 50,
-          images: [{ base64, ext: 'jpeg' }],
-        }
+        cy.task<string>('addPost', { ...p1, userId }).then((pId) => {
+          cy.req<IUser>({ url: `/api/users/${userId}` }).then((res) => {
+            const { body } = res
 
-        cy.signIn(u1.email, u1.password)
-        cy.req({ url: '/api/post', method: 'POST', body, csrfToken: true })
+            const p1Images = p1.images.map(
+              (img) => '/static/images/posts/' + img
+            )
 
-        cy.req({ url: `/api/users/${ids.u1Id}` }).then((res) => {
-          cy.task<PostModel>('getPostByUserId', ids.u1Id).then((post) => {
-            expect(res.body).to.have.deep.property('postsIds', [post._id])
+            expect(body.posts[0]).to.eql({
+              id: pId,
+              name: p1.name,
+              description: p1.description,
+              categories: p1.categories,
+              price: p1.price / 100,
+              images: p1Images,
+            })
           })
         })
       })

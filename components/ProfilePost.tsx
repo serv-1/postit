@@ -1,4 +1,4 @@
-import { Entries, IImage, IPost } from '../types/common'
+import { Entries, IImage, IUserPost } from '../types/common'
 import X from '../public/static/images/x.svg'
 import Pencil from '../public/static/images/pencil.svg'
 import { useState } from 'react'
@@ -35,7 +35,7 @@ type FilteredData = Omit<PostsIdPutClientSchema, 'images'> & {
 }
 
 interface ProfilePostProps {
-  post: IPost
+  post: IUserPost
 }
 
 const ProfilePost = (props: ProfilePostProps) => {

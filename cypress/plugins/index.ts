@@ -1,23 +1,26 @@
-import { connect, connection as conn, Types } from 'mongoose'
+import { connect, connection as conn } from 'mongoose'
 import User, { UserModel } from '../../models/User'
 import Account, { AccountModel } from '../../models/Account'
 import Post, { PostModel } from '../../models/Post'
-import { faker } from '@faker-js/faker'
-import u1Json from '../fixtures/user1.json'
-import postsJson from '../fixtures/posts.json'
-import u2Json from '../fixtures/user2.json'
 const { GoogleSocialLogin } = require('cypress-social-logins').plugins
 require('dotenv').config()
 import env from '../../utils/constants/env'
-import { randomBytes, scryptSync } from 'crypto'
 import { readdir, unlink } from 'fs/promises'
 import { cwd } from 'process'
-import { IPost } from '../../types/common'
+import createFile from '../../utils/functions/createFile'
 
-export interface Ids {
-  u1Id: string
-  u2Id: string
-  pId?: string
+type UserToAdd = Omit<UserModel, '_id' | 'postsIds' | 'image'> & {
+  postsIds?: string
+  image?: string
+}
+type PostToAdd = Omit<PostModel, '_id'>
+type AccountToAdd = Omit<AccountModel, '_id'>
+
+interface CreateFileParams {
+  data: string | Buffer
+  ext: string
+  dir: string
+  name?: string
 }
 
 const pluginConfig: Cypress.PluginConfig = (on, config) => {
@@ -31,25 +34,42 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 
       return null
     },
+    async createFile({ data, ext, dir, name }: CreateFileParams) {
+      await createFile(data, ext, dir, { name })
+      return null
+    },
     async reset() {
       await connect(env.MONGODB_URI)
-      const colls = await conn.db.collections()
 
-      for (const coll of colls) {
+      for (const coll of await conn.db.collections()) {
         await coll.deleteMany({})
       }
 
       return null
     },
-    async seed({ posts }: { posts?: boolean } = {}): Promise<Ids> {
-      await connect(env.MONGODB_URI)
-
-      const ids = await insertUsers()
-      await insertAccount(ids.u1Id)
-
-      if (posts) ids.pId = await insertPosts(ids.u1Id)
-
-      return ids
+    async addUser(user: UserToAdd): Promise<string> {
+      const addedUser = await new User(user).save()
+      return addedUser._id.toString()
+    },
+    async addUsers(users: string): Promise<string[]> {
+      const addedUsers = await User.insertMany(JSON.parse(users))
+      return addedUsers.map((user) => user._id.toString())
+    },
+    async addPost(post: PostToAdd): Promise<string> {
+      const addedPost = await new Post(post).save()
+      return addedPost._id.toString()
+    },
+    async addPosts(posts: string): Promise<string[]> {
+      const addedPosts = await Post.insertMany(JSON.parse(posts))
+      return addedPosts.map((post) => post._id.toString())
+    },
+    async addAccount(account: AccountToAdd): Promise<string> {
+      const addedAccount = await new Account(account).save()
+      return addedAccount._id.toString()
+    },
+    async addAccounts(accounts: string): Promise<string[]> {
+      const addedAccounts = await Account.insertMany(JSON.parse(accounts))
+      return addedAccounts.map((account) => account._id.toString())
     },
     async getUser(idOrEmail: string): Promise<UserModel | null> {
       await connect(env.MONGODB_URI)
@@ -73,94 +93,3 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
 }
 
 export default pluginConfig
-
-/**
- * Insert a user registered with it's credentials and a user
- * registered with Google in database
- * @returns \{ uId: "credentials user id", guId: "google user id" \}
- */
-async function insertUsers(): Promise<Ids> {
-  const salt1 = randomBytes(16).toString('hex')
-  const hash1 = scryptSync(u1Json.password, salt1, 64).toString('hex')
-
-  const salt2 = randomBytes(16).toString('hex')
-  const hash2 = scryptSync(u2Json.password, salt2, 64).toString('hex')
-
-  const u1 = { ...u1Json, password: `${salt1}:${hash1}` }
-  const u2 = { ...u2Json, password: `${salt2}:${hash2}` }
-
-  const result = await User.insertMany([u1, u2])
-
-  return { u1Id: result[0]._id.toString(), u2Id: result[1]._id.toString() }
-}
-
-/**
- * Insert an account with the given user id in database
- * @param id User's id
- */
-async function insertAccount(id: string) {
-  const account: AccountModel = {
-    type: 'oauth',
-    provider: 'google',
-    providerAccountId: String(faker.datatype.number()),
-    refresh_token: faker.datatype.string(),
-    scope: 'openid',
-    id_token: faker.datatype.string(),
-    userId: new Types.ObjectId(id),
-    oauth_token_secret: faker.datatype.string(),
-    oauth_token: faker.datatype.string(),
-    session_state: faker.datatype.string(),
-  }
-
-  const doc = new Account(account)
-
-  await doc.save()
-}
-
-/**
- * Insert 40 posts and return the id of the first added post (visible in posts.json fixture)
- * @param id user's id that will create the first post
- * @returns first added post's id
- */
-async function insertPosts(id: string): Promise<string> {
-  const posts: Omit<PostModel, '_id'>[] = (
-    postsJson as Omit<IPost, 'id'>[]
-  ).map((post) => ({
-    ...post,
-    userId: new Types.ObjectId(post.userId),
-  }))
-
-  posts[0].userId = new Types.ObjectId(id)
-
-  for (let i = 0; i < 40; i++) {
-    const categories =
-      i % 2 === 0
-        ? ['pet' as const]
-        : i % 3 === 0
-        ? ['cat' as const]
-        : ['pet' as const, 'cat' as const]
-
-    posts.push({
-      name: 'Cat',
-      description: 'Horribly monstruous cat',
-      categories,
-      price: (i === 0 ? 1 : i) * 1000,
-      images: ['/static/images/posts/cat-' + i + '.jpeg'],
-      userId: new Types.ObjectId(generateRandomObjectId()),
-    })
-  }
-
-  const result = await Post.insertMany(posts)
-
-  return result[0]._id.toString()
-}
-
-function generateRandomObjectId() {
-  let objectId: string = ''
-
-  for (let i = 0; i < 24; i++) {
-    objectId += Math.floor(Math.random() * 10)
-  }
-
-  return objectId
-}
