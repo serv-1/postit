@@ -39,7 +39,9 @@ test("the form signs in the user and redirect him to it's profile", async () => 
 test('an error renders if the server fails to sign in the user', async () => {
   const setToast = jest.fn()
   useToast.mockReturnValue({ setToast })
-  signIn.mockResolvedValueOnce({ error: 'Error' })
+  signIn.mockResolvedValueOnce({
+    error: JSON.stringify({ name: 'email', message: err.EMAIL_USED }),
+  })
 
   render(<SignIn providers={null} />)
 
@@ -59,7 +61,9 @@ test('an error renders if the server fails to sign in the user', async () => {
 })
 
 test('an error renders if the server fails to validate the request data', async () => {
-  signIn.mockResolvedValueOnce({ error: err.EMAIL_INVALID })
+  signIn.mockResolvedValueOnce({
+    error: JSON.stringify({ name: 'email', message: err.EMAIL_INVALID }),
+  })
 
   render(<SignIn providers={null} />)
 

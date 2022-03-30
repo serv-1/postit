@@ -15,6 +15,12 @@ import InputError from '../../components/InputError'
 import PasswordInput from '../../components/PasswordInput'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await NextAuth.getSession(ctx)
+
+  if (session) {
+    return { redirect: { permanent: false, destination: '/403' } }
+  }
+
   return {
     props: {
       providers: await NextAuth.getProviders(),
@@ -40,17 +46,17 @@ const SignIn = ({ providers }: SignInProps) => {
       ...data,
       redirect: false,
     })
+
     if (res && res.error) {
-      const err = res.error
-      if (new RegExp(/email/i).test(err)) {
-        methods.setError('email', { message: err }, { shouldFocus: true })
-      } else if (new RegExp(/password/i).test(err)) {
-        methods.setError('password', { message: err }, { shouldFocus: true })
-      } else {
-        setToast({ message: err, error: true })
+      const { name, message } = JSON.parse(res.error)
+
+      if (name) {
+        return methods.setError(name, { message }, { shouldFocus: true })
       }
-      return
+
+      return setToast({ message, error: true })
     }
+
     router.push('/profile')
   }
 
@@ -129,7 +135,5 @@ const SignIn = ({ providers }: SignInProps) => {
     </>
   )
 }
-
-SignIn.needAuth = false
 
 export default SignIn

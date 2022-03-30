@@ -52,9 +52,6 @@ describe('/api/posts/:id', () => {
               const p1Images = p1.images.map(
                 (img) => '/static/images/posts/' + img
               )
-              const p2Images = p2.images.map(
-                (img) => '/static/images/posts/' + img
-              )
 
               expect(body).to.eql({
                 id: pIds[0],
@@ -72,10 +69,8 @@ describe('/api/posts/:id', () => {
                     {
                       id: pIds[1],
                       name: p2.name,
-                      description: p2.description,
-                      categories: p2.categories,
                       price: p2.price / 100,
-                      images: p2Images,
+                      image: '/static/images/posts/' + p2.images[0],
                     },
                   ],
                 },

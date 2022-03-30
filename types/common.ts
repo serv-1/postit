@@ -4,10 +4,10 @@ import { UserModel } from '../models/User'
 
 export interface IPost extends Omit<PostModel, '_id' | 'userId'> {
   id: string
-  user: IUser
+  user: Omit<IUser, 'posts'> & { posts: ILightPost[] }
 }
 
-export interface ISearchedPost
+export interface ILightPost
   extends Omit<IPost, 'user' | 'categories' | 'description' | 'images'> {
   image: string
 }

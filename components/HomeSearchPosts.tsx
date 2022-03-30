@@ -32,7 +32,14 @@ const HomeSearchPosts = () => {
     if (maxPrice) url.append('maxPrice', maxPrice)
     if (categories) categories.forEach((c) => url.append('categories', c))
 
-    window.history.pushState('', '', '?' + url.toString())
+    const newUrl = '?' + url.toString()
+    const state = { ...window.history.state, as: newUrl, url: newUrl }
+
+    // To avoid rerender with router.push(), we use pushState.
+    // We must specify the state because if we do not NextJS fails to send
+    // us back to the previous page.
+    // see: https://github.com/vercel/next.js/discussions/18072
+    window.history.pushState(state, '', newUrl)
 
     document.dispatchEvent(new CustomEvent('queryStringChange'))
   }

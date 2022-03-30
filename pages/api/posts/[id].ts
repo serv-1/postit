@@ -36,18 +36,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     case 'GET': {
       await dbConnect()
 
-      const $set = {
-        id: { $toString: '$_id' },
-        price: { $divide: ['$price', 100] },
-        images: {
-          $map: {
-            input: '$images',
-            as: 'image',
-            in: { $concat: ['/static/images/posts/', '$$image'] },
-          },
-        },
-      }
-
       const post = await Post.aggregate(
         [
           { $match: { _id: new Types.ObjectId(id) } },
@@ -72,8 +60,28 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                           },
                         },
                       },
-                      { $set },
-                      { $unset: ['_id', 'userId', '__v'] },
+                      {
+                        $set: {
+                          id: { $toString: '$_id' },
+                          price: { $divide: ['$price', 100] },
+                          image: {
+                            $concat: [
+                              '/static/images/posts/',
+                              { $arrayElemAt: ['$images', 0] },
+                            ],
+                          },
+                        },
+                      },
+                      {
+                        $unset: [
+                          '_id',
+                          'userId',
+                          '__v',
+                          'description',
+                          'categories',
+                          'images',
+                        ],
+                      },
                     ],
                     as: 'posts',
                   },
@@ -95,7 +103,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               as: 'user',
             },
           },
-          { $set: { ...$set, user: { $arrayElemAt: ['$user', 0] } } },
+          {
+            $set: {
+              id: { $toString: '$_id' },
+              price: { $divide: ['$price', 100] },
+              images: {
+                $map: {
+                  input: '$images',
+                  as: 'image',
+                  in: { $concat: ['/static/images/posts/', '$$image'] },
+                },
+              },
+              user: { $arrayElemAt: ['$user', 0] },
+            },
+          },
           { $unset: ['_id', 'userId', '__v'] },
         ],
         {}

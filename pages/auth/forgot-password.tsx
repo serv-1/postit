@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios'
-import { signIn } from 'next-auth/react'
+import { getSession, signIn } from 'next-auth/react'
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
@@ -12,6 +12,17 @@ import {
 } from '../../lib/joi/forgotPasswordSchema'
 import Input from '../../components/Input'
 import InputError from '../../components/InputError'
+import { GetServerSideProps } from 'next'
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getSession(ctx)
+
+  if (session) {
+    return { redirect: { permanent: false, destination: '/403' } }
+  }
+
+  return { props: {} }
+}
 
 const ForgotPassword = () => {
   const methods = useForm<ForgotPasswordSchema>({
@@ -65,7 +76,5 @@ const ForgotPassword = () => {
     </>
   )
 }
-
-ForgotPassword.needAuth = false
 
 export default ForgotPassword

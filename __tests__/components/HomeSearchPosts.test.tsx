@@ -41,7 +41,9 @@ test('set the url query string parameters with the form data', async () => {
 
   await waitFor(() => {
     const q = '?query=Table&maxPrice=200&categories=furniture'
-    expect(pushState).toHaveBeenNthCalledWith(1, '', '', q)
+    const state = { ...window.history.state, as: q, url: q }
+
+    expect(pushState).toHaveBeenNthCalledWith(1, state, '', q)
     expect(onQueryStringChange).toHaveBeenCalledTimes(1)
   })
 

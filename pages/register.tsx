@@ -3,7 +3,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
-import { signIn } from 'next-auth/react'
+import { getSession, signIn } from 'next-auth/react'
 import Form from '../components/Form'
 import getAxiosError from '../utils/functions/getAxiosError'
 import { useToast } from '../contexts/toast'
@@ -12,6 +12,17 @@ import Button from '../components/Button'
 import Input from '../components/Input'
 import InputError from '../components/InputError'
 import PasswordInput from '../components/PasswordInput'
+import { GetServerSideProps } from 'next'
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getSession(ctx)
+
+  if (session) {
+    return { redirect: { permanent: false, destination: '/403' } }
+  }
+
+  return { props: {} }
+}
 
 const Register = () => {
   const methods = useForm<RegisterSchema>({
@@ -37,7 +48,9 @@ const Register = () => {
         redirect: false,
       })
 
-      if (res && res.error) return router.push('/auth/sign-in')
+      if (res && res.error) {
+        return router.push('/auth/sign-in')
+      }
 
       router.push('/profile')
     } catch (e) {
@@ -102,7 +115,5 @@ const Register = () => {
     </>
   )
 }
-
-Register.needAuth = false
 
 export default Register

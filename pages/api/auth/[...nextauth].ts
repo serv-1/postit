@@ -8,7 +8,7 @@ import clientPromise from '../../../lib/mongodb'
 import User from '../../../models/User'
 import dbConnect from '../../../utils/functions/dbConnect'
 import env from '../../../utils/constants/env'
-import err from '../../../utils/constants/errors'
+import getAxiosError from '../../../utils/functions/getAxiosError'
 
 export default NextAuth({
   providers: [
@@ -23,13 +23,10 @@ export default NextAuth({
             email: credentials?.email,
             password: credentials?.password,
           })
+
           return res.data
         } catch (e) {
-          const res = (e as AxiosError).response
-          if (!res) {
-            throw new Error(err.NO_RESPONSE)
-          }
-          throw new Error(res.data.message || err.DEFAULT)
+          throw new Error(JSON.stringify(getAxiosError(e as AxiosError)))
         }
       },
     }),

@@ -65,14 +65,16 @@ const Post = ({ post }: PostProps) => {
             <p>{post.description}</p>
           </div>
         </section>
-        <section className="col-span-full">
-          <h2 className="text-3xl md:text-t-3xl lg:text-d-3xl font-bold mb-16">
-            {post.user.name}&apos;s other posts
-          </h2>
-          <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-[repeat(6,72px)] gap-x-16 justify-center">
-            <PostList posts={post.user.posts} />
-          </div>
-        </section>
+        {post.user.posts.length > 0 && (
+          <section className="col-span-full">
+            <h2 className="text-3xl md:text-t-3xl lg:text-d-3xl font-bold mb-16">
+              {post.user.name}&apos;s other posts
+            </h2>
+            <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-[repeat(6,72px)] gap-x-16 justify-center">
+              <PostList posts={post.user.posts} />
+            </div>
+          </section>
+        )}
       </main>
     </>
   )
