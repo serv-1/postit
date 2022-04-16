@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import addCommasToNb from '../utils/functions/addCommasToNb'
+import addSpacesToNb from '../utils/functions/addSpacesToNb'
 import formatForUrl from '../utils/functions/formatForUrl'
 import Link from './Link'
 
@@ -14,22 +14,24 @@ const Post = ({ id, name, price, image }: PostProps) => {
   const truncatedName = name.length > 23 ? name.slice(0, 22) + '...' : name
 
   return (
-    <div className="even:col-start-2 col-span-3 relative flex flex-col h-[248px] border border-indigo-600 rounded mb-16 md:even:col-start-auto md:col-start-2 lg:col-start-auto">
-      <div className="flex-grow relative">
-        <Image src={image} alt={name} layout="fill" />
-      </div>
-      <div className="px-8 py-4 bg-indigo-600">
+    <figure className="w-full h-full md:w-[calc((100%-32px)/3)] md:h-1/3">
+      <Image
+        src={image}
+        alt={name}
+        layout="responsive"
+        width="328"
+        height="328"
+        className="rounded-8 object-cover"
+      />
+      <figcaption className="px-8 py-4 text-center">
         <Link
           href={`/posts/${id}/${formatForUrl(name)}`}
-          className="text-white hover:underline"
+          className="text-fuchsia-600 hover:underline"
         >
-          {truncatedName} →
+          {truncatedName} - {addSpacesToNb(price)}€
         </Link>
-      </div>
-      <div className="absolute bg-white rounded text-indigo-600 px-4 py-2 top-8 right-8">
-        {addCommasToNb(price)}€
-      </div>
-    </div>
+      </figcaption>
+    </figure>
   )
 }
 

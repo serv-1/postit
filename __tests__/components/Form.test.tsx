@@ -8,7 +8,7 @@ const getCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 
 beforeEach(() => getCsrfToken.mockResolvedValue('csrfToken'))
 
-test('the form renders', async () => {
+it('renders', async () => {
   const submitHandler = jest.fn()
   const methods = {
     handleSubmit: jest.fn(() => (e: BaseSyntheticEvent) => {
@@ -40,12 +40,12 @@ test('the form renders', async () => {
   const submitBtn = screen.getByRole('button')
   expect(submitBtn).toBeInTheDocument()
 
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await waitFor(() => expect(submitHandler).toHaveBeenCalledTimes(1))
 })
 
-test('the csrfToken input does not render if we do not need it', () => {
+test("the csrfToken input doesn't render if we don't need it", () => {
   const methods = {
     handleSubmit: jest.fn(),
     register: jest.fn(),

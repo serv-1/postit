@@ -12,7 +12,7 @@ const Link = (props: LinkProps) => {
 
   const _className = classNames(
     {
-      'bg-indigo-600 hover:bg-indigo-800 transition-colors duration-200 text-white px-8 py-4 rounded':
+      'bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-200 active:bg-fuchsia-900 active:text-fuchsia-200 transition-colors duration-200 px-16 py-8 rounded font-bold':
         needButtonStyle,
     },
     className

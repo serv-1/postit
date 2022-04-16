@@ -16,73 +16,66 @@ const setFormContext = (isSubmitted: boolean, message?: string) => ({
   setFocus,
 })
 
+beforeEach(() => useFormContext.mockReturnValue(setFormContext(false)))
+
 interface FormFields {
   test: string
 }
 
-test('the input renders', () => {
+it('renders', async () => {
   const onChange = jest.fn()
-
-  useFormContext.mockReturnValue(setFormContext(false))
 
   render(
     <Input<FormFields>
       type="text"
       name="test"
       registerOptions={{ onChange }}
-      className="red"
+      className="blue"
     />
   )
 
   const input = screen.getByRole('textbox')
   expect(input).toHaveAttribute('id', 'test')
   expect(input).toHaveAttribute('name', 'test')
-  expect(input).toHaveClass('red', 'border-indigo-600')
+  expect(input).toHaveAttribute('aria-describedby', 'testFeedback')
+  expect(input).toHaveClass('blue')
+  expect(input.className).toContain('border')
+  expect(input.className).not.toContain('red')
+  expect(input.className).not.toContain('file')
 
-  userEvent.type(input, 'a')
+  await userEvent.type(input, 'a')
   expect(onChange).toHaveBeenCalledTimes(1)
 
   expect(setFocus).not.toHaveBeenCalled()
+
+  const container = screen.queryByTestId('container')
+  expect(container).not.toBeInTheDocument()
 })
 
-test('the textarea renders', () => {
-  useFormContext.mockReturnValue(setFormContext(false))
-
-  render(<Input<FormFields> name="test" isTextArea />)
-
-  const textarea = screen.getByRole('textbox')
-  expect(textarea.tagName).toBe('TEXTAREA')
-})
-
-test('the input has the focus', () => {
-  useFormContext.mockReturnValue(setFormContext(false))
-
+it('has the focus', () => {
   render(<Input<FormFields> type="text" name="test" needFocus />)
-
   expect(setFocus).toHaveBeenNthCalledWith(1, 'test')
 })
 
-test("the input's border is red if the form is submitted and there is an error", () => {
+test('its border is red if the form is submitted and there is an error', () => {
   useFormContext.mockReturnValueOnce(setFormContext(true, 'Error'))
 
   render(<Input<FormFields> type="text" name="test" />)
 
   const input = screen.getByRole('textbox')
-  expect(input).toHaveClass('border-red-600')
+  expect(input.className).toContain('red')
 })
 
-test("the input's border is not red if the form is submitted and there is no error", () => {
+test("its border isn't red if the form is submitted and there is no error", () => {
   useFormContext.mockReturnValueOnce(setFormContext(true))
 
   render(<Input<FormFields> type="text" name="test" />)
 
   const input = screen.getByRole('textbox')
-  expect(input).toHaveClass('border-indigo-600')
+  expect(input.className).not.toContain('red')
 })
 
-test('the file input is red if the form is submitted and there is an error', () => {
-  useFormContext.mockReturnValueOnce(setFormContext(true, 'error'))
-
+test('file input has different class', () => {
   render(
     <>
       <label htmlFor="test">Test</label>
@@ -90,34 +83,18 @@ test('the file input is red if the form is submitted and there is an error', () 
     </>
   )
 
-  const input = screen.getByLabelText(/test/i)
-  expect(input).toHaveClass('file:bg-red-200')
+  const input = screen.getByLabelText('Test')
+  expect(input.className).toContain('file')
 })
 
-test('the file input is not red if the form is submitted and there is no error', () => {
-  useFormContext.mockReturnValueOnce(setFormContext(true))
-
+test('the add-on renders', () => {
   render(
-    <>
-      <label htmlFor="test">Test</label>
-      <Input<FormFields> type="file" name="test" />
-    </>
+    <Input<FormFields> type="text" name="test" addOn="@" addOnClass="dark" />
   )
 
-  const input = screen.getByLabelText(/test/i)
-  expect(input).toHaveClass('file:bg-indigo-200')
-})
+  const addOn = screen.getByText('@')
+  expect(addOn).toHaveClass('dark')
 
-test('the file input is not red if the form is not submitted', () => {
-  useFormContext.mockReturnValueOnce(setFormContext(false))
-
-  render(
-    <>
-      <label htmlFor="test">Test</label>
-      <Input<FormFields> type="file" name="test" />
-    </>
-  )
-
-  const input = screen.getByLabelText(/test/i)
-  expect(input).toHaveClass('file:bg-indigo-200')
+  const container = screen.getByTestId('container')
+  expect(container.className).toContain('border')
 })

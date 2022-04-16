@@ -13,14 +13,14 @@ const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 
 beforeEach(() => signIn.mockResolvedValue({ error: '' }))
 
-test("the form sends a mail for the user to sign in which redirect him to it's profile", async () => {
+test('the form sends a mail to the user to sign in, which redirect him to its profile', async () => {
   render(<ForgotPassword />)
 
   const input = screen.getByRole('textbox')
-  userEvent.type(input, 'johndoe@test.com')
+  await userEvent.type(input, 'johndoe@test.com')
 
   const submitBtn = screen.getByRole('button')
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await waitFor(() => {
     expect(signIn).toHaveBeenNthCalledWith(1, 'email', {
@@ -40,10 +40,10 @@ test('an error renders if the server fails to verify the user email', async () =
   render(<ForgotPassword />)
 
   const input = screen.getByRole('textbox')
-  userEvent.type(input, 'johndoe@test.com')
+  await userEvent.type(input, 'johndoe@test.com')
 
   const submitBtn = screen.getByRole('button')
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent(err.EMAIL_INVALID)

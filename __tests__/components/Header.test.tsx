@@ -6,6 +6,11 @@ import server from '../../mocks/server'
 import { rest } from 'msw'
 import userEvent from '@testing-library/user-event'
 
+jest.mock('react-popper', () => ({
+  __esModule: true,
+  usePopper: () => ({ styles: {}, attributes: {} }),
+}))
+
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
@@ -23,11 +28,11 @@ beforeEach(() => {
 test('nothing render while the session is loading', () => {
   render(<Header />)
 
-  const list = screen.getByRole('navigation')
-  expect(list).toBeEmptyDOMElement()
+  const nav = screen.getByRole('navigation')
+  expect(nav).toBeEmptyDOMElement()
 })
 
-test('the user image loads then renders if the user is authenticated', async () => {
+test('the user image loads', async () => {
   useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
 
   render(<Header />)
@@ -39,24 +44,48 @@ test('the user image loads then renders if the user is authenticated', async () 
   expect(image).toBeInTheDocument()
 })
 
-test('clicking on the user image open the dropdown menu and a second click close it', async () => {
+test('the button opens and closes the dropdown menu on click', async () => {
   useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
 
   render(<Header />)
 
-  const image = await screen.findByRole('img')
-  userEvent.click(image)
+  let btn = screen.getByRole('button')
+  await userEvent.click(btn)
 
-  let menu: HTMLElement | null = screen.getAllByRole('list')[1]
-  expect(menu).toBeInTheDocument()
+  const profileLink = screen.getByRole('link', { name: /profile/i })
+  expect(profileLink).toBeInTheDocument()
 
-  userEvent.click(image)
+  await userEvent.click(btn)
 
-  menu = screen.getAllByRole('list')[1]
-  expect(menu).toBeUndefined()
+  expect(profileLink).not.toBeInTheDocument()
 })
 
-test("if the user is on it's profile, the sign out link renders in place of the dropdown menu", () => {
+test("clicking outside the dropdown menu close it but clicking inside shouldn't", async () => {
+  useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
+
+  const { container } = render(<Header />)
+
+  const btn = screen.getByRole('button')
+  await userEvent.click(btn)
+
+  let profileLink = screen.getByRole('link', { name: /profile/i })
+  expect(profileLink).toBeInTheDocument()
+
+  await userEvent.click(container)
+
+  expect(profileLink).not.toBeInTheDocument()
+  await userEvent.click(btn)
+
+  profileLink = screen.getByRole('link', { name: /profile/i })
+  expect(profileLink).toBeInTheDocument()
+
+  const menu = screen.getAllByRole('list')[1]
+  await userEvent.click(menu)
+
+  expect(profileLink).toBeInTheDocument()
+})
+
+test("the dropdown menu doesn't render on the profile page", () => {
   const setToast = jest.fn()
   useToast.mockReturnValue({ setToast })
 
@@ -70,9 +99,6 @@ test("if the user is on it's profile, the sign out link renders in place of the 
   useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
 
   render(<Header />)
-
-  const signOutLink = screen.getByRole('link', { name: /sign out/i })
-  expect(signOutLink).toBeInTheDocument()
 
   const dropDownBtn = screen.queryByRole('button')
   expect(dropDownBtn).not.toBeInTheDocument()

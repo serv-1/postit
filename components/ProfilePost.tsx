@@ -24,6 +24,7 @@ import readAsDataUrl from '../utils/functions/readAsDataUrl'
 import { getCsrfToken } from 'next-auth/react'
 import Link from './Link'
 import formatForUrl from '../utils/functions/formatForUrl'
+import TextArea from './TextArea'
 
 const options = categories.map((category) => ({
   label: category,
@@ -175,7 +176,7 @@ const ProfilePost = (props: ProfilePostProps) => {
               Actual description:{' '}
               <span className="text-indigo-600">{post.description}</span>
             </p>
-            <Input isTextArea name="description" />
+            <TextArea name="description" />
             <InputError inputName="description" />
           </div>
           <div className="mb-16">

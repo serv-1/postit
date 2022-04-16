@@ -20,20 +20,20 @@ beforeEach(() => {
   useRouter.mockReturnValue(router)
 })
 
-test("the form registers the user, sends him a mail, signs in him and redirects him to it's profile", async () => {
+test('the form registers the user, sends him a mail, signs in him and redirects him to its profile', async () => {
   render(<Register />)
 
   const nameInput = screen.getByLabelText(/name/i)
-  userEvent.type(nameInput, 'John Doe')
+  await userEvent.type(nameInput, 'John Doe')
 
   const emailInput = screen.getByLabelText(/email/i)
-  userEvent.type(emailInput, 'johndoe@test.com')
+  await userEvent.type(emailInput, 'johndoe@test.com')
 
   const passwordInput = screen.getByLabelText(/^password$/i)
-  userEvent.type(passwordInput, 'my super password')
+  await userEvent.type(passwordInput, 'my super password')
 
   const submitBtn = screen.getByRole('button', { name: /register/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await waitFor(() => {
     expect(signIn).toHaveBeenCalledWith('email', {
@@ -46,23 +46,23 @@ test("the form registers the user, sends him a mail, signs in him and redirects 
   })
 })
 
-test('the forms redirects the user to the sign in page if it fails to do it', async () => {
+test('the form redirects the user to the sign in page if it fails to do it', async () => {
   signIn.mockResolvedValue({ error: 'Error' })
 
   render(<Register />)
 
   const nameInput = screen.getByLabelText(/name/i)
   expect(nameInput).toHaveFocus()
-  userEvent.type(nameInput, 'John Doe')
+  await userEvent.type(nameInput, 'John Doe')
 
   const emailInput = screen.getByLabelText(/email/i)
-  userEvent.type(emailInput, 'johndoe@test.com')
+  await userEvent.type(emailInput, 'johndoe@test.com')
 
   const passwordInput = screen.getByLabelText(/^password$/i)
-  userEvent.type(passwordInput, 'my super password')
+  await userEvent.type(passwordInput, 'my super password')
 
   const submitBtn = screen.getByRole('button', { name: /register/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await waitFor(() => {
     expect(router.push).toHaveBeenNthCalledWith(1, '/auth/sign-in')
@@ -82,16 +82,16 @@ test('an error renders if the server fails to register the user', async () => {
   render(<Register />)
 
   const nameInput = screen.getByLabelText(/name/i)
-  userEvent.type(nameInput, 'John Doe')
+  await userEvent.type(nameInput, 'John Doe')
 
   const emailInput = screen.getByLabelText(/email/i)
-  userEvent.type(emailInput, 'johndoe@test.com')
+  await userEvent.type(emailInput, 'johndoe@test.com')
 
   const passwordInput = screen.getByLabelText(/^password$/i)
-  userEvent.type(passwordInput, 'my super password')
+  await userEvent.type(passwordInput, 'my super password')
 
   const submitBtn = screen.getByRole('button', { name: /register/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await waitFor(() => {
     const toast = { message: err.METHOD_NOT_ALLOWED, error: true }
@@ -112,16 +112,16 @@ test('an error renders if the server fails to validate the request data', async 
   render(<Register />)
 
   const nameInput = screen.getByLabelText(/name/i)
-  userEvent.type(nameInput, 'John Doe')
+  await userEvent.type(nameInput, 'John Doe')
 
   const emailInput = screen.getByLabelText(/email/i)
-  userEvent.type(emailInput, 'johndoe@test.com')
+  await userEvent.type(emailInput, 'johndoe@test.com')
 
   const passwordInput = screen.getByLabelText(/^password$/i)
-  userEvent.type(passwordInput, 'my super password')
+  await userEvent.type(passwordInput, 'my super password')
 
   const submitBtn = screen.getByRole('button', { name: /register/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent(err.NAME_REQUIRED)

@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import validate from '../../utils/functions/validate'
 
-it('only return the validated value if there is no error', () => {
+it('only returns the validated value if there is no error', () => {
   const schema = Joi.object({ a: Joi.string() })
   const value = { a: 'a' }
 
@@ -10,7 +10,7 @@ it('only return the validated value if there is no error', () => {
   expect(result).toEqual({ value })
 })
 
-it('return the validated value with the error name and message', () => {
+it('returns the validated value with the error name and message', () => {
   const schema = Joi.object({ a: Joi.string() })
   const value = 1
 

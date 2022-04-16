@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Modal from '../../components/Modal'
 
-test('the modal renders', () => {
+it('renders', async () => {
   render(
     <Modal
       title={'This is a super modal!'}
@@ -15,21 +15,18 @@ test('the modal renders', () => {
     />
   )
 
-  let openBtn = screen.getByRole('button', { name: /open/i })
-  userEvent.click(openBtn)
+  const openBtn = screen.getByRole('button', { name: /open/i })
+  await userEvent.click(openBtn)
 
-  let title: HTMLElement | null = screen.getByRole('heading')
+  const title = screen.getByRole('heading')
   expect(title).toHaveTextContent('This is a super modal!')
 
   const child = screen.getByRole('link')
   expect(child).toBeInTheDocument()
 
   const closeBtn = screen.getByRole('button', { name: /close/i })
-  userEvent.click(closeBtn)
+  await userEvent.click(closeBtn)
 
-  title = screen.queryByRole('heading')
   expect(title).not.toBeInTheDocument()
-
-  openBtn = screen.getByRole('button', { name: /open/i })
   expect(openBtn).toBeInTheDocument()
 })

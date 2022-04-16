@@ -1,7 +1,7 @@
 import err from '../../utils/constants/errors'
 import getAxiosError from '../../utils/functions/getAxiosError'
 
-it('return the NO_RESPONSE error message if there is no response', () => {
+it('returns the NO_RESPONSE error message if there is no response', () => {
   const e = {
     isAxiosError: true,
     config: {},
@@ -15,7 +15,7 @@ it('return the NO_RESPONSE error message if there is no response', () => {
   expect(result).toEqual({ message: err.NO_RESPONSE })
 })
 
-it("return the error's name and message with the response status code", () => {
+it("returns the error's name and message with the response status code", () => {
   const e = {
     isAxiosError: true,
     config: {},
@@ -40,7 +40,7 @@ it("return the error's name and message with the response status code", () => {
   })
 })
 
-it("only return the error's message and the response status code", () => {
+it("only returns the error's message and the response status code", () => {
   const e = {
     isAxiosError: true,
     config: {},

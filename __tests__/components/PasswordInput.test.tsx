@@ -18,7 +18,7 @@ interface FormFields {
   password: string
 }
 
-test('the input renders and is hidden by default', () => {
+it('renders', () => {
   useFormContext.mockReturnValue(setFormContext())
 
   render(
@@ -61,7 +61,7 @@ test("the container's border is red if the form is submitted and there is an err
   expect(container).toHaveClass('border-red-600')
 })
 
-test("the container's border is not red if the form is submitted and there is no error", () => {
+test("the container's border isn't red if the form is submitted and there is no error", () => {
   useFormContext.mockReturnValue(setFormContext(true))
 
   render(
@@ -75,7 +75,7 @@ test("the container's border is not red if the form is submitted and there is no
   expect(container).toHaveClass('border-indigo-600')
 })
 
-test('the password can be shown', () => {
+test('the password can be shown', async () => {
   useFormContext.mockReturnValue(setFormContext())
 
   render(
@@ -87,7 +87,7 @@ test('the password can be shown', () => {
 
   const btn = screen.getByRole('button')
 
-  userEvent.click(btn)
+  await userEvent.click(btn)
   expect(btn).toHaveAccessibleName(/hide/i)
 
   const openEye = screen.queryByTestId('openEye')
@@ -103,7 +103,7 @@ test('the password can be shown', () => {
   expect(inputAriaDescr).not.toContain('passwordRules')
 })
 
-test("the password strength renders and take into account the other fields' values", () => {
+test("the password strength renders and take into account the other fields' values", async () => {
   useFormContext.mockReturnValue(setFormContext())
 
   render(
@@ -118,28 +118,28 @@ test("the password strength renders and take into account the other fields' valu
   const yellow = screen.getByTestId('yellow')
   const green = screen.getByTestId('green')
 
-  userEvent.type(input, 'english')
+  await userEvent.type(input, 'english')
 
   expect(red).toHaveClass('bg-red-500')
   expect(yellow).not.toHaveClass('bg-yellow-500')
   expect(green).not.toHaveClass('bg-green-500')
 
-  userEvent.clear(input)
-  userEvent.type(input, 'english rigole')
+  await userEvent.clear(input)
+  await userEvent.type(input, 'english rigole')
 
   expect(red).not.toHaveClass('bg-red-500')
   expect(yellow).toHaveClass('bg-yellow-500')
   expect(green).not.toHaveClass('bg-green-500')
 
-  userEvent.clear(input)
-  userEvent.type(input, 'english rigole tile')
+  await userEvent.clear(input)
+  await userEvent.type(input, 'english rigole tile')
 
   expect(red).not.toHaveClass('bg-red-500')
   expect(yellow).not.toHaveClass('bg-yellow-500')
   expect(green).toHaveClass('bg-green-500')
 
-  userEvent.clear(input)
-  userEvent.type(input, 'John Doe') // value of another field
+  await userEvent.clear(input)
+  await userEvent.type(input, 'John Doe') // value of another field
 
   expect(red).toHaveClass('bg-red-500')
   expect(yellow).not.toHaveClass('bg-yellow-500')

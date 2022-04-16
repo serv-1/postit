@@ -18,6 +18,7 @@ import Input from '../components/Input'
 import InputError from '../components/InputError'
 import Select from '../components/Select'
 import categories from '../categories'
+import TextArea from '../components/TextArea'
 
 const options = categories.map((category) => ({
   label: category,
@@ -93,7 +94,7 @@ const CreateAPost = () => {
 
           <div className="mb-16">
             <label htmlFor="description">Description</label>
-            <Input<CreatePostClientSchema> isTextArea name="description" />
+            <TextArea<CreatePostClientSchema> name="description" />
             <InputError<CreatePostClientSchema> inputName="description" />
           </div>
 

@@ -32,7 +32,7 @@ const App = ({ Component, pageProps }: NextAppProps) => {
           ) : (
             <Component {...pageProps} />
           )}
-          <footer className="bg-black text-white p-8 mt-auto">
+          <footer className="text-s p-8 mt-32">
             <p>
               Copyright © {new Date().getFullYear()} Filanad. All rights
               reserved.

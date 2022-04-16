@@ -8,11 +8,12 @@ const Home = () => {
       <Head>
         <title>Home - Filanad</title>
       </Head>
-      <main data-cy="home" className="py-32 flex-grow flex flex-col">
-        <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-16 justify-center">
-          <h1 className="text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16 col-span-full">
-            Search posts
-          </h1>
+      <main
+        data-cy="home"
+        className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 grid-rows-[auto_1fr] gap-x-24"
+      >
+        <div className="col-span-full lg:col-span-4 bg-[linear-gradient(71.81deg,#F0ABFC_0%,#F5D0FE_100%)] p-16 mb-32 rounded-16 shadow-[-4px_4px_8px_#F5D0FE] lg:sticky lg:top-16">
+          <h1 className="mb-16">Search</h1>
           <HomeSearchPosts />
         </div>
         <HomePostPage />

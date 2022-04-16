@@ -8,7 +8,7 @@ const defaultPost = {
   image: 'data:image/jpeg;base64,base64=',
 }
 
-test('the post renders correctly', () => {
+it('renders', () => {
   const { id, name, image } = defaultPost
 
   render(<Post {...defaultPost} />)
@@ -23,12 +23,13 @@ test('the post renders correctly', () => {
   const href = `/posts/${id}/${name.replaceAll(' ', '-')}`
   expect(link).toHaveAttribute('href', href)
 
-  const priceText = screen.getByText('5,000€')
+  const priceText = screen.getByText(/5 000/)
   expect(priceText).toBeInTheDocument()
 })
 
-test("post's name should be truncated if it is too long", () => {
+test("its name should be truncated if it's too long", () => {
   const name = new Uint8Array(90).join('')
+
   render(<Post {...defaultPost} name={name} />)
 
   const text = screen.queryByText(name)

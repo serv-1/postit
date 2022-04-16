@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import PostList from '../../components/PostList'
 
-test('the posts render', () => {
+it('renders', () => {
   const defaultPosts = [
     {
       id: 'f0f0f0f0f0f0f0f0f0f0f0f0',

@@ -21,24 +21,24 @@ test('the user is signed out and redirected to the home page after being deleted
   render(<ProfileDeleteAccount />)
 
   const openModalBtn = screen.getByRole('button')
-  userEvent.click(openModalBtn)
+  await userEvent.click(openModalBtn)
 
   const deleteBtn = screen.getByRole('button', { name: /^delete$/i })
-  userEvent.click(deleteBtn)
+  await userEvent.click(deleteBtn)
 
   await waitFor(() => {
     expect(signOut).toHaveBeenNthCalledWith(1, { callbackUrl: '/' })
   })
 })
 
-test('the cancel button closes the modal', () => {
+test('the cancel button closes the modal', async () => {
   render(<ProfileDeleteAccount />)
 
   const openModalBtn = screen.getByRole('button')
-  userEvent.click(openModalBtn)
+  await userEvent.click(openModalBtn)
 
   const cancelBtn = screen.getByRole('button', { name: /cancel/i })
-  userEvent.click(cancelBtn)
+  await userEvent.click(cancelBtn)
 
   const deleteBtn = screen.queryByRole('button', { name: /^delete$/i })
   expect(deleteBtn).not.toBeInTheDocument()
@@ -57,10 +57,10 @@ test('an error renders if the server fails to delete the user', async () => {
   render(<ProfileDeleteAccount />)
 
   const openModalBtn = screen.getByRole('button')
-  userEvent.click(openModalBtn)
+  await userEvent.click(openModalBtn)
 
   const deleteBtn = screen.getByRole('button', { name: /^delete$/i })
-  userEvent.click(deleteBtn)
+  await userEvent.click(deleteBtn)
 
   await waitFor(() => {
     const toast = { message: err.PARAMS_INVALID, error: true }

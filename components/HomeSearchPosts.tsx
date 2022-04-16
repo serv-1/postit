@@ -10,7 +10,7 @@ import {
   searchPostsSchema,
   SearchPostsSchema,
 } from '../lib/joi/searchPostsSchema'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Categories } from '../types/common'
 
 const options = categories.map((category) => ({
@@ -18,7 +18,11 @@ const options = categories.map((category) => ({
   value: category,
 }))
 
+type OpenedModalState = 'price' | 'location' | 'none'
+
 const HomeSearchPosts = () => {
+  const [openedModal, setOpenedModal] = useState<OpenedModalState>('none')
+
   const methods = useForm<SearchPostsSchema>({
     resolver: joiResolver(searchPostsSchema),
   })
@@ -26,7 +30,7 @@ const HomeSearchPosts = () => {
   const submitHandler: SubmitHandler<SearchPostsSchema> = (data) => {
     const { query, minPrice, maxPrice, categories } = data
 
-    const url = new URLSearchParams({ query: query })
+    const url = new URLSearchParams({ query })
 
     if (minPrice) url.append('minPrice', minPrice)
     if (maxPrice) url.append('maxPrice', maxPrice)
@@ -57,6 +61,19 @@ const HomeSearchPosts = () => {
     methods.setValue('maxPrice', queryString.get('maxPrice') || undefined)
   }, [methods])
 
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const modal = (e.target as Element).closest('#priceModal, #locationModal')
+      if (modal) return
+
+      setOpenedModal('none')
+    }
+
+    document.addEventListener('click', onClick)
+
+    return () => document.removeEventListener('click', onClick)
+  }, [setOpenedModal])
+
   return (
     <Form
       name="searchPost"
@@ -64,44 +81,92 @@ const HomeSearchPosts = () => {
       methods={methods}
       submitHandler={submitHandler}
       role="search"
-      className="col-span-full grid grid-cols-[repeat(2,1fr)] gap-8 md:grid-cols-[repeat(6,1fr)] lg:grid-cols-[repeat(5,1fr)]"
+      className="relative"
     >
-      <div className="col-span-full">
+      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] md:mr-8 lg:block lg:w-auto lg:mr-0">
+        <Input<SearchPostsSchema>
+          name="query"
+          type="search"
+          placeholder="Umbrella, sofa, ..."
+        />
         <InputError<SearchPostsSchema> inputName="query" />
-        <InputError<SearchPostsSchema> inputName="minPrice" />
-        <InputError<SearchPostsSchema> inputName="maxPrice" />
+      </div>
+      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] lg:block lg:w-auto">
+        <Select<SearchPostsSchema>
+          name="categories"
+          options={options}
+          aria-label="Categories"
+          placeholder="Categories"
+        />
         <InputError<SearchPostsSchema> inputName="categories" />
       </div>
-      <Input<SearchPostsSchema>
-        name="query"
-        type="search"
-        placeholder="Nimbus 2000, invisibility cloak, ..."
-        className="col-span-full lg:col-span-2"
-      />
-      <Input<SearchPostsSchema>
-        name="minPrice"
-        type="number"
-        placeholder="Min. price"
-        aria-label="Minimum price"
-        className="col-span-1 md:col-span-3 lg:col-span-2"
-      />
-      <Input<SearchPostsSchema>
-        name="maxPrice"
-        type="number"
-        placeholder="Max. price"
-        aria-label="Maximum price"
-        className="col-span-1 md:col-span-3 lg:col-span-2"
-      />
-      <Select<SearchPostsSchema>
-        name="categories"
-        options={options}
-        aria-label="Categories"
-        className="col-span-full md:col-span-4 lg:row-start-2 lg:col-start-3 lg:col-span-2"
-      />
+      <Button
+        type="button"
+        needDefaultClassNames={false}
+        className="text-fuchsia-600 border-2 border-fuchsia-600 rounded-full px-8 py-4 font-bold hover:bg-fuchsia-600 hover:text-fuchsia-50 active:bg-fuchsia-900 active:text-fuchsia-50 active:border-fuchsia-900 transition-colors mr-8"
+        onClick={(e) => {
+          setOpenedModal(openedModal === 'price' ? 'none' : 'price')
+          e.stopPropagation()
+        }}
+      >
+        Price
+      </Button>
+      {openedModal === 'price' && (
+        <div
+          id="priceModal"
+          className="bg-fuchsia-200 border-2 border-fuchsia-500 shadow-[0_0_16px_#D946EF] rounded-8 absolute inset-x-0 top-[calc(100%+4px)] z-20 p-16 max-w-[328px]"
+        >
+          <span className="font-bold mb-8">Price</span>
+          <div className="flex flex-row flex-nowrap">
+            <div className="mr-8">
+              <label htmlFor="minPrice">Minimum</label>
+              <Input<SearchPostsSchema>
+                id="minPrice"
+                name="minPrice"
+                type="number"
+                addOn="€"
+                addOnClass="text-[rgba(112,26,117,0.5)]"
+              />
+            </div>
+            <div>
+              <label htmlFor="maxPrice">Maximum</label>
+              <Input<SearchPostsSchema>
+                id="maxPrice"
+                name="maxPrice"
+                type="number"
+                addOn="€"
+                addOnClass="text-[rgba(112,26,117,0.5)]"
+              />
+            </div>
+          </div>
+          <InputError<SearchPostsSchema> inputName="minPrice" />
+          <InputError<SearchPostsSchema> inputName="maxPrice" />
+        </div>
+      )}
+      <Button
+        type="button"
+        needDefaultClassNames={false}
+        className="text-fuchsia-600 border-2 border-fuchsia-600 rounded-full px-8 py-4 font-bold hover:bg-fuchsia-600 hover:text-fuchsia-50 active:bg-fuchsia-900 active:text-fuchsia-50 active:border-fuchsia-900 transition-colors"
+        onClick={(e) => {
+          setOpenedModal(openedModal === 'location' ? 'none' : 'location')
+          e.stopPropagation()
+        }}
+      >
+        Location
+      </Button>
+      {openedModal === 'location' && (
+        <div
+          id="locationModal"
+          className="bg-fuchsia-200 border-2 border-fuchsia-500 shadow-[0_0_16px_#D946EF] rounded-8 absolute inset-x-0 top-[calc(100%+4px)] z-20 p-16 max-w-[328px]"
+        >
+          <span className="font-bold mb-8">Location</span>
+          <p>work in progress</p>
+        </div>
+      )}
       <Button
         type="submit"
-        className="col-span-full md:col-span-2 lg:row-start-2 lg:row-span-2 lg:col-start-5"
         aria-label="Search"
+        className="absolute right-0 -bottom-[36px] md:left-1/2 md:-translate-x-1/2 md:right-auto lg:right-0 lg:left-auto lg:translate-x-0 z-10"
       >
         Search
       </Button>

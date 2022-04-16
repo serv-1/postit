@@ -1,7 +1,7 @@
 import err from '../../utils/constants/errors'
 import isImageValid from '../../utils/functions/isImageValid'
 
-it('returns an error message if the image is not an image', () => {
+it("returns an error message if the image isn't an image", () => {
   const notImage = new File(['data'], 'text.txt', { type: 'text/plain' })
 
   const result = isImageValid(notImage)

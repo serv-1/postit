@@ -18,7 +18,7 @@ const InputError = <FormFields extends FieldValues = FieldValues>({
       {...props}
       id={`${inputName}Feedback`}
       role="alert"
-      className="text-s text-red-600 mt-4"
+      className="text-red-600 font-bold"
     >
       {errors[inputName].message}
     </div>

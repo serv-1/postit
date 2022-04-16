@@ -15,7 +15,7 @@ test('the toast renders and the close button closes it', async () => {
   expect(toast).toHaveClass('bg-indigo-200')
 
   const closeBtn = screen.getByRole('button')
-  userEvent.click(closeBtn)
+  await userEvent.click(closeBtn)
 
   await waitFor(() => expect(setToast).toHaveBeenNthCalledWith(1, {}))
 })
@@ -30,7 +30,7 @@ test('the toast is red if error is true', () => {
   expect(toast).toHaveClass('bg-red-500')
 })
 
-test('the toast does not render if there is no message to display', () => {
+test("the toast doesn't render if there is no message to display", () => {
   useToast.mockReturnValue({ toast: {} })
 
   render(<Toast />)

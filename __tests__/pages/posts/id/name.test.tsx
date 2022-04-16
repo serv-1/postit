@@ -27,7 +27,7 @@ it('renders', () => {
   const category = screen.getByText(post.categories[0])
   expect(category).toBeInTheDocument()
 
-  const price = screen.getByText('5,000.12€')
+  const price = screen.getByText('5 000,12€')
   expect(price).toBeInTheDocument()
 
   const img = screen.getByRole('img')
@@ -60,6 +60,6 @@ it('renders the user other posts', () => {
   const userOtherPostsTitle = screen.getByRole('heading', { level: 2 })
   expect(userOtherPostsTitle).toHaveTextContent(p.user.name + "'s other posts")
 
-  const postName = screen.getByText(p.user.posts[0].name + ' →')
+  const postName = screen.getByText(new RegExp(p.user.posts[0].name, 'i'))
   expect(postName).toBeInTheDocument()
 })

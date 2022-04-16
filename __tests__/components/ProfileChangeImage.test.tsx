@@ -22,7 +22,7 @@ afterAll(() => server.close())
 
 const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
 
-test('the button triggers a click on the file input', () => {
+test('the button triggers a click on the file input', async () => {
   render(<ProfileChangeImage image="/img" />)
 
   const input = screen.getByLabelText(/image/i)
@@ -30,7 +30,7 @@ test('the button triggers a click on the file input', () => {
   input.click = click
 
   const btn = screen.getByRole('button')
-  userEvent.click(btn)
+  await userEvent.click(btn)
   expect(click).toHaveBeenCalledTimes(1)
 })
 
@@ -43,7 +43,7 @@ test('an alert renders if the user image is updated and the new user image rende
   render(<ProfileChangeImage image="/img" />)
 
   const input = screen.getByLabelText(/image/i)
-  userEvent.upload(input, file)
+  await userEvent.upload(input, file)
 
   await waitFor(() => {
     expect(setToast).toHaveNthReturnedWith(1, undefined)
@@ -61,7 +61,7 @@ test('an error renders if the user image is invalid', async () => {
 
   const input = screen.getByLabelText(/image/i)
   const textFile = new File(['text'], 'text.txt', { type: 'text/plain' })
-  userEvent.upload(input, textFile)
+  await userEvent.upload(input, textFile)
 
   await waitFor(() => {
     const toast = { message: err.IMAGE_INVALID, error: true }
@@ -78,7 +78,7 @@ test('an error renders if the image cannot be read as data url', async () => {
   render(<ProfileChangeImage image="/img" />)
 
   const input = screen.getByLabelText(/image/i)
-  userEvent.upload(input, file)
+  await userEvent.upload(input, file)
 
   await waitFor(() => {
     const toast = { message: 'error', error: true }
@@ -99,7 +99,7 @@ test('an error renders if the server fails to update the user image', async () =
   render(<ProfileChangeImage image="/img" />)
 
   const input = screen.getByLabelText(/image/i)
-  userEvent.upload(input, file)
+  await userEvent.upload(input, file)
 
   await waitFor(() => {
     const toast = { message: err.IMAGE_INVALID, error: true }

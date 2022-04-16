@@ -23,7 +23,7 @@ test('the alert renders if the form is submitted an there is an error', () => {
   expect(alert).toHaveAttribute('id', 'emailFeedback')
 })
 
-test('the alert does not render if the form is not submitted even if there is an error', () => {
+test("the alert doesn't render if the form isn't submitted even if there is an error", () => {
   useFormContext.mockReturnValue(setFormContext(false, 'Error'))
 
   render(<InputError<FormFields> inputName="email" />)

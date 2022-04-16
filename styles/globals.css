@@ -2,12 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-body,
-#__next {
-  min-height: 100vh;
-}
+@layer base {
+  html {
+    @apply text-fuchsia-900 bg-fuchsia-50;
+    font-family: Quicksand, sans-serif;
+  }
 
-#__next {
-  display: flex;
-  flex-flow: column nowrap;
+  #__next {
+    @apply mx-16 grid grid-rows-[auto_1fr_auto] min-h-[100vh];
+  }
+
+  h1 {
+    @apply text-m-4xl font-bold;
+  }
+  h2 {
+    @apply text-m-3xl font-bold;
+  }
+  h3 {
+    @apply text-m-2xl font-bold;
+  }
+  h4 {
+    @apply text-m-xl font-bold;
+  }
+  h5 {
+    @apply text-m-l font-bold;
+  }
+
+  @media screen(md) {
+    h1 {
+      @apply text-t-4xl font-bold;
+    }
+    h2 {
+      @apply text-t-3xl font-bold;
+    }
+    h3 {
+      @apply text-t-2xl font-bold;
+    }
+    h4 {
+      @apply text-t-xl font-bold;
+    }
+    h5 {
+      @apply text-t-l font-bold;
+    }
+  }
+
+  @media screen and (min-width: 1200px) {
+    #__next {
+      @apply max-w-[1200px] mx-auto;
+    }
+  }
 }

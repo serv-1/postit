@@ -23,7 +23,7 @@ const removeOnQueryStringChange = (onQueryStringChange: EventListener) => {
   document.removeEventListener('queryStringChange', onQueryStringChange)
 }
 
-test('everything render correctly', () => {
+it('renders', () => {
   setPage(10)
   render(<Pagination totalPages={20} />)
 
@@ -52,7 +52,7 @@ test('everything render correctly', () => {
   expect(lastPage).toBeInTheDocument()
 })
 
-test('first page link sends to the first page', () => {
+test('the first page link links to the first page', async () => {
   const pushState = setPushState()
   const onQueryStringChange = setOnQueryStringChange()
 
@@ -60,7 +60,7 @@ test('first page link sends to the first page', () => {
   render(<Pagination totalPages={20} />)
 
   const firstPageLink = screen.getByRole('link', { name: /first/i })
-  userEvent.click(firstPageLink)
+  await userEvent.click(firstPageLink)
 
   expect(pushState).toHaveBeenNthCalledWith(1, {}, '', '?query=cat&page=1')
   expect(onQueryStringChange).toHaveBeenCalledTimes(1)
@@ -68,7 +68,7 @@ test('first page link sends to the first page', () => {
   removeOnQueryStringChange(onQueryStringChange)
 })
 
-test('first page link does not render if it is already visible', () => {
+test("the first page link doesn't render if it's already visible", () => {
   setPage(1)
   const { rerender } = render(<Pagination totalPages={20} />)
 
@@ -88,7 +88,7 @@ test('first page link does not render if it is already visible', () => {
   expect(firstPage).not.toBeInTheDocument()
 })
 
-test('last page link sends to the last page', () => {
+test('the last page link links to the last page', async () => {
   const pushState = setPushState()
   const onQueryStringChange = setOnQueryStringChange()
 
@@ -96,7 +96,7 @@ test('last page link sends to the last page', () => {
   render(<Pagination totalPages={20} />)
 
   const lastPageLink = screen.getByRole('link', { name: /last/i })
-  userEvent.click(lastPageLink)
+  await userEvent.click(lastPageLink)
 
   expect(pushState).toHaveBeenNthCalledWith(1, {}, '', '?query=cat&page=20')
   expect(onQueryStringChange).toHaveBeenCalledTimes(1)
@@ -104,7 +104,7 @@ test('last page link sends to the last page', () => {
   removeOnQueryStringChange(onQueryStringChange)
 })
 
-test('last page link does not render if it is already visible', () => {
+test("the last page link doesn't render if it's already visible", () => {
   setPage(18)
   const { rerender } = render(<Pagination totalPages={20} />)
 
@@ -124,7 +124,7 @@ test('last page link does not render if it is already visible', () => {
   expect(lastPage).not.toBeInTheDocument()
 })
 
-test('previous page link sends to the previous page', () => {
+test('the previous page link links to the previous page', async () => {
   const pushState = setPushState()
   const onQueryStringChange = setOnQueryStringChange()
 
@@ -132,7 +132,7 @@ test('previous page link sends to the previous page', () => {
   render(<Pagination totalPages={20} />)
 
   const previousPageLink = screen.getByRole('link', { name: /previous/i })
-  userEvent.click(previousPageLink)
+  await userEvent.click(previousPageLink)
 
   expect(pushState).toHaveBeenNthCalledWith(1, {}, '', '?query=cat&page=9')
   expect(onQueryStringChange).toHaveBeenCalledTimes(1)
@@ -140,15 +140,14 @@ test('previous page link sends to the previous page', () => {
   removeOnQueryStringChange(onQueryStringChange)
 })
 
-test('previous page link does not render if there is no previous page', () => {
+test("the previous page link doesn't render if there is no previous page", () => {
   setPage(1)
   render(<Pagination totalPages={20} />)
-
   const previousPage = screen.queryByRole('link', { name: /previous/i })
   expect(previousPage).not.toBeInTheDocument()
 })
 
-test('next page link sends to the next page', () => {
+test('the next page link links to the next page', async () => {
   const pushState = setPushState()
   const onQueryStringChange = setOnQueryStringChange()
 
@@ -156,7 +155,7 @@ test('next page link sends to the next page', () => {
   render(<Pagination totalPages={20} />)
 
   const nextPageLink = screen.getByRole('link', { name: /next/i })
-  userEvent.click(nextPageLink)
+  await userEvent.click(nextPageLink)
 
   expect(pushState).toHaveBeenNthCalledWith(1, {}, '', '?query=cat&page=11')
   expect(onQueryStringChange).toHaveBeenCalledTimes(1)
@@ -164,10 +163,9 @@ test('next page link sends to the next page', () => {
   removeOnQueryStringChange(onQueryStringChange)
 })
 
-test('next page link does not render if there is no next page', () => {
+test("the next page link doesn't render if there is no next page", () => {
   setPage(20)
   render(<Pagination totalPages={20} />)
-
   const nextPage = screen.queryByRole('link', { name: /next/i })
   expect(nextPage).not.toBeInTheDocument()
 })
@@ -206,7 +204,7 @@ test('there is no additional pages with the last and second to last page', () =>
   expect(page22).not.toBeInTheDocument()
 })
 
-test('a numbered page sends to the matching numbered page', () => {
+test('a numbered page sends to the matching numbered page', async () => {
   const pushState = setPushState()
   const onQueryStringChange = setOnQueryStringChange()
 
@@ -214,7 +212,7 @@ test('a numbered page sends to the matching numbered page', () => {
   render(<Pagination totalPages={20} />)
 
   const page12Link = screen.getByRole('link', { name: /12/i })
-  userEvent.click(page12Link)
+  await userEvent.click(page12Link)
 
   expect(pushState).toHaveBeenNthCalledWith(1, {}, '', '?query=cat&page=12')
   expect(onQueryStringChange).toHaveBeenCalledTimes(1)

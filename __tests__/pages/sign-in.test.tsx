@@ -19,17 +19,17 @@ beforeEach(() => {
   useToast.mockReturnValue({})
 })
 
-test("the form signs in the user and redirect him to it's profile", async () => {
+test('the form signs in the user and redirect him to its profile', async () => {
   render(<SignIn providers={null} />)
 
   const emailInput = screen.getByRole('textbox')
-  userEvent.type(emailInput, 'johndoe@test.com')
+  await userEvent.type(emailInput, 'johndoe@test.com')
 
   const passwordInput = screen.getByLabelText(/^password$/i)
-  userEvent.type(passwordInput, 'my super password')
+  await userEvent.type(passwordInput, 'my super password')
 
   const submitBtn = screen.getByRole('button', { name: /sign in/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await waitFor(() => {
     expect(router.push).toHaveBeenNthCalledWith(1, '/profile')
@@ -40,22 +40,22 @@ test('an error renders if the server fails to sign in the user', async () => {
   const setToast = jest.fn()
   useToast.mockReturnValue({ setToast })
   signIn.mockResolvedValueOnce({
-    error: JSON.stringify({ name: 'email', message: err.EMAIL_USED }),
+    error: JSON.stringify({ message: err.DEFAULT }),
   })
 
   render(<SignIn providers={null} />)
 
   const emailInput = screen.getByRole('textbox')
-  userEvent.type(emailInput, 'johndoe@test.com')
+  await userEvent.type(emailInput, 'johndoe@test.com')
 
   const passwordInput = screen.getByLabelText(/^password$/i)
-  userEvent.type(passwordInput, 'my super password')
+  await userEvent.type(passwordInput, 'my super password')
 
   const submitBtn = screen.getByRole('button', { name: /sign in/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    const toast = { message: 'Error', error: true }
+    const toast = { message: err.DEFAULT, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })
@@ -68,13 +68,13 @@ test('an error renders if the server fails to validate the request data', async 
   render(<SignIn providers={null} />)
 
   const emailInput = screen.getByRole('textbox')
-  userEvent.type(emailInput, 'johndoe@test.com')
+  await userEvent.type(emailInput, 'johndoe@test.com')
 
   const passwordInput = screen.getByLabelText(/^password$/i)
-  userEvent.type(passwordInput, 'my super password')
+  await userEvent.type(passwordInput, 'my super password')
 
   const submitBtn = screen.getByRole('button', { name: /sign in/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent(err.EMAIL_INVALID)
@@ -82,7 +82,7 @@ test('an error renders if the server fails to validate the request data', async 
   await waitFor(() => expect(emailInput).toHaveFocus())
 })
 
-test('the providers render', () => {
+test('the providers render', async () => {
   type MockProvider = Record<
     LiteralUnion<'google' | 'email', string>,
     ClientSafeProvider
@@ -107,7 +107,7 @@ test('the providers render', () => {
   const googleBtn = screen.getByRole('button', { name: /google/i })
   expect(googleBtn).toBeInTheDocument()
 
-  userEvent.click(googleBtn)
+  await userEvent.click(googleBtn)
   expect(signIn).toHaveBeenNthCalledWith(1, 'google', {
     callbackUrl: 'http://localhost:3000/profile',
   })

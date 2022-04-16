@@ -31,26 +31,20 @@ const Pagination = ({ totalPages }: PaginationProps) => {
     setCurrentPage(page)
   }
 
+  const linkClass =
+    'flex justify-center items-center rounded w-[28px] h-[28px] md:w-32 md:h-32 bg-fuchsia-100 hover:bg-fuchsia-300 transition-colors duration-200'
+
   const pagesLinks: React.ReactNode[] = []
 
   const start = currentPage > 2 ? currentPage - 2 : 1
   const end = currentPage < totalPages - 1 ? currentPage + 2 : totalPages
 
   for (let i = start; i <= end; i++) {
-    let ariaCurrent: 'page' | undefined = undefined
-    let linkClass =
-      'border border-indigo-600 rounded px-8 py-4 text-s hover:bg-indigo-600 hover:text-white'
-
-    if (i === currentPage) {
-      linkClass += ' bg-indigo-600 text-white'
-      ariaCurrent = 'page'
-    }
-
     pagesLinks.push(
-      <li key={i} className="mr-4" aria-current={ariaCurrent}>
+      <li key={i} aria-current={i === currentPage ? 'page' : undefined}>
         <Link
           href="#"
-          className={linkClass}
+          className={linkClass + (i === currentPage ? 'bg-fuchsia-300' : '')}
           aria-label={`Page ${i}`}
           onClick={(e) => onClick(e, i)}
         >
@@ -61,13 +55,13 @@ const Pagination = ({ totalPages }: PaginationProps) => {
   }
 
   return (
-    <nav aria-label="Pages" className="col-span-full">
-      <ul className="flex justify-center">
+    <nav aria-label="Pages">
+      <ol className="flex gap-x-8 justify-center mt-16">
         {currentPage > 3 && (
           <li>
             <Link
               href="#"
-              className="border border-indigo-600 rounded px-8 py-4 text-s mr-4 hover:bg-indigo-600 hover:text-white"
+              className={linkClass}
               aria-label="First page"
               onClick={(e) => onClick(e, 1)}
             >
@@ -79,7 +73,7 @@ const Pagination = ({ totalPages }: PaginationProps) => {
           <li>
             <Link
               href="#"
-              className="border border-indigo-600 rounded px-8 py-4 text-s mr-4 hover:bg-indigo-600 hover:text-white"
+              className={linkClass}
               aria-label="Previous page"
               onClick={(e) => onClick(e, currentPage - 1)}
             >
@@ -92,7 +86,7 @@ const Pagination = ({ totalPages }: PaginationProps) => {
           <li>
             <Link
               href="#"
-              className="border border-indigo-600 rounded px-8 py-4 text-s mr-4 hover:bg-indigo-600 hover:text-white"
+              className={linkClass}
               aria-label="Next page"
               onClick={(e) => onClick(e, currentPage + 1)}
             >
@@ -104,7 +98,7 @@ const Pagination = ({ totalPages }: PaginationProps) => {
           <li>
             <Link
               href="#"
-              className="border border-indigo-600 rounded px-8 py-4 text-s hover:bg-indigo-600 hover:text-white"
+              className={linkClass}
               aria-label="Last page"
               onClick={(e) => onClick(e, totalPages)}
             >
@@ -112,7 +106,7 @@ const Pagination = ({ totalPages }: PaginationProps) => {
             </Link>
           </li>
         )}
-      </ul>
+      </ol>
     </nav>
   )
 }

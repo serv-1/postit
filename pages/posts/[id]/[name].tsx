@@ -2,7 +2,7 @@ import axios from 'axios'
 import { GetServerSideProps } from 'next'
 import { IPost } from '../../../types/common'
 import PostImages from '../../../components/PostImages'
-import addCommasToNb from '../../../utils/functions/addCommasToNb'
+import addSpacesToNb from '../../../utils/functions/addSpacesToNb'
 import Head from 'next/head'
 import Link from '../../../components/Link'
 import PostList from '../../../components/PostList'
@@ -47,7 +47,7 @@ const Post = ({ post }: PostProps) => {
           <div className="mb-8">
             for{' '}
             <span className="text-indigo-600 text-4xl md:text-t-4xl lg:text-d-4xl font-bold ">
-              {addCommasToNb(post.price)}€
+              {addSpacesToNb(post.price)}€
             </span>
           </div>
           <PostImages images={post.images} />

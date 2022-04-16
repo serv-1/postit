@@ -1,8 +1,8 @@
-import { ISearchedPost, IUserPost } from '../types/common'
+import { ILightPost, IUserPost } from '../types/common'
 import Post from './Post'
 
 interface PostListProps {
-  posts: ISearchedPost[] | IUserPost[]
+  posts: ILightPost[] | IUserPost[]
 }
 
 const PostList = ({ posts }: PostListProps) => {

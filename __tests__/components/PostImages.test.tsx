@@ -4,7 +4,7 @@ import PostImages from '../../components/PostImages'
 
 /** images[0] is the selected image */
 
-test('images render', () => {
+it('renders', () => {
   render(<PostImages images={['/img1', '/img2', '/img3']} />)
 
   const images = screen.getAllByRole('img')
@@ -17,19 +17,14 @@ test('images render', () => {
 
 test('clicking an image select it', async () => {
   render(<PostImages images={['/img1', '/img2', '/img3']} />)
-
   const images = screen.getAllByRole('img')
-
-  userEvent.click(images[2])
-
+  await userEvent.click(images[2])
   expect(images[0]).toHaveAttribute('src', '/img2')
 })
 
 test('only 1 image render', () => {
   render(<PostImages images={['/img1']} />)
-
   const images = screen.getAllByRole('img')
-
   expect(images).toHaveLength(1)
 })
 
@@ -37,12 +32,10 @@ test('if the given images are updated then the default selected image is updated
   const { rerender } = render(<PostImages images={['/img1']} />)
 
   let selectedImage = screen.getByRole('img')
-
   expect(selectedImage).toHaveAttribute('src', '/img1')
 
   rerender(<PostImages images={['/img2']} />)
 
   selectedImage = screen.getByRole('img')
-
   expect(selectedImage).toHaveAttribute('src', '/img2')
 })

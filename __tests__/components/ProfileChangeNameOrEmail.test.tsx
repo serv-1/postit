@@ -14,14 +14,14 @@ const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 beforeEach(() => useToast.mockReturnValue({}))
 
-test('the user name/email and the form render correctly', async () => {
+it('renders', async () => {
   render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const name = screen.getByText('John Doe')
   expect(name).toBeInTheDocument()
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   const form = screen.getByRole('form')
   expect(form).toBeInTheDocument()
@@ -38,7 +38,7 @@ test('an input with an email type renders', async () => {
   render(<ProfileChangeNameOrEmail type="email" value="johndoe@test.com" />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
@@ -50,15 +50,15 @@ test('the cancel button cancels the editing process', async () => {
   render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
   const input = screen.getByRole('textbox')
-  userEvent.type(input, ' edited')
+  await userEvent.type(input, ' edited')
 
   const cancelBtn = screen.getByRole('button', { name: /cancel/i })
-  userEvent.click(cancelBtn)
+  await userEvent.click(cancelBtn)
 
   const name = screen.getByText('John Doe')
   expect(name).toBeInTheDocument()
@@ -71,15 +71,15 @@ test('an alert renders if the user name/email is updated and the new user name/e
   render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
   const input = screen.getByRole('textbox')
-  userEvent.type(input, ' edited')
+  await userEvent.type(input, ' edited')
 
   const submitBtn = screen.getByRole('button', { name: /submit/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   const name = await screen.findByText('John Doe' + ' edited')
   expect(name).toBeInTheDocument()
@@ -87,23 +87,23 @@ test('an alert renders if the user name/email is updated and the new user name/e
   await waitFor(() => expect(setToast).toHaveNthReturnedWith(1, undefined))
 })
 
-test('the user name/email does not update if it has not change', async () => {
+test("the user name/email doesn't update if it hasn't change", async () => {
   const setToast = jest.fn()
   useToast.mockReturnValue({ setToast })
 
   render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
   const input = screen.getByRole('textbox')
-  userEvent.clear(input)
-  userEvent.type(input, 'John Doe')
+  await userEvent.clear(input)
+  await userEvent.type(input, 'John Doe')
 
   const submitBtn = screen.getByRole('button', { name: /submit/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await screen.findByText('John Doe')
 
@@ -120,15 +120,15 @@ test('an error renders if the server fails to update the user', async () => {
   render(<ProfileChangeNameOrEmail type="name" value="John Doe" />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
   const input = screen.getByRole('textbox')
-  userEvent.type(input, ' edited')
+  await userEvent.type(input, ' edited')
 
   const submitBtn = screen.getByRole('button', { name: /submit/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent(err.NAME_MAX)

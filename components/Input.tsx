@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React from 'react'
+import React, { ReactNode } from 'react'
 import {
   FieldPath,
   FieldValues,
@@ -7,64 +7,73 @@ import {
   useFormContext,
 } from 'react-hook-form'
 
-interface InputProps<FormFields extends FieldValues = FieldValues>
+interface InputProps<FormFields extends FieldValues>
   extends React.ComponentPropsWithoutRef<'input'> {
   name: FieldPath<FormFields>
   registerOptions?: RegisterOptions<FormFields>
   type: 'text' | 'email' | 'number' | 'file' | 'password' | 'search'
   needFocus?: boolean
-  isTextArea?: false
+  addOn?: ReactNode
+  addOnClass?: string
 }
 
-interface TextAreaProps<FormFields extends FieldValues = FieldValues>
-  extends React.ComponentPropsWithoutRef<'textarea'> {
-  name: FieldPath<FormFields>
-  registerOptions?: RegisterOptions<FormFields>
-  type?: undefined
-  needFocus?: boolean
-  isTextArea: true
-}
-
-const Input = <FormFields extends FieldValues = FieldValues>({
+const Input = <FormFields extends FieldValues>({
+  type,
   name,
   registerOptions,
   needFocus,
   className,
+  addOn,
+  addOnClass,
   ...props
-}: InputProps<FormFields> | TextAreaProps<FormFields>) => {
-  const { isTextArea, type } = props
-
+}: InputProps<FormFields>) => {
   const { register, setFocus, formState } = useFormContext<FormFields>()
   const { isSubmitted, errors } = formState
 
-  const _className = classNames(
-    'border rounded p-4 w-full align-top',
-    {
-      'file:border-none file:py-4 file:px-8 file:mr-8 p-0': type === 'file',
-    },
+  const border =
     isSubmitted && errors[name]
-      ? 'border-red-600' + (type === 'file' ? ' file:bg-red-200' : '')
-      : 'border-indigo-600' + (type === 'file' ? ' file:bg-indigo-200' : ''),
-    className
-  )
+      ? 'border-2 border-red-600 focus-within:border-red-900'
+      : 'border-[rgba(112,26,117,0.25)] focus-within:border-[rgba(112,26,117,0.75)]'
+
+  const fileInputClass =
+    'file:border-none file:p-8 file:mr-8 file:text-fuchsia-900 file:bg-fuchsia-100 rounded p-0 bg-fuchsia-50 hover:file:bg-fuchsia-600 hover:file:text-fuchsia-50 file:transition-colors cursor-pointer file:cursor-pointer w-full'
+
+  const otherInputClass =
+    'p-8 outline-none placeholder:text-[rgba(112,26,117,0.5)] bg-fuchsia-50 w-full'
 
   React.useEffect(() => {
     if (needFocus) setFocus(name)
   }, [needFocus, setFocus, name])
 
+  const inputClass = classNames(
+    type === 'file' ? fileInputClass : otherInputClass,
+    className
+  )
+
   const attributes = {
+    type,
     ...register(name, registerOptions),
-    className: _className,
     id: name,
-    'aria-describedby': name + 'Feedback',
+    'aria-describedby': `${name}Feedback`,
+    ...props,
   }
 
-  delete props.isTextArea
-
-  return isTextArea ? (
-    <textarea {...props} {...attributes}></textarea>
+  return addOn ? (
+    <div
+      data-testid="container"
+      className={
+        border +
+        ' flex flex-row flex-nowrap items-center bg-fuchsia-50 border-b-2 transition-colors rounded'
+      }
+    >
+      <input {...attributes} className={inputClass + ' rounded-l'} />
+      <div className={classNames(addOnClass, 'pr-8')}>{addOn}</div>
+    </div>
   ) : (
-    <input {...props} {...attributes} />
+    <input
+      {...attributes}
+      className={`${inputClass} ${border} border-b-2 transition-colors rounded`}
+    />
   )
 }
 

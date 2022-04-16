@@ -31,7 +31,7 @@ const post = {
   userId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
 }
 
-test("the post's name renders", () => {
+test('its name renders', () => {
   render(<ProfilePost post={post} />)
 
   const postName = screen.getByText(post.name)
@@ -45,7 +45,7 @@ test('the delete button deletes the post', async () => {
   render(<ProfilePost post={post} />)
 
   const deleteBtn = screen.getByRole('button', { name: /delete/i })
-  userEvent.click(deleteBtn)
+  await userEvent.click(deleteBtn)
 
   await waitFor(() => {
     expect(setToast).toHaveNthReturnedWith(1, undefined)
@@ -62,7 +62,7 @@ test('an error renders if the server fails to delete the post', async () => {
   render(<ProfilePost post={post} />)
 
   const deleteBtn = screen.getByRole('button', { name: /delete/i })
-  userEvent.click(deleteBtn)
+  await userEvent.click(deleteBtn)
 
   await waitFor(() => {
     const toast = { message: err.DEFAULT, error: true }
@@ -74,7 +74,7 @@ test('the form displays the actual post data', async () => {
   render(<ProfilePost post={post} />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
@@ -101,15 +101,15 @@ test('an alert renders if the post is updated and the new value is shown instead
   render(<ProfilePost post={post} />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
   const inputName = screen.getByRole('textbox', { name: /name/i })
-  userEvent.type(inputName, 'Garden gnome')
+  await userEvent.type(inputName, 'Garden gnome')
 
   const submitBtn = screen.getByRole('button', { name: /update/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await waitFor(() => expect(setToast).toHaveBeenCalledTimes(1))
 
@@ -123,19 +123,19 @@ test('the new images are shown instead of the old ones', async () => {
   render(<ProfilePost post={post} />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
   const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
 
   const fileInput = screen.getByLabelText(/images/i)
-  userEvent.upload(fileInput, image)
+  await userEvent.upload(fileInput, image)
 
   const oldImgSrc = screen.getByRole('img').getAttribute('src')
 
   const submitBtn = screen.getByRole('button', { name: /update/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await waitFor(() => {
     const newImgSrc = screen.getByRole('img').getAttribute('src')
@@ -153,12 +153,12 @@ test('an error renders if the server fails to update the post', async () => {
   render(<ProfilePost post={post} />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
   const submitBtn = screen.getByRole('button', { name: /update/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   await waitFor(() => {
     const toast = { message: err.DEFAULT, error: true }
@@ -179,12 +179,12 @@ test('an error renders if the server fails to validate the request data', async 
   render(<ProfilePost post={post} />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
   const submitBtn = screen.getByRole('button', { name: /update/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent(err.NAME_MAX)
@@ -194,37 +194,37 @@ test('an error renders if an image is invalid', async () => {
   render(<ProfilePost post={post} />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
   const notImage = new File(['data'], 'text.txt', { type: 'text/plain' })
   const imagesInput = screen.getByLabelText(/images/i)
-  userEvent.upload(imagesInput, notImage)
+  await userEvent.upload(imagesInput, notImage)
 
   const submitBtn = screen.getByRole('button', { name: /update/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent(err.IMAGE_INVALID)
 })
 
-test('an error renders if an image cannot be read as data url', async () => {
+test("an error renders if an image can't be read as data url", async () => {
   mockReadAsDataUrl.mockResolvedValue('error')
 
   render(<ProfilePost post={post} />)
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
-  userEvent.click(editBtn)
+  await userEvent.click(editBtn)
 
   await screen.findByTestId('csrfToken')
 
   const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
   const imagesInput = screen.getByLabelText(/images/i)
-  userEvent.upload(imagesInput, image)
+  await userEvent.upload(imagesInput, image)
 
   const submitBtn = screen.getByRole('button', { name: /update/i })
-  userEvent.click(submitBtn)
+  await userEvent.click(submitBtn)
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent('error')

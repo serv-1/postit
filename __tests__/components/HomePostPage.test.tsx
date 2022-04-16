@@ -12,12 +12,8 @@ const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 beforeEach(() => useToast.mockReturnValue({ setToast: () => null }))
 
-test('an informative text renders if the user have not search something yet', () => {
+test("an informative text renders if the user hasn't searched something yet", () => {
   render(<HomePostPage />)
-
-  const container = screen.getByTestId('container')
-  expect(container).toHaveClass('my-auto')
-
   const text = screen.getByRole('status')
   expect(text).toHaveTextContent(/search something/i)
 })
@@ -37,27 +33,24 @@ test('an informative text renders if no posts have been found', async () => {
 
   render(<HomePostPage />)
 
-  const container = screen.getByTestId('container')
-  expect(container).toHaveClass('my-auto')
-
   const text = screen.getByRole('status')
   await waitFor(() => expect(text).toHaveTextContent(/no posts found/i))
 })
 
-test('a request is send to fetch the posts matching the query parameters', async () => {
+test("a request is sent to fetch the posts matching the url query string's data", async () => {
   const search = '?query=cat'
   Object.defineProperty(window, 'location', { get: () => ({ search }) })
 
   render(<HomePostPage />)
+
+  const nbOfPostsFound = await screen.findByText(/2/)
+  expect(nbOfPostsFound).toBeInTheDocument()
 
   const post1 = await screen.findByRole('link', { name: /blue cat/i })
   expect(post1).toBeInTheDocument()
 
   const post2 = await screen.findByRole('link', { name: /red cat/i })
   expect(post2).toBeInTheDocument()
-
-  const container = screen.getByTestId('container')
-  expect(container).not.toHaveClass('my-auto')
 })
 
 test('an error renders if the server fails to fetch the posts', async () => {

@@ -1,15 +1,18 @@
-import ReactSelect, { StylesConfig, MultiValue } from 'react-select'
+import ReactSelect, {
+  StylesConfig,
+  MultiValue,
+  CSSObjectWithLabel,
+} from 'react-select'
 import { useController, FieldValues, FieldPath } from 'react-hook-form'
-import classNames from 'classnames'
 import { StateManagerProps } from 'react-select/dist/declarations/src/useStateManager'
 import { Categories } from '../types/common'
 
-interface Option {
+export interface Option {
   label: Categories
   value: Categories
 }
 
-interface SelectProps<FormFields extends FieldValues = FieldValues>
+export interface SelectProps<FormFields extends FieldValues = FieldValues>
   extends StateManagerProps<Option, true> {
   name: FieldPath<FormFields>
   options: Option[]
@@ -18,34 +21,44 @@ interface SelectProps<FormFields extends FieldValues = FieldValues>
 const Select = <FormFields extends FieldValues = FieldValues>({
   name,
   options,
-  className,
   ...props
 }: SelectProps<FormFields>) => {
   const { field, formState } = useController<FormFields>({ name })
   const { isSubmitted, errors } = formState
 
-  const selectClass = classNames(
-    'border border-indigo-600 rounded',
-    className,
-    isSubmitted && errors[name] ? 'border-red-600' : 'border-indigo-600'
-  )
-
   const styles: StylesConfig<Option> = {
-    control: () => ({ display: 'flex' }),
-    menu: (provided) => ({ ...provided, border: '1px solid #4f46e5' }),
-    valueContainer: (provided) => ({ ...provided, padding: '0 8px 0 0' }),
-    placeholder: (provided) => ({ ...provided, paddingLeft: 4 }),
-    input: (provided) => ({ ...provided, paddingLeft: 4 }),
+    control: (provided, states) => {
+      const styles: CSSObjectWithLabel = {
+        display: 'flex',
+        height: 40,
+        backgroundColor: '#FDF4FF',
+        borderRadius: '4px',
+      }
+
+      if (isSubmitted && errors[name]) {
+        styles.border = `2px solid #${states.isFocused ? '881337' : 'E11D48'}`
+      } else {
+        const a = states.isFocused ? '0.75' : '0.25'
+        styles.borderBottom = `2px solid rgba(112,26,117,${a})`
+      }
+
+      return styles
+    },
+    menu: (provided) => ({
+      ...provided,
+      backgroundColor: '#fdf4ff',
+      borderBottom: '2px solid rgba(112,26,117,0.25)',
+      zIndex: 9999,
+    }),
+    placeholder: (provided) => ({ ...provided, color: 'rgba(112,26,117,0.5)' }),
     option: (provided, state) => {
-      const backgroundColor = state.isFocused
-        ? '#c7d2fe'
-        : provided.backgroundColor
       return {
         ...provided,
-        backgroundColor,
-        '&:hover': { backgroundColor: '#c7d2fe' },
+        backgroundColor: state.isFocused ? '#f5d0fe' : provided.backgroundColor,
+        '&:hover': { backgroundColor: '#f5d0fe' },
       }
     },
+    indicatorSeparator: () => ({ display: 'none' }),
   }
 
   const value = options.filter(({ value }) => field.value?.includes(value))
@@ -59,11 +72,10 @@ const Select = <FormFields extends FieldValues = FieldValues>({
       {...field}
       inputId={field.name}
       options={options}
-      className={selectClass}
       styles={styles}
       value={value}
       onChange={onChange}
-      aria-label={props['aria-label']}
+      {...props}
     />
   )
 }
