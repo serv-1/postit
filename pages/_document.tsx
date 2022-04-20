@@ -1,6 +1,8 @@
-import { Html, Head, Main, NextScript } from 'next/document'
+import { Html, Head, Main, NextScript, DocumentProps } from 'next/document'
 
-const Document = () => {
+const Document = (props: DocumentProps) => {
+  const pageProps = props?.__NEXT_DATA__?.props?.pageProps
+
   return (
     <Html>
       <Head>
@@ -15,7 +17,7 @@ const Document = () => {
           rel="stylesheet"
         />
       </Head>
-      <body>
+      <body className={pageProps?.background}>
         <Main />
         <NextScript />
       </body>

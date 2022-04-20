@@ -31,13 +31,14 @@ it('renders', async () => {
       name="test"
       registerOptions={{ onChange }}
       className="blue"
+      aria-describedby="described"
     />
   )
 
   const input = screen.getByRole('textbox')
   expect(input).toHaveAttribute('id', 'test')
   expect(input).toHaveAttribute('name', 'test')
-  expect(input).toHaveAttribute('aria-describedby', 'testFeedback')
+  expect(input).toHaveAttribute('aria-describedby', 'testFeedback described')
   expect(input).toHaveClass('blue')
   expect(input.className).toContain('border')
   expect(input.className).not.toContain('red')
@@ -89,12 +90,19 @@ test('file input has different class', () => {
 
 test('the add-on renders', () => {
   render(
-    <Input<FormFields> type="text" name="test" addOn="@" addOnClass="dark" />
+    <Input<FormFields>
+      type="text"
+      name="test"
+      addOn="@"
+      addOnClass="dark"
+      containerClass="red"
+    />
   )
 
   const addOn = screen.getByText('@')
   expect(addOn).toHaveClass('dark')
 
   const container = screen.getByTestId('container')
+  expect(container).toHaveClass('red')
   expect(container.className).toContain('border')
 })

@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { ReactNode } from 'react'
+import { ComponentPropsWithoutRef, ReactNode, useEffect } from 'react'
 import {
   FieldPath,
   FieldValues,
@@ -7,15 +7,25 @@ import {
   useFormContext,
 } from 'react-hook-form'
 
-interface InputProps<FormFields extends FieldValues>
-  extends React.ComponentPropsWithoutRef<'input'> {
+interface InputWithoutAddOnProps {
+  addOn?: undefined
+  addOnClass?: undefined
+  containerClass?: undefined
+}
+
+interface InputWithAddOnProps {
+  addOn: ReactNode
+  addOnClass?: string
+  containerClass?: string
+}
+
+type InputProps<FormFields extends FieldValues> = {
   name: FieldPath<FormFields>
   registerOptions?: RegisterOptions<FormFields>
   type: 'text' | 'email' | 'number' | 'file' | 'password' | 'search'
   needFocus?: boolean
-  addOn?: ReactNode
-  addOnClass?: string
-}
+} & ComponentPropsWithoutRef<'input'> &
+  (InputWithoutAddOnProps | InputWithAddOnProps)
 
 const Input = <FormFields extends FieldValues>({
   type,
@@ -25,6 +35,8 @@ const Input = <FormFields extends FieldValues>({
   className,
   addOn,
   addOnClass,
+  containerClass,
+  'aria-describedby': ariaDescribedBy,
   ...props
 }: InputProps<FormFields>) => {
   const { register, setFocus, formState } = useFormContext<FormFields>()
@@ -41,7 +53,7 @@ const Input = <FormFields extends FieldValues>({
   const otherInputClass =
     'p-8 outline-none placeholder:text-[rgba(112,26,117,0.5)] bg-fuchsia-50 w-full'
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (needFocus) setFocus(name)
   }, [needFocus, setFocus, name])
 
@@ -54,17 +66,18 @@ const Input = <FormFields extends FieldValues>({
     type,
     ...register(name, registerOptions),
     id: name,
-    'aria-describedby': `${name}Feedback`,
+    'aria-describedby': classNames(`${name}Feedback`, ariaDescribedBy),
     ...props,
   }
 
   return addOn ? (
     <div
       data-testid="container"
-      className={
-        border +
-        ' flex flex-row flex-nowrap items-center bg-fuchsia-50 border-b-2 transition-colors rounded'
-      }
+      className={classNames(
+        border,
+        'flex flex-row flex-nowrap items-center bg-fuchsia-50 border-b-2 transition-colors rounded',
+        containerClass
+      )}
     >
       <input {...attributes} className={inputClass + ' rounded-l'} />
       <div className={classNames(addOnClass, 'pr-8')}>{addOn}</div>

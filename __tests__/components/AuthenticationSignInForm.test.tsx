@@ -1,4 +1,4 @@
-import SignIn from '../../pages/auth/sign-in'
+import AuthenticationSignInForm from '../../components/AuthenticationSignInForm'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
@@ -19,10 +19,11 @@ beforeEach(() => {
   useToast.mockReturnValue({})
 })
 
-test('the form signs in the user and redirect him to its profile', async () => {
-  render(<SignIn providers={null} />)
+it('signs in the user and redirects him to its profile', async () => {
+  render(<AuthenticationSignInForm providers={null} />)
 
   const emailInput = screen.getByRole('textbox')
+  expect(emailInput).toHaveFocus()
   await userEvent.type(emailInput, 'johndoe@test.com')
 
   const passwordInput = screen.getByLabelText(/^password$/i)
@@ -43,7 +44,7 @@ test('an error renders if the server fails to sign in the user', async () => {
     error: JSON.stringify({ message: err.DEFAULT }),
   })
 
-  render(<SignIn providers={null} />)
+  render(<AuthenticationSignInForm providers={null} />)
 
   const emailInput = screen.getByRole('textbox')
   await userEvent.type(emailInput, 'johndoe@test.com')
@@ -65,7 +66,7 @@ test('an error renders if the server fails to validate the request data', async 
     error: JSON.stringify({ name: 'email', message: err.EMAIL_INVALID }),
   })
 
-  render(<SignIn providers={null} />)
+  render(<AuthenticationSignInForm providers={null} />)
 
   const emailInput = screen.getByRole('textbox')
   await userEvent.type(emailInput, 'johndoe@test.com')
@@ -102,7 +103,7 @@ test('the providers render', async () => {
     credentials: createProvider('credentials'),
   }
 
-  render(<SignIn providers={mockProviders} />)
+  render(<AuthenticationSignInForm providers={mockProviders} />)
 
   const googleBtn = screen.getByRole('button', { name: /google/i })
   expect(googleBtn).toBeInTheDocument()

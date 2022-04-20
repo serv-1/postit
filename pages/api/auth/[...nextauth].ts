@@ -48,7 +48,7 @@ export default NextAuth({
     }),
   ],
   pages: {
-    signIn: '/auth/sign-in',
+    signIn: '/authentication',
     verifyRequest: '/auth/mail-sent',
   },
   callbacks: {

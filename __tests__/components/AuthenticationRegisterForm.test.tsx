@@ -1,4 +1,4 @@
-import Register from '../../pages/register'
+import AuthenticationRegisterForm from '../../components/AuthenticationRegisterForm'
 import { screen, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
@@ -20,13 +20,14 @@ beforeEach(() => {
   useRouter.mockReturnValue(router)
 })
 
-test('the form registers the user, sends him a mail, signs in him and redirects him to its profile', async () => {
-  render(<Register />)
+it('registers the user, sends him a mail, signs in him and redirects him to its profile', async () => {
+  render(<AuthenticationRegisterForm />)
 
   const nameInput = screen.getByLabelText(/name/i)
+  expect(nameInput).toHaveFocus()
   await userEvent.type(nameInput, 'John Doe')
 
-  const emailInput = screen.getByLabelText(/email/i)
+  const emailInput = screen.getByLabelText(/ema	il/i)
   await userEvent.type(emailInput, 'johndoe@test.com')
 
   const passwordInput = screen.getByLabelText(/^password$/i)
@@ -46,10 +47,10 @@ test('the form registers the user, sends him a mail, signs in him and redirects 
   })
 })
 
-test('the form redirects the user to the sign in page if it fails to do it', async () => {
+it('redirects the user to the sign in page if the server fails to signs in him', async () => {
   signIn.mockResolvedValue({ error: 'Error' })
 
-  render(<Register />)
+  render(<AuthenticationRegisterForm />)
 
   const nameInput = screen.getByLabelText(/name/i)
   expect(nameInput).toHaveFocus()
@@ -79,7 +80,7 @@ test('an error renders if the server fails to register the user', async () => {
     })
   )
 
-  render(<Register />)
+  render(<AuthenticationRegisterForm />)
 
   const nameInput = screen.getByLabelText(/name/i)
   await userEvent.type(nameInput, 'John Doe')
@@ -109,7 +110,7 @@ test('an error renders if the server fails to validate the request data', async 
     })
   )
 
-  render(<Register />)
+  render(<AuthenticationRegisterForm />)
 
   const nameInput = screen.getByLabelText(/name/i)
   await userEvent.type(nameInput, 'John Doe')

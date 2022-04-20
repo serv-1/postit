@@ -8,10 +8,6 @@
     font-family: Quicksand, sans-serif;
   }
 
-  #__next {
-    @apply mx-16 grid grid-rows-[auto_1fr_auto] min-h-[100vh];
-  }
-
   h1 {
     @apply text-m-4xl font-bold;
   }

@@ -9,7 +9,7 @@ import getAxiosError from '../utils/functions/getAxiosError'
 import Button from './Button'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
-import PasswordInput from './PasswordInput'
+import PasswordField from './PasswordField'
 import InputError from './InputError'
 
 const ProfileChangePassword = () => {
@@ -39,7 +39,7 @@ const ProfileChangePassword = () => {
     >
       <div className="mb-16">
         <label htmlFor="password">New password</label>
-        <PasswordInput<PasswordCsrfSchema> showStrength />
+        <PasswordField<PasswordCsrfSchema> showStrength />
         <InputError<PasswordCsrfSchema> inputName="password" />
       </div>
       <div className="md:text-right">

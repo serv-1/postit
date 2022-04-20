@@ -48,7 +48,7 @@ const HomePostPage = () => {
   }, [setToast])
 
   return posts && posts.length > 0 ? (
-    <div className="col-span-full lg:col-start-5 lg:row-span-full">
+    <div className="col-span-full lg:col-start-5 lg:row-span-full my-32">
       <div className="mb-16" role="status">
         {totalPosts} posts found
       </div>
