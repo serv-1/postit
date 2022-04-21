@@ -49,7 +49,7 @@ export default NextAuth({
   ],
   pages: {
     signIn: '/authentication',
-    verifyRequest: '/auth/mail-sent',
+    verifyRequest: '/mail-sent',
   },
   callbacks: {
     async jwt({ token, user, account }) {

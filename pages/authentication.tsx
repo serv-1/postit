@@ -63,7 +63,7 @@ const Authentication = ({ providers }: AuthenticationProps) => {
       <div className="flex flex-col flex-nowrap justify-center items-center">
         <Header noMenu className="px-0 py-4" />
         <main className="w-full rounded-16 min-h-[470px] overflow-hidden md:min-h-[486px] md:flex md:flex-row md:flex-nowrap">
-          <div className="flex justify-center h-full p-32 bg-[rgba(253,244,255,0.6)] backdrop-blur-[4px] shadow-[-8px_8px_8px_rgba(112,26,117,0.05),inset_4px_-4px_8px_rgba(253,244,255,0.1),inset_-4px_4px_8px_rgba(253,244,255,0.2)] md:bg-fuchsia-50 md:shadow-[-8px_8px_8px_rgba(112,26,117,0.05)] md:basis-1/2">
+          <div className="flex justify-center h-full p-32 bg-[rgba(253,244,255,0.6)] backdrop-blur-[4px] shadow-[-8px_8px_8px_rgba(112,26,117,0.05),inset_4px_-4px_8px_rgba(253,244,255,0.1),inset_-4px_4px_8px_rgba(253,244,255,0.2)] md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-[-8px_8px_8px_rgba(112,26,117,0.05)] md:basis-1/2">
             <div className="flex flex-col flex-nowrap h-full basis-[350px]">
               {authAction === 'forgot-password' ? (
                 <AuthenticationForgotPassword />
