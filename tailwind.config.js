@@ -45,7 +45,17 @@ module.exports = {
       32: '32px',
       full: '9999px',
     },
-    extend: {},
+    extend: {
+      keyframes: {
+        heartbeat: {
+          '0%': { transform: 'scale(1)' },
+          '33%': { transform: 'scale(1.25)' },
+          '40%': { transform: 'scale(1)' },
+          '66%': { transform: 'scale(1.25) ' },
+          '73%,100%': { transform: 'scale(1) ' },
+        },
+      },
+    },
   },
   plugins: [],
 }

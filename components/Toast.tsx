@@ -1,6 +1,5 @@
 import classNames from 'classnames'
 import { useToast } from '../contexts/toast'
-import Button from './Button'
 import X from '../public/static/images/x.svg'
 
 const Toast = () => {
@@ -21,13 +20,9 @@ const Toast = () => {
   return toast.message ? (
     <div className={toastClass} role="alert">
       <div>{toast.message}</div>
-      <Button
-        needDefaultClassNames={false}
-        className={closeBtnClass}
-        onClick={() => setToast({})}
-      >
+      <button className={closeBtnClass} onClick={() => setToast({})}>
         <X className="w-24 h-24" />
-      </Button>
+      </button>
     </div>
   ) : null
 }

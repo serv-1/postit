@@ -5,7 +5,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
 import { signInSchema, SignInSchema } from '../lib/joi/signInSchema'
 import { UnPromise } from '../types/common'
-import Button from './Button'
+import MainButton from './MainButton'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
@@ -65,9 +65,12 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
           containerClass="md:bg-fuchsia-100"
         />
 
-        <Button type="submit" className="relative left-full -translate-x-full">
+        <MainButton
+          type="submit"
+          className="relative left-full -translate-x-full"
+        >
           Sign in
-        </Button>
+        </MainButton>
       </Form>
       <div className="flex flex-row flex-nowrap items-center gap-x-4 font-bold text-center rounded-full my-16 before:block before:h-[1px] before:w-1/2 before:bg-fuchsia-900 after:block after:h-[1px] after:w-1/2 after:bg-fuchsia-900">
         Or
@@ -77,7 +80,7 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
           ({ id, name }) =>
             id === 'credentials' ||
             id === 'email' || (
-              <Button
+              <MainButton
                 key={id}
                 data-cy={`${id}Btn`}
                 className="w-full"
@@ -86,7 +89,7 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
                 }
               >
                 Sign in with {name}
-              </Button>
+              </MainButton>
             )
         )}
     </>

@@ -1,14 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ReactNode } from 'react'
 import Authentication from '../../pages/authentication'
-
-jest.mock('next/head', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => (
-    <div data-testid="documentTitle">{children}</div>
-  ),
-}))
 
 jest.mock('../../components/AuthenticationForgotPassword', () => ({
   __esModule: true,

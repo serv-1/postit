@@ -1,4 +1,4 @@
-import Button from './Button'
+import MainButton from './MainButton'
 import Form from './Form'
 import Input from './Input'
 import Select from './Select'
@@ -100,9 +100,8 @@ const HomeSearchPosts = () => {
         />
         <InputError<SearchPostsSchema> inputName="categories" />
       </div>
-      <Button
+      <button
         type="button"
-        needDefaultClassNames={false}
         className="text-fuchsia-600 border-2 border-fuchsia-600 rounded-full px-8 py-4 font-bold hover:bg-fuchsia-600 hover:text-fuchsia-50 active:bg-fuchsia-900 active:text-fuchsia-50 active:border-fuchsia-900 transition-colors mr-8"
         onClick={(e) => {
           setOpenedModal(openedModal === 'price' ? 'none' : 'price')
@@ -110,7 +109,7 @@ const HomeSearchPosts = () => {
         }}
       >
         Price
-      </Button>
+      </button>
       {openedModal === 'price' && (
         <div
           id="priceModal"
@@ -126,6 +125,7 @@ const HomeSearchPosts = () => {
                 type="number"
                 addOn="€"
                 addOnClass="text-[rgba(112,26,117,0.5)]"
+                needFocus
               />
             </div>
             <div>
@@ -143,9 +143,8 @@ const HomeSearchPosts = () => {
           <InputError<SearchPostsSchema> inputName="maxPrice" />
         </div>
       )}
-      <Button
+      <button
         type="button"
-        needDefaultClassNames={false}
         className="text-fuchsia-600 border-2 border-fuchsia-600 rounded-full px-8 py-4 font-bold hover:bg-fuchsia-600 hover:text-fuchsia-50 active:bg-fuchsia-900 active:text-fuchsia-50 active:border-fuchsia-900 transition-colors"
         onClick={(e) => {
           setOpenedModal(openedModal === 'location' ? 'none' : 'location')
@@ -153,7 +152,7 @@ const HomeSearchPosts = () => {
         }}
       >
         Location
-      </Button>
+      </button>
       {openedModal === 'location' && (
         <div
           id="locationModal"
@@ -163,13 +162,13 @@ const HomeSearchPosts = () => {
           <p>work in progress</p>
         </div>
       )}
-      <Button
+      <MainButton
         type="submit"
         aria-label="Search"
         className="absolute right-0 -bottom-[36px] md:left-1/2 md:-translate-x-1/2 md:right-auto lg:right-0 lg:left-auto lg:translate-x-0 z-10"
       >
         Search
-      </Button>
+      </MainButton>
     </Form>
   )
 }

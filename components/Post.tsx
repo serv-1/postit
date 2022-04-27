@@ -14,7 +14,7 @@ const Post = ({ id, name, price, image }: PostProps) => {
   const truncatedName = name.length > 23 ? name.slice(0, 22) + '...' : name
 
   return (
-    <figure className="w-full h-full md:w-[calc((100%-32px)/3)] md:h-1/3">
+    <figure className="w-full h-full">
       <Image
         src={image}
         alt={name}

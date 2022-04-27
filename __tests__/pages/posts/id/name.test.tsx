@@ -1,6 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import Post from '../../../../pages/posts/[id]/[name]'
 import { IPost } from '../../../../types/common'
+import userEvent from '@testing-library/user-event'
+
+jest.mock('../../../../components/Header', () => ({
+  __esModule: true,
+  default: () => <header></header>,
+}))
 
 const post: IPost = {
   id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
@@ -21,22 +27,23 @@ const post: IPost = {
 it('renders', () => {
   render(<Post post={post} />)
 
-  const mainTitle = screen.getByRole('heading', { level: 1 })
-  expect(mainTitle).toHaveTextContent(post.name)
-
-  const category = screen.getByText(post.categories[0])
-  expect(category).toBeInTheDocument()
-
-  const price = screen.getByText('5 000,12€')
-  expect(price).toBeInTheDocument()
+  const documentTitle = screen.getByTestId('documentTitle')
+  expect(documentTitle).toHaveTextContent(post.name)
 
   const img = screen.getByRole('img')
   expect(img).toHaveAttribute('src', '/table.jpeg')
+  expect(img).toHaveAttribute('alt', post.name)
 
-  const username = screen.getByRole('link')
-  expect(username).toHaveTextContent(post.user.name)
-  expect(username).toHaveAttribute('href', '/users/' + post.user.id)
-  expect(username).toHaveAttribute('title', post.user.name + "'s profile")
+  for (const link of screen.getAllByRole('link')) {
+    expect(link).toHaveTextContent(post.user.name)
+    expect(link).toHaveAttribute('href', `/users/${post.user.id}`)
+  }
+
+  const mainTitle = screen.getByRole('heading', { level: 1 })
+  expect(mainTitle).toHaveTextContent(post.name)
+
+  const price = screen.getByText('5 000,12€')
+  expect(price).toBeInTheDocument()
 
   const description = screen.getByText(post.description)
   expect(description).toBeInTheDocument()
@@ -45,7 +52,19 @@ it('renders', () => {
   expect(userOtherPostsTitle).not.toBeInTheDocument()
 })
 
-it('renders the user other posts', () => {
+test('the arrow left redirect to the previous page', async () => {
+  const back = jest.fn()
+  Object.defineProperty(window, 'history', { get: () => ({ back }) })
+
+  render(<Post post={post} />)
+
+  const arrowLeft = screen.getByRole('button', { name: /go back/i })
+  await userEvent.click(arrowLeft)
+
+  expect(back).toHaveBeenCalledTimes(1)
+})
+
+it('renders the other posts of the user', () => {
   const p = { ...post }
 
   p.user.posts.push({
@@ -57,9 +76,6 @@ it('renders the user other posts', () => {
 
   render(<Post post={post} />)
 
-  const userOtherPostsTitle = screen.getByRole('heading', { level: 2 })
-  expect(userOtherPostsTitle).toHaveTextContent(p.user.name + "'s other posts")
-
-  const postName = screen.getByText(new RegExp(p.user.posts[0].name, 'i'))
-  expect(postName).toBeInTheDocument()
+  const otherPostsTitle = screen.getByRole('heading', { level: 2 })
+  expect(otherPostsTitle).toHaveTextContent(p.user.name + "'s other posts")
 })

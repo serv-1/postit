@@ -6,7 +6,6 @@ import { useToast } from '../contexts/toast'
 import { EmailCsrfSchema, emailCsrfSchema } from '../lib/joi/emailSchema'
 import { NameCsrfSchema, nameCsrfSchema } from '../lib/joi/nameSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
-import Button from './Button'
 import Form from './Form'
 import InputError from './InputError'
 import Input from './Input'
@@ -66,29 +65,24 @@ const ProfileChangeNameOrEmail = (props: ProfileChangeNameOrEmailProps) => {
         name={type}
         needFocus
       />
-      <Button
+      <button
         type="button"
-        needDefaultClassNames={false}
         aria-label="Cancel"
         onClick={() => setShowForm(false)}
       >
         <X className="w-24 h-24 md:w-32 md:h-32" />
-      </Button>
-      <Button needDefaultClassNames={false} aria-label="Submit" type="submit">
+      </button>
+      <button aria-label="Submit" type="submit">
         <Check className="w-24 h-24 md:w-32 md:h-32" />
-      </Button>
+      </button>
       <InputError<FormFields<Type>> inputName={type} />
     </Form>
   ) : (
     <div className="flex justify-between first-of-type:mb-8">
       <span className="text-xl md:text-t-xl lg:text-d-xl">{value}</span>
-      <Button
-        needDefaultClassNames={false}
-        aria-label="Edit"
-        onClick={() => setShowForm(true)}
-      >
+      <button aria-label="Edit" onClick={() => setShowForm(true)}>
         <Pencil className="w-24 h-24 md:w-32 md:h-32" />
-      </Button>
+      </button>
     </div>
   )
 }

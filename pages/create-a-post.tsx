@@ -1,7 +1,7 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import axios, { AxiosError } from 'axios'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import Button from '../components/Button'
+import MainButton from '../components/MainButton'
 import Form from '../components/Form'
 import { useToast } from '../contexts/toast'
 import {
@@ -119,9 +119,9 @@ const CreateAPost = () => {
             <InputError<CreatePostClientSchema> inputName="images" />
           </div>
 
-          <Button type="submit" className="w-full">
+          <MainButton type="submit" className="w-full">
             Create
-          </Button>
+          </MainButton>
         </Form>
       </main>
     </>

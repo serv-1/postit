@@ -9,7 +9,7 @@ export const imageSchema = object({
     'string.base64': err.IMAGE_INVALID,
     'any.required': err.IMAGE_REQUIRED,
   }),
-  ext: Joi.string().required().valid('jpeg', 'png', 'gif').messages({
+  ext: Joi.string().required().valid('jpg', 'jpeg', 'png', 'gif').messages({
     'string.base': err.IMAGE_INVALID,
     'string.empty': err.IMAGE_REQUIRED,
     'any.required': err.IMAGE_REQUIRED,

@@ -6,7 +6,7 @@ import {
 } from '../lib/joi/passwordSchema'
 import Form from './Form'
 import getAxiosError from '../utils/functions/getAxiosError'
-import Button from './Button'
+import MainButton from './MainButton'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import PasswordField from './PasswordField'
@@ -43,9 +43,9 @@ const ProfileChangePassword = () => {
         <InputError<PasswordCsrfSchema> inputName="password" />
       </div>
       <div className="md:text-right">
-        <Button type="submit" className="w-full md:w-auto">
+        <MainButton type="submit" className="w-full md:w-auto">
           Change
-        </Button>
+        </MainButton>
       </div>
     </Form>
   )

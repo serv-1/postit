@@ -7,7 +7,7 @@ import {
   ForgotPasswordSchema,
 } from '../lib/joi/forgotPasswordSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
-import Button from './Button'
+import MainButton from './MainButton'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
@@ -61,9 +61,12 @@ const AuthenticationForgotPassword = () => {
           />
           <InputError<ForgotPasswordSchema> inputName="email" />
         </div>
-        <Button type="submit" className="relative left-full -translate-x-full">
+        <MainButton
+          type="submit"
+          className="relative left-full -translate-x-full"
+        >
           Send
-        </Button>
+        </MainButton>
       </Form>
       <div className="flex-grow flex items-end">
         <a

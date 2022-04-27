@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
 import { registerSchema, RegisterSchema } from '../lib/joi/registerSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
-import Button from './Button'
+import MainButton from './MainButton'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
@@ -87,9 +87,12 @@ const AuthenticationRegisterForm = () => {
         containerClass="md:bg-fuchsia-100"
       />
 
-      <Button type="submit" className="relative left-full -translate-x-full">
+      <MainButton
+        type="submit"
+        className="relative left-full -translate-x-full"
+      >
         Register
-      </Button>
+      </MainButton>
     </Form>
   )
 }

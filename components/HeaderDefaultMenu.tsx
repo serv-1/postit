@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react'
 import { usePopper } from 'react-popper'
 import { useToast } from '../contexts/toast'
 import getAxiosError from '../utils/functions/getAxiosError'
-import Button from './Button'
 import Link from './Link'
+import MainButton from './MainButton'
 import Pulser from './Pulser'
 
 type PopperElement = HTMLDivElement | null
@@ -64,24 +64,22 @@ const HeaderDefaultMenu = () => {
   return (
     <nav>
       {status === 'unauthenticated' ? (
-        <Link
-          needButtonStyle
-          href="/api/auth/signin"
+        <MainButton
+          role="link"
           onClick={(e) => {
             e.preventDefault()
             signIn()
           }}
         >
           Sign in
-        </Link>
+        </MainButton>
       ) : status === 'authenticated' ? (
         <ul className="flex items-center h-32 md:h-40">
           <li className="bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold mr-8 md:mr-16">
             <Link href="/create-a-post">Create a post</Link>
           </li>
           <li className="w-40 h-40">
-            <Button
-              needDefaultClassNames={false}
+            <button
               className="w-full h-full"
               onClick={(e) => {
                 setIsMenuOpen(!isMenuOpen)
@@ -101,7 +99,7 @@ const HeaderDefaultMenu = () => {
               ) : (
                 <Pulser />
               )}
-            </Button>
+            </button>
             {isMenuOpen && (
               <div
                 ref={(r) => setPopperElement(r)}
@@ -114,17 +112,14 @@ const HeaderDefaultMenu = () => {
                   className="p-16 bg-fuchsia-50 rounded-8 font-bold shadow-[-8px_8px_8px_rgba(112,26,117,0.05)]"
                 >
                   <li>
-                    <Link
-                      href="/profile"
-                      className="pb-8 hover:underline inline-block w-full"
-                    >
+                    <Link href="/profile" className="pb-8 inline-block w-full">
                       Profile
                     </Link>
                   </li>
                   <li>
                     <Link
                       href="/api/auth/signout"
-                      className="hover:underline inline-block w-full"
+                      className="inline-block w-full"
                       onClick={(e) => {
                         e.preventDefault()
                         signOut({ callbackUrl: '/' })

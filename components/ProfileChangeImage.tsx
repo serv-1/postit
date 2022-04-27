@@ -2,7 +2,6 @@ import axios, { AxiosError } from 'axios'
 import { ChangeEvent, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useToast } from '../contexts/toast'
-import Button from './Button'
 import getAxiosError from '../utils/functions/getAxiosError'
 import isImageValid from '../utils/functions/isImageValid'
 import readAsDataUrl from '../utils/functions/readAsDataUrl'
@@ -51,8 +50,7 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
 
   return (
     <>
-      <Button
-        needDefaultClassNames={false}
+      <button
         className="mb-16 w-full"
         onClick={() => fileInputRef.current?.click()}
       >
@@ -64,7 +62,7 @@ const ProfileChangeImage = ({ image: img }: ProfileChangeImageProps) => {
           title="Click to change your profile image"
           className="rounded-full"
         />
-      </Button>
+      </button>
       <input
         onChange={updateImage}
         ref={fileInputRef}

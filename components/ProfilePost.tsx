@@ -5,7 +5,7 @@ import { useState } from 'react'
 import Modal from './Modal'
 import Form from './Form'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import Button from './Button'
+import MainButton from './MainButton'
 import Input from './Input'
 import InputError from './InputError'
 import Select from './Select'
@@ -133,26 +133,18 @@ const ProfilePost = (props: ProfilePostProps) => {
       title="Update post"
       renderActionElement={(setIsOpen) => (
         <div className="bg-indigo-600 text-white flex justify-between p-8 rounded mb-8 last-of-type:mb-0">
-          <Button
-            needDefaultClassNames={false}
-            aria-label="Delete"
-            onClick={deletePost}
-          >
+          <button aria-label="Delete" onClick={deletePost}>
             <X className="text-white" />
-          </Button>
+          </button>
           <Link
             href={`/posts/${post.id}/${formatForUrl(post.name)}`}
             className="leading-[16px] hover:underline"
           >
             {post.name}
           </Link>
-          <Button
-            needDefaultClassNames={false}
-            onClick={() => setIsOpen(true)}
-            aria-label="Edit"
-          >
+          <button onClick={() => setIsOpen(true)} aria-label="Edit">
             <Pencil className="text-white" />
-          </Button>
+          </button>
         </div>
       )}
       renderContent={() => (
@@ -221,9 +213,9 @@ const ProfilePost = (props: ProfilePostProps) => {
             <Input type="file" multiple name="images" />
             <InputError inputName="images" />
           </div>
-          <Button type="submit" className="w-full">
+          <MainButton type="submit" className="w-full">
             Update
-          </Button>
+          </MainButton>
         </Form>
       )}
     />

@@ -4,7 +4,6 @@ import { useFormContext } from 'react-hook-form'
 import zxcvbn from 'zxcvbn'
 import Eye from '../public/static/images/eye-fill.svg'
 import EyeSlash from '../public/static/images/eye-slash-fill.svg'
-import Button from './Button'
 import Input from './Input'
 import InputError from './InputError'
 import Link from './Link'
@@ -78,7 +77,7 @@ const PasswordField = <
           ) : (
             <Link
               href="/authentication#forgot-password"
-              className="text-fuchsia-700 hover:underline text-s"
+              className="text-fuchsia-700 text-s"
             >
               Forgot password?
             </Link>
@@ -102,8 +101,7 @@ const PasswordField = <
         containerClass={containerClass}
         addOnClass="flex justify-center items-center"
         addOn={
-          <Button
-            needDefaultClassNames={false}
+          <button
             className="text-fuchsia-700"
             type="button"
             onClick={() => setShowPassword(!showPassword)}
@@ -114,7 +112,7 @@ const PasswordField = <
             ) : (
               <Eye data-testid="openEye" width="20" height="20" />
             )}
-          </Button>
+          </button>
         }
       />
       <InputError<{ password: string }> inputName="password" />

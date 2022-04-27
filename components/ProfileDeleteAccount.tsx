@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios'
 import { getCsrfToken, signOut } from 'next-auth/react'
 import { useToast } from '../contexts/toast'
 import getAxiosError from '../utils/functions/getAxiosError'
-import Button from './Button'
+import MainButton from './MainButton'
 import Modal from './Modal'
 
 const ProfileDeleteAccount = () => {
@@ -25,12 +25,12 @@ const ProfileDeleteAccount = () => {
       <Modal
         title="Delete account"
         renderActionElement={(setIsOpen) => (
-          <Button
+          <MainButton
             className="col-span-2 col-start-2 md:col-start-3 bg-red-500 hover:bg-red-700"
             onClick={() => setIsOpen(true)}
           >
             Delete account
-          </Button>
+          </MainButton>
         )}
         renderContent={(setIsOpen) => (
           <>
@@ -40,18 +40,18 @@ const ProfileDeleteAccount = () => {
               action is irreversible.
             </p>
             <div className="flex">
-              <Button
+              <MainButton
                 className="flex-grow mr-16"
                 onClick={() => setIsOpen(false)}
               >
                 Cancel
-              </Button>
-              <Button
+              </MainButton>
+              <MainButton
                 className="flex-grow bg-red-500 hover:bg-red-700"
                 onClick={() => deleteUser()}
               >
                 Delete
-              </Button>
+              </MainButton>
             </div>
           </>
         )}
