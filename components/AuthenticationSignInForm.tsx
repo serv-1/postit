@@ -9,10 +9,11 @@ import MainButton from './MainButton'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
-import PasswordField from './PasswordField'
+import PasswordInput from './PasswordInput'
 
 interface AuthenticationSignInFormProps {
   providers: UnPromise<ReturnType<typeof getProviders>>
+  setForgotPassword: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
@@ -59,11 +60,19 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
           <InputError<SignInSchema> inputName="email" />
         </div>
 
-        <PasswordField<SignInSchema>
-          showForgotLink
-          inputClass="md:bg-fuchsia-100"
-          containerClass="md:bg-fuchsia-100"
-        />
+        <div className="mb-16">
+          <label htmlFor="password" className="inline-block w-1/2">
+            Password
+          </label>
+          <button
+            className="inline-block w-1/2 text-fuchsia-600 text-s text-right hover:underline"
+            onClick={() => props.setForgotPassword(true)}
+          >
+            Forgot password?
+          </button>
+          <PasswordInput<SignInSchema> containerClass="bg-fuchsia-100" />
+          <InputError<SignInSchema> inputName="password" />
+        </div>
 
         <MainButton
           type="submit"

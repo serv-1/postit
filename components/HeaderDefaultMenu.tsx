@@ -7,7 +7,6 @@ import { usePopper } from 'react-popper'
 import { useToast } from '../contexts/toast'
 import getAxiosError from '../utils/functions/getAxiosError'
 import Link from './Link'
-import MainButton from './MainButton'
 import Pulser from './Pulser'
 
 type PopperElement = HTMLDivElement | null
@@ -64,15 +63,16 @@ const HeaderDefaultMenu = () => {
   return (
     <nav>
       {status === 'unauthenticated' ? (
-        <MainButton
-          role="link"
+        <a
+          href={'/authentication'}
+          className="block bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold mr-8 md:mr-16"
           onClick={(e) => {
             e.preventDefault()
             signIn()
           }}
         >
           Sign in
-        </MainButton>
+        </a>
       ) : status === 'authenticated' ? (
         <ul className="flex items-center h-32 md:h-40">
           <li className="bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold mr-8 md:mr-16">
@@ -80,7 +80,7 @@ const HeaderDefaultMenu = () => {
           </li>
           <li className="w-40 h-40">
             <button
-              className="w-full h-full"
+              className="w-full h-full relative"
               onClick={(e) => {
                 setIsMenuOpen(!isMenuOpen)
                 e.stopPropagation()
@@ -91,9 +91,8 @@ const HeaderDefaultMenu = () => {
                 <Image
                   src={image}
                   alt="Your profile image"
-                  layout="responsive"
-                  width={40}
-                  height={40}
+                  layout="fill"
+                  objectFit="cover"
                   className="rounded-full"
                 />
               ) : (

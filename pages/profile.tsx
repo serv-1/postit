@@ -1,13 +1,19 @@
-import ProfileDeleteAccount from '../components/ProfileDeleteAccount'
-import ProfileChangeImage from '../components/ProfileChangeImage'
-import ProfileChangeNameOrEmail from '../components/ProfileChangeNameOrEmail'
-import ProfileChangePassword from '../components/ProfileChangePassword'
+import ProfileUserImage from '../components/ProfileUserImage'
 import axios from 'axios'
-import { getSession } from 'next-auth/react'
+import { getSession, signOut } from 'next-auth/react'
 import { GetServerSideProps } from 'next'
-import ProfilePost from '../components/ProfilePost'
 import { IPost, IUser } from '../types/common'
 import Head from 'next/head'
+import Header from '../components/Header'
+import Link from '../components/Link'
+import SignOut from '../public/static/images/sign-out.svg'
+import { TabsProvider } from '../contexts/tabs'
+import TabList from '../components/TabList'
+import Tab from '../components/Tab'
+import TabPanel from '../components/TabPanel'
+import ProfilePostsTabPanel from '../components/ProfilePostsTabPanel'
+import UpdateAccountForm from '../components/UpdateAccountForm'
+import DeleteAccountModal from '../components/DeleteAccountModal'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx)
@@ -35,33 +41,88 @@ const Profile = ({ user }: ProfileProps) => {
       <Head>
         <title>Profile - Filanad</title>
       </Head>
+      <Header>
+        <Link
+          href="/create-a-post"
+          className="bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold mr-8 md:mr-16 hover:no-underline"
+        >
+          Create a post
+        </Link>
+      </Header>
       <main
         data-cy="profile"
-        className="py-32 grid grid-cols-4 md:grid-cols-[repeat(6,72px)] gap-x-16 justify-center"
+        className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-24"
       >
-        <section className="col-span-full mb-32">
-          <h1 className="text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16">
-            Profile
-          </h1>
-          <ProfileChangeImage image={user.image} />
-          <ProfileChangeNameOrEmail value={user.name} type="name" />
-          <ProfileChangeNameOrEmail value={user.email} type="email" />
-        </section>
-        <section className="col-span-full mb-32">
-          <h2 className="text-3xl md:text-t-3xl lg:text-d-3xl font-bold mb-16">
-            Posts
-          </h2>
-          {user.posts.map((post) => (
-            <ProfilePost key={post.id} post={post} />
-          ))}
-        </section>
-        <section className="col-span-full mb-32">
-          <h2 className="text-3xl md:text-t-3xl lg:text-d-3xl font-bold mb-16">
-            Personal data
-          </h2>
-          <ProfileChangePassword />
-        </section>
-        <ProfileDeleteAccount />
+        <div className="col-span-full">
+          <div className="mb-32 p-8 md:flex md:flex-row md:flex-nowrap md:justify-between md:items-center md:bg-fuchsia-100 md:rounded-16 md:p-16">
+            <div className="flex flex-row flex-nowrap mb-8">
+              <ProfileUserImage image={user.image} />
+              <div className="flex-grow flex flex-row flew-nowrap justify-between items-center md:gap-x-16">
+                <h1>{user.name}</h1>
+                <a
+                  href={'/sign-out'}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    signOut({ callbackUrl: '/' })
+                  }}
+                  className="text-fuchsia-600 hover:text-fuchsia-900 transition-colors duration-200"
+                  aria-label="Sign out"
+                >
+                  <SignOut className="w-32 h-32" />
+                </a>
+              </div>
+            </div>
+            <Link
+              href={`/users/${user.id}`}
+              className="bg-fuchsia-200 text-fuchsia-600 py-8 px-16 block w-full text-center font-bold rounded hover:no-underline hover:bg-fuchsia-300 transition-colors duration-200 md:w-auto md:h-40"
+            >
+              See my public profile
+            </Link>
+          </div>
+          <div className="mb-32 md:bg-fuchsia-100 md:p-32 md:rounded-16">
+            <TabsProvider defaultValue="post">
+              <TabList className="flex flex-row flew-nowrap mb-16 md:justify-center md:mb-32">
+                <Tab
+                  value="post"
+                  baseClass="p-8 w-full font-bold md:w-[150px] rounded-l-full"
+                  activeClass="bg-fuchsia-400 text-fuchsia-900"
+                  inactiveClass="bg-fuchsia-200 text-fuchsia-400 hover:bg-fuchsia-400 hover:text-fuchsia-900 transition-colors duration-200"
+                >
+                  Post
+                </Tab>
+                <Tab
+                  value="favorite"
+                  baseClass="p-8 w-full font-bold md:w-[150px]"
+                  activeClass="bg-fuchsia-400 text-fuchsia-900"
+                  inactiveClass="bg-fuchsia-200 text-fuchsia-400 hover:bg-fuchsia-400 hover:text-fuchsia-900 transition-colors duration-200"
+                >
+                  Favorite
+                </Tab>
+                <Tab
+                  value="account"
+                  baseClass="p-8 w-full font-bold md:w-[150px] rounded-r-full"
+                  activeClass="bg-fuchsia-400 text-fuchsia-900"
+                  inactiveClass="bg-fuchsia-200 text-fuchsia-400 hover:bg-fuchsia-400 hover:text-fuchsia-900 transition-colors duration-200"
+                >
+                  Account
+                </Tab>
+              </TabList>
+              <ProfilePostsTabPanel posts={user.posts} />
+              <TabPanel value="favorite">
+                <div className="text-center">Your favorite list is empty.</div>
+              </TabPanel>
+              <TabPanel
+                value="account"
+                className="md:w-[450px] md:bg-fuchsia-200 md:rounded-16 md:p-32 md:mx-auto"
+              >
+                <UpdateAccountForm value="name" />
+                <UpdateAccountForm value="email" />
+                <UpdateAccountForm value="password" />
+                <DeleteAccountModal />
+              </TabPanel>
+            </TabsProvider>
+          </div>
+        </div>
       </main>
     </>
   )

@@ -1,20 +1,16 @@
 import { GetServerSideProps } from 'next'
 import { getProviders, getSession } from 'next-auth/react'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import AuthenticationForgotPassword from '../components/AuthenticationForgotPassword'
 import AuthenticationRegisterForm from '../components/AuthenticationRegisterForm'
 import AuthenticationSignInForm from '../components/AuthenticationSignInForm'
 import Header from '../components/Header'
 import { UnPromise } from '../types/common'
-
-type AuthActionState = 'sign-in' | 'register' | 'forgot-password'
-
-const titles = {
-  'sign-in': 'Sign in',
-  register: 'Register',
-  'forgot-password': 'Forgot password',
-}
+import { TabsProvider } from '../contexts/tabs'
+import Tab from '../components/Tab'
+import TabList from '../components/TabList'
+import TabPanel from '../components/TabPanel'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx)
@@ -37,96 +33,49 @@ interface AuthenticationProps {
 }
 
 const Authentication = ({ providers }: AuthenticationProps) => {
-  const [authAction, setAuthAction] = useState<AuthActionState>('sign-in')
-
-  useEffect(() => {
-    const onHashChange = () => {
-      setAuthAction(window.location.hash.slice(1) as AuthActionState)
-    }
-    window.addEventListener('onHashChange', onHashChange)
-    return () => window.removeEventListener('onHashChange', onHashChange)
-  }, [])
-
-  useEffect(() => {
-    const hash = window.location.hash.slice(1)
-    if (!hash || !Object.keys(titles).includes(hash)) return
-    setAuthAction(hash as AuthActionState)
-  }, [])
-
-  let currentTab = authAction === 'register' ? 1 : 0
-
+  const [forgotPassword, setForgotPassword] = useState(false)
   return (
     <>
       <Head>
-        <title>{titles[authAction]} - Filanad</title>
+        <title>Authentication - Filanad</title>
       </Head>
       <div className="flex flex-col flex-nowrap justify-center items-center">
         <Header noMenu className="px-0 py-4" />
         <main className="w-full rounded-16 min-h-[470px] overflow-hidden md:min-h-[486px] md:flex md:flex-row md:flex-nowrap">
           <div className="flex justify-center h-full p-32 bg-[rgba(253,244,255,0.6)] backdrop-blur-[4px] shadow-[-8px_8px_8px_rgba(112,26,117,0.05),inset_4px_-4px_8px_rgba(253,244,255,0.1),inset_-4px_4px_8px_rgba(253,244,255,0.2)] md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-[-8px_8px_8px_rgba(112,26,117,0.05)] md:basis-1/2">
             <div className="flex flex-col flex-nowrap h-full basis-[350px]">
-              {authAction === 'forgot-password' ? (
-                <AuthenticationForgotPassword />
+              {forgotPassword ? (
+                <AuthenticationForgotPassword
+                  setForgotPassword={setForgotPassword}
+                />
               ) : (
                 <>
                   <h1>Authentication</h1>
-                  <div
-                    role="tablist"
-                    className="mt-16 mb-32 text-fuchsia-600 flex flex-row flex-nowrap gap-x-16"
-                    onKeyDown={(e) => {
-                      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')
-                        return
-
-                      const tabs = (e.currentTarget as HTMLDivElement).children
-
-                      tabs[currentTab].setAttribute('tabindex', '-1')
-
-                      if (e.key === 'ArrowLeft') {
-                        currentTab--
-                        if (currentTab < 0) currentTab = tabs.length - 1
-                      } else {
-                        currentTab++
-                        if (currentTab >= tabs.length) currentTab = 0
-                      }
-
-                      tabs[currentTab].setAttribute('tabindex', '0')
-                      ;(tabs[currentTab] as HTMLButtonElement).focus()
-                    }}
-                  >
-                    {(['sign-in', 'register'] as const).map((value) => (
-                      <button
-                        role="tab"
-                        tabIndex={value === authAction ? 0 : -1}
-                        aria-selected={value === authAction}
-                        aria-controls={value + '-panel'}
-                        id={value + '-tab'}
-                        key={value}
-                        className={
-                          value === authAction
-                            ? 'border-b-2 border-fuchsia-600 transition-colors duration-200'
-                            : ''
-                        }
-                        onClick={() => {
-                          window.location.hash = value
-                          window.dispatchEvent(new CustomEvent('onHashChange'))
-                        }}
+                  <TabsProvider defaultValue="signIn">
+                    <TabList className="mt-16 mb-32 text-fuchsia-600 flex flex-row flex-nowrap gap-x-16">
+                      <Tab
+                        value="signIn"
+                        activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
                       >
-                        {titles[value]}
-                      </button>
-                    ))}
-                  </div>
-                  <div
-                    role="tabpanel"
-                    id={authAction + '-panel'}
-                    tabIndex={0}
-                    aria-labelledby={authAction + '-tab'}
-                  >
-                    {authAction === 'sign-in' ? (
-                      <AuthenticationSignInForm providers={providers} />
-                    ) : (
+                        Sign in
+                      </Tab>
+                      <Tab
+                        value="register"
+                        activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
+                      >
+                        Register
+                      </Tab>
+                    </TabList>
+                    <TabPanel value="signIn">
+                      <AuthenticationSignInForm
+                        providers={providers}
+                        setForgotPassword={setForgotPassword}
+                      />
+                    </TabPanel>
+                    <TabPanel value="register">
                       <AuthenticationRegisterForm />
-                    )}
-                  </div>
+                    </TabPanel>
+                  </TabsProvider>
                 </>
               )}
             </div>

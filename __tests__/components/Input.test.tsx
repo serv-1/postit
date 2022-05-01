@@ -39,7 +39,7 @@ it('renders', async () => {
   expect(input).toHaveAttribute('id', 'test')
   expect(input).toHaveAttribute('name', 'test')
   expect(input).toHaveAttribute('aria-describedby', 'testFeedback described')
-  expect(input).toHaveClass('blue')
+  expect(input).toHaveClass('blue', 'bg-fuchsia-50')
   expect(input.className).toContain('border')
   expect(input.className).not.toContain('red')
   expect(input.className).not.toContain('file')
@@ -105,4 +105,7 @@ test('the add-on renders', () => {
   const container = screen.getByTestId('container')
   expect(container).toHaveClass('red')
   expect(container.className).toContain('border')
+
+  const input = screen.getByRole('textbox')
+  expect(input).toHaveClass('bg-transparent')
 })

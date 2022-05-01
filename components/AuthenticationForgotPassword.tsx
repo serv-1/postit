@@ -13,7 +13,11 @@ import Input from './Input'
 import InputError from './InputError'
 import { useToast } from '../contexts/toast'
 
-const AuthenticationForgotPassword = () => {
+interface AuthenticationFPProps {
+  setForgotPassword: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const AuthenticationForgotPassword = (props: AuthenticationFPProps) => {
   const methods = useForm<ForgotPasswordSchema>({
     resolver: joiResolver(forgotPasswordSchema),
   })
@@ -69,17 +73,12 @@ const AuthenticationForgotPassword = () => {
         </MainButton>
       </Form>
       <div className="flex-grow flex items-end">
-        <a
-          href={'/authentication#sign-in'}
+        <button
           className="hover:underline text-fuchsia-600"
-          onClick={(e) => {
-            e.preventDefault()
-            window.location.hash = 'sign-in'
-            window.dispatchEvent(new CustomEvent('onHashChange'))
-          }}
+          onClick={() => props.setForgotPassword(false)}
         >
           ← Back to Authentication
-        </a>
+        </button>
       </div>
     </>
   )

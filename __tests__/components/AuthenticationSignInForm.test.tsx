@@ -20,7 +20,9 @@ beforeEach(() => {
 })
 
 it('signs in the user and redirects him to its profile', async () => {
-  render(<AuthenticationSignInForm providers={null} />)
+  render(
+    <AuthenticationSignInForm providers={null} setForgotPassword={() => null} />
+  )
 
   const emailInput = screen.getByRole('textbox')
   expect(emailInput).toHaveFocus()
@@ -44,7 +46,9 @@ test('an error renders if the server fails to sign in the user', async () => {
     error: JSON.stringify({ message: err.DEFAULT }),
   })
 
-  render(<AuthenticationSignInForm providers={null} />)
+  render(
+    <AuthenticationSignInForm providers={null} setForgotPassword={() => null} />
+  )
 
   const emailInput = screen.getByRole('textbox')
   await userEvent.type(emailInput, 'johndoe@test.com')
@@ -66,7 +70,9 @@ test('an error renders if the server fails to validate the request data', async 
     error: JSON.stringify({ name: 'email', message: err.EMAIL_INVALID }),
   })
 
-  render(<AuthenticationSignInForm providers={null} />)
+  render(
+    <AuthenticationSignInForm providers={null} setForgotPassword={() => null} />
+  )
 
   const emailInput = screen.getByRole('textbox')
   await userEvent.type(emailInput, 'johndoe@test.com')
@@ -103,7 +109,12 @@ test('the providers render', async () => {
     credentials: createProvider('credentials'),
   }
 
-  render(<AuthenticationSignInForm providers={mockProviders} />)
+  render(
+    <AuthenticationSignInForm
+      providers={mockProviders}
+      setForgotPassword={() => null}
+    />
+  )
 
   const googleBtn = screen.getByRole('button', { name: /google/i })
   expect(googleBtn).toBeInTheDocument()
@@ -118,4 +129,19 @@ test('the providers render', async () => {
 
   const credentialsBtn = screen.queryByRole('button', { name: /credentials/i })
   expect(credentialsBtn).not.toBeInTheDocument()
+})
+
+test('the "Forgot password?" button triggers the rendering of the forgot password form', async () => {
+  const setForgotPassword = jest.fn()
+  render(
+    <AuthenticationSignInForm
+      providers={null}
+      setForgotPassword={setForgotPassword}
+    />
+  )
+
+  const forgotPwBtn = screen.getByRole('button', { name: /forgot/i })
+  await userEvent.click(forgotPwBtn)
+
+  expect(setForgotPassword).toHaveBeenNthCalledWith(1, true)
 })

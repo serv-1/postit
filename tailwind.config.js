@@ -39,6 +39,7 @@ module.exports = {
       12: 'repeat(12, 1fr)',
     },
     borderRadius: {
+      none: '0px',
       DEFAULT: '4px',
       8: '8px',
       16: '16px',

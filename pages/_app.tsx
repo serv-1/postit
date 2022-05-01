@@ -15,7 +15,11 @@ export type PageType = ComponentType<{}> & {
 type NextAppProps = AppProps & { Component: PageType }
 
 const App = ({ Component, pageProps }: NextAppProps) => {
-  useEffect(() => (document.body.className = pageProps?.background))
+  useEffect(() => {
+    if (pageProps && pageProps.background) {
+      document.body.className = pageProps.background
+    }
+  })
   return (
     <>
       <Head>

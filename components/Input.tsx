@@ -48,17 +48,18 @@ const Input = <FormFields extends FieldValues>({
       : 'border-[rgba(112,26,117,0.25)] focus-within:border-[rgba(112,26,117,0.75)]'
 
   const fileInputClass =
-    'file:border-none file:p-8 file:mr-8 file:text-fuchsia-900 file:bg-fuchsia-100 rounded p-0 bg-fuchsia-50 hover:file:bg-fuchsia-600 hover:file:text-fuchsia-50 file:transition-colors cursor-pointer file:cursor-pointer w-full'
+    'file:border-none file:p-8 file:mr-8 file:text-fuchsia-900 file:bg-fuchsia-100 rounded p-0 hover:file:bg-fuchsia-600 hover:file:text-fuchsia-50 file:transition-colors file:duration-200 cursor-pointer file:cursor-pointer w-full'
 
-  const otherInputClass =
-    'p-8 outline-none placeholder:text-[rgba(112,26,117,0.5)] bg-fuchsia-50 w-full'
+  const otherInputsClass =
+    'p-8 outline-none placeholder:text-[rgba(112,26,117,0.5)] w-full'
 
   useEffect(() => {
     if (needFocus) setFocus(name)
   }, [needFocus, setFocus, name])
 
   const inputClass = classNames(
-    type === 'file' ? fileInputClass : otherInputClass,
+    type === 'file' ? fileInputClass : otherInputsClass,
+    addOn ? 'bg-transparent' : 'bg-fuchsia-50',
     className
   )
 
@@ -75,7 +76,7 @@ const Input = <FormFields extends FieldValues>({
       data-testid="container"
       className={classNames(
         border,
-        'flex flex-row flex-nowrap items-center bg-fuchsia-50 border-b-2 transition-colors rounded',
+        'flex flex-row flex-nowrap items-center bg-fuchsia-50 border-b-2 transition-colors duration-200 rounded',
         containerClass
       )}
     >
@@ -85,7 +86,7 @@ const Input = <FormFields extends FieldValues>({
   ) : (
     <input
       {...attributes}
-      className={`${inputClass} ${border} border-b-2 transition-colors rounded`}
+      className={`${inputClass} ${border} border-b-2 transition-colors duration-200 rounded`}
     />
   )
 }

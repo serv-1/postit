@@ -10,7 +10,8 @@ import MainButton from './MainButton'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
-import PasswordField from './PasswordField'
+import PasswordStrength from './PasswordStrength'
+import PasswordInput from './PasswordInput'
 
 const AuthenticationRegisterForm = () => {
   const methods = useForm<RegisterSchema>({
@@ -81,11 +82,20 @@ const AuthenticationRegisterForm = () => {
         <InputError<RegisterSchema> inputName="email" />
       </div>
 
-      <PasswordField<RegisterSchema>
-        showStrength
-        inputClass="md:bg-fuchsia-100"
-        containerClass="md:bg-fuchsia-100"
-      />
+      <div className="mb-16">
+        <label htmlFor="password" className="inline-block w-1/2">
+          Password
+        </label>
+        <PasswordStrength className="inline-block w-1/2 text-right">
+          {(onChange) => (
+            <PasswordInput<RegisterSchema>
+              onChange={onChange}
+              containerClass="bg-fuchsia-100"
+            />
+          )}
+        </PasswordStrength>
+        <InputError<RegisterSchema> inputName="password" />
+      </div>
 
       <MainButton
         type="submit"

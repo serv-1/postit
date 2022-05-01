@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ProfileDeleteAccount from '../../components/ProfileDeleteAccount'
+import DeleteAccountModal from '../../components/DeleteAccountModal'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
@@ -18,12 +18,12 @@ beforeEach(() => {
 })
 
 test('the user is signed out and redirected to the home page after being deleted', async () => {
-  render(<ProfileDeleteAccount />)
+  render(<DeleteAccountModal />)
 
   const openModalBtn = screen.getByRole('button')
   await userEvent.click(openModalBtn)
 
-  const deleteBtn = screen.getByRole('button', { name: /^delete$/i })
+  const deleteBtn = screen.getByRole('button', { name: /delete$/i })
   await userEvent.click(deleteBtn)
 
   await waitFor(() => {
@@ -31,17 +31,42 @@ test('the user is signed out and redirected to the home page after being deleted
   })
 })
 
-test('the cancel button closes the modal', async () => {
-  render(<ProfileDeleteAccount />)
+test('the modal closes', async () => {
+  render(<DeleteAccountModal />)
 
-  const openModalBtn = screen.getByRole('button')
-  await userEvent.click(openModalBtn)
+  const openBtn = screen.getByRole('button')
+  await userEvent.click(openBtn)
+
+  const closeBtn = screen.getByRole('button', { name: /close/i })
+  await userEvent.click(closeBtn)
+  expect(closeBtn).not.toBeInTheDocument()
+
+  await userEvent.click(openBtn)
 
   const cancelBtn = screen.getByRole('button', { name: /cancel/i })
   await userEvent.click(cancelBtn)
+  expect(cancelBtn).not.toBeInTheDocument()
+})
 
-  const deleteBtn = screen.queryByRole('button', { name: /^delete$/i })
-  expect(deleteBtn).not.toBeInTheDocument()
+test('the focus is trapped in the modal', async () => {
+  render(<DeleteAccountModal />)
+
+  const openBtn = screen.getByRole('button')
+  await userEvent.click(openBtn)
+
+  const cancelBtn = screen.getByRole('button', { name: /cancel/i })
+  expect(cancelBtn).toHaveFocus()
+
+  await userEvent.tab({ shift: true })
+  await userEvent.tab({ shift: true })
+
+  const deleteBtn = screen.getByRole('button', { name: /delete$/i })
+  expect(deleteBtn).toHaveFocus()
+
+  await userEvent.tab()
+
+  const closeBtn = screen.getByRole('button', { name: /close/i })
+  expect(closeBtn).toHaveFocus()
 })
 
 test('an error renders if the server fails to delete the user', async () => {
@@ -54,12 +79,12 @@ test('an error renders if the server fails to delete the user', async () => {
     })
   )
 
-  render(<ProfileDeleteAccount />)
+  render(<DeleteAccountModal />)
 
   const openModalBtn = screen.getByRole('button')
   await userEvent.click(openModalBtn)
 
-  const deleteBtn = screen.getByRole('button', { name: /^delete$/i })
+  const deleteBtn = screen.getByRole('button', { name: /delete$/i })
   await userEvent.click(deleteBtn)
 
   await waitFor(() => {

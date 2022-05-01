@@ -20,12 +20,12 @@ beforeEach(() => {
 })
 
 test('the form sends a mail to the user to sign in, which redirect him to its profile', async () => {
-  render(<AuthenticationForgotPassword />)
+  render(<AuthenticationForgotPassword setForgotPassword={() => null} />)
 
   const input = screen.getByRole('textbox')
   await userEvent.type(input, 'johndoe@test.com')
 
-  const submitBtn = screen.getByRole('button')
+  const submitBtn = screen.getByRole('button', { name: /send/i })
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
@@ -43,12 +43,12 @@ test('an error renders if the server fails to verify the user email', async () =
     })
   )
 
-  render(<AuthenticationForgotPassword />)
+  render(<AuthenticationForgotPassword setForgotPassword={() => null} />)
 
   const input = screen.getByRole('textbox')
   await userEvent.type(input, 'johndoe@test.com')
 
-  const submitBtn = screen.getByRole('button')
+  const submitBtn = screen.getByRole('button', { name: /send/i })
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
@@ -64,12 +64,12 @@ test('an error renders if the server fails to validate the request data', async 
     })
   )
 
-  render(<AuthenticationForgotPassword />)
+  render(<AuthenticationForgotPassword setForgotPassword={() => null} />)
 
   const input = screen.getByRole('textbox')
   await userEvent.type(input, 'johndoe@test.com')
 
-  const submitBtn = screen.getByRole('button')
+  const submitBtn = screen.getByRole('button', { name: /send/i })
   await userEvent.click(submitBtn)
 
   const alert = await screen.findByRole('alert')
@@ -78,17 +78,12 @@ test('an error renders if the server fails to validate the request data', async 
   expect(input).toHaveFocus()
 })
 
-test("the link changes the url's hash and dispatch the corresponding event", async () => {
-  const onHashChange = jest.fn()
-  window.addEventListener('onHashChange', onHashChange)
+test('the "Back to Auth." button returns the user to the sign in form', async () => {
+  const setForgotPassword = jest.fn()
+  render(<AuthenticationForgotPassword setForgotPassword={setForgotPassword} />)
 
-  render(<AuthenticationForgotPassword />)
+  const backToAuthBtn = screen.getByRole('button', { name: /back/i })
+  await userEvent.click(backToAuthBtn)
 
-  const link = screen.getByRole('link')
-  await userEvent.click(link)
-
-  expect(window.location.hash).toBe('#sign-in')
-  expect(onHashChange).toHaveBeenCalledTimes(1)
-
-  window.removeEventListener('onHashChange', onHashChange)
+  expect(setForgotPassword).toHaveBeenNthCalledWith(1, false)
 })
