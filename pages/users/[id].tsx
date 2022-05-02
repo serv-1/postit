@@ -2,8 +2,11 @@ import axios from 'axios'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
+import Header from '../../components/Header'
 import PostList from '../../components/PostList'
 import { IUser } from '../../types/common'
+import Blob from '../../public/static/images/blob.svg'
+import ChatFill from '../../public/static/images/chat-fill.svg'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id
@@ -26,38 +29,39 @@ const User = ({ user }: UserProps) => {
       <Head>
         <title>{user.name}&apos;s profile - Filanad</title>
       </Head>
-      <main className="py-32 grid grid-cols-4 md:grid-cols-8 gap-x-16 justify-center">
-        <section className="col-span-full md:col-start-2 md:col-span-6 mb-32">
-          <h1 className="text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16">
-            {user.name}&apos;s profile
-          </h1>
-          <div className="text-center">
+      <Header />
+      <main className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 grid-rows-[auto,1fr] gap-x-24">
+        <section className="col-span-full mb-32 bg-fuchsia-100 rounded-16 p-16">
+          <div className="relative w-[100px] h-[100px] mx-auto mb-8 md:w-[125px] md:h-[125px]">
             <Image
               src={user.image}
               alt={`${user.name} profile image`}
-              width={160}
-              height={160}
+              layout="fill"
+              objectFit="cover"
               className="rounded-full"
             />
           </div>
+          <h1 className="text-center">{user.name}</h1>
         </section>
         {user.posts.length > 0 ? (
-          <section className="col-span-full mb-32 grid grid-cols-4 md:grid-cols-8 gap-x-16 justify-center">
-            <h2 className="col-span-full md:col-start-2 text-3xl md:text-t-3xl lg:text-d-3xl font-bold mb-16">
-              <span className="text-indigo-600">{user.posts.length}</span> Posts
-            </h2>
-            <div className="col-span-full grid grid-cols-4 md:grid-cols-8 lg:grid-cols-[repeat(6,72px)] gap-x-16 justify-center">
-              <PostList posts={user.posts} />
-            </div>
+          <section className="col-span-full mb-32">
+            <h2 className="mb-16">Its {user.posts.length} posts</h2>
+            <PostList posts={user.posts} />
           </section>
         ) : (
           <div
-            className="col-span-full text-3xl md:text-t-3xl lg:text-d-3xl text-center"
-            data-testid="noPosts"
+            className="col-span-full relative flex justify-center items-center"
+            role="status"
           >
-            <span className="text-indigo-600">{user.name}</span> has no posts.
+            <Blob className="w-full h-3/4 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2" />
+            <span className="text-m-4xl md:text-t-4xl text-center z-10">
+              {user.name} hasn&apos;t created any posts yet.
+            </span>
           </div>
         )}
+        <div className="w-48 h-48 bg-fuchsia-600 text-fuchsia-50 rounded-full shadow-[0_0_8px_rgba(192,38,211,0.75)] fixed bottom-8 right-8 flex justify-center items-center hover:bg-fuchsia-50 hover:text-fuchsia-900 transition-colors duration-200 cursor-pointer lg:hidden">
+          <ChatFill className="w-24 h-24" />
+        </div>
       </main>
     </>
   )

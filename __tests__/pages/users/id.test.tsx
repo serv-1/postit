@@ -1,6 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import User from '../../../pages/users/[id]'
 
+jest.mock('../../../components/Header', () => ({
+  __esModule: true,
+  default: () => <header></header>,
+}))
+
 it('renders', () => {
   const user = {
     id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
@@ -12,14 +17,14 @@ it('renders', () => {
 
   render(<User user={user} />)
 
-  const mainTitle = screen.getByRole('heading')
-  expect(mainTitle).toHaveTextContent(user.name + "'s profile")
+  const title = screen.getByRole('heading')
+  expect(title).toHaveTextContent(user.name)
 
   const img = screen.getByRole('img')
   expect(img).toHaveAttribute('src', user.image)
 
-  const posts = screen.getByTestId('noPosts')
-  expect(posts).toHaveTextContent(user.name + ' has no posts.')
+  const posts = screen.getByRole('status')
+  expect(posts).toHaveTextContent(user.name)
 })
 
 it('renders the user posts', () => {
@@ -43,8 +48,8 @@ it('renders the user posts', () => {
 
   render(<User user={user} />)
 
-  const postsNumber = screen.getByText(user.posts.length)
-  expect(postsNumber).toBeInTheDocument()
+  const title = screen.getByRole('heading', { level: 2 })
+  expect(title).toHaveTextContent(String(user.posts.length))
 
   const regex = new RegExp(user.posts[0].name, 'i')
   const post = screen.getByText(regex)
