@@ -25,7 +25,7 @@ const TextArea = <FormFields extends FieldValues>({
   const { isSubmitted, errors } = formState
 
   const _className = classNames(
-    'rounded p-8 w-full bg-fuchsia-100 border-b-2 outline-none transition-colors placeholder:text-[rgba(112,26,117,0.5)]',
+    'rounded p-8 w-full bg-fuchsia-100 border-b-2 outline-none align-bottom transition-colors placeholder:text-[rgba(112,26,117,0.5)]',
     isSubmitted && errors[name]
       ? 'border-2 border-red-600 focus:border-red-900'
       : 'border-[rgba(112,26,117,0.25)] focus:border-[rgba(112,26,117,0.75)]',

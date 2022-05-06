@@ -1,11 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import User from '../../../pages/users/[id]'
 
-jest.mock('../../../components/Header', () => ({
-  __esModule: true,
-  default: () => <header></header>,
-}))
-
 it('renders', () => {
   const user = {
     id: 'f0f0f0f0f0f0f0f0f0f0f0f0',

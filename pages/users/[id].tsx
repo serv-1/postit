@@ -7,6 +7,7 @@ import PostList from '../../components/PostList'
 import { IUser } from '../../types/common'
 import Blob from '../../public/static/images/blob.svg'
 import ChatFill from '../../public/static/images/chat-fill.svg'
+import MainButton from '../../components/MainButton'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id
@@ -59,9 +60,15 @@ const User = ({ user }: UserProps) => {
             </span>
           </div>
         )}
-        <div className="w-48 h-48 bg-fuchsia-600 text-fuchsia-50 rounded-full shadow-[0_0_8px_rgba(192,38,211,0.75)] fixed bottom-8 right-8 flex justify-center items-center hover:bg-fuchsia-50 hover:text-fuchsia-900 transition-colors duration-200 cursor-pointer lg:hidden">
+        <MainButton
+          bgColor={{ states: 'hover:bg-fuchsia-50' }}
+          textColor={{ states: 'hover:text-fuchsia-900' }}
+          radius="rounded-full"
+          padding="p-0"
+          className="w-48 h-48 shadow-[0_0_8px_rgba(192,38,211,0.75)] fixed bottom-8 right-8 flex justify-center items-center md:hidden"
+        >
           <ChatFill className="w-24 h-24" />
-        </div>
+        </MainButton>
       </main>
     </>
   )

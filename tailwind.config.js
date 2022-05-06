@@ -56,6 +56,19 @@ module.exports = {
           '73%,100%': { transform: 'scale(1) ' },
         },
       },
+      backgroundImage: {
+        'linear-search': 'linear-gradient(72deg, #F0ABFC 0%, #F5D0FE 100%)',
+        'linear-page':
+          'linear-gradient(160deg, #FAE8FF 33.90%, #F5D0FE 34%, #F5D0FE 48.90%, #D946EF 49%)',
+        'linear-wrapper': 'linear-gradient(210deg, #F0ABFC 12.5%, #E879F9 54%)',
+      },
+      boxShadow: {
+        wrapper: '-8px 8px 8px rgba(112, 26, 117, 0.05)',
+        glass:
+          '-8px 8px 8px rgba(112, 26, 117, 0.05), inset 4px -4px 8px rgba(253, 244, 255, 0.1), inset -4px 4px 8px rgba(253, 244, 255, 0.2)',
+        shape:
+          '-8px 8px 0 rgba(217, 70, 239, 0.75), -16px 16px 0 rgba(112, 26, 117, 0.75), inset -4px 4px 8px rgba(250, 232, 255, 0.5), inset 8px -8px 16px rgba(112, 26, 117, 0.5)',
+      },
     },
   },
   plugins: [],

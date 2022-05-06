@@ -45,17 +45,30 @@ const Post = ({ post }: PostProps) => {
             objectFit="cover"
             priority
           />
-          <button
-            className="w-48 h-48 bg-fuchsia-50 text-fuchsia-600 rounded-full shadow-[0_2px_8px_rgba(112,26,117,0.25)] absolute top-8 left-8 p-8 hover:text-fuchsia-50 hover:bg-fuchsia-900 transition-colors duration-200 cursor-pointer md:hidden"
+          <MainButton
+            bgColor={{ base: 'bg-fuchsia-50', states: 'hover:bg-fuchsia-900' }}
+            textColor={{
+              base: 'text-fuchsia-600',
+              states: 'hover:text-fuchsia-50',
+            }}
+            radius="rounded-full"
+            padding="p-8"
+            className="w-48 h-48 shadow-[0_2px_8px_rgba(112,26,117,0.25)] absolute top-8 left-8 md:hidden"
             onClick={() => window.history.back()}
             aria-label="Go back to the previous page"
           >
             <ArrowLeft className="w-full h-full" />
-          </button>
-          <div className="w-48 h-48 bg-fuchsia-50 text-fuchsia-600 rounded-full shadow-[0_2px_8px_rgba(112,26,117,0.25)] absolute top-8 right-8 p-8 transition-colors duration-200 group cursor-pointer">
+          </MainButton>
+          <MainButton
+            bgColor={{ base: 'bg-fuchsia-50', states: false }}
+            textColor={{ base: 'text-fuchsia-600', states: false }}
+            radius="rounded-full"
+            padding="p-8"
+            className="w-48 h-48 shadow-[0_2px_8px_rgba(112,26,117,0.25)] absolute top-8 right-8 group"
+          >
             <Heart className="w-full h-full group-hover:opacity-0 transition-opacity duration-200" />
             <HeartFill className="w-full h-full opacity-0 group-hover:opacity-100 group-hover:animate-[heartbeat_1s_linear_infinite] transition-opacity duration-200 relative -top-full" />
-          </div>
+          </MainButton>
           <PostsSeeAllPhotosModal images={post.images} />
         </div>
         <div className="col-span-full md:col-span-3 md:sticky md:top-16 lg:col-span-4">
@@ -96,9 +109,15 @@ const Post = ({ post }: PostProps) => {
             <PostList posts={post.user.posts} columns={2} />
           </section>
         )}
-        <div className="w-48 h-48 bg-fuchsia-600 text-fuchsia-50 rounded-full shadow-[0_0_8px_rgba(192,38,211,0.75)] fixed bottom-8 right-8 flex justify-center items-center hover:bg-fuchsia-50 hover:text-fuchsia-900 transition-colors duration-200 cursor-pointer md:hidden">
+        <MainButton
+          bgColor={{ states: 'hover:bg-fuchsia-50' }}
+          textColor={{ states: 'hover:text-fuchsia-900' }}
+          radius="rounded-full"
+          padding="p-0"
+          className="w-48 h-48 shadow-[0_0_8px_rgba(192,38,211,0.75)] fixed bottom-8 right-8 flex justify-center items-center md:hidden"
+        >
           <ChatFill className="w-24 h-24" />
-        </div>
+        </MainButton>
       </main>
     </>
   )

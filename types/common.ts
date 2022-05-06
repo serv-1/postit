@@ -22,7 +22,7 @@ export type IUserPost = Omit<IPost, 'user'>
 
 export interface IImage {
   base64: string
-  ext: 'jpeg' | 'png' | 'gif'
+  ext: 'jpg' | 'jpeg' | 'png' | 'gif'
 }
 
 export type Categories = typeof categories[0]

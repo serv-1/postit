@@ -100,16 +100,26 @@ const HomeSearchPosts = () => {
         />
         <InputError<SearchPostsSchema> inputName="categories" />
       </div>
-      <button
+      <MainButton
         type="button"
-        className="text-fuchsia-600 border-2 border-fuchsia-600 rounded-full px-8 py-4 font-bold hover:bg-fuchsia-600 hover:text-fuchsia-50 active:bg-fuchsia-900 active:text-fuchsia-50 active:border-fuchsia-900 transition-colors mr-8"
+        bgColor={{
+          base: 'bg-transparent',
+          states: 'hover:bg-fuchsia-600 focus:bg-fuchsia-600',
+        }}
+        textColor={{
+          base: 'text-fuchsia-600',
+          states: 'hover:text-fuchsia-50 focus:text-fuchsia-50',
+        }}
+        radius="rounded-full"
+        padding="px-8 py-4"
+        className="border-2 border-fuchsia-600 mr-8"
         onClick={(e) => {
           setOpenedModal(openedModal === 'price' ? 'none' : 'price')
           e.stopPropagation()
         }}
       >
         Price
-      </button>
+      </MainButton>
       {openedModal === 'price' && (
         <div
           id="priceModal"
@@ -143,16 +153,26 @@ const HomeSearchPosts = () => {
           <InputError<SearchPostsSchema> inputName="maxPrice" />
         </div>
       )}
-      <button
+      <MainButton
         type="button"
-        className="text-fuchsia-600 border-2 border-fuchsia-600 rounded-full px-8 py-4 font-bold hover:bg-fuchsia-600 hover:text-fuchsia-50 active:bg-fuchsia-900 active:text-fuchsia-50 active:border-fuchsia-900 transition-colors"
+        bgColor={{
+          base: 'bg-transparent',
+          states: 'hover:bg-fuchsia-600 focus:bg-fuchsia-600',
+        }}
+        textColor={{
+          base: 'text-fuchsia-600',
+          states: 'hover:text-fuchsia-50 focus:text-fuchsia-50',
+        }}
+        radius="rounded-full"
+        padding="px-8 py-4"
+        className="border-2 border-fuchsia-600 mr-8"
         onClick={(e) => {
           setOpenedModal(openedModal === 'location' ? 'none' : 'location')
           e.stopPropagation()
         }}
       >
         Location
-      </button>
+      </MainButton>
       {openedModal === 'location' && (
         <div
           id="locationModal"

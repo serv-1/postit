@@ -63,7 +63,7 @@ const UpdateAccountForm = ({ value }: UpdateAccountFormProps) => {
             </PasswordStrength>
             <InputError<PasswordCsrfSchema> inputName="password" />
           </div>
-          <MainButton className="h-[42px]  rounded-l-none">Change</MainButton>
+          <MainButton className="h-[42px] rounded-l-none">Change</MainButton>
         </div>
       ) : (
         <div className="mb-16 md:mb-32">

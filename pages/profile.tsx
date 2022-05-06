@@ -59,8 +59,8 @@ const Profile = ({ user }: ProfileProps) => {
               <ProfileUserImage image={user.image} />
               <div className="flex-grow flex flex-row flew-nowrap justify-between items-center md:gap-x-16">
                 <h1>{user.name}</h1>
-                <a
-                  href={'/sign-out'}
+                <Link
+                  href="/sign-out"
                   onClick={(e) => {
                     e.preventDefault()
                     signOut({ callbackUrl: '/' })
@@ -69,7 +69,7 @@ const Profile = ({ user }: ProfileProps) => {
                   aria-label="Sign out"
                 >
                   <SignOut className="w-32 h-32" />
-                </a>
+                </Link>
               </div>
             </div>
             <Link

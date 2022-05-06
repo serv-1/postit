@@ -58,7 +58,12 @@ const DeleteAccountModal = () => {
             <div className="flex flex-row flew-nowrap">
               <MainButton
                 ref={setup.focused}
-                className="w-full mr-24 bg-fuchsia-300 text-fuchsia-900"
+                className="w-full mr-24"
+                bgColor={{
+                  base: 'bg-fuchsia-300',
+                  states: 'hover:bg-fuchsia-400',
+                }}
+                textColor={{ base: 'text-fuchsia-900', states: false }}
                 onClick={() => setup.setIsOpen(false)}
               >
                 Cancel

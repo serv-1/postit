@@ -3,11 +3,6 @@ import Post from '../../../../pages/posts/[id]/[name]'
 import { IPost } from '../../../../types/common'
 import userEvent from '@testing-library/user-event'
 
-jest.mock('../../../../components/Header', () => ({
-  __esModule: true,
-  default: () => <header></header>,
-}))
-
 const post: IPost = {
   id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
   name: 'Table',

@@ -64,12 +64,12 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
           <label htmlFor="password" className="inline-block w-1/2">
             Password
           </label>
-          <button
+          <a
             className="inline-block w-1/2 text-fuchsia-600 text-s text-right hover:underline"
             onClick={() => props.setForgotPassword(true)}
           >
             Forgot password?
-          </button>
+          </a>
           <PasswordInput<SignInSchema> containerClass="bg-fuchsia-100" />
           <InputError<SignInSchema> inputName="password" />
         </div>

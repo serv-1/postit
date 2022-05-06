@@ -1,7 +1,6 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import axios, { AxiosError } from 'axios'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import MainButton from '../components/MainButton'
 import Form from '../components/Form'
 import { useToast } from '../contexts/toast'
 import {
@@ -11,51 +10,30 @@ import {
 import getAxiosError from '../utils/functions/getAxiosError'
 import { useRouter } from 'next/router'
 import { IImage } from '../types/common'
-import isImageValid from '../utils/functions/isImageValid'
-import readAsDataUrl from '../utils/functions/readAsDataUrl'
 import Head from 'next/head'
-import Input from '../components/Input'
-import InputError from '../components/InputError'
-import Select from '../components/Select'
-import categories from '../categories'
-import TextArea from '../components/TextArea'
+import Header from '../components/Header'
+import HeaderDropdownMenu from '../components/HeaderDropdownMenu'
+import { useState } from 'react'
+import { GetStaticProps } from 'next'
+import CreateAPostStep1 from '../components/CreateAPostStep1'
+import CreateAPostStep2 from '../components/CreateAPostStep2'
+import CreateAPostStep3 from '../components/CreateAPostStep3'
 
-const options = categories.map((category) => ({
-  label: category,
-  value: category,
-}))
+export const getStaticProps: GetStaticProps = () => ({
+  props: { background: 'bg-linear-page' },
+})
 
 const CreateAPost = () => {
+  const [step, setStep] = useState<0 | 1 | 2>(0)
+  const [images, setImages] = useState<IImage[]>()
   const resolver = joiResolver(createPostClientSchema)
   const methods = useForm<CreatePostClientSchema>({ resolver })
   const { setToast } = useToast()
   const router = useRouter()
 
   const submitHandler: SubmitHandler<CreatePostClientSchema> = async (data) => {
-    const { images } = data
-    const encodedImages: IImage[] = []
-
-    for (const image of Array.from(images)) {
-      const message = isImageValid(image)
-
-      if (message) {
-        return methods.setError('images', { message }, { shouldFocus: true })
-      }
-
-      const result = await readAsDataUrl<IImage['ext']>(image)
-
-      if (typeof result === 'string') {
-        methods.setError('images', { message: result }, { shouldFocus: true })
-      } else {
-        encodedImages.push(result)
-      }
-    }
-
     try {
-      await axios.post('http://localhost:3000/api/post', {
-        ...data,
-        images: encodedImages,
-      })
+      await axios.post('http://localhost:3000/api/post', { ...data, images })
       router.push('/profile')
     } catch (e) {
       type FieldsNames = keyof CreatePostClientSchema
@@ -69,65 +47,56 @@ const CreateAPost = () => {
     }
   }
 
+  const visibleClasses = 'h-full flex flex-col flex-nowrap justify-between'
+  const titles = ['Where is it?', 'Show us what it is', 'Post!']
+
   return (
     <>
       <Head>
         <title>Create a post - Filanad</title>
       </Head>
-      <main className="py-32 grid grid-cols-4 gap-x-16 justify-center">
-        <h1 className="col-span-full text-4xl md:text-t-4xl lg:text-d-4xl font-bold mb-16">
-          Create a post
-        </h1>
-        <Form
-          name="createPost"
-          method="post"
-          methods={methods}
-          submitHandler={submitHandler}
-          needCsrfToken
-          className="col-span-full"
-        >
-          <div className="mb-16">
-            <label htmlFor="name">Name</label>
-            <Input<CreatePostClientSchema> type="text" name="name" needFocus />
-            <InputError<CreatePostClientSchema> inputName="name" />
+      <div className="flex flex-col flex-nowrap justify-center items-center">
+        <Header className="w-[328px] py-4 pb-8 md:w-full">
+          <HeaderDropdownMenu />
+        </Header>
+        <main className="md:w-full md:bg-linear-wrapper md:rounded-16 md:py-32">
+          <div className="w-[328px] h-[604px] p-32 rounded-16 bg-fuchsia-50/60 backdrop-blur-[4px] shadow-glass flex flex-col flex-nowrap md:shadow-shape md:bg-fuchsia-200 md:w-[450px] md:h-[620px] md:mx-auto">
+            <h1 className="mb-16">{titles[step]}</h1>
+            <Form
+              name="createPost"
+              method="post"
+              methods={methods}
+              submitHandler={submitHandler}
+              needCsrfToken
+              className="h-full"
+            >
+              <div
+                data-testid="step0"
+                className={step === 0 ? visibleClasses : 'hidden'}
+              >
+                <CreateAPostStep1 setStep={setStep} />
+              </div>
+              <div
+                data-testid="step1"
+                className={step === 1 ? visibleClasses : 'hidden'}
+              >
+                <CreateAPostStep2 setStep={setStep} setImages={setImages} />
+              </div>
+              <div
+                data-testid="step2"
+                className={step === 2 ? visibleClasses : 'hidden'}
+              >
+                <CreateAPostStep3 setStep={setStep} />
+              </div>
+            </Form>
           </div>
-
-          <div className="mb-16">
-            <label htmlFor="description">Description</label>
-            <TextArea<CreatePostClientSchema> name="description" />
-            <InputError<CreatePostClientSchema> inputName="description" />
-          </div>
-
-          <div className="mb-16">
-            <label htmlFor="categories">Categories</label>
-            <Select<CreatePostClientSchema>
-              name="categories"
-              options={options}
-            />
-            <InputError<CreatePostClientSchema> inputName="categories" />
-          </div>
-
-          <div className="mb-16">
-            <label htmlFor="price">Price (euros)</label>
-            <Input<CreatePostClientSchema> type="number" name="price" />
-            <InputError<CreatePostClientSchema> inputName="price" />
-          </div>
-
-          <div className="mb-16">
-            <label htmlFor="images">Images</label>
-            <Input<CreatePostClientSchema> type="file" name="images" multiple />
-            <InputError<CreatePostClientSchema> inputName="images" />
-          </div>
-
-          <MainButton type="submit" className="w-full">
-            Create
-          </MainButton>
-        </Form>
-      </main>
+        </main>
+      </div>
     </>
   )
 }
 
 CreateAPost.needAuth = true
+CreateAPost.need2RowsGrid = true
 
 export default CreateAPost

@@ -5,13 +5,6 @@ import selectEvent from 'react-select-event'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
-import readAsDataUrl from '../../utils/functions/readAsDataUrl'
-
-jest.mock('../../utils/functions/readAsDataUrl')
-
-const mockReadAsDataUrl = readAsDataUrl as jest.MockedFunction<
-  typeof readAsDataUrl
->
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
@@ -27,90 +20,74 @@ beforeEach(() => {
   useToast.mockReturnValue({})
 })
 
+it('renders', async () => {
+  render(<CreateAPost />)
+
+  await screen.findByTestId('csrfToken')
+
+  let title = screen.getByRole('heading', { level: 1 })
+  expect(title).toHaveTextContent(/where/i)
+
+  const step0 = screen.getByTestId('step0')
+  expect(step0).not.toHaveClass('hidden')
+
+  const step1 = screen.getByTestId('step1')
+  expect(step1).toHaveClass('hidden')
+
+  const step2 = screen.getByTestId('step2')
+  expect(step2).toHaveClass('hidden')
+
+  const nextBtns = screen.getAllByRole('button', { name: /next/i })
+  await userEvent.click(nextBtns[0])
+
+  expect(title).toHaveTextContent(/show/i)
+  expect(step0).toHaveClass('hidden')
+  expect(step1).not.toHaveClass('hidden')
+  expect(step2).toHaveClass('hidden')
+
+  const fileInput = screen.getByLabelText(/images/i)
+  const files = [new File(['1'], '1.jpeg', { type: 'image/jpeg' })]
+  await userEvent.upload(fileInput, files)
+
+  await userEvent.click(nextBtns[1])
+
+  expect(title).toHaveTextContent(/post/i)
+  expect(step0).toHaveClass('hidden')
+  expect(step1).toHaveClass('hidden')
+  expect(step2).not.toHaveClass('hidden')
+})
+
 test('the user is redirected to its profile after a valid submission', async () => {
   render(<CreateAPost />)
 
   await screen.findByTestId('csrfToken')
 
+  const nextBtns = screen.getAllByRole('button', { name: /next/i })
+  await userEvent.click(nextBtns[0])
+
+  const imagesInput = screen.getByLabelText(/images/i)
+  const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
+  await userEvent.upload(imagesInput, image)
+
+  await userEvent.click(nextBtns[1])
+
   const nameInput = screen.getByRole('textbox', { name: /name/i })
   await userEvent.type(nameInput, 'Modern table')
-
-  const descriptionInput = screen.getByRole('textbox', { name: /description/i })
-  await userEvent.type(descriptionInput, 'A magnificent modern table.')
-
-  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
 
   const priceInput = screen.getByRole('spinbutton', { name: /price/i })
   await userEvent.type(priceInput, '40')
 
-  const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
-  const imagesInput = screen.getByLabelText(/images/i)
-  await userEvent.upload(imagesInput, image)
+  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
 
-  const submitBtn = screen.getByRole('button', { name: /create/i })
+  const descriptionInput = screen.getByRole('textbox', { name: /description/i })
+  await userEvent.type(descriptionInput, 'A magnificent modern table.')
+
+  const submitBtn = screen.getByRole('button', { name: /post/i })
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
     expect(router.push).toHaveBeenNthCalledWith(1, '/profile')
   })
-})
-
-test('an error renders for the images field if an image is invalid', async () => {
-  render(<CreateAPost />)
-
-  await screen.findByTestId('csrfToken')
-
-  const nameInput = screen.getByRole('textbox', { name: /name/i })
-  await userEvent.type(nameInput, 'Modern table')
-
-  const descriptionInput = screen.getByRole('textbox', { name: /description/i })
-  await userEvent.type(descriptionInput, 'A magnificent modern table.')
-
-  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
-
-  const priceInput = screen.getByRole('spinbutton', { name: /price/i })
-  await userEvent.type(priceInput, '40')
-
-  const textFile = new File(['invalid'], 'invalid')
-  const imagesInput = screen.getByLabelText(/images/i)
-  await userEvent.upload(imagesInput, textFile)
-
-  const submitBtn = screen.getByRole('button', { name: /create/i })
-  await userEvent.click(submitBtn)
-
-  const error = await screen.findByRole('alert')
-  expect(error).toHaveTextContent(err.IMAGE_INVALID)
-})
-
-test("an error renders for the images field if an image can't be read as data url", async () => {
-  mockReadAsDataUrl.mockResolvedValue('error')
-
-  render(<CreateAPost />)
-
-  await screen.findByTestId('csrfToken')
-
-  const nameInput = screen.getByRole('textbox', { name: /name/i })
-  await userEvent.type(nameInput, 'Modern table')
-
-  const descriptionInput = screen.getByRole('textbox', {
-    name: /description/i,
-  })
-  await userEvent.type(descriptionInput, 'A magnificent modern table.')
-
-  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
-
-  const priceInput = screen.getByRole('spinbutton', { name: /price/i })
-  await userEvent.type(priceInput, '40')
-
-  const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
-  const imagesInput = screen.getByLabelText(/images/i)
-  await userEvent.upload(imagesInput, image)
-
-  const submitBtn = screen.getByRole('button', { name: /create/i })
-  await userEvent.click(submitBtn)
-
-  const error = await screen.findByRole('alert')
-  expect(error).toHaveTextContent('error')
 })
 
 test('an error renders if the server fails to create the post', async () => {
@@ -127,22 +104,27 @@ test('an error renders if the server fails to create the post', async () => {
 
   await screen.findByTestId('csrfToken')
 
+  const nextBtns = screen.getAllByRole('button', { name: /next/i })
+  await userEvent.click(nextBtns[0])
+
+  const imagesInput = screen.getByLabelText(/images/i)
+  const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
+  await userEvent.upload(imagesInput, image)
+
+  await userEvent.click(nextBtns[1])
+
   const nameInput = screen.getByRole('textbox', { name: /name/i })
   await userEvent.type(nameInput, 'Modern table')
-
-  const descriptionInput = screen.getByRole('textbox', { name: /description/i })
-  await userEvent.type(descriptionInput, 'A magnificent modern table.')
-
-  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
 
   const priceInput = screen.getByRole('spinbutton', { name: /price/i })
   await userEvent.type(priceInput, '40')
 
-  const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
-  const imagesInput = screen.getByLabelText(/images/i)
-  await userEvent.upload(imagesInput, image)
+  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
 
-  const submitBtn = screen.getByRole('button', { name: /create/i })
+  const descriptionInput = screen.getByRole('textbox', { name: /description/i })
+  await userEvent.type(descriptionInput, 'A magnificent modern table.')
+
+  const submitBtn = screen.getByRole('button', { name: /post/i })
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
@@ -151,7 +133,7 @@ test('an error renders if the server fails to create the post', async () => {
   })
 })
 
-test('an error renders if the server fails to validate the request data', async () => {
+test("an error renders if the server fails to validate the request's data", async () => {
   server.use(
     rest.post('http://localhost:3000/api/post', (req, res, ctx) => {
       return res(
@@ -165,22 +147,27 @@ test('an error renders if the server fails to validate the request data', async 
 
   await screen.findByTestId('csrfToken')
 
+  const nextBtns = screen.getAllByRole('button', { name: /next/i })
+  await userEvent.click(nextBtns[0])
+
+  const imagesInput = screen.getByLabelText(/images/i)
+  const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
+  await userEvent.upload(imagesInput, image)
+
+  await userEvent.click(nextBtns[1])
+
   const nameInput = screen.getByRole('textbox', { name: /name/i })
   await userEvent.type(nameInput, 'Modern table')
-
-  const descriptionInput = screen.getByRole('textbox', { name: /description/i })
-  await userEvent.type(descriptionInput, 'A magnificent modern table.')
-
-  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
 
   const priceInput = screen.getByRole('spinbutton', { name: /price/i })
   await userEvent.type(priceInput, '40')
 
-  const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
-  const imagesInput = screen.getByLabelText(/images/i)
-  await userEvent.upload(imagesInput, image)
+  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
 
-  const submitBtn = screen.getByRole('button', { name: /create/i })
+  const descriptionInput = screen.getByRole('textbox', { name: /description/i })
+  await userEvent.type(descriptionInput, 'A magnificent modern table.')
+
+  const submitBtn = screen.getByRole('button', { name: /post/i })
   await userEvent.click(submitBtn)
 
   const error = await screen.findByRole('alert')

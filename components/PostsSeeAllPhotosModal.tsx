@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Modal from './Modal'
 import X from '../public/static/images/x.svg'
+import MainButton from './MainButton'
 
 interface PostsSeeAllPhotosModalProps {
   images: string[]
@@ -12,22 +13,39 @@ const PostsSeeAllPhotosModal = ({ images }: PostsSeeAllPhotosModalProps) => {
       id="seeAllPhotosModal"
       openerId="seeAllPhotosModalOpener"
       renderOpener={(setIsOpen) => (
-        <button
+        <MainButton
           id="seeAllPhotosModalOpener"
-          className="bg-fuchsia-50 text-fuchsia-600 rounded-full shadow-[0_2px_8px_rgba(112,26,117,0.25)] absolute bottom-8 right-8 p-8 hover:text-fuchsia-50 hover:bg-fuchsia-900 transition-colors duration-200 cursor-pointer"
+          bgColor={{ base: 'bg-fuchsia-50', states: 'hover:bg-fuchsia-900' }}
+          textColor={{
+            base: 'text-fuchsia-600',
+            states: 'hover:text-fuchsia-50',
+          }}
+          radius="rounded-full"
+          padding="p-8"
+          className="shadow-[0_2px_8px_rgba(112,26,117,0.25)] absolute bottom-8 right-8"
           onClick={() => setIsOpen(true)}
         >
           See all photos
-        </button>
+        </MainButton>
       )}
       className="fixed top-0 left-0 w-screen h-screen bg-fuchsia-50 z-10"
       renderContent={(setup) => (
         <div className="relative w-full h-full overflow-y-auto md:p-16 md:flex md:flex-col md:flex-nowrap lg:max-w-[1200px] lg:mx-auto">
           <div className="absolute top-8 right-8 z-20 md:static md:text-right md:pb-16">
-            <button
+            <MainButton
               ref={setup.firstFocusable}
               onKeyDown={setup.onShiftTab}
-              className="w-48 h-48 bg-fuchsia-50 text-fuchsia-600 rounded-full shadow-[0_2px_8px_rgba(112,26,117,0.25)] p-4 hover:text-fuchsia-50 hover:bg-fuchsia-900 transition-colors duration-200 cursor-pointer md:shadow-none md:p-0 md:align-bottom"
+              bgColor={{
+                base: 'bg-fuchsia-50',
+                states: 'hover:bg-fuchsia-900',
+              }}
+              textColor={{
+                base: 'text-fuchsia-600',
+                states: 'hover:text-fuchsia-50',
+              }}
+              radius="rounded-full"
+              padding="p-4 md:p-0"
+              className="w-48 h-48 shadow-[0_2px_8px_rgba(112,26,117,0.25)] md:shadow-none md:align-bottom"
               onClick={(e) => {
                 setup.setIsOpen(false)
                 e.stopPropagation()
@@ -35,7 +53,7 @@ const PostsSeeAllPhotosModal = ({ images }: PostsSeeAllPhotosModalProps) => {
               aria-label="Close"
             >
               <X className="w-full h-full" />
-            </button>
+            </MainButton>
           </div>
           <ul className="md:flex md:flex-row md:flex-wrap md:justify-center md:content-center md:gap-16 lg:gap-24">
             {images.map((image, i) => (
@@ -80,13 +98,23 @@ const PostsSeeAllPhotosModal = ({ images }: PostsSeeAllPhotosModalProps) => {
                   renderContent={(setup) => (
                     <div className="relative pb-8 flex flex-col flex-nowrap w-full h-full md:pb-16 lg:max-w-[1200px] lg:mx-auto">
                       <div className="p-8 text-right md:p-16">
-                        <button
+                        <MainButton
                           ref={setup.firstFocusable}
                           onKeyDown={(e) => {
                             setup.onTab(e)
                             setup.onShiftTab(e)
                           }}
-                          className="w-48 h-48 bg-fuchsia-50 text-fuchsia-600 rounded-full hover:text-fuchsia-50 hover:bg-fuchsia-900 transition-colors duration-200 cursor-pointer align-bottom"
+                          bgColor={{
+                            base: 'bg-fuchsia-50',
+                            states: 'hover:bg-fuchsia-900',
+                          }}
+                          textColor={{
+                            base: 'text-fuchsia-600',
+                            states: 'hover:text-fuchsia-50',
+                          }}
+                          radius="rounded-full"
+                          padding="p-0"
+                          className="w-48 h-48 align-bottom"
                           onClick={(e) => {
                             setup.setIsOpen(false)
                             e.stopPropagation()
@@ -94,7 +122,7 @@ const PostsSeeAllPhotosModal = ({ images }: PostsSeeAllPhotosModalProps) => {
                           aria-label="Close"
                         >
                           <X className="w-full h-full" />
-                        </button>
+                        </MainButton>
                       </div>
                       <div className="h-full relative">
                         <Image

@@ -58,6 +58,7 @@ const ProfileUserImage = ({ image: img }: ProfileUserImageProps) => {
           inputRef.current?.click()
         }}
         htmlFor="userImage"
+        aria-label="Change your profile image"
         className="block relative w-[60px] h-[60px] group cursor-pointer md:w-[80px] md:h-[80px]"
       >
         <Image
@@ -76,7 +77,6 @@ const ProfileUserImage = ({ image: img }: ProfileUserImageProps) => {
         type="file"
         name="image"
         id="userImage"
-        aria-label="Change your profile image"
         className="hidden"
       />
     </div>

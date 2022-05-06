@@ -22,3 +22,8 @@ jest.mock('next/link', () => {
   return ({ children, href }: { children: JSX.Element; href: string }) =>
     mockCloneElement(children, { href })
 })
+
+jest.mock('./components/Header', () => ({
+  __esModule: true,
+  default: () => <header></header>,
+}))

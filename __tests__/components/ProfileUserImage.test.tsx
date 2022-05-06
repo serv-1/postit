@@ -5,13 +5,10 @@ import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
 import { ToastState } from '../../contexts/toast'
-import readAsDataUrl from '../../utils/functions/readAsDataUrl'
+import RADU from '../../utils/functions/readAsDataUrl'
 
 jest.mock('../../utils/functions/readAsDataUrl')
-
-const mockReadAsDataUrl = readAsDataUrl as jest.MockedFunction<
-  typeof readAsDataUrl
->
+const mockReadAsDataUrl = RADU as jest.MockedFunction<typeof RADU>
 
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
@@ -45,12 +42,11 @@ test('the user image can be updated by pressing Enter while focusing it', async 
   render(<ProfileUserImage image="/img" />)
 
   const input = screen.getByLabelText(/image/i)
-  input.click = jest.fn()
 
   await userEvent.tab()
   await userEvent.keyboard('{Enter}')
 
-  expect(input.click).toHaveBeenCalledTimes(1)
+  expect(input).toHaveFocus()
 })
 
 test('an error renders if the user image is invalid', async () => {
