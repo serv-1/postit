@@ -20,43 +20,6 @@ beforeEach(() => {
   useToast.mockReturnValue({})
 })
 
-it('renders', async () => {
-  render(<CreateAPost />)
-
-  await screen.findByTestId('csrfToken')
-
-  let title = screen.getByRole('heading', { level: 1 })
-  expect(title).toHaveTextContent(/where/i)
-
-  const step0 = screen.getByTestId('step0')
-  expect(step0).not.toHaveClass('hidden')
-
-  const step1 = screen.getByTestId('step1')
-  expect(step1).toHaveClass('hidden')
-
-  const step2 = screen.getByTestId('step2')
-  expect(step2).toHaveClass('hidden')
-
-  const nextBtns = screen.getAllByRole('button', { name: /next/i })
-  await userEvent.click(nextBtns[0])
-
-  expect(title).toHaveTextContent(/show/i)
-  expect(step0).toHaveClass('hidden')
-  expect(step1).not.toHaveClass('hidden')
-  expect(step2).toHaveClass('hidden')
-
-  const fileInput = screen.getByLabelText(/images/i)
-  const files = [new File(['1'], '1.jpeg', { type: 'image/jpeg' })]
-  await userEvent.upload(fileInput, files)
-
-  await userEvent.click(nextBtns[1])
-
-  expect(title).toHaveTextContent(/post/i)
-  expect(step0).toHaveClass('hidden')
-  expect(step1).toHaveClass('hidden')
-  expect(step2).not.toHaveClass('hidden')
-})
-
 test('the user is redirected to its profile after a valid submission', async () => {
   render(<CreateAPost />)
 

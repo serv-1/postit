@@ -6,15 +6,15 @@ import Input from './Input'
 
 interface PasswordInputProps {
   needFocus?: boolean
-  className?: string
-  containerClass?: string
+  bgColor?: string
+  noRightRadius?: boolean
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void
 }
 
 const PasswordInput = <FormFields extends { password: string }>({
   needFocus,
-  className,
-  containerClass,
+  bgColor,
+  noRightRadius,
   onChange,
 }: PasswordInputProps) => {
   const [showPassword, setShowPassword] = useState(false)
@@ -26,8 +26,8 @@ const PasswordInput = <FormFields extends { password: string }>({
       registerOptions={{ onChange }}
       aria-describedby="passwordStrength"
       needFocus={needFocus}
-      className={className}
-      containerClass={containerClass}
+      noRightRadius={noRightRadius}
+      bgColor={bgColor}
       addOnClass="flex justify-center items-center"
       addOn={
         <button

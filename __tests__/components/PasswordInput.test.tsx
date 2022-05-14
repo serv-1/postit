@@ -22,24 +22,19 @@ it('renders', async () => {
   render(
     <>
       <label htmlFor="password">Password</label>
-      <PasswordInput
-        className="red"
-        containerClass="blue"
-        onChange={onChange}
-      />
+      <PasswordInput noRightRadius bgColor="red" onChange={onChange} />
     </>
   )
 
   const input = screen.getByLabelText(/^password/i)
   expect(input).toHaveAttribute('type', 'password')
-  expect(input).toHaveClass('red')
   expect(setFocus).not.toHaveBeenCalled()
 
   await userEvent.type(input, 'a')
   expect(onChange).toHaveBeenCalledTimes(1)
 
   const container = screen.getByTestId('container')
-  expect(container).toHaveClass('blue')
+  expect(container).toHaveClass('red rounded-r-none')
 
   const showHideBtn = screen.getByRole('button')
   expect(showHideBtn).toHaveAccessibleName(/show/i)

@@ -73,7 +73,7 @@ const Profile = ({ user }: ProfileProps) => {
               </div>
             </div>
             <Link
-              href={`/users/${user.id}`}
+              href={`/users/${user.id}/${user.name}`}
               className="bg-fuchsia-200 text-fuchsia-600 py-8 px-16 block w-full text-center font-bold rounded hover:no-underline hover:bg-fuchsia-300 transition-colors duration-200 md:w-auto md:h-40"
             >
               See my public profile

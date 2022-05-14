@@ -7,11 +7,11 @@ import {
   ForgotPasswordSchema,
 } from '../lib/joi/forgotPasswordSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
-import MainButton from './MainButton'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
 import { useToast } from '../contexts/toast'
+import Button from './Button'
 
 interface AuthenticationFPProps {
   setForgotPassword: React.Dispatch<React.SetStateAction<boolean>>
@@ -61,16 +61,13 @@ const AuthenticationForgotPassword = (props: AuthenticationFPProps) => {
             type="email"
             name="email"
             needFocus
-            className="md:bg-fuchsia-100"
+            bgColor="md:bg-fuchsia-100"
           />
           <InputError<ForgotPasswordSchema> inputName="email" />
         </div>
-        <MainButton
-          type="submit"
-          className="relative left-full -translate-x-full"
-        >
-          Send
-        </MainButton>
+        <div className="flex justify-end">
+          <Button color="primary">Send</Button>
+        </div>
       </Form>
       <div className="flex-grow flex items-end">
         <button

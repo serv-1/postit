@@ -1,121 +1,93 @@
-import { KeyboardEventHandler } from 'react'
+import { nanoid } from 'nanoid'
 import {
   ComponentPropsWithoutRef,
   Dispatch,
-  KeyboardEvent,
   ReactNode,
-  RefObject,
   SetStateAction,
   useEffect,
   useRef,
   useState,
 } from 'react'
+import { createPortal } from 'react-dom'
 
-type SetIsOpen = Dispatch<SetStateAction<boolean>>
-type DivProps = Omit<ComponentPropsWithoutRef<'div'>, 'role' | 'id'>
-type Setup<T, U> = {
-  firstFocusable: RefObject<T>
-  lastFocusable?: RefObject<U>
-  onShiftTab: KeyboardEventHandler
-  onTab: KeyboardEventHandler
-  setIsOpen: SetIsOpen
+type ModalProps = Omit<
+  ComponentPropsWithoutRef<'div'>,
+  'role' | 'aria-modal'
+> & {
+  children: ReactNode
+  setIsOpen: Dispatch<SetStateAction<boolean>>
 }
 
-interface WithoutFirstFocusableFocused<T, U, V> {
-  isFirstFocusableFocused?: false
-  renderContent: (setup: { focused: RefObject<U> } & Setup<T, V>) => ReactNode
-}
+const Modal = ({ children, setIsOpen, ...rest }: ModalProps) => {
+  const focusableEls =
+    "a[href]:not([tabindex='-1']), area[href]:not([tabindex='-1']), input:not([disabled]):not([tabindex='-1']), select:not([disabled]):not([tabindex='-1']), textarea:not([disabled]):not([tabindex='-1']), button:not([disabled]):not([tabindex='-1']), iframe:not([tabindex='-1']), [tabindex]:not([tabindex='-1']), [contentEditable=true]:not([tabindex='-1'])"
 
-interface WithFirstFocusableFocused<T, U> {
-  isFirstFocusableFocused: true
-  renderContent: (setup: Setup<T, U>) => ReactNode
-}
-
-type ModalProps<T, U, V> = DivProps & {
-  id: string
-  openerId: string
-  renderOpener: (setIsOpen: SetIsOpen, isOpen: boolean) => ReactNode
-} & (WithoutFirstFocusableFocused<T, V, U> | WithFirstFocusableFocused<T, U>)
-
-const Modal = <
-  FirstFocusable extends HTMLElement,
-  LastFocusable extends HTMLElement | null = null,
-  Focused extends HTMLElement | null = null
->({
-  id,
-  openerId,
-  renderOpener,
-  renderContent,
-  isFirstFocusableFocused,
-  ...rest
-}: ModalProps<FirstFocusable, LastFocusable, Focused>) => {
-  const focused = useRef<Focused>(null)
-  const firstFocusable = useRef<FirstFocusable>(null)
-  const lastFocusable = useRef<LastFocusable>(null)
-  const [isOpen, setIsOpen] = useState(false)
+  const [isContainerMount, setIsContainerMount] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
+  const idRef = useRef('a' + nanoid())
+  const restoreFocusRef = useRef(document.activeElement as HTMLElement)
 
   useEffect(() => {
+    const restoreFocus = restoreFocusRef.current
+    const container = document.createElement('div')
+    container.setAttribute('id', idRef.current)
+
     const onClick = (e: MouseEvent) => {
-      const t = e.target as HTMLElement
-
-      if (t.getAttribute('id') === openerId) return
-      if (t.closest('#' + id)) return
-
+      if (modalRef.current?.contains(e.target as HTMLElement)) return
       setIsOpen(false)
     }
 
-    document.addEventListener('click', onClick)
+    container.addEventListener('click', onClick)
+    document.body.appendChild(container)
+    setIsContainerMount(true)
 
-    return () => document.removeEventListener('click', onClick)
-  }, [id, openerId])
+    return () => {
+      container.remove()
+      container.removeEventListener('click', onClick)
+      restoreFocus.focus()
+    }
+  }, [setIsOpen])
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!modalRef.current) return
+    const el = modalRef.current.querySelectorAll<HTMLElement>(focusableEls)[0]
+    if (el) el.focus()
+  }, [isContainerMount])
 
-    if (isFirstFocusableFocused) {
-      return firstFocusable.current?.focus()
-    }
+  if (!isContainerMount) return null
 
-    focused.current?.focus()
-  }, [isOpen, isFirstFocusableFocused])
+  return createPortal(
+    <div
+      {...rest}
+      ref={modalRef}
+      role="dialog"
+      aria-modal="true"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') {
+          setIsOpen(false)
+        } else if (e.key === 'Tab') {
+          const modal = modalRef.current
+          if (!modal) return
 
-  const setup = {
-    firstFocusable,
-    lastFocusable,
-    onShiftTab(e: KeyboardEvent<HTMLElement>) {
-      if (e.shiftKey && e.key === 'Tab') {
-        lastFocusable.current?.focus()
-        e.preventDefault()
-      }
-    },
-    onTab(e: KeyboardEvent<HTMLElement>) {
-      if (e.key === 'Tab' && !e.shiftKey) {
-        firstFocusable.current?.focus()
-        e.preventDefault()
-      }
-    },
-    setIsOpen,
-  }
+          const els = modal.querySelectorAll<HTMLElement>(focusableEls)
+          const first = els[0]
+          const last = els[els.length - 1]
 
-  return (
-    <>
-      {renderOpener(setIsOpen, isOpen)}
-      {isOpen ? (
-        <div
-          {...rest}
-          id={id}
-          role="dialog"
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') setIsOpen(false)
-            e.stopPropagation()
-          }}
-        >
-          {isFirstFocusableFocused
-            ? renderContent(setup)
-            : renderContent({ ...setup, focused })}
-        </div>
-      ) : null}
-    </>
+          if (e.target === first && e.shiftKey) {
+            last.focus()
+            e.preventDefault()
+          } else if (e.target === last && !e.shiftKey) {
+            first.focus()
+            e.preventDefault()
+          }
+        }
+
+        e.stopPropagation()
+      }}
+    >
+      {children}
+    </div>,
+    document.querySelector('#' + idRef.current) as HTMLElement
   )
 }
 

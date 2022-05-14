@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import ProfilePostsTabPanel from '../../components/ProfilePostsTabPanel'
+import { IUserPost } from '../../types/common'
 
 const useTabs = jest.spyOn(require('../../contexts/tabs'), 'useTabs')
 
@@ -13,20 +14,18 @@ it('renders without posts', () => {
 })
 
 it('renders with posts', () => {
-  render(
-    <ProfilePostsTabPanel
-      posts={[
-        {
-          id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
-          name: 'Table',
-          description: 'Awesome table',
-          categories: ['furniture'],
-          price: 50,
-          images: ['/table.jpeg'],
-        },
-      ]}
-    />
-  )
+  const post: IUserPost = {
+    id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
+    name: 'Table',
+    description: 'Awesome table',
+    categories: ['furniture'],
+    price: 50,
+    images: ['/table.jpeg'],
+  }
+  render(<ProfilePostsTabPanel posts={[post]} />)
+
+  const link = screen.getByRole('link')
+  expect(link).toHaveAttribute('href', `/posts/${post.id}/${post.name}/update`)
 
   const img = screen.getByRole('img')
   expect(img).toHaveAttribute('src', '/table.jpeg')

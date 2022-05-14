@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import addSpacesToNb from '../utils/functions/addSpacesToNb'
-import formatForUrl from '../utils/functions/formatForUrl'
+import formatToUrl from '../utils/functions/formatToUrl'
 import Link from './Link'
 
 interface PostProps {
@@ -25,7 +25,7 @@ const Post = ({ id, name, price, image }: PostProps) => {
       />
       <figcaption className="px-8 py-4 text-center">
         <Link
-          href={`/posts/${id}/${formatForUrl(name)}`}
+          href={`/posts/${id}/${formatToUrl(name)}`}
           className="text-fuchsia-600 hover:underline"
         >
           {truncatedName} - {addSpacesToNb(price)}€

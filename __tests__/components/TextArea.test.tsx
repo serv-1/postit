@@ -21,16 +21,13 @@ beforeEach(() => useFormContext.mockReturnValue(setFormContext(false)))
 it('renders', async () => {
   const onChange = jest.fn()
 
-  render(
-    <TextArea name="test" registerOptions={{ onChange }} className="blue" />
-  )
+  render(<TextArea name="test" registerOptions={{ onChange }} required />)
 
   const textarea = screen.getByRole('textbox')
   expect(textarea).toHaveAttribute('name', 'test')
   expect(textarea).toHaveAttribute('id', 'test')
   expect(textarea).toHaveAttribute('aria-describedby', 'testFeedback')
-  expect(textarea).toHaveClass('blue')
-  expect(textarea.className).not.toContain('red')
+  expect(textarea).toBeRequired()
 
   await userEvent.type(textarea, 'a')
   expect(onChange).toHaveBeenCalledTimes(1)

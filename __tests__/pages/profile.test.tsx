@@ -22,7 +22,10 @@ it('renders', () => {
   expect(title).toHaveTextContent(user.name)
 
   const publicProfileLink = screen.getByRole('link', { name: /public/i })
-  expect(publicProfileLink).toHaveAttribute('href', '/users/' + user.id)
+  expect(publicProfileLink).toHaveAttribute(
+    'href',
+    `/users/${user.id}/${user.name}`
+  )
 })
 
 it('the user is signed out', async () => {

@@ -6,12 +6,12 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
 import { registerSchema, RegisterSchema } from '../lib/joi/registerSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
-import MainButton from './MainButton'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
 import PasswordStrength from './PasswordStrength'
 import PasswordInput from './PasswordInput'
+import Button from './Button'
 
 const AuthenticationRegisterForm = () => {
   const methods = useForm<RegisterSchema>({
@@ -67,7 +67,7 @@ const AuthenticationRegisterForm = () => {
           type="text"
           name="name"
           needFocus
-          className="md:bg-fuchsia-100"
+          bgColor="md:bg-fuchsia-100"
         />
         <InputError<RegisterSchema> inputName="name" />
       </div>
@@ -77,7 +77,7 @@ const AuthenticationRegisterForm = () => {
         <Input<RegisterSchema>
           type="email"
           name="email"
-          className="md:bg-fuchsia-100"
+          bgColor="md:bg-fuchsia-100"
         />
         <InputError<RegisterSchema> inputName="email" />
       </div>
@@ -90,19 +90,16 @@ const AuthenticationRegisterForm = () => {
           {(onChange) => (
             <PasswordInput<RegisterSchema>
               onChange={onChange}
-              containerClass="bg-fuchsia-100"
+              bgColor="bg-fuchsia-50 md:bg-fuchsia-100"
             />
           )}
         </PasswordStrength>
         <InputError<RegisterSchema> inputName="password" />
       </div>
 
-      <MainButton
-        type="submit"
-        className="relative left-full -translate-x-full"
-      >
-        Register
-      </MainButton>
+      <div className="flex justify-end">
+        <Button color="primary">Register</Button>
+      </div>
     </Form>
   )
 }

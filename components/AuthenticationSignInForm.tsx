@@ -5,11 +5,11 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
 import { signInSchema, SignInSchema } from '../lib/joi/signInSchema'
 import { UnPromise } from '../types/common'
-import MainButton from './MainButton'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
 import PasswordInput from './PasswordInput'
+import Button from './Button'
 
 interface AuthenticationSignInFormProps {
   providers: UnPromise<ReturnType<typeof getProviders>>
@@ -55,7 +55,7 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
             type="email"
             name="email"
             needFocus
-            className="md:bg-fuchsia-100"
+            bgColor="md:bg-fuchsia-100"
           />
           <InputError<SignInSchema> inputName="email" />
         </div>
@@ -64,22 +64,20 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
           <label htmlFor="password" className="inline-block w-1/2">
             Password
           </label>
-          <a
+          <button
+            type="button"
             className="inline-block w-1/2 text-fuchsia-600 text-s text-right hover:underline"
             onClick={() => props.setForgotPassword(true)}
           >
             Forgot password?
-          </a>
-          <PasswordInput<SignInSchema> containerClass="bg-fuchsia-100" />
+          </button>
+          <PasswordInput<SignInSchema> bgColor="bg-fuchsia-50 md:bg-fuchsia-100" />
           <InputError<SignInSchema> inputName="password" />
         </div>
 
-        <MainButton
-          type="submit"
-          className="relative left-full -translate-x-full"
-        >
-          Sign in
-        </MainButton>
+        <div className="flex justify-end">
+          <Button color="primary">Sign in</Button>
+        </div>
       </Form>
       <div className="flex flex-row flex-nowrap items-center gap-x-4 font-bold text-center rounded-full my-16 before:block before:h-[1px] before:w-1/2 before:bg-fuchsia-900 after:block after:h-[1px] after:w-1/2 after:bg-fuchsia-900">
         Or
@@ -89,16 +87,17 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
           ({ id, name }) =>
             id === 'credentials' ||
             id === 'email' || (
-              <MainButton
+              <Button
                 key={id}
+                color="primary"
+                fullWidth
                 data-cy={`${id}Btn`}
-                className="w-full"
                 onClick={() =>
                   signIn(id, { callbackUrl: 'http://localhost:3000/profile' })
                 }
               >
                 Sign in with {name}
-              </MainButton>
+              </Button>
             )
         )}
     </>

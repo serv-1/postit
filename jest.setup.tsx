@@ -13,8 +13,11 @@ jest.mock('next/head', () => ({
 jest.mock(
   'next/image',
   () =>
-    function Image(props: Omit<ImageProps, 'src'> & { src?: string }) {
-      return <img src={props.src} alt={props.alt} title={props.title} />
+    function Image(
+      props: Omit<ImageProps, 'src'> & { src?: string; className?: string }
+    ) {
+      const { src, alt, title, className } = props
+      return <img src={src} alt={alt} title={title} className={className} />
     }
 )
 

@@ -1,4 +1,3 @@
-import MainButton from './MainButton'
 import Form from './Form'
 import Input from './Input'
 import Select from './Select'
@@ -12,6 +11,8 @@ import {
 } from '../lib/joi/searchPostsSchema'
 import { useEffect, useState } from 'react'
 import { Categories } from '../types/common'
+import OutlineButton from './OutlineButton'
+import Button from './Button'
 
 const options = categories.map((category) => ({
   label: category,
@@ -100,26 +101,15 @@ const HomeSearchPosts = () => {
         />
         <InputError<SearchPostsSchema> inputName="categories" />
       </div>
-      <MainButton
+      <OutlineButton
         type="button"
-        bgColor={{
-          base: 'bg-transparent',
-          states: 'hover:bg-fuchsia-600 focus:bg-fuchsia-600',
-        }}
-        textColor={{
-          base: 'text-fuchsia-600',
-          states: 'hover:text-fuchsia-50 focus:text-fuchsia-50',
-        }}
-        radius="rounded-full"
-        padding="px-8 py-4"
-        className="border-2 border-fuchsia-600 mr-8"
         onClick={(e) => {
           setOpenedModal(openedModal === 'price' ? 'none' : 'price')
           e.stopPropagation()
         }}
       >
         Price
-      </MainButton>
+      </OutlineButton>
       {openedModal === 'price' && (
         <div
           id="priceModal"
@@ -134,7 +124,7 @@ const HomeSearchPosts = () => {
                 name="minPrice"
                 type="number"
                 addOn="€"
-                addOnClass="text-[rgba(112,26,117,0.5)]"
+                addOnClass="text-fuchsia-900/50"
                 needFocus
               />
             </div>
@@ -145,7 +135,7 @@ const HomeSearchPosts = () => {
                 name="maxPrice"
                 type="number"
                 addOn="€"
-                addOnClass="text-[rgba(112,26,117,0.5)]"
+                addOnClass="text-fuchsia-900/50"
               />
             </div>
           </div>
@@ -153,26 +143,15 @@ const HomeSearchPosts = () => {
           <InputError<SearchPostsSchema> inputName="maxPrice" />
         </div>
       )}
-      <MainButton
+      <OutlineButton
         type="button"
-        bgColor={{
-          base: 'bg-transparent',
-          states: 'hover:bg-fuchsia-600 focus:bg-fuchsia-600',
-        }}
-        textColor={{
-          base: 'text-fuchsia-600',
-          states: 'hover:text-fuchsia-50 focus:text-fuchsia-50',
-        }}
-        radius="rounded-full"
-        padding="px-8 py-4"
-        className="border-2 border-fuchsia-600 mr-8"
         onClick={(e) => {
           setOpenedModal(openedModal === 'location' ? 'none' : 'location')
           e.stopPropagation()
         }}
       >
         Location
-      </MainButton>
+      </OutlineButton>
       {openedModal === 'location' && (
         <div
           id="locationModal"
@@ -182,13 +161,9 @@ const HomeSearchPosts = () => {
           <p>work in progress</p>
         </div>
       )}
-      <MainButton
-        type="submit"
-        aria-label="Search"
-        className="absolute right-0 -bottom-[36px] md:left-1/2 md:-translate-x-1/2 md:right-auto lg:right-0 lg:left-auto lg:translate-x-0 z-10"
-      >
-        Search
-      </MainButton>
+      <div className="absolute right-0 -bottom-[36px] md:left-1/2 md:-translate-x-1/2 md:right-auto lg:right-0 lg:left-auto lg:translate-x-0 z-10">
+        <Button color="primary">Search</Button>
+      </div>
     </Form>
   )
 }

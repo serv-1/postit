@@ -31,42 +31,24 @@ test('the user is signed out and redirected to the home page after being deleted
   })
 })
 
-test('the modal closes', async () => {
+it('opens/closes', async () => {
   render(<DeleteAccountModal />)
 
   const openBtn = screen.getByRole('button')
   await userEvent.click(openBtn)
 
+  const modal = screen.getByRole('dialog')
+  expect(modal).toBeInTheDocument()
+
   const closeBtn = screen.getByRole('button', { name: /close/i })
   await userEvent.click(closeBtn)
-  expect(closeBtn).not.toBeInTheDocument()
+  expect(modal).not.toBeInTheDocument()
 
   await userEvent.click(openBtn)
 
   const cancelBtn = screen.getByRole('button', { name: /cancel/i })
   await userEvent.click(cancelBtn)
   expect(cancelBtn).not.toBeInTheDocument()
-})
-
-test('the focus is trapped in the modal', async () => {
-  render(<DeleteAccountModal />)
-
-  const openBtn = screen.getByRole('button')
-  await userEvent.click(openBtn)
-
-  const cancelBtn = screen.getByRole('button', { name: /cancel/i })
-  expect(cancelBtn).toHaveFocus()
-
-  await userEvent.tab({ shift: true })
-  await userEvent.tab({ shift: true })
-
-  const deleteBtn = screen.getByRole('button', { name: /delete$/i })
-  expect(deleteBtn).toHaveFocus()
-
-  await userEvent.tab()
-
-  const closeBtn = screen.getByRole('button', { name: /close/i })
-  expect(closeBtn).toHaveFocus()
 })
 
 test('an error renders if the server fails to delete the user', async () => {

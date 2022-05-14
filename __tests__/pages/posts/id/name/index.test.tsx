@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import Post from '../../../../pages/posts/[id]/[name]'
-import { IPost } from '../../../../types/common'
+import Name from '../../../../../pages/posts/[id]/[name]'
+import { IPost } from '../../../../../types/common'
 import userEvent from '@testing-library/user-event'
 
 const post: IPost = {
@@ -20,7 +20,7 @@ const post: IPost = {
 }
 
 it('renders', () => {
-  render(<Post post={post} />)
+  render(<Name post={post} />)
 
   const documentTitle = screen.getByTestId('documentTitle')
   expect(documentTitle).toHaveTextContent(post.name)
@@ -31,7 +31,10 @@ it('renders', () => {
 
   for (const link of screen.getAllByRole('link')) {
     expect(link).toHaveTextContent(post.user.name)
-    expect(link).toHaveAttribute('href', `/users/${post.user.id}`)
+    expect(link).toHaveAttribute(
+      'href',
+      `/users/${post.user.id}/${post.user.name}`
+    )
   }
 
   const mainTitle = screen.getByRole('heading', { level: 1 })
@@ -51,7 +54,7 @@ test('the arrow left redirect to the previous page', async () => {
   const back = jest.fn()
   Object.defineProperty(window, 'history', { get: () => ({ back }) })
 
-  render(<Post post={post} />)
+  render(<Name post={post} />)
 
   const arrowLeft = screen.getByRole('button', { name: /go back/i })
   await userEvent.click(arrowLeft)
@@ -69,7 +72,7 @@ it('renders the other posts of the user', () => {
     id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
   })
 
-  render(<Post post={post} />)
+  render(<Name post={post} />)
 
   const otherPostsTitle = screen.getByRole('heading', { level: 2 })
   expect(otherPostsTitle).toHaveTextContent(p.user.name + "'s other posts")

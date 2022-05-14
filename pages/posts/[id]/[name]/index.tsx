@@ -1,18 +1,19 @@
 import axios from 'axios'
 import { GetServerSideProps } from 'next'
-import { IPost } from '../../../types/common'
-import addSpacesToNb from '../../../utils/functions/addSpacesToNb'
+import { IPost } from '../../../../types/common'
+import addSpacesToNb from '../../../../utils/functions/addSpacesToNb'
 import Head from 'next/head'
-import Link from '../../../components/Link'
-import PostList from '../../../components/PostList'
+import Link from '../../../../components/Link'
+import PostList from '../../../../components/PostList'
 import Image from 'next/image'
-import ArrowLeft from '../../../public/static/images/arrow-left.svg'
-import Heart from '../../../public/static/images/heart.svg'
-import HeartFill from '../../../public/static/images/heart-fill.svg'
-import ChatFill from '../../../public/static/images/chat-fill.svg'
-import PostsSeeAllPhotosModal from '../../../components/PostsSeeAllPhotosModal'
-import MainButton from '../../../components/MainButton'
-import Header from '../../../components/Header'
+import ArrowLeft from '../../../../public/static/images/arrow-left.svg'
+import Heart from '../../../../public/static/images/heart.svg'
+import HeartFill from '../../../../public/static/images/heart-fill.svg'
+import ChatFill from '../../../../public/static/images/chat-fill.svg'
+import PostsSeeAllPhotosModal from '../../../../components/PostsSeeAllPhotosModal'
+import Header from '../../../../components/Header'
+import DotButton from '../../../../components/DotButton'
+import Button from '../../../../components/Button'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id
@@ -25,11 +26,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 }
 
-interface PostProps {
+interface NameProps {
   post: IPost
 }
 
-const Post = ({ post }: PostProps) => {
+const Name = ({ post }: NameProps) => {
   return (
     <>
       <Head>
@@ -45,41 +46,33 @@ const Post = ({ post }: PostProps) => {
             objectFit="cover"
             priority
           />
-          <MainButton
-            bgColor={{ base: 'bg-fuchsia-50', states: 'hover:bg-fuchsia-900' }}
-            textColor={{
-              base: 'text-fuchsia-600',
-              states: 'hover:text-fuchsia-50',
-            }}
-            radius="rounded-full"
-            padding="p-8"
-            className="w-48 h-48 shadow-[0_2px_8px_rgba(112,26,117,0.25)] absolute top-8 left-8 md:hidden"
+          <DotButton
+            style="arrowLeft"
             onClick={() => window.history.back()}
             aria-label="Go back to the previous page"
           >
             <ArrowLeft className="w-full h-full" />
-          </MainButton>
-          <MainButton
-            bgColor={{ base: 'bg-fuchsia-50', states: false }}
-            textColor={{ base: 'text-fuchsia-600', states: false }}
-            radius="rounded-full"
-            padding="p-8"
-            className="w-48 h-48 shadow-[0_2px_8px_rgba(112,26,117,0.25)] absolute top-8 right-8 group"
-          >
+          </DotButton>
+          <DotButton style="heart">
             <Heart className="w-full h-full group-hover:opacity-0 transition-opacity duration-200" />
             <HeartFill className="w-full h-full opacity-0 group-hover:opacity-100 group-hover:animate-[heartbeat_1s_linear_infinite] transition-opacity duration-200 relative -top-full" />
-          </MainButton>
-          <PostsSeeAllPhotosModal images={post.images} />
+          </DotButton>
+          <PostsSeeAllPhotosModal sources={post.images} />
         </div>
         <div className="col-span-full md:col-span-3 md:sticky md:top-16 lg:col-span-4">
           <div className="md:bg-fuchsia-100 md:rounded-16 md:p-16 md:text-t-xl md:font-bold">
             Posted by{' '}
-            <Link href={`/users/${post.user.id}`} className="text-fuchsia-600">
+            <Link
+              href={`/users/${post.user.id}/${post.user.name}`}
+              className="text-fuchsia-600 md:mb-16"
+            >
               {post.user.name}
             </Link>
-            <MainButton className="hidden md:block md:text-base md:w-full md:mt-16">
-              Contact
-            </MainButton>
+            <div className="hidden md:block">
+              <Button color="primary" fullWidth>
+                Contact
+              </Button>
+            </div>
           </div>
         </div>
         <section className="col-span-full my-32 md:col-span-5 lg:col-span-8">
@@ -99,7 +92,7 @@ const Post = ({ post }: PostProps) => {
           <section className="col-span-full mb-32 md:col-span-5 lg:col-span-8">
             <h2 className="mb-16">
               <Link
-                href={`/users/${post.user.id}`}
+                href={`/users/${post.user.id}/${post.user.name}`}
                 className="text-fuchsia-600"
               >
                 {post.user.name}
@@ -109,18 +102,12 @@ const Post = ({ post }: PostProps) => {
             <PostList posts={post.user.posts} columns={2} />
           </section>
         )}
-        <MainButton
-          bgColor={{ states: 'hover:bg-fuchsia-50' }}
-          textColor={{ states: 'hover:text-fuchsia-900' }}
-          radius="rounded-full"
-          padding="p-0"
-          className="w-48 h-48 shadow-[0_0_8px_rgba(192,38,211,0.75)] fixed bottom-8 right-8 flex justify-center items-center md:hidden"
-        >
-          <ChatFill className="w-24 h-24" />
-        </MainButton>
+        <DotButton style="chat">
+          <ChatFill className="w-full h-full" />
+        </DotButton>
       </main>
     </>
   )
 }
 
-export default Post
+export default Name

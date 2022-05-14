@@ -9,10 +9,10 @@ import {
   passwordCsrfSchema,
 } from '../lib/joi/passwordSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
+import Button from './Button'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
-import MainButton from './MainButton'
 import PasswordInput from './PasswordInput'
 import PasswordStrength from './PasswordStrength'
 
@@ -48,22 +48,27 @@ const UpdateAccountForm = ({ value }: UpdateAccountFormProps) => {
   return (
     <Form methods={methods} submitHandler={submitHandler} needCsrfToken>
       {value === 'password' ? (
-        <div className="mb-16 flex flex-row flex-nowrap items-end md:mb-32">
-          <div className="w-full flex flex-row flex-wrap">
-            <label htmlFor="password" className="w-1/2">
-              Password
-            </label>
-            <PasswordStrength className="w-1/2 text-right">
-              {(onChange) => (
-                <PasswordInput<PasswordCsrfSchema>
-                  onChange={onChange}
-                  containerClass="rounded-r-none bg-fuchsia-100 w-full"
-                />
-              )}
-            </PasswordStrength>
-            <InputError<PasswordCsrfSchema> inputName="password" />
+        <div className="mb-16">
+          <div className="flex flex-row flex-nowrap items-end md:mb-32">
+            <div className="w-full flex flex-row flex-wrap">
+              <label htmlFor="password" className="w-1/2">
+                Password
+              </label>
+              <PasswordStrength className="w-1/2 text-right">
+                {(onChange) => (
+                  <PasswordInput<PasswordCsrfSchema>
+                    onChange={onChange}
+                    noRightRadius
+                    bgColor="bg-fuchsia-100"
+                  />
+                )}
+              </PasswordStrength>
+            </div>
+            <Button color="primary" noRadius="left">
+              Change
+            </Button>
           </div>
-          <MainButton className="h-[42px] rounded-l-none">Change</MainButton>
+          <InputError<PasswordCsrfSchema> inputName="password" />
         </div>
       ) : (
         <div className="mb-16 md:mb-32">
@@ -74,10 +79,13 @@ const UpdateAccountForm = ({ value }: UpdateAccountFormProps) => {
             <Input<Schemas>
               type={value === 'name' ? 'text' : value}
               name={value}
-              className="rounded-r-none bg-fuchsia-100"
+              noRightRadius
+              bgColor="bg-fuchsia-100"
             />
             <InputError<Schemas> inputName={value} />
-            <MainButton className="rounded-l-none">Change</MainButton>
+            <Button color="primary" noRadius="left">
+              Change
+            </Button>
           </div>
         </div>
       )}

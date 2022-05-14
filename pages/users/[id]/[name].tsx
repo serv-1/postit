@@ -2,12 +2,12 @@ import axios from 'axios'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
-import Header from '../../components/Header'
-import PostList from '../../components/PostList'
-import { IUser } from '../../types/common'
-import Blob from '../../public/static/images/blob.svg'
-import ChatFill from '../../public/static/images/chat-fill.svg'
-import MainButton from '../../components/MainButton'
+import Header from '../../../components/Header'
+import PostList from '../../../components/PostList'
+import { IUser } from '../../../types/common'
+import Blob from '../../../public/static/images/blob.svg'
+import ChatFill from '../../../public/static/images/chat-fill.svg'
+import DotButton from '../../../components/DotButton'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id
@@ -24,7 +24,7 @@ interface UserProps {
   user: IUser
 }
 
-const User = ({ user }: UserProps) => {
+const Name = ({ user }: UserProps) => {
   return (
     <>
       <Head>
@@ -60,18 +60,12 @@ const User = ({ user }: UserProps) => {
             </span>
           </div>
         )}
-        <MainButton
-          bgColor={{ states: 'hover:bg-fuchsia-50' }}
-          textColor={{ states: 'hover:text-fuchsia-900' }}
-          radius="rounded-full"
-          padding="p-0"
-          className="w-48 h-48 shadow-[0_0_8px_rgba(192,38,211,0.75)] fixed bottom-8 right-8 flex justify-center items-center md:hidden"
-        >
-          <ChatFill className="w-24 h-24" />
-        </MainButton>
+        <DotButton style="chat">
+          <ChatFill className="w-full h-full" />
+        </DotButton>
       </main>
     </>
   )
 }
 
-export default User
+export default Name

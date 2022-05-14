@@ -30,7 +30,8 @@ it('renders', async () => {
       type="text"
       name="test"
       registerOptions={{ onChange }}
-      className="blue"
+      bgColor="blue"
+      noRightRadius
       aria-describedby="described"
     />
   )
@@ -39,7 +40,7 @@ it('renders', async () => {
   expect(input).toHaveAttribute('id', 'test')
   expect(input).toHaveAttribute('name', 'test')
   expect(input).toHaveAttribute('aria-describedby', 'testFeedback described')
-  expect(input).toHaveClass('blue', 'bg-fuchsia-50')
+  expect(input).toHaveClass('blue', 'rounded-r-none')
   expect(input.className).toContain('border')
   expect(input.className).not.toContain('red')
   expect(input.className).not.toContain('file')
@@ -95,7 +96,8 @@ test('the add-on renders', () => {
       name="test"
       addOn="@"
       addOnClass="dark"
-      containerClass="red"
+      bgColor="red"
+      noRightRadius
     />
   )
 
@@ -103,7 +105,7 @@ test('the add-on renders', () => {
   expect(addOn).toHaveClass('dark')
 
   const container = screen.getByTestId('container')
-  expect(container).toHaveClass('red')
+  expect(container).toHaveClass('red rounded-r-none')
   expect(container.className).toContain('border')
 
   const input = screen.getByRole('textbox')

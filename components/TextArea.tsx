@@ -6,9 +6,16 @@ import {
   RegisterOptions,
   useFormContext,
 } from 'react-hook-form'
+import { BORDER, RED_BORDER } from './Input'
+
+const TEXTAREA_BASE =
+  'rounded p-8 w-full bg-fuchsia-50 border-b-2 outline-none align-bottom transition-colors placeholder:text-[rgba(112,26,117,0.5)]'
 
 interface TextAreaProps<FormFields extends FieldValues>
-  extends React.ComponentPropsWithoutRef<'textarea'> {
+  extends Omit<
+    React.ComponentPropsWithoutRef<'textarea'>,
+    'id' | 'className' | 'aria-describedby'
+  > {
   name: FieldPath<FormFields>
   registerOptions?: RegisterOptions<FormFields>
   needFocus?: boolean
@@ -18,19 +25,10 @@ const TextArea = <FormFields extends FieldValues>({
   name,
   registerOptions,
   needFocus,
-  className,
   ...props
 }: TextAreaProps<FormFields>) => {
   const { register, setFocus, formState } = useFormContext<FormFields>()
   const { isSubmitted, errors } = formState
-
-  const _className = classNames(
-    'rounded p-8 w-full bg-fuchsia-100 border-b-2 outline-none align-bottom transition-colors placeholder:text-[rgba(112,26,117,0.5)]',
-    isSubmitted && errors[name]
-      ? 'border-2 border-red-600 focus:border-red-900'
-      : 'border-[rgba(112,26,117,0.25)] focus:border-[rgba(112,26,117,0.75)]',
-    className
-  )
 
   useEffect(() => {
     if (needFocus) setFocus(name)
@@ -38,11 +36,14 @@ const TextArea = <FormFields extends FieldValues>({
 
   return (
     <textarea
+      {...props}
       {...register(name, registerOptions)}
-      className={_className}
       id={name}
       aria-describedby={`${name}Feedback`}
-      {...props}
+      className={classNames(
+        TEXTAREA_BASE,
+        isSubmitted && errors[name] ? RED_BORDER : BORDER
+      )}
     ></textarea>
   )
 }

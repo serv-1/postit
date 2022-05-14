@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import User from '../../../pages/users/[id]'
+import Name from '../../../../pages/users/[id]/[name]'
 
 it('renders', () => {
   const user = {
@@ -10,7 +10,7 @@ it('renders', () => {
     posts: [],
   }
 
-  render(<User user={user} />)
+  render(<Name user={user} />)
 
   const title = screen.getByRole('heading')
   expect(title).toHaveTextContent(user.name)
@@ -41,7 +41,7 @@ it('renders the user posts', () => {
     ],
   }
 
-  render(<User user={user} />)
+  render(<Name user={user} />)
 
   const title = screen.getByRole('heading', { level: 2 })
   expect(title).toHaveTextContent(String(user.posts.length))
