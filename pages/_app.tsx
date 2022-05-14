@@ -30,7 +30,7 @@ const App = ({ Component, pageProps }: NextAppProps) => {
         <ToastProvider>
           <div
             className={
-              'mx-16 grid min-h-screen ' +
+              'relative mx-16 grid min-h-screen ' +
               (Component.need2RowsGrid
                 ? 'grid-rows-[1fr_auto]'
                 : 'grid-rows-[auto_1fr_auto]')

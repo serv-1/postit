@@ -18,7 +18,8 @@ const FILE_INPUT_BASE =
 const FIB_WITH_ADDON = FILE_INPUT_BASE + ' rounded-r-none bg-transparent'
 
 export const BORDER = 'border-fuchsia-900/25 focus-within:border-fuchsia-900/75'
-export const RED_BORDER = 'border-2 border-red-600 focus-within:border-red-900'
+export const RED_BORDER =
+  'border-2 border-rose-600 focus-within:border-rose-900'
 
 interface InputWithoutAddOnProps {
   addOn?: undefined

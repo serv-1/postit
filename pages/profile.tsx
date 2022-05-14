@@ -44,7 +44,7 @@ const Profile = ({ user }: ProfileProps) => {
       <Header>
         <Link
           href="/create-a-post"
-          className="bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold mr-8 md:mr-16 hover:no-underline"
+          className="bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold mr-8 md:mr-16"
         >
           Create a post
         </Link>
@@ -74,7 +74,7 @@ const Profile = ({ user }: ProfileProps) => {
             </div>
             <Link
               href={`/users/${user.id}/${user.name}`}
-              className="bg-fuchsia-200 text-fuchsia-600 py-8 px-16 block w-full text-center font-bold rounded hover:no-underline hover:bg-fuchsia-300 transition-colors duration-200 md:w-auto md:h-40"
+              className="bg-fuchsia-200 text-fuchsia-600 py-8 px-16 block w-full text-center font-bold rounded hover:bg-fuchsia-300 transition-colors duration-200 md:w-auto md:h-40"
             >
               See my public profile
             </Link>

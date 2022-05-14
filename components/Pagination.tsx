@@ -44,7 +44,7 @@ const Pagination = ({ totalPages }: PaginationProps) => {
       <li key={i} aria-current={i === currentPage ? 'page' : undefined}>
         <Link
           href="#"
-          className={linkClass + (i === currentPage ? 'bg-fuchsia-300' : '')}
+          className={linkClass + (i === currentPage ? ' bg-fuchsia-300' : '')}
           aria-label={`Page ${i}`}
           onClick={(e) => onClick(e, i)}
         >

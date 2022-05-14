@@ -64,11 +64,11 @@ const Name = ({ post }: NameProps) => {
             Posted by{' '}
             <Link
               href={`/users/${post.user.id}/${post.user.name}`}
-              className="text-fuchsia-600 md:mb-16"
+              className="text-fuchsia-600 hover:underline"
             >
               {post.user.name}
             </Link>
-            <div className="hidden md:block">
+            <div className="hidden md:block md:mt-16">
               <Button color="primary" fullWidth>
                 Contact
               </Button>
@@ -93,7 +93,7 @@ const Name = ({ post }: NameProps) => {
             <h2 className="mb-16">
               <Link
                 href={`/users/${post.user.id}/${post.user.name}`}
-                className="text-fuchsia-600"
+                className="text-fuchsia-600 hover:underline"
               >
                 {post.user.name}
               </Link>

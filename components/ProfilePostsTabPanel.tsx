@@ -17,7 +17,7 @@ const ProfilePostsTabPanel = ({ posts }: ProfilePostsTabPanel) => {
           <Link
             key={post.id}
             href={`/posts/${post.id}/${formatToUrl(post.name)}/update`}
-            className="flex flex-row flex-nowrap mb-8 last:mb-0 bg-fuchsia-200 rounded-8 overflow-hidden hover:no-underline hover:bg-fuchsia-300 transition-colors duration-200 group md:mb-16 md:max-w-[700px] md:mx-auto"
+            className="flex flex-row flex-nowrap mb-8 last:mb-0 bg-fuchsia-200 rounded-8 overflow-hidden hover:bg-fuchsia-300 transition-colors duration-200 group md:mb-16 md:max-w-[700px] md:mx-auto"
           >
             <div className="relative flex-shrink-0 w-[100px] h-[100px] md:w-[150px] md:h-[150px]">
               <Image

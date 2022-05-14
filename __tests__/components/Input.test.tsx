@@ -42,7 +42,7 @@ it('renders', async () => {
   expect(input).toHaveAttribute('aria-describedby', 'testFeedback described')
   expect(input).toHaveClass('blue', 'rounded-r-none')
   expect(input.className).toContain('border')
-  expect(input.className).not.toContain('red')
+  expect(input.className).not.toContain('rose')
   expect(input.className).not.toContain('file')
 
   await userEvent.type(input, 'a')
@@ -65,7 +65,7 @@ test('its border is red if the form is submitted and there is an error', () => {
   render(<Input<FormFields> type="text" name="test" />)
 
   const input = screen.getByRole('textbox')
-  expect(input.className).toContain('red')
+  expect(input.className).toContain('rose')
 })
 
 test("its border isn't red if the form is submitted and there is no error", () => {
@@ -74,7 +74,7 @@ test("its border isn't red if the form is submitted and there is no error", () =
   render(<Input<FormFields> type="text" name="test" />)
 
   const input = screen.getByRole('textbox')
-  expect(input.className).not.toContain('red')
+  expect(input.className).not.toContain('rose')
 })
 
 test('file input has different class', () => {

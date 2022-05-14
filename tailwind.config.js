@@ -55,6 +55,10 @@ module.exports = {
           '66%': { transform: 'scale(1.25) ' },
           '73%,100%': { transform: 'scale(1) ' },
         },
+        fadeInDown: {
+          '0%': { opacity: 0, top: 0 },
+          '100%': { opacity: 1, top: 16 },
+        },
       },
       backgroundImage: {
         'linear-search': 'linear-gradient(72deg, #F0ABFC 0%, #F5D0FE 100%)',

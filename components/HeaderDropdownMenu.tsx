@@ -92,14 +92,17 @@ const HeaderDropdownMenu = () => {
             className="p-16 bg-fuchsia-50 rounded-8 font-bold shadow-[-8px_8px_8px_rgba(112,26,117,0.05)]"
           >
             <li>
-              <Link href="/profile" className="pb-8 inline-block w-full">
+              <Link
+                href="/profile"
+                className="pb-8 inline-block w-full hover:underline"
+              >
                 Profile
               </Link>
             </li>
             <li>
               <Link
                 href="/api/auth/signout"
-                className="inline-block w-full"
+                className="inline-block w-full hover:underline"
                 onClick={(e) => {
                   e.preventDefault()
                   signOut({ callbackUrl: '/' })
