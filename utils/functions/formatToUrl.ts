@@ -6,7 +6,10 @@
  */
 const formatToUrl = (str: string) => {
   const NotAllowedChars = /[^a-zA-Z0-9-_.~]/g
-  return str.replaceAll(' ', '-').replaceAll(NotAllowedChars, '')
+  return str
+    .normalize('NFKD')
+    .replaceAll(' ', '-')
+    .replaceAll(NotAllowedChars, '')
 }
 
 export default formatToUrl

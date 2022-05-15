@@ -68,7 +68,7 @@ const Name = ({ post }: NameProps) => {
             >
               {post.user.name}
             </Link>
-            <div className="hidden md:block md:mt-16">
+            <div className="hidden md:block md:mt-16 md:text-base">
               <Button color="primary" fullWidth>
                 Contact
               </Button>

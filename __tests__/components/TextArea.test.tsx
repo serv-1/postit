@@ -44,12 +44,12 @@ it('has a red border if the form is submitted and there is an error', () => {
   useFormContext.mockReturnValue(setFormContext(true, 'error'))
   render(<TextArea name="test" />)
   const textarea = screen.getByRole('textbox')
-  expect(textarea.className).toContain('red')
+  expect(textarea.className).toContain('rose')
 })
 
 it("hasn't a red border if the form is submitted and there is no error", () => {
   useFormContext.mockReturnValue(setFormContext(true))
   render(<TextArea name="test" />)
   const textarea = screen.getByRole('textbox')
-  expect(textarea.className).not.toContain('red')
+  expect(textarea.className).not.toContain('rose')
 })

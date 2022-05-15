@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import Header from '../../components/Header'
 
+jest.unmock('../../components/Header')
+
 jest.mock('../../components/HeaderDropdownMenu', () => ({
   __esModule: true,
   default: () => <ul></ul>,
@@ -34,7 +36,7 @@ test('the given children render', () => {
   expect(header).toHaveClass('justify-between')
 })
 
-test("the default menu doesn'\t render while the session hasn't been fetched yet", () => {
+test("the default menu doesn't render while the session hasn't been fetched yet", () => {
   render(<Header className="red" />)
 
   const defaultMenu = screen.queryByRole('navigation')

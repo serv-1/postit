@@ -38,7 +38,10 @@ const AuthenticationRegisterForm = () => {
       })
 
       if (res && res.error) {
-        return router.push('/auth/sign-in')
+        return setToast({
+          message:
+            'Your account has been successfully created. You can now sign in!',
+        })
       }
 
       router.push('/profile')

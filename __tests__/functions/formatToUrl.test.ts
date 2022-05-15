@@ -1,7 +1,7 @@
 import formatToUrl from '../../utils/functions/formatToUrl'
 
 it('returns the string formatted', () => {
-  const strToFormat = 'yes, of course!'
+  const strToFormat = 'yès, of çôursë!'
 
   const result = formatToUrl(strToFormat)
 

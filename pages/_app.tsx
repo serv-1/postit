@@ -18,6 +18,8 @@ const App = ({ Component, pageProps }: NextAppProps) => {
   useEffect(() => {
     if (pageProps && pageProps.background) {
       document.body.className = pageProps.background
+    } else {
+      document.body.className = ''
     }
   })
   return (

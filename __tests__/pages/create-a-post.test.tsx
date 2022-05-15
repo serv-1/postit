@@ -40,7 +40,8 @@ test('the user is redirected to its profile after a valid submission', async () 
   const priceInput = screen.getByRole('spinbutton', { name: /price/i })
   await userEvent.type(priceInput, '40')
 
-  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
+  const select = screen.getByLabelText('Categories')
+  await selectEvent.select(select, 'furniture')
 
   const descriptionInput = screen.getByRole('textbox', { name: /description/i })
   await userEvent.type(descriptionInput, 'A magnificent modern table.')
@@ -82,7 +83,8 @@ test('an error renders if the server fails to create the post', async () => {
   const priceInput = screen.getByRole('spinbutton', { name: /price/i })
   await userEvent.type(priceInput, '40')
 
-  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
+  const select = screen.getByLabelText('Categories')
+  await selectEvent.select(select, 'furniture')
 
   const descriptionInput = screen.getByRole('textbox', { name: /description/i })
   await userEvent.type(descriptionInput, 'A magnificent modern table.')
@@ -125,7 +127,8 @@ test("an error renders if the server fails to validate the request's data", asyn
   const priceInput = screen.getByRole('spinbutton', { name: /price/i })
   await userEvent.type(priceInput, '40')
 
-  await selectEvent.select(screen.getByLabelText('Categories'), 'furniture')
+  const select = screen.getByLabelText('Categories')
+  await selectEvent.select(select, 'furniture')
 
   const descriptionInput = screen.getByRole('textbox', { name: /description/i })
   await userEvent.type(descriptionInput, 'A magnificent modern table.')

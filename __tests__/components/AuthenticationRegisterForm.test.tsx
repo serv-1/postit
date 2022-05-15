@@ -27,7 +27,7 @@ it('registers the user, sends him a mail, signs in him and redirects him to its 
   expect(nameInput).toHaveFocus()
   await userEvent.type(nameInput, 'John Doe')
 
-  const emailInput = screen.getByLabelText(/ema	il/i)
+  const emailInput = screen.getByLabelText(/email/i)
   await userEvent.type(emailInput, 'johndoe@test.com')
 
   const passwordInput = screen.getByLabelText(/^password$/i)
@@ -47,7 +47,9 @@ it('registers the user, sends him a mail, signs in him and redirects him to its 
   })
 })
 
-it('redirects the user to the sign in page if the server fails to signs in him', async () => {
+it('an alert renders if the server fails to sign in the user', async () => {
+  const setToast = jest.fn()
+  useToast.mockReturnValue({ setToast })
   signIn.mockResolvedValue({ error: 'Error' })
 
   render(<AuthenticationRegisterForm />)
@@ -65,9 +67,7 @@ it('redirects the user to the sign in page if the server fails to signs in him',
   const submitBtn = screen.getByRole('button', { name: /register/i })
   await userEvent.click(submitBtn)
 
-  await waitFor(() => {
-    expect(router.push).toHaveBeenNthCalledWith(1, '/auth/sign-in')
-  })
+  await waitFor(() => expect(setToast).toHaveBeenCalledTimes(1))
 })
 
 test('an error renders if the server fails to register the user', async () => {

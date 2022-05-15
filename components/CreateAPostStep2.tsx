@@ -63,7 +63,7 @@ const CreateAPostStep2 = ({ step, setStep }: CreateAPostStep2Props) => {
         >
           ← Back
         </Button>
-        <Button type="button" fullWidth color="primary">
+        <Button fullWidth color="primary">
           Post
         </Button>
       </div>
