@@ -20,6 +20,11 @@ jest.mock('../../components/AuthenticationSignInForm', () => ({
   }) => <button onClick={() => props.setForgotPassword(false)}>Back</button>,
 }))
 
+jest.mock('../../components/AuthenticationRegisterForm', () => ({
+  __esModule: true,
+  default: () => null,
+}))
+
 it('renders the "Forgot password" button and the "Back" button', async () => {
   render(<Authentication providers={null} />)
 

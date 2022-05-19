@@ -2,7 +2,7 @@ import ProfileUserImage from '../components/ProfileUserImage'
 import axios from 'axios'
 import { getSession, signOut } from 'next-auth/react'
 import { GetServerSideProps } from 'next'
-import { IPost, IUser } from '../types/common'
+import { IUser } from '../types/common'
 import Head from 'next/head'
 import Header from '../components/Header'
 import Link from '../components/Link'
@@ -11,9 +11,10 @@ import { TabsProvider } from '../contexts/tabs'
 import TabList from '../components/TabList'
 import Tab from '../components/Tab'
 import TabPanel from '../components/TabPanel'
-import ProfilePostsTabPanel from '../components/ProfilePostsTabPanel'
 import UpdateAccountForm from '../components/UpdateAccountForm'
 import DeleteAccountModal from '../components/DeleteAccountModal'
+import ProfilePostList from '../components/ProfilePostList'
+import formatToUrl from '../utils/functions/formatToUrl'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx)
@@ -32,7 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 }
 
 interface ProfileProps {
-  user: Omit<IUser, 'postsIds'> & { posts: IPost[] }
+  user: IUser
 }
 
 const Profile = ({ user }: ProfileProps) => {
@@ -73,7 +74,7 @@ const Profile = ({ user }: ProfileProps) => {
               </div>
             </div>
             <Link
-              href={`/users/${user.id}/${user.name}`}
+              href={`/users/${user.id}/${formatToUrl(user.name)}`}
               className="bg-fuchsia-200 text-fuchsia-600 py-8 px-16 block w-full text-center font-bold rounded hover:bg-fuchsia-300 transition-colors duration-200 md:w-auto md:h-40"
             >
               See my public profile
@@ -107,9 +108,18 @@ const Profile = ({ user }: ProfileProps) => {
                   Account
                 </Tab>
               </TabList>
-              <ProfilePostsTabPanel posts={user.posts} />
+              <TabPanel value="post">
+                <ProfilePostList
+                  posts={user.posts}
+                  altText="You haven't created any posts yet."
+                />
+              </TabPanel>
               <TabPanel value="favorite">
-                <div className="text-center">Your favorite list is empty.</div>
+                <ProfilePostList
+                  isFavPost
+                  posts={user.favPosts}
+                  altText="Your favorite list is empty."
+                />
               </TabPanel>
               <TabPanel
                 value="account"

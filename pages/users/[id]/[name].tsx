@@ -60,9 +60,11 @@ const Name = ({ user }: UserProps) => {
             </span>
           </div>
         )}
-        <DotButton style="chat">
-          <ChatFill className="w-full h-full" />
-        </DotButton>
+        <div className="fixed bottom-8 right-8 md:hidden">
+          <DotButton>
+            <ChatFill className="w-full h-full" />
+          </DotButton>
+        </div>
       </main>
     </>
   )

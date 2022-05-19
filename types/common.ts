@@ -12,13 +12,18 @@ export interface ILightPost
   image: string
 }
 
+export type IFavPost = Omit<ILightPost, 'price'>
+export type IUserPost = Omit<IPost, 'user'>
+
 export interface IUser
-  extends Omit<UserModel, '_id' | 'postsIds' | 'password' | 'emailVerified'> {
+  extends Omit<
+    UserModel,
+    '_id' | 'postsIds' | 'favPostsIds' | 'password' | 'emailVerified'
+  > {
   id: string
   posts: IUserPost[]
+  favPosts: IFavPost[]
 }
-
-export type IUserPost = Omit<IPost, 'user'>
 
 export interface IImage {
   base64: string

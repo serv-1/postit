@@ -33,7 +33,7 @@ describe('/api/posts/:id', () => {
       })
     })
 
-    it('200 - Get the post', function () {
+    it.only('200 - Get the post', function () {
       cy.task('reset')
 
       cy.task<string[]>('addUsers', JSON.stringify([u1, u2])).then(
@@ -497,8 +497,10 @@ describe('DELETE', () => {
 
         cy.signIn(u1.email, u1.password)
 
-        const url = `/api/posts/${pId}`
+        const body = { action: 'push', favPostId: pId }
+        cy.req({ url: '/api/user', method: 'PUT', body, csrfToken: true })
 
+        const url = `/api/posts/${pId}`
         cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
           expect(res.status).to.eq(200)
         })
@@ -509,6 +511,7 @@ describe('DELETE', () => {
 
         cy.task<UserModel>('getUser', userId).then((user) => {
           expect(user.postsIds).to.not.include(pId)
+          expect(user.favPostsIds).to.not.include(pId)
         })
       })
     })

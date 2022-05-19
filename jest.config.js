@@ -15,7 +15,7 @@ module.exports = {
     /* Handle image imports
     https://jestjs.io/docs/webpack#handling-static-assets */
     '^.+\\.(jpg|jpeg|png|gif|webp|avif|svg)$':
-      '<rootDir>/__mocks__/fileMock.ts',
+      '<rootDir>/__mocks__/fileMock.tsx',
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.tsx'],
   testPathIgnorePatterns: [

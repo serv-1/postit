@@ -9,7 +9,7 @@ const Toast = () => {
     <div className="w-full z-[9999] absolute top-16 animate-[fadeInDown_.3s_ease-out] flex flex-row flex-nowrap justify-center">
       <div
         className={classNames(
-          'fixed p-8 rounded flex flex-row flex-nowrap gap-x-8 justify-center items-start text-fuchsia-50 font-bold outline outline-4',
+          'mx-16 fixed p-8 rounded flex flex-row flex-nowrap gap-x-8 justify-center items-start text-fuchsia-50 font-bold outline outline-4',
           error
             ? 'bg-rose-600 outline-rose-900/75'
             : 'bg-fuchsia-600 outline-fuchsia-900/75'

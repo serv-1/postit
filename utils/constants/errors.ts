@@ -1,4 +1,6 @@
 const err = {
+	/* Id */
+	ID_INVALID: 'The id is invalid.' as const,
 	/* Email */
 	EMAIL_REQUIRED: 'The email is required.' as const,
   EMAIL_INVALID: 'The email is invalid.' as const,

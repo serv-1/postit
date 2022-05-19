@@ -35,13 +35,11 @@ const ExpandedImageModal = (props: ExpandedImageModalProps) => {
           className="fixed top-0 left-0 w-screen h-screen bg-fuchsia-50 z-30"
         >
           <div className="relative p-8 flex flex-col flex-nowrap w-full h-full md:p-16 lg:max-w-[1200px] lg:mx-auto">
-            <DotButton
-              style="x"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close"
-            >
-              <X className="w-full h-full" />
-            </DotButton>
+            <div className="absolute top-8 right-8 z-20 md:static md:shadow-none md:self-end md:mb-16">
+              <DotButton onClick={() => setIsOpen(false)} aria-label="Close">
+                <X className="w-full h-full" />
+              </DotButton>
+            </div>
             <div className="h-full relative">
               <Image src={props.src} alt="" layout="fill" objectFit="contain" />
             </div>

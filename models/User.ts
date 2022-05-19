@@ -1,5 +1,6 @@
 import { randomBytes, scryptSync } from 'crypto'
-import { models, model, Schema, Model, Types } from 'mongoose'
+import { DeleteResult } from 'mongodb'
+import { models, model, Schema, Model, Types, Query } from 'mongoose'
 import err from '../utils/constants/errors'
 import Account from './Account'
 import Post from './Post'
@@ -11,6 +12,7 @@ export interface UserModel {
   password?: string
   emailVerified?: Date
   postsIds: Types.ObjectId[]
+  favPostsIds: Types.ObjectId[]
   image: string
 }
 
@@ -32,27 +34,26 @@ const userSchema = new Schema<UserModel>({
   },
   emailVerified: Date,
   postsIds: [Schema.Types.ObjectId],
+  favPostsIds: [Schema.Types.ObjectId],
   image: {
     type: String,
     default: 'default.jpg',
   },
 })
 
-type ModelWithPassword = Omit<UserModel, 'password'> & { password: string }
-
-userSchema.pre<ModelWithPassword>('save', function (next) {
+userSchema.pre('save', function (next) {
   const salt = randomBytes(16).toString('hex')
-  const hash = scryptSync(this.password, salt, 64).toString('hex')
+  const hash = scryptSync(this.password as string, salt, 64).toString('hex')
 
   this.password = `${salt}:${hash}`
 
   next()
 })
 
-userSchema.pre<Model<ModelWithPassword>>('insertMany', function (next, users) {
-  for (const user of users) {
+userSchema.pre<Model<UserModel>>('insertMany', function (next, users) {
+  for (const user of users as UserModel[]) {
     const salt = randomBytes(16).toString('hex')
-    const hash = scryptSync(user.password, salt, 64).toString('hex')
+    const hash = scryptSync(user.password as string, salt, 64).toString('hex')
 
     user.password = `${salt}:${hash}`
   }
@@ -60,13 +61,10 @@ userSchema.pre<Model<ModelWithPassword>>('insertMany', function (next, users) {
   next()
 })
 
-userSchema.post('deleteOne', async function (res, next) {
+userSchema.pre<Query<DeleteResult, UserModel>>('deleteOne', async function () {
   const userId = this.getFilter()._id
-
   await Account.deleteOne({ userId }).lean().exec()
   await Post.deleteMany({ userId }).lean().exec()
-
-  next()
 })
 
 export default (models.User as Model<UserModel>) ||

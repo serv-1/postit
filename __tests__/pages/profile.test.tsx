@@ -9,10 +9,11 @@ jest.mock('../../contexts/toast', () => ({
 
 const user = {
   id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
-  name: 'Mario',
-  email: 'mario@mushroomkingdom.mu',
-  image: 'itsmemario.jpeg',
+  name: 'John Doe',
+  email: 'doe@doe.doe',
+  image: 'john.jpeg',
   posts: [],
+  favPosts: [],
 }
 
 it('renders', () => {
@@ -24,7 +25,7 @@ it('renders', () => {
   const publicProfileLink = screen.getByRole('link', { name: /public/i })
   expect(publicProfileLink).toHaveAttribute(
     'href',
-    `/users/${user.id}/${user.name}`
+    `/users/${user.id}/John-Doe`
   )
 })
 

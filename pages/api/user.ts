@@ -1,31 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { randomBytes, scryptSync } from 'crypto'
 import dbConnect from '../../utils/functions/dbConnect'
-import User from '../../models/User'
+import User, { UserModel } from '../../models/User'
 import { MongoError } from 'mongodb'
 import err from '../../utils/constants/errors'
 import validate from '../../utils/functions/validate'
 import { RegisterSchema, registerSchema } from '../../lib/joi/registerSchema'
 import { getSession } from 'next-auth/react'
-import {
-  UsersIdPutSchema,
-  usersIdPutSchema,
-} from '../../lib/joi/usersIdPutSchema'
+import { UserPutSchema, userPutSchema } from '../../lib/joi/userPutSchema'
 import isCsrfTokenValid from '../../utils/functions/isCsrfTokenValid'
 import isBase64ValueTooBig from '../../utils/functions/isBase64ValueTooBig'
 import { unlink } from 'fs/promises'
 import { cwd } from 'process'
 import createFile from '../../utils/functions/createFile'
 import { csrfTokenSchema } from '../../lib/joi/csrfTokenSchema'
-import Account from '../../models/Account'
-import Post from '../../models/Post'
-
-type Update =
-  | { name: string }
-  | { email: string }
-  | { password: string }
-  | { image: string }
-  | undefined
+import { UpdateQuery } from 'mongoose'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
@@ -36,7 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(403).json({ message: err.FORBIDDEN })
       }
 
-      const result = validate(usersIdPutSchema, req.body as UsersIdPutSchema)
+      const result = validate(userPutSchema, req.body as UserPutSchema)
       const reqBody = result.value
 
       if ('message' in result) {
@@ -49,7 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
       }
 
-      let update: Update
+      let update: UpdateQuery<UserModel> = {}
 
       if ('image' in reqBody) {
         const { ext, base64 } = reqBody.image
@@ -82,6 +71,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         update = { name: reqBody.name }
       } else if ('email' in reqBody) {
         update = { email: reqBody.email }
+      } else if ('favPostId' in reqBody) {
+        update = { [`$${reqBody.action}`]: { favPostsIds: reqBody.favPostId } }
       }
 
       try {

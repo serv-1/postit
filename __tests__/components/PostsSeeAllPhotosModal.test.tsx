@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
-import PostsSeeAllPhotosModal from '../../components/PostsSeeAllPhotosModal'
+import SeeAllPhotosModal from '../../components/SeeAllPhotosModal'
 import userEvent from '@testing-library/user-event'
 
 it('renders', async () => {
-  render(<PostsSeeAllPhotosModal sources={['/img1']} />)
+  render(<SeeAllPhotosModal sources={['/img1']} />)
 
   const photosBtn = screen.getByRole('button', { name: /photos/i })
   await userEvent.click(photosBtn)
@@ -22,7 +22,7 @@ it('renders', async () => {
 })
 
 it('closes', async () => {
-  render(<PostsSeeAllPhotosModal sources={['/img1']} />)
+  render(<SeeAllPhotosModal sources={['/img1']} />)
 
   const photosBtn = screen.getByRole('button', { name: /photos/i })
   await userEvent.click(photosBtn)

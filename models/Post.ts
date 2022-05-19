@@ -1,4 +1,5 @@
-import { models, model, Schema, Model, Types } from 'mongoose'
+import { DeleteResult } from 'mongodb'
+import { models, model, Schema, Model, Types, Query } from 'mongoose'
 import { Categories } from '../types/common'
 import err from '../utils/constants/errors'
 import User from './User'
@@ -13,7 +14,7 @@ export interface PostModel {
   userId: Types.ObjectId
 }
 
-const postSchema = new Schema<PostModel>({
+const postSchema = new Schema<PostModel, Model<PostModel>, PostModel>({
   name: {
     type: String,
     required: [true, err.NAME_REQUIRED],
@@ -47,29 +48,34 @@ const postSchema = new Schema<PostModel>({
   },
 })
 
-postSchema.pre('save', async function (next) {
+postSchema.pre('save', async function () {
   const update = { $push: { postsIds: this._id } }
   await User.updateOne({ _id: this.userId }, update).lean().exec()
-  next()
 })
 
-postSchema.post('insertMany', async function (posts, next) {
-  for (const post of posts) {
+postSchema.post('insertMany', async function (posts) {
+  for (const post of posts as PostModel[]) {
     const update = { $push: { postsIds: post._id } }
     await User.updateOne({ _id: post.userId }, update).lean().exec()
   }
-  next()
 })
 
-postSchema.post('deleteOne', async function (res, next) {
+postSchema.pre<Query<DeleteResult, PostModel>>('deleteOne', async function () {
   const id = this.getFilter()._id
 
-  User.updateOne(
+  await User.updateOne(
     { postsIds: { $all: [id] } },
     { $pull: { postsIds: id } }
-  ).exec()
+  )
+    .lean()
+    .exec()
 
-  next()
+  await User.updateMany(
+    { favPostsIds: { $all: [id] } },
+    { $pull: { favPostsIds: id } }
+  )
+    .lean()
+    .exec()
 })
 
 export default (models.Post as Model<PostModel>) ||

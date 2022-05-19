@@ -35,34 +35,41 @@ describe('/api/users/:id', () => {
 
       cy.task('addUser', u1).then((userId) => {
         cy.req<IUser>({ url: `/api/users/${userId}` }).then((res) => {
-          const { body, status } = res
-
-          expect(status).to.eq(200)
-
-          expect(body).to.eql({
+          expect(res.status).to.eq(200)
+          expect(res.body).to.eql({
             id: userId,
             name: u1.name,
             email: u1.email,
             image: '/static/images/' + u1.image,
             posts: [],
+            favPosts: [],
           })
         })
 
         cy.task<string>('addPost', { ...p1, userId }).then((pId) => {
+          const p1Images = p1.images.map((img) => '/static/images/posts/' + img)
+
           cy.req<IUser>({ url: `/api/users/${userId}` }).then((res) => {
-            const { body } = res
-
-            const p1Images = p1.images.map(
-              (img) => '/static/images/posts/' + img
-            )
-
-            expect(body.posts[0]).to.eql({
+            expect(res.body.posts[0]).to.eql({
               id: pId,
               name: p1.name,
               description: p1.description,
               categories: p1.categories,
               price: p1.price / 100,
               images: p1Images,
+            })
+          })
+
+          cy.signIn(u1.email, u1.password)
+
+          const body = { action: 'push', favPostId: pId }
+          cy.req({ method: 'PUT', url: '/api/user', body, csrfToken: true })
+
+          cy.req<IUser>({ url: `/api/users/${userId}` }).then((res) => {
+            expect(res.body.favPosts[0]).to.eql({
+              id: pId,
+              name: p1.name,
+              image: p1Images[0],
             })
           })
         })

@@ -1,7 +1,7 @@
 import isBase64ValueTooBig from '../../../utils/functions/isBase64ValueTooBig'
-import { isValidObjectId, Types } from 'mongoose'
+import { isValidObjectId, Types, UpdateQuery } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
-import Post from '../../../models/Post'
+import Post, { PostModel } from '../../../models/Post'
 import dbConnect from '../../../utils/functions/dbConnect'
 import err from '../../../utils/constants/errors'
 import { cwd } from 'process'
@@ -11,19 +11,10 @@ import { csrfTokenSchema } from '../../../lib/joi/csrfTokenSchema'
 import isCsrfTokenValid from '../../../utils/functions/isCsrfTokenValid'
 import createFile from '../../../utils/functions/createFile'
 import { unlink } from 'fs/promises'
-import { Categories } from '../../../types/common'
 import {
   PostsIdPutServerSchema,
   postsIdPutServerSchema,
 } from '../../../lib/joi/postsIdPutSchema'
-
-interface Update {
-  name?: string
-  description?: string
-  categories?: Categories[]
-  price?: number
-  images?: string[]
-}
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
@@ -73,14 +64,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                         },
                       },
                       {
-                        $unset: [
-                          '_id',
-                          'userId',
-                          '__v',
-                          'description',
-                          'categories',
-                          'images',
-                        ],
+                        $project: {
+                          _id: 0,
+                          id: 1,
+                          name: 1,
+                          price: 1,
+                          image: 1,
+                        },
                       },
                     ],
                     as: 'posts',
@@ -98,7 +88,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     },
                   },
                 },
-                { $unset: ['_id', 'postsIds', '__v', 'password'] },
+                {
+                  $unset: ['_id', 'postsIds', '__v', 'password', 'favPostsIds'],
+                },
               ],
               as: 'user',
             },
@@ -162,7 +154,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(422).json({ message: err.PARAMS_INVALID })
       }
 
-      const update: Update = {}
+      const update: UpdateQuery<PostModel> = {}
 
       if (reqBody.images) {
         const images: string[] = []

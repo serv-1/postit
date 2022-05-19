@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import { useTabs } from '../contexts/tabs'
 
 type OmittedDivProps = 'role' | 'tabIndex' | 'id' | 'aria-labelledby'
@@ -7,12 +8,16 @@ interface TabPanelProps extends DivProps {
   value: string
 }
 
-const TabPanel = ({ children, value, ...props }: TabPanelProps) => {
+const TabPanel = ({ children, value, className, ...props }: TabPanelProps) => {
   const { activeTab } = useTabs()
 
-  return value === activeTab ? (
+  return (
     <div
       {...props}
+      className={classNames(
+        className,
+        value === activeTab ? 'block' : 'hidden'
+      )}
       role="tabpanel"
       tabIndex={0}
       id={value + '-panel'}
@@ -20,7 +25,7 @@ const TabPanel = ({ children, value, ...props }: TabPanelProps) => {
     >
       {children}
     </div>
-  ) : null
+  )
 }
 
 export default TabPanel

@@ -45,6 +45,28 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
       },
       {
+        $lookup: {
+          from: 'posts',
+          let: { favPostsIds: '$favPostsIds' },
+          pipeline: [
+            { $match: { $expr: { $in: ['$_id', '$$favPostsIds'] } } },
+            {
+              $set: {
+                id: { $toString: '$_id' },
+                image: {
+                  $concat: [
+                    '/static/images/posts/',
+                    { $arrayElemAt: ['$images', 0] },
+                  ],
+                },
+              },
+            },
+            { $project: { _id: 0, id: 1, image: 1, name: 1 } },
+          ],
+          as: 'favPosts',
+        },
+      },
+      {
         $set: {
           id: { $toString: '$_id' },
           image: {
@@ -56,7 +78,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
         },
       },
-      { $unset: ['_id', '__v', 'password', 'emailVerified', 'postsIds'] },
+      {
+        $project: {
+          _id: 0,
+          id: 1,
+          name: 1,
+          email: 1,
+          image: 1,
+          posts: 1,
+          favPosts: 1,
+        },
+      },
     ]).exec()
 
     if (!user.length) {

@@ -9,6 +9,7 @@ const BUTTON_COLORS = {
     'bg-fuchsia-600 text-fuchsia-50 hover:bg-fuchsia-300 focus:bg-fuchsia-300 hover:text-fuchsia-900 focus:text-fuchsia-900 disabled:bg-fuchsia-800/70 disabled:text-fuchsia-50/80',
   secondary:
     'bg-fuchsia-300 text-fuchsia-900 hover:bg-fuchsia-400 focus:bg-fuchsia-400',
+  danger: 'bg-rose-600 text-rose-50 hover:bg-rose-700 focus:bg-rose-700',
 }
 
 const NO_RADIUS = {
