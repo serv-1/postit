@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { rest } from 'msw'
 import server from '../../../../../mocks/server'
-import Update from '../../../../../pages/posts/[id]/[name]/update'
+import UpdatePost from '../../../../../pages/posts/[id]/[name]/update'
 import err from '../../../../../utils/constants/errors'
 import readAsDataUrl from '../../../../../utils/functions/readAsDataUrl'
 
@@ -34,7 +34,7 @@ const post = {
 }
 
 it('renders', async () => {
-  render(<Update post={post} />)
+  render(<UpdatePost post={post} />)
 
   const documentTitle = screen.getByTestId('documentTitle')
   expect(documentTitle).toHaveTextContent(post.name)
@@ -71,7 +71,7 @@ it('renders', async () => {
 })
 
 test('an alert renders if the post is updated', async () => {
-  render(<Update post={post} />)
+  render(<UpdatePost post={post} />)
 
   await screen.findByTestId('csrfToken')
 
@@ -94,7 +94,7 @@ test('an error renders if the server fails to update the post', async () => {
     })
   )
 
-  render(<Update post={post} />)
+  render(<UpdatePost post={post} />)
 
   await screen.findByTestId('csrfToken')
 
@@ -117,7 +117,7 @@ test("an error renders if the server fails to validate the request's data", asyn
     })
   )
 
-  render(<Update post={post} />)
+  render(<UpdatePost post={post} />)
 
   await screen.findByTestId('csrfToken')
 
@@ -135,7 +135,7 @@ test("an error renders if the server fails to validate the request's data", asyn
 })
 
 test('an error renders if an image is invalid', async () => {
-  render(<Update post={post} />)
+  render(<UpdatePost post={post} />)
 
   await screen.findByTestId('csrfToken')
 
@@ -156,7 +156,7 @@ test('an error renders if an image is invalid', async () => {
 test("an error renders if an image can't be read as data url", async () => {
   mockReadAsDataUrl.mockResolvedValue('error')
 
-  render(<Update post={post} />)
+  render(<UpdatePost post={post} />)
 
   await screen.findByTestId('csrfToken')
 

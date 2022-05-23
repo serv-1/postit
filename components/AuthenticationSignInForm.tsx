@@ -3,13 +3,13 @@ import { getProviders, signIn } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
-import { signInSchema, SignInSchema } from '../lib/joi/signInSchema'
 import { UnPromise } from '../types/common'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
 import PasswordInput from './PasswordInput'
 import Button from './Button'
+import signInSchema, { SignInSchema } from '../schemas/signInSchema'
 
 interface AuthenticationSignInFormProps {
   providers: UnPromise<ReturnType<typeof getProviders>>
@@ -17,7 +17,9 @@ interface AuthenticationSignInFormProps {
 }
 
 const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
-  const methods = useForm<SignInSchema>({ resolver: joiResolver(signInSchema) })
+  const methods = useForm<SignInSchema>({
+    resolver: joiResolver(signInSchema),
+  })
 
   const { setToast } = useToast()
   const router = useRouter()

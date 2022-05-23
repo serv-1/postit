@@ -2,12 +2,15 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import axios, { AxiosError } from 'axios'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
-import { EmailCsrfSchema, emailCsrfSchema } from '../lib/joi/emailSchema'
-import { NameCsrfSchema, nameCsrfSchema } from '../lib/joi/nameSchema'
-import {
-  PasswordCsrfSchema,
-  passwordCsrfSchema,
-} from '../lib/joi/passwordSchema'
+import updateUserEmailSchema, {
+  UpdateUserEmailSchema,
+} from '../schemas/updateUserEmailSchema'
+import updateUserNameSchema, {
+  UpdateUserNameSchema,
+} from '../schemas/updateUserNameSchema'
+import updateUserPwSchema, {
+  UpdateUserPwSchema,
+} from '../schemas/updateUserPwSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
 import Button from './Button'
 import Form from './Form'
@@ -16,26 +19,36 @@ import InputError from './InputError'
 import PasswordInput from './PasswordInput'
 import PasswordStrength from './PasswordStrength'
 
-type Schemas = PasswordCsrfSchema | EmailCsrfSchema | NameCsrfSchema
-
 interface UpdateAccountFormProps {
   value: 'name' | 'email' | 'password'
 }
 
+type Schemas =
+  | typeof updateUserNameSchema
+  | typeof updateUserEmailSchema
+  | typeof updateUserPwSchema
+
+type TSchemas =
+  | UpdateUserNameSchema
+  | UpdateUserEmailSchema
+  | UpdateUserPwSchema
+
 const UpdateAccountForm = ({ value }: UpdateAccountFormProps) => {
-  const methods = useForm<Schemas>({
-    resolver: joiResolver(
-      value === 'password'
-        ? passwordCsrfSchema
-        : value === 'name'
-        ? nameCsrfSchema
-        : emailCsrfSchema
-    ),
+  let schema: Schemas = updateUserNameSchema
+
+  if (value === 'email') {
+    schema = updateUserEmailSchema
+  } else if (value === 'password') {
+    schema = updateUserPwSchema
+  }
+
+  const methods = useForm<TSchemas>({
+    resolver: joiResolver(schema),
   })
 
   const { setToast } = useToast()
 
-  const submitHandler: SubmitHandler<Schemas> = async (data) => {
+  const submitHandler: SubmitHandler<TSchemas> = async (data) => {
     try {
       await axios.put('http://localhost:3000/api/user', data)
       setToast({ message: `Your ${value} has been updated! 🎉` })
@@ -56,7 +69,7 @@ const UpdateAccountForm = ({ value }: UpdateAccountFormProps) => {
               </label>
               <PasswordStrength className="w-1/2 text-right">
                 {(onChange) => (
-                  <PasswordInput<PasswordCsrfSchema>
+                  <PasswordInput<UpdateUserPwSchema>
                     onChange={onChange}
                     noRightRadius
                     bgColor="bg-fuchsia-100"
@@ -68,7 +81,7 @@ const UpdateAccountForm = ({ value }: UpdateAccountFormProps) => {
               Change
             </Button>
           </div>
-          <InputError<PasswordCsrfSchema> inputName="password" />
+          <InputError<UpdateUserPwSchema> inputName="password" />
         </div>
       ) : (
         <div className="mb-16 md:mb-32">
@@ -76,13 +89,15 @@ const UpdateAccountForm = ({ value }: UpdateAccountFormProps) => {
             {value[0].toUpperCase() + value.slice(1)}
           </label>
           <div className="flex flex-row flex-nowrap">
-            <Input<Schemas>
+            <Input<UpdateUserEmailSchema | UpdateUserNameSchema>
               type={value === 'name' ? 'text' : value}
               name={value}
               noRightRadius
               bgColor="bg-fuchsia-100"
             />
-            <InputError<Schemas> inputName={value} />
+            <InputError<UpdateUserEmailSchema | UpdateUserNameSchema>
+              inputName={value}
+            />
             <Button color="primary" noRadius="left">
               Change
             </Button>

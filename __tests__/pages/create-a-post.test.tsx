@@ -25,14 +25,9 @@ test('the user is redirected to its profile after a valid submission', async () 
 
   await screen.findByTestId('csrfToken')
 
-  const nextBtns = screen.getAllByRole('button', { name: /next/i })
-  await userEvent.click(nextBtns[0])
-
   const imagesInput = screen.getByLabelText(/images/i)
   const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
   await userEvent.upload(imagesInput, image)
-
-  await userEvent.click(nextBtns[1])
 
   const nameInput = screen.getByRole('textbox', { name: /name/i })
   await userEvent.type(nameInput, 'Modern table')
@@ -68,14 +63,9 @@ test('an error renders if the server fails to create the post', async () => {
 
   await screen.findByTestId('csrfToken')
 
-  const nextBtns = screen.getAllByRole('button', { name: /next/i })
-  await userEvent.click(nextBtns[0])
-
   const imagesInput = screen.getByLabelText(/images/i)
   const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
   await userEvent.upload(imagesInput, image)
-
-  await userEvent.click(nextBtns[1])
 
   const nameInput = screen.getByRole('textbox', { name: /name/i })
   await userEvent.type(nameInput, 'Modern table')
@@ -83,8 +73,8 @@ test('an error renders if the server fails to create the post', async () => {
   const priceInput = screen.getByRole('spinbutton', { name: /price/i })
   await userEvent.type(priceInput, '40')
 
-  const select = screen.getByLabelText('Categories')
-  await selectEvent.select(select, 'furniture')
+  const categoriesSelect = screen.getByLabelText('Categories')
+  await selectEvent.select(categoriesSelect, 'furniture')
 
   const descriptionInput = screen.getByRole('textbox', { name: /description/i })
   await userEvent.type(descriptionInput, 'A magnificent modern table.')
@@ -112,14 +102,9 @@ test("an error renders if the server fails to validate the request's data", asyn
 
   await screen.findByTestId('csrfToken')
 
-  const nextBtns = screen.getAllByRole('button', { name: /next/i })
-  await userEvent.click(nextBtns[0])
-
   const imagesInput = screen.getByLabelText(/images/i)
   const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
   await userEvent.upload(imagesInput, image)
-
-  await userEvent.click(nextBtns[1])
 
   const nameInput = screen.getByRole('textbox', { name: /name/i })
   await userEvent.type(nameInput, 'Modern table')
@@ -127,8 +112,8 @@ test("an error renders if the server fails to validate the request's data", asyn
   const priceInput = screen.getByRole('spinbutton', { name: /price/i })
   await userEvent.type(priceInput, '40')
 
-  const select = screen.getByLabelText('Categories')
-  await selectEvent.select(select, 'furniture')
+  const categoriesSelect = screen.getByLabelText('Categories')
+  await selectEvent.select(categoriesSelect, 'furniture')
 
   const descriptionInput = screen.getByRole('textbox', { name: /description/i })
   await userEvent.type(descriptionInput, 'A magnificent modern table.')

@@ -7,14 +7,13 @@ import err from '../../../utils/constants/errors'
 import { cwd } from 'process'
 import { getSession } from 'next-auth/react'
 import validate from '../../../utils/functions/validate'
-import { csrfTokenSchema } from '../../../lib/joi/csrfTokenSchema'
+import csrfTokenSchema from '../../../schemas/csrfTokenSchema'
 import isCsrfTokenValid from '../../../utils/functions/isCsrfTokenValid'
 import createFile from '../../../utils/functions/createFile'
 import { unlink } from 'fs/promises'
-import {
-  PostsIdPutServerSchema,
-  postsIdPutServerSchema,
-} from '../../../lib/joi/postsIdPutSchema'
+import updatePostApiSchema, {
+  UpdatePostApiSchema,
+} from '../../../schemas/updatePostApiSchema'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
@@ -129,8 +128,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       const result = validate(
-        postsIdPutServerSchema,
-        req.body as PostsIdPutServerSchema
+        updatePostApiSchema,
+        req.body as UpdatePostApiSchema
       )
       const reqBody = result.value
 

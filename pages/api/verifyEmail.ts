@@ -1,9 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import {
-  ForgotPasswordSchema,
-  forgotPasswordSchema,
-} from '../../lib/joi/forgotPasswordSchema'
 import User from '../../models/User'
+import forgotPwSchema, { ForgotPwSchema } from '../../schemas/forgotPwSchema'
 import err from '../../utils/constants/errors'
 import validate from '../../utils/functions/validate'
 
@@ -12,10 +9,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  const result = validate(
-    forgotPasswordSchema,
-    req.body as ForgotPasswordSchema
-  )
+  const result = validate(forgotPwSchema, req.body as ForgotPwSchema)
 
   if ('message' in result) {
     return res.status(422).json({ message: result.message })

@@ -5,14 +5,11 @@ import categories from '../categories'
 import InputError from './InputError'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
-import {
-  searchPostsSchema,
-  SearchPostsSchema,
-} from '../lib/joi/searchPostsSchema'
 import { useEffect, useState } from 'react'
 import { Categories } from '../types/common'
 import OutlineButton from './OutlineButton'
 import Button from './Button'
+import searchPostSchema, { SearchPostSchema } from '../schemas/searchPostSchema'
 
 const options = categories.map((category) => ({
   label: category,
@@ -24,11 +21,11 @@ type OpenedModalState = 'price' | 'location' | 'none'
 const HomeSearchPosts = () => {
   const [openedModal, setOpenedModal] = useState<OpenedModalState>('none')
 
-  const methods = useForm<SearchPostsSchema>({
-    resolver: joiResolver(searchPostsSchema),
+  const methods = useForm<SearchPostSchema>({
+    resolver: joiResolver(searchPostSchema),
   })
 
-  const submitHandler: SubmitHandler<SearchPostsSchema> = (data) => {
+  const submitHandler: SubmitHandler<SearchPostSchema> = (data) => {
     const { query, minPrice, maxPrice, categories } = data
 
     const url = new URLSearchParams({ query })
@@ -85,21 +82,21 @@ const HomeSearchPosts = () => {
       className="relative"
     >
       <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] md:mr-8 lg:block lg:w-auto lg:mr-0">
-        <Input<SearchPostsSchema>
+        <Input<SearchPostSchema>
           name="query"
           type="search"
           placeholder="Umbrella, sofa, ..."
         />
-        <InputError<SearchPostsSchema> inputName="query" />
+        <InputError<SearchPostSchema> inputName="query" />
       </div>
       <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] lg:block lg:w-auto">
-        <Select<SearchPostsSchema>
+        <Select<SearchPostSchema>
           name="categories"
           options={options}
           aria-label="Categories"
           placeholder="Categories"
         />
-        <InputError<SearchPostsSchema> inputName="categories" />
+        <InputError<SearchPostSchema> inputName="categories" />
       </div>
       <OutlineButton
         type="button"
@@ -119,7 +116,7 @@ const HomeSearchPosts = () => {
           <div className="flex flex-row flex-nowrap">
             <div className="mr-8">
               <label htmlFor="minPrice">Minimum</label>
-              <Input<SearchPostsSchema>
+              <Input<SearchPostSchema>
                 id="minPrice"
                 name="minPrice"
                 type="number"
@@ -130,7 +127,7 @@ const HomeSearchPosts = () => {
             </div>
             <div>
               <label htmlFor="maxPrice">Maximum</label>
-              <Input<SearchPostsSchema>
+              <Input<SearchPostSchema>
                 id="maxPrice"
                 name="maxPrice"
                 type="number"
@@ -139,8 +136,8 @@ const HomeSearchPosts = () => {
               />
             </div>
           </div>
-          <InputError<SearchPostsSchema> inputName="minPrice" />
-          <InputError<SearchPostsSchema> inputName="maxPrice" />
+          <InputError<SearchPostSchema> inputName="minPrice" />
+          <InputError<SearchPostSchema> inputName="maxPrice" />
         </div>
       )}
       <OutlineButton

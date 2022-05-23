@@ -2,29 +2,26 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import axios, { AxiosError } from 'axios'
 import { signIn } from 'next-auth/react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import {
-  forgotPasswordSchema,
-  ForgotPasswordSchema,
-} from '../lib/joi/forgotPasswordSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
 import { useToast } from '../contexts/toast'
 import Button from './Button'
+import forgotPwSchema, { ForgotPwSchema } from '../schemas/forgotPwSchema'
 
 interface AuthenticationFPProps {
   setForgotPassword: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const AuthenticationForgotPassword = (props: AuthenticationFPProps) => {
-  const methods = useForm<ForgotPasswordSchema>({
-    resolver: joiResolver(forgotPasswordSchema),
+  const methods = useForm<ForgotPwSchema>({
+    resolver: joiResolver(forgotPwSchema),
   })
 
   const { setToast } = useToast()
 
-  const submitHandler: SubmitHandler<ForgotPasswordSchema> = async (data) => {
+  const submitHandler: SubmitHandler<ForgotPwSchema> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/verifyEmail', data)
       await signIn('email', {
@@ -57,13 +54,13 @@ const AuthenticationForgotPassword = (props: AuthenticationFPProps) => {
       >
         <div className="mb-16">
           <label htmlFor="email">Email</label>
-          <Input<ForgotPasswordSchema>
+          <Input<ForgotPwSchema>
             type="email"
             name="email"
             needFocus
             bgColor="md:bg-fuchsia-100"
           />
-          <InputError<ForgotPasswordSchema> inputName="email" />
+          <InputError<ForgotPwSchema> inputName="email" />
         </div>
         <div className="flex justify-end">
           <Button color="primary">Send</Button>

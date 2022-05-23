@@ -4,7 +4,6 @@ import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
-import { registerSchema, RegisterSchema } from '../lib/joi/registerSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
 import Form from './Form'
 import Input from './Input'
@@ -12,16 +11,17 @@ import InputError from './InputError'
 import PasswordStrength from './PasswordStrength'
 import PasswordInput from './PasswordInput'
 import Button from './Button'
+import addUserSchema, { AddUserSchema } from '../schemas/addUserSchema'
 
 const AuthenticationRegisterForm = () => {
-  const methods = useForm<RegisterSchema>({
-    resolver: joiResolver(registerSchema),
+  const methods = useForm<AddUserSchema>({
+    resolver: joiResolver(addUserSchema),
   })
 
   const { setToast } = useToast()
   const router = useRouter()
 
-  const submitHandler: SubmitHandler<RegisterSchema> = async (data) => {
+  const submitHandler: SubmitHandler<AddUserSchema> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/user', data)
 
@@ -46,7 +46,7 @@ const AuthenticationRegisterForm = () => {
 
       router.push('/profile')
     } catch (e) {
-      type FieldsNames = keyof RegisterSchema
+      type FieldsNames = keyof AddUserSchema
       const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)
 
       if (name) {
@@ -66,23 +66,23 @@ const AuthenticationRegisterForm = () => {
     >
       <div className="mb-16">
         <label htmlFor="name">Name</label>
-        <Input<RegisterSchema>
+        <Input<AddUserSchema>
           type="text"
           name="name"
           needFocus
           bgColor="md:bg-fuchsia-100"
         />
-        <InputError<RegisterSchema> inputName="name" />
+        <InputError<AddUserSchema> inputName="name" />
       </div>
 
       <div className="mb-16">
         <label htmlFor="email">Email</label>
-        <Input<RegisterSchema>
+        <Input<AddUserSchema>
           type="email"
           name="email"
           bgColor="md:bg-fuchsia-100"
         />
-        <InputError<RegisterSchema> inputName="email" />
+        <InputError<AddUserSchema> inputName="email" />
       </div>
 
       <div className="mb-16">
@@ -91,13 +91,13 @@ const AuthenticationRegisterForm = () => {
         </label>
         <PasswordStrength className="inline-block w-1/2 text-right">
           {(onChange) => (
-            <PasswordInput<RegisterSchema>
+            <PasswordInput<AddUserSchema>
               onChange={onChange}
               bgColor="bg-fuchsia-50 md:bg-fuchsia-100"
             />
           )}
         </PasswordStrength>
-        <InputError<RegisterSchema> inputName="password" />
+        <InputError<AddUserSchema> inputName="password" />
       </div>
 
       <div className="flex justify-end">

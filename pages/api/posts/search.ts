@@ -1,9 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import err from '../../../utils/constants/errors'
-import {
-  searchPostsSchema,
-  SearchPostsSchema,
-} from '../../../lib/joi/searchPostsSchema'
+import searchPostSchema, {
+  SearchPostSchema,
+} from '../../../schemas/searchPostSchema'
 import dbConnect from '../../../utils/functions/dbConnect'
 import Post from '../../../models/Post'
 import validate from '../../../utils/functions/validate'
@@ -20,7 +19,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   let queryCategories = req.query.categories as
-    | SearchPostsSchema['categories']
+    | SearchPostSchema['categories']
     | Categories
 
   if (queryCategories && !Array.isArray(queryCategories)) {
@@ -33,9 +32,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     minPrice: +req.query.minPrice || undefined,
     maxPrice: +req.query.maxPrice || undefined,
     categories: queryCategories,
-  } as SearchPostsSchema
+  } as SearchPostSchema
 
-  const result = validate(searchPostsSchema, reqQuery)
+  const result = validate(searchPostSchema, reqQuery)
 
   if ('message' in result) {
     return res.status(422).json({ name: result.name, message: result.message })

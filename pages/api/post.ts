@@ -7,10 +7,9 @@ import err from '../../utils/constants/errors'
 import isBase64ValueTooBig from '../../utils/functions/isBase64ValueTooBig'
 import validate from '../../utils/functions/validate'
 import createFile from '../../utils/functions/createFile'
-import {
-  CreatePostServerSchema,
-  createPostServerSchema,
-} from '../../lib/joi/createPostSchema'
+import addPostApiSchema, {
+  AddPostApiSchema,
+} from '../../schemas/addPostApiSchema'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getSession({ req })
@@ -23,10 +22,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  const result = validate(
-    createPostServerSchema,
-    req.body as CreatePostServerSchema
-  )
+  const result = validate(addPostApiSchema, req.body as AddPostApiSchema)
 
   if ('message' in result) {
     return res.status(422).json({ name: result.name, message: result.message })

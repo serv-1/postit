@@ -5,16 +5,18 @@ import User, { UserModel } from '../../models/User'
 import { MongoError } from 'mongodb'
 import err from '../../utils/constants/errors'
 import validate from '../../utils/functions/validate'
-import { RegisterSchema, registerSchema } from '../../lib/joi/registerSchema'
 import { getSession } from 'next-auth/react'
-import { UserPutSchema, userPutSchema } from '../../lib/joi/userPutSchema'
+import updateUserApiSchema, {
+  UpdateUserApiSchema,
+} from '../../schemas/updateUserApiSchema'
 import isCsrfTokenValid from '../../utils/functions/isCsrfTokenValid'
 import isBase64ValueTooBig from '../../utils/functions/isBase64ValueTooBig'
 import { unlink } from 'fs/promises'
 import { cwd } from 'process'
 import createFile from '../../utils/functions/createFile'
-import { csrfTokenSchema } from '../../lib/joi/csrfTokenSchema'
+import csrfTokenSchema from '../../schemas/csrfTokenSchema'
 import { UpdateQuery } from 'mongoose'
+import addUserSchema, { AddUserSchema } from '../../schemas/addUserSchema'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
@@ -25,7 +27,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(403).json({ message: err.FORBIDDEN })
       }
 
-      const result = validate(userPutSchema, req.body as UserPutSchema)
+      const result = validate(
+        updateUserApiSchema,
+        req.body as UpdateUserApiSchema
+      )
       const reqBody = result.value
 
       if ('message' in result) {
@@ -86,7 +91,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       break
     }
     case 'POST': {
-      const result = validate(registerSchema, req.body as RegisterSchema)
+      const result = validate(addUserSchema, req.body as AddUserSchema)
 
       if ('message' in result) {
         const { name, message } = result

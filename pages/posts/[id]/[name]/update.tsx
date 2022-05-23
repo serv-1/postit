@@ -14,10 +14,6 @@ import InputError from '../../../../components/InputError'
 import Select from '../../../../components/Select'
 import TextArea from '../../../../components/TextArea'
 import { useToast } from '../../../../contexts/toast'
-import {
-  postsIdPutClientSchema,
-  PostsIdPutClientSchema,
-} from '../../../../lib/joi/postsIdPutSchema'
 import { Entries, IImage, IPost, IUserPost } from '../../../../types/common'
 import addSpacesToNb from '../../../../utils/functions/addSpacesToNb'
 import getAxiosError from '../../../../utils/functions/getAxiosError'
@@ -26,6 +22,9 @@ import readAsDataUrl from '../../../../utils/functions/readAsDataUrl'
 import GlassWrapper from '../../../../components/GlassWrapper'
 import ShapeContainer from '../../../../components/ShapeContainer'
 import Button from '../../../../components/Button'
+import updatePostSchema, {
+  UpdatePostSchema,
+} from '../../../../schemas/updatePostSchema'
 
 const options = categories.map((category) => ({
   label: category,
@@ -43,22 +42,22 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 }
 
-type FilteredData = Omit<PostsIdPutClientSchema, 'images'> & {
+type FilteredData = Omit<UpdatePostSchema, 'images'> & {
   images?: IImage[]
 }
 
-interface UpdateProps {
+interface UpdatePostProps {
   post: IUserPost
 }
 
-const Update = ({ post }: UpdateProps) => {
-  const methods = useForm<PostsIdPutClientSchema>({
-    resolver: joiResolver(postsIdPutClientSchema),
+const UpdatePost = ({ post }: UpdatePostProps) => {
+  const methods = useForm<UpdatePostSchema>({
+    resolver: joiResolver(updatePostSchema),
   })
 
   const { setToast } = useToast()
 
-  const submitHandler: SubmitHandler<PostsIdPutClientSchema> = async (data) => {
+  const submitHandler: SubmitHandler<UpdatePostSchema> = async (data) => {
     const { images, ...rest } = data
     const filteredData: FilteredData = rest
 
@@ -96,7 +95,7 @@ const Update = ({ post }: UpdateProps) => {
       )
       setToast({ message: 'The post has been updated! 🎉' })
     } catch (e) {
-      type FieldsNames = keyof Required<PostsIdPutClientSchema>
+      type FieldsNames = keyof Required<UpdatePostSchema>
       const { message, name } = getAxiosError<FieldsNames>(e as AxiosError)
 
       if (name) {
@@ -226,7 +225,7 @@ const Update = ({ post }: UpdateProps) => {
   )
 }
 
-Update.needAuth = true
-Update.need2RowsGrid = true
+UpdatePost.needAuth = true
+UpdatePost.need2RowsGrid = true
 
-export default Update
+export default UpdatePost

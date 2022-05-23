@@ -4,7 +4,7 @@ import dbConnect from '../../utils/functions/dbConnect'
 import crypto from 'crypto'
 import { Buffer } from 'buffer'
 import err from '../../utils/constants/errors'
-import { signInSchema, SignInSchema } from '../../lib/joi/signInSchema'
+import signInSchema, { SignInSchema } from '../../schemas/signInSchema'
 import validate from '../../utils/functions/validate'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

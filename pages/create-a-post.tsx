@@ -3,10 +3,6 @@ import axios, { AxiosError } from 'axios'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import Form from '../components/Form'
 import { useToast } from '../contexts/toast'
-import {
-  createPostClientSchema,
-  CreatePostClientSchema,
-} from '../lib/joi/createPostSchema'
 import getAxiosError from '../utils/functions/getAxiosError'
 import { useRouter } from 'next/router'
 import { IImage } from '../types/common'
@@ -20,6 +16,7 @@ import CreateAPostStep1 from '../components/CreateAPostStep1'
 import CreateAPostStep2 from '../components/CreateAPostStep2'
 import GlassWrapper from '../components/GlassWrapper'
 import ShapeContainer from '../components/ShapeContainer'
+import addPostSchema, { AddPostSchema } from '../schemas/addPostSchema'
 
 export const getStaticProps: GetStaticProps = () => ({
   props: { background: 'bg-linear-page' },
@@ -28,17 +25,17 @@ export const getStaticProps: GetStaticProps = () => ({
 const CreateAPost = () => {
   const [step, setStep] = useState<0 | 1 | 2>(0)
   const [images, setImages] = useState<IImage[]>()
-  const resolver = joiResolver(createPostClientSchema)
-  const methods = useForm<CreatePostClientSchema>({ resolver })
+  const resolver = joiResolver(addPostSchema)
+  const methods = useForm<AddPostSchema>({ resolver })
   const { setToast } = useToast()
   const router = useRouter()
 
-  const submitHandler: SubmitHandler<CreatePostClientSchema> = async (data) => {
+  const submitHandler: SubmitHandler<AddPostSchema> = async (data) => {
     try {
       await axios.post('http://localhost:3000/api/post', { ...data, images })
       router.push('/profile')
     } catch (e) {
-      type FieldsNames = keyof CreatePostClientSchema
+      type FieldsNames = keyof AddPostSchema
       const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)
 
       if (name) {
