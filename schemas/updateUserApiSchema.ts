@@ -14,7 +14,7 @@ export type UpdateUserApiSchema =
   | { csrfToken: string; email: string }
   | { csrfToken: string; password: string }
   | { csrfToken: string; image: IImage }
-  | { csrfToken: string; favPostId: string; action: 'push' | 'pull' }
+  | { csrfToken: string; favPostId: string }
 
 const updateUserApiSchema = object<UpdateUserApiSchema>({
   csrfToken: csrfTokenSchema,
@@ -23,12 +23,8 @@ const updateUserApiSchema = object<UpdateUserApiSchema>({
   password: passwordSchema,
   image: imageSchema,
   favPostId: idSchema,
-  action: Joi.string()
-    .valid('push', 'pull')
-    .messages({ 'string.base': err.ID_INVALID, 'any.only': err.ID_INVALID }),
 })
   .xor('name', 'email', 'password', 'image', 'favPostId')
-  .and('favPostId', 'action')
-  .messages({ 'object.xor': err.DATA_INVALID, 'object.and': err.DATA_INVALID })
+  .messages({ 'object.xor': err.DATA_INVALID })
 
 export default updateUserApiSchema

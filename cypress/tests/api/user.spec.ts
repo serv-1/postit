@@ -247,32 +247,17 @@ describe('/api/user', () => {
       })
     })
 
-    describe('favoritePosts', () => {
+    describe('favorite posts', () => {
       before(() => {
         cy.task('reset')
         cy.task<string>('addUser', u1).then((uId) => cy.wrap(uId).as('uId'))
-      })
-
-      it('422 - Invalid action', function () {
-        cy.signIn(u1.email, u1.password)
-
-        const url = '/api/user'
-        const body = {
-          action: 'no',
-          favoritePostId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
-        }
-
-        cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
-          expect(res.status).to.eq(422)
-          expect(res.body).to.have.property('message', err.ID_INVALID)
-        })
       })
 
       it('422 - Invalid favorite post id', function () {
         cy.signIn(u1.email, u1.password)
 
         const url = '/api/user'
-        const body = { action: 'push', favPostId: 'f' }
+        const body = { favPostId: 'f' }
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(422)
@@ -284,7 +269,7 @@ describe('/api/user', () => {
         cy.signIn(u1.email, u1.password)
 
         const url = '/api/user'
-        const body = { action: 'push', favPostId: 'f0f0f0f0f0f0f0f0f0f0f0f0' }
+        const body = { favPostId: 'f0f0f0f0f0f0f0f0f0f0f0f0' }
 
         cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(200)
@@ -294,12 +279,7 @@ describe('/api/user', () => {
           expect(user.favPostsIds).to.include(body.favPostId)
         })
 
-        cy.req({
-          url,
-          method: 'PUT',
-          body: { ...body, action: 'pull' },
-          csrfToken: true,
-        }).then((res) => {
+        cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
           expect(res.status).to.eq(200)
         })
 

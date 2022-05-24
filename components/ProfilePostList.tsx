@@ -32,7 +32,6 @@ const ProfilePostList = (props: FavPostProps | PostProps) => {
       if (props.isFavPost) {
         await axios.put('http://localhost:3000/api/user', {
           csrfToken: await getCsrfToken(),
-          action: 'pull',
           favPostId: id,
         })
       } else {

@@ -3,6 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { IUser } from '../../types/common'
 import err from '../../utils/constants/errors'
+import server from '../../mocks/server'
+import { rest } from 'msw'
 
 const user: IUser = {
   id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
@@ -13,7 +15,6 @@ const user: IUser = {
   favPosts: [{ id: '0', name: 'table', image: '/table.jpeg' }],
 }
 
-const axiosPut = jest.spyOn(require('axios'), 'put')
 const getCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 const setToast = jest.fn()
@@ -22,6 +23,9 @@ beforeEach(() => {
   useToast.mockReturnValue({ setToast })
   getCsrfToken.mockResolvedValue('csrfToken')
 })
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 it('renders', () => {
   render(<PostsNameFavoriteButton postId="0" />)
@@ -52,15 +56,6 @@ test('the user can add or delete the post to its favorite', async () => {
       message:
         'This post has been successfully deleted from your favorite list! 🎉',
     })
-    expect(axiosPut).toHaveBeenNthCalledWith(
-      1,
-      'http://localhost:3000/api/user',
-      {
-        csrfToken: 'csrfToken',
-        action: 'pull',
-        favPostId: '0',
-      }
-    )
   })
 
   heartBtn = screen.getByRole('button', { name: /favorite/i })
@@ -77,15 +72,6 @@ test('the user can add or delete the post to its favorite', async () => {
       message:
         'This post has been successfully added to your favorite list! 🎉',
     })
-    expect(axiosPut).toHaveBeenNthCalledWith(
-      2,
-      'http://localhost:3000/api/user',
-      {
-        csrfToken: 'csrfToken',
-        action: 'push',
-        favPostId: '0',
-      }
-    )
   })
 
   heartBtn = screen.getByRole('button', { name: /favorite/i })
@@ -98,7 +84,11 @@ test('the user can add or delete the post to its favorite', async () => {
 })
 
 test('an error renders if the server fails to update the user favorite post list', async () => {
-  axiosPut.mockRejectedValue({ response: { data: { message: err.DEFAULT } } })
+  server.use(
+    rest.put('http://localhost:3000/api/user', (req, res, ctx) => {
+      return res(ctx.status(422), ctx.json({ message: err.DEFAULT }))
+    })
+  )
 
   render(<PostsNameFavoriteButton postId="0" user={user} />)
 

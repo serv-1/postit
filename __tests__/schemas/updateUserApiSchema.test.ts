@@ -25,31 +25,14 @@ it('passes', () => {
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 
-  const v5 = { csrfToken, favPostId, action: 'push' }
+  const v5 = { csrfToken, favPostId }
   result = updateUserApiSchema.validate(v5)
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 })
 
-it('fails if action is not a string', () => {
-  const value = { csrfToken, favPostId, action: 0 }
-  const { error: e } = updateUserApiSchema.validate(value)
-  expect(e?.details[0].message).toBe(err.ID_INVALID)
-})
-
-it('fails if action is invalid', () => {
-  const value = { csrfToken, favPostId, action: 'no' }
-  const { error: e } = updateUserApiSchema.validate(value)
-  expect(e?.details[0].message).toBe(err.ID_INVALID)
-})
-
 it('fails if there is too many properties', () => {
   const value = { csrfToken, name: 'bob', email: 'bob@bob.bob' }
   const { error: e } = updateUserApiSchema.validate(value)
-  expect(e?.details[0].message).toBe(err.DATA_INVALID)
-})
-
-it('fails if action is missing', () => {
-  const { error: e } = updateUserApiSchema.validate({ csrfToken, favPostId })
   expect(e?.details[0].message).toBe(err.DATA_INVALID)
 })

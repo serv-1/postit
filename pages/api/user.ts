@@ -77,7 +77,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       } else if ('email' in reqBody) {
         update = { email: reqBody.email }
       } else if ('favPostId' in reqBody) {
-        update = { [`$${reqBody.action}`]: { favPostsIds: reqBody.favPostId } }
+        const user = await User.findById(session.id).lean().exec()
+
+        if (!user) {
+          return res.status(404).json({ message: err.USER_NOT_FOUND })
+        }
+
+        const favPostsIds = user.favPostsIds.map((id) => id.toString())
+        const action = favPostsIds.includes(reqBody.favPostId) ? 'pull' : 'push'
+
+        update = { [`$${action}`]: { favPostsIds: reqBody.favPostId } }
       }
 
       try {

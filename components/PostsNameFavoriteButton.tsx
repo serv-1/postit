@@ -29,17 +29,15 @@ const PostsNameFavoriteButton = (props: PostsNameFavoriteButtonProps) => {
   const handleFavPost = user
     ? async () => {
         try {
-          const action = isFavPost ? 'pull' : 'push'
-          const verb = isFavPost ? 'deleted from' : 'added to'
-
           await axios.put('http://localhost:3000/api/user', {
             csrfToken: await getCsrfToken(),
-            action,
             favPostId: postId,
           })
 
           setToast({
-            message: `This post has been successfully ${verb} your favorite list! 🎉`,
+            message: `This post has been successfully ${
+              isFavPost ? 'deleted from' : 'added to'
+            } your favorite list! 🎉`,
           })
           setIsFavPost(!isFavPost)
         } catch (e) {
