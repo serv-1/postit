@@ -21,6 +21,8 @@ import PasswordStrength from './PasswordStrength'
 
 interface UpdateAccountFormProps {
   value: 'name' | 'email' | 'password'
+  setName?: React.Dispatch<React.SetStateAction<string>>
+  csrfToken?: string
 }
 
 type Schemas =
@@ -33,7 +35,8 @@ type TSchemas =
   | UpdateUserEmailSchema
   | UpdateUserPwSchema
 
-const UpdateAccountForm = ({ value }: UpdateAccountFormProps) => {
+const UpdateAccountForm = (props: UpdateAccountFormProps) => {
+  const { value, setName, csrfToken } = props
   let schema: Schemas = updateUserNameSchema
 
   if (value === 'email') {
@@ -52,6 +55,7 @@ const UpdateAccountForm = ({ value }: UpdateAccountFormProps) => {
     try {
       await axios.put('http://localhost:3000/api/user', data)
       setToast({ message: `Your ${value} has been updated! 🎉` })
+      if (setName) setName(data[value] as string)
     } catch (e) {
       const { message } = getAxiosError(e as AxiosError)
       methods.setError(value, { message }, { shouldFocus: true })
@@ -59,7 +63,7 @@ const UpdateAccountForm = ({ value }: UpdateAccountFormProps) => {
   }
 
   return (
-    <Form methods={methods} submitHandler={submitHandler} needCsrfToken>
+    <Form methods={methods} submitHandler={submitHandler} csrfToken={csrfToken}>
       {value === 'password' ? (
         <div className="mb-16">
           <div className="flex flex-row flex-nowrap items-end md:mb-32">

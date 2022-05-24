@@ -71,9 +71,7 @@ it('renders', async () => {
 })
 
 test('an alert renders if the post is updated', async () => {
-  render(<UpdatePost post={post} />)
-
-  await screen.findByTestId('csrfToken')
+  render(<UpdatePost post={post} csrfToken="csrf" />)
 
   const nameBtn = screen.getByRole('button', { name: /name/i })
   await userEvent.click(nameBtn)
@@ -94,9 +92,7 @@ test('an error renders if the server fails to update the post', async () => {
     })
   )
 
-  render(<UpdatePost post={post} />)
-
-  await screen.findByTestId('csrfToken')
+  render(<UpdatePost post={post} csrfToken="csrf" />)
 
   const submitBtn = screen.getByRole('button', { name: /update/i })
   await userEvent.click(submitBtn)
@@ -117,9 +113,7 @@ test("an error renders if the server fails to validate the request's data", asyn
     })
   )
 
-  render(<UpdatePost post={post} />)
-
-  await screen.findByTestId('csrfToken')
+  render(<UpdatePost post={post} csrfToken="csrf" />)
 
   const nameBtn = screen.getByRole('button', { name: /name/i })
   await userEvent.click(nameBtn)
@@ -135,9 +129,7 @@ test("an error renders if the server fails to validate the request's data", asyn
 })
 
 test('an error renders if an image is invalid', async () => {
-  render(<UpdatePost post={post} />)
-
-  await screen.findByTestId('csrfToken')
+  render(<UpdatePost post={post} csrfToken="csrf" />)
 
   const imagesBtn = screen.getByRole('button', { name: /images/i })
   await userEvent.click(imagesBtn)
@@ -156,9 +148,7 @@ test('an error renders if an image is invalid', async () => {
 test("an error renders if an image can't be read as data url", async () => {
   mockReadAsDataUrl.mockResolvedValue('error')
 
-  render(<UpdatePost post={post} />)
-
-  await screen.findByTestId('csrfToken')
+  render(<UpdatePost post={post} csrfToken="csrf" />)
 
   const imagesBtn = screen.getByRole('button', { name: /images/i })
   await userEvent.click(imagesBtn)

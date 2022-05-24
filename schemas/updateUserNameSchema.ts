@@ -5,6 +5,8 @@ import object from './object'
 export interface UpdateUserNameSchema {
   name: string
   csrfToken: string
+  email?: never
+  password?: never
 }
 
 const updateUserNameSchema = object<UpdateUserNameSchema>({

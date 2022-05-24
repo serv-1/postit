@@ -4,10 +4,6 @@ import { BaseSyntheticEvent } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import Form from '../../components/Form'
 
-const getCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
-
-beforeEach(() => getCsrfToken.mockResolvedValue('csrfToken'))
-
 it('renders', async () => {
   const submitHandler = jest.fn()
   const methods = {
@@ -24,7 +20,7 @@ it('renders', async () => {
       method="post"
       methods={methods}
       submitHandler={submitHandler}
-      needCsrfToken
+      csrfToken="csrfToken"
     >
       <input type="submit" />
     </Form>
@@ -34,7 +30,7 @@ it('renders', async () => {
   expect(form).toHaveAttribute('name', 'register')
   expect(form).toHaveAttribute('method', 'post')
 
-  const csrfTokenInput = await screen.findByTestId('csrfToken')
+  const csrfTokenInput = form.children[0]
   expect(csrfTokenInput).toHaveValue('csrfToken')
 
   const submitBtn = screen.getByRole('button')
@@ -60,6 +56,6 @@ test("the csrfToken input doesn't render if we don't need it", () => {
     ></Form>
   )
 
-  const csrfToken = screen.queryByTestId('csrfToken')
-  expect(csrfToken).not.toBeInTheDocument()
+  const csrfTokenInput = screen.getByRole('form').children[0]
+  expect(csrfTokenInput).toBeUndefined()
 })

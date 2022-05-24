@@ -10,19 +10,24 @@ import Head from 'next/head'
 import Header from '../components/Header'
 import HeaderDropdownMenu from '../components/HeaderDropdownMenu'
 import { useState } from 'react'
-import { GetStaticProps } from 'next'
+import { GetServerSideProps } from 'next'
 import CreateAPostStep0 from '../components/CreateAPostStep0'
 import CreateAPostStep1 from '../components/CreateAPostStep1'
 import CreateAPostStep2 from '../components/CreateAPostStep2'
 import GlassWrapper from '../components/GlassWrapper'
 import ShapeContainer from '../components/ShapeContainer'
 import addPostSchema, { AddPostSchema } from '../schemas/addPostSchema'
+import { getCsrfToken } from 'next-auth/react'
 
-export const getStaticProps: GetStaticProps = () => ({
-  props: { background: 'bg-linear-page' },
+export const getServerSideProps: GetServerSideProps = async (ctx) => ({
+  props: { background: 'bg-linear-page', csrfToken: await getCsrfToken(ctx) },
 })
 
-const CreateAPost = () => {
+interface CreateAPostProps {
+  csrfToken?: string
+}
+
+const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
   const [step, setStep] = useState<0 | 1 | 2>(0)
   const [images, setImages] = useState<IImage[]>()
   const resolver = joiResolver(addPostSchema)
@@ -68,7 +73,7 @@ const CreateAPost = () => {
               method="post"
               methods={methods}
               submitHandler={submitHandler}
-              needCsrfToken
+              csrfToken={csrfToken}
               className="h-full"
             >
               <CreateAPostStep0 step={step} setStep={setStep} />

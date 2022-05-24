@@ -5,6 +5,8 @@ import passwordSchema from './passwordSchema'
 export interface UpdateUserPwSchema {
   password: string
   csrfToken: string
+  email?: never
+  name?: never
 }
 
 const updateUserPwSchema = object<UpdateUserPwSchema>({

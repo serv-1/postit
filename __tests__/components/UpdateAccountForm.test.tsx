@@ -5,6 +5,7 @@ import server from '../../mocks/server'
 import { rest } from 'msw'
 import err from '../../utils/constants/errors'
 
+const setName = jest.fn()
 const setToast = jest.fn()
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
@@ -14,7 +15,7 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 test('an alert renders if the user name is updated', async () => {
-  render(<UpdateAccountForm value="name" />)
+  render(<UpdateAccountForm value="name" setName={setName} csrfToken="csrf" />)
 
   const input = screen.getByLabelText('Name')
   expect(input).toHaveAttribute('type', 'text')
@@ -25,15 +26,16 @@ test('an alert renders if the user name is updated', async () => {
   const submitBtn = screen.getByRole('button')
   await userEvent.click(submitBtn)
 
-  await waitFor(() =>
+  await waitFor(() => {
+    expect(setName).toHaveBeenNthCalledWith(1, 'John Doe')
     expect(setToast).toHaveBeenNthCalledWith(1, {
       message: 'Your name has been updated! 🎉',
     })
-  )
+  })
 })
 
 test('an alert renders if the user email is updated', async () => {
-  render(<UpdateAccountForm value="email" />)
+  render(<UpdateAccountForm value="email" setName={setName} csrfToken="csrf" />)
 
   const input = screen.getByLabelText('Email')
   expect(input).toHaveAttribute('type', 'email')
@@ -44,15 +46,18 @@ test('an alert renders if the user email is updated', async () => {
   const submitBtn = screen.getByRole('button')
   await userEvent.click(submitBtn)
 
-  await waitFor(() =>
+  await waitFor(() => {
+    expect(setName).toHaveBeenNthCalledWith(1, 'johndoe@test.com')
     expect(setToast).toHaveBeenNthCalledWith(1, {
       message: 'Your email has been updated! 🎉',
     })
-  )
+  })
 })
 
 test('an alert renders if the user password is updated', async () => {
-  render(<UpdateAccountForm value="password" />)
+  render(
+    <UpdateAccountForm value="password" setName={setName} csrfToken="csrf" />
+  )
 
   const input = screen.getByLabelText('Password')
   expect(input).toHaveAttribute('type', 'password')
@@ -63,11 +68,12 @@ test('an alert renders if the user password is updated', async () => {
   const submitBtn = screen.getByRole('button', { name: /change/i })
   await userEvent.click(submitBtn)
 
-  await waitFor(() =>
+  await waitFor(() => {
+    expect(setName).toHaveBeenNthCalledWith(1, 'super password')
     expect(setToast).toHaveBeenNthCalledWith(1, {
       message: 'Your password has been updated! 🎉',
     })
-  )
+  })
 })
 
 test('an alert renders if the server fails to update the user name', async () => {
@@ -77,7 +83,7 @@ test('an alert renders if the server fails to update the user name', async () =>
     })
   )
 
-  render(<UpdateAccountForm value="name" />)
+  render(<UpdateAccountForm value="name" csrfToken="csrf" />)
 
   const input = screen.getByLabelText('Name')
   await userEvent.type(input, 'John Doe')
@@ -97,7 +103,7 @@ test('an alert renders if the server fails to update the user password', async (
     })
   )
 
-  render(<UpdateAccountForm value="password" />)
+  render(<UpdateAccountForm value="password" csrfToken="csrf" />)
 
   const input = screen.getByLabelText('Password')
   await userEvent.type(input, 'super password')

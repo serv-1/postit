@@ -21,9 +21,7 @@ beforeEach(() => {
 })
 
 test('the user is redirected to its profile after a valid submission', async () => {
-  render(<CreateAPost />)
-
-  await screen.findByTestId('csrfToken')
+  render(<CreateAPost csrfToken="csrf" />)
 
   const imagesInput = screen.getByLabelText(/images/i)
   const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
@@ -59,9 +57,7 @@ test('an error renders if the server fails to create the post', async () => {
     })
   )
 
-  render(<CreateAPost />)
-
-  await screen.findByTestId('csrfToken')
+  render(<CreateAPost csrfToken="csrf" />)
 
   const imagesInput = screen.getByLabelText(/images/i)
   const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
@@ -98,9 +94,7 @@ test("an error renders if the server fails to validate the request's data", asyn
     })
   )
 
-  render(<CreateAPost />)
-
-  await screen.findByTestId('csrfToken')
+  render(<CreateAPost csrfToken="csrf" />)
 
   const imagesInput = screen.getByLabelText(/images/i)
   const image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })

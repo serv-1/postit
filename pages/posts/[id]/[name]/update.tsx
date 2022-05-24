@@ -25,6 +25,7 @@ import Button from '../../../../components/Button'
 import updatePostSchema, {
   UpdatePostSchema,
 } from '../../../../schemas/updatePostSchema'
+import { getCsrfToken } from 'next-auth/react'
 
 const options = categories.map((category) => ({
   label: category,
@@ -36,7 +37,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   try {
     const res = await axios.get<IPost>(`http://localhost:3000/api/posts/${id}`)
-    return { props: { post: res.data, background: 'bg-linear-page' } }
+    return {
+      props: {
+        post: res.data,
+        background: 'bg-linear-page',
+        csrfToken: await getCsrfToken(ctx),
+      },
+    }
   } catch (e) {
     return { notFound: true }
   }
@@ -48,9 +55,10 @@ type FilteredData = Omit<UpdatePostSchema, 'images'> & {
 
 interface UpdatePostProps {
   post: IUserPost
+  csrfToken?: string
 }
 
-const UpdatePost = ({ post }: UpdatePostProps) => {
+const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
   const methods = useForm<UpdatePostSchema>({
     resolver: joiResolver(updatePostSchema),
   })
@@ -124,7 +132,7 @@ const UpdatePost = ({ post }: UpdatePostProps) => {
               method="post"
               methods={methods}
               submitHandler={submitHandler}
-              needCsrfToken
+              csrfToken={csrfToken}
               className="h-full"
             >
               <Accordion title="Name" id="name" headingLevel={2}>

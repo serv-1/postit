@@ -1,5 +1,4 @@
-import { getCsrfToken } from 'next-auth/react'
-import { ComponentPropsWithoutRef, useEffect, useState } from 'react'
+import { ComponentPropsWithoutRef } from 'react'
 import * as RHF from 'react-hook-form'
 
 type FormProps<FormFields extends RHF.FieldValues = RHF.FieldValues> =
@@ -8,26 +7,18 @@ type FormProps<FormFields extends RHF.FieldValues = RHF.FieldValues> =
     submitHandler: RHF.SubmitHandler<FormFields>
     submitErrorHandler?: RHF.SubmitErrorHandler<FormFields>
   } & (FormFields extends { csrfToken: string }
-      ? { needCsrfToken: true }
-      : { needCsrfToken?: false })
+      ? { csrfToken?: string }
+      : { csrfToken?: never })
 
 const Form = <FormFields extends RHF.FieldValues = RHF.FieldValues>({
   methods,
   submitHandler,
   submitErrorHandler,
-  needCsrfToken,
+  csrfToken,
   children,
   ...props
 }: FormProps<FormFields>) => {
   const { handleSubmit, register } = methods
-
-  const [csrfToken, setCsrfToken] = useState<string>()
-
-  useEffect(() => {
-    const csrf = async () => setCsrfToken(await getCsrfToken())
-    if (needCsrfToken) csrf()
-  }, [needCsrfToken])
-
   return (
     <RHF.FormProvider {...methods}>
       <form
@@ -39,7 +30,6 @@ const Form = <FormFields extends RHF.FieldValues = RHF.FieldValues>({
       >
         {csrfToken && (
           <input
-            data-testid="csrfToken"
             {...register('csrfToken' as any)}
             type="hidden"
             value={csrfToken}

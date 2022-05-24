@@ -1,6 +1,6 @@
 import ProfileUserImage from '../components/ProfileUserImage'
 import axios from 'axios'
-import { getSession, signOut } from 'next-auth/react'
+import { getCsrfToken, getSession, signOut } from 'next-auth/react'
 import { GetServerSideProps } from 'next'
 import { IUser } from '../types/common'
 import Head from 'next/head'
@@ -15,6 +15,7 @@ import UpdateAccountForm from '../components/UpdateAccountForm'
 import DeleteAccountModal from '../components/DeleteAccountModal'
 import ProfilePostList from '../components/ProfilePostList'
 import formatToUrl from '../utils/functions/formatToUrl'
+import { useState } from 'react'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx)
@@ -26,7 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
     const { id } = session
     const res = await axios.get<IUser>(`http://localhost:3000/api/users/${id}`)
-    return { props: { user: res.data } }
+    return { props: { user: res.data, csrfToken: await getCsrfToken(ctx) } }
   } catch (e) {
     return { notFound: true }
   }
@@ -34,9 +35,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
 interface ProfileProps {
   user: IUser
+  csrfToken?: string
 }
 
-const Profile = ({ user }: ProfileProps) => {
+const Profile = ({ user, csrfToken }: ProfileProps) => {
+  const [name, setName] = useState(user.name)
   return (
     <>
       <Head>
@@ -59,7 +62,7 @@ const Profile = ({ user }: ProfileProps) => {
             <div className="flex flex-row flex-nowrap mb-8">
               <ProfileUserImage image={user.image} />
               <div className="flex-grow flex flex-row flew-nowrap justify-between items-center md:gap-x-16">
-                <h1>{user.name}</h1>
+                <h1>{name}</h1>
                 <Link
                   href="/sign-out"
                   onClick={(e) => {
@@ -74,7 +77,7 @@ const Profile = ({ user }: ProfileProps) => {
               </div>
             </div>
             <Link
-              href={`/users/${user.id}/${formatToUrl(user.name)}`}
+              href={`/users/${user.id}/${formatToUrl(name)}`}
               className="bg-fuchsia-200 text-fuchsia-600 py-8 px-16 block w-full text-center font-bold rounded hover:bg-fuchsia-300 transition-colors duration-200 md:w-auto md:h-40"
             >
               See my public profile
@@ -125,9 +128,13 @@ const Profile = ({ user }: ProfileProps) => {
                 value="account"
                 className="md:w-[450px] md:bg-fuchsia-200 md:rounded-16 md:p-32 md:mx-auto"
               >
-                <UpdateAccountForm value="name" />
-                <UpdateAccountForm value="email" />
-                <UpdateAccountForm value="password" />
+                <UpdateAccountForm
+                  value="name"
+                  setName={setName}
+                  csrfToken={csrfToken}
+                />
+                <UpdateAccountForm value="email" csrfToken={csrfToken} />
+                <UpdateAccountForm value="password" csrfToken={csrfToken} />
                 <DeleteAccountModal />
               </TabPanel>
             </TabsProvider>
