@@ -1,13 +1,12 @@
 import Image from 'next/image'
 import { useState } from 'react'
-import { ChangeHandler, useFormContext } from 'react-hook-form'
+import { ChangeHandler } from 'react-hook-form'
 import PlusCircle from '../public/static/images/plus-circle.svg'
 import { IImage } from '../types/common'
+import err from '../utils/constants/errors'
 import isImageValid from '../utils/functions/isImageValid'
 import readAsDataUrl from '../utils/functions/readAsDataUrl'
 import Button from './Button'
-
-import InputError from './InputError'
 
 interface CreateAPostStep1Props {
   step: React.SetStateAction<0 | 1 | 2>
@@ -18,12 +17,16 @@ interface CreateAPostStep1Props {
 const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
   const { step, setStep, setImages } = props
   const [imageDataUrls, setImageDataUrls] = useState<string[]>()
-  const { register, setError } = useFormContext()
+  const [error, setError] = useState<string>()
 
   const onChange: ChangeHandler = async (e) => {
     const files = e.target.files
 
-    if (!files || files.length === 0 || files.length > 5) {
+    if (files.length === 0) {
+      setError(err.IMAGES_REQUIRED)
+      return setImageDataUrls(undefined)
+    } else if (files.length > 5) {
+      setError(err.IMAGES_MAX)
       return setImageDataUrls(undefined)
     }
 
@@ -34,13 +37,15 @@ const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
       const message = isImageValid(file)
 
       if (message) {
-        return setError('images', { message }, { shouldFocus: true })
+        setError(message)
+        return setImageDataUrls(undefined)
       }
 
       const result = await readAsDataUrl<IImage['ext']>(file)
 
       if (typeof result === 'string') {
-        return setError('images', { message: result }, { shouldFocus: true })
+        setError(result)
+        return setImageDataUrls(undefined)
       }
 
       dataUrls.push(`data:${file.type};base64,${result.base64}`)
@@ -48,6 +53,7 @@ const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
     }
 
     setImageDataUrls(dataUrls)
+    setError(undefined)
     setImages(images)
   }
 
@@ -67,7 +73,7 @@ const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
               document.querySelector<HTMLInputElement>('#images')?.click()
           }}
           aria-label="Images"
-          className="flex flex-row flex-wrap gap-8 justify-center"
+          className="flex flex-row flex-wrap gap-8 justify-center cursor-pointer"
         >
           {[0, 1, 2, 3, 4].map((i) => {
             if (imageDataUrls && imageDataUrls[i]) {
@@ -97,11 +103,16 @@ const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
         <input
           type="file"
           multiple
-          {...register('images', { onChange })}
+          name="images"
+          onChange={onChange}
           id="images"
           className="hidden"
         />
-        <InputError inputName="images" />
+        {error && (
+          <div role="alert" className="font-bold text-rose-600">
+            {error}
+          </div>
+        )}
       </div>
       <div className="flex gap-x-16">
         <Button

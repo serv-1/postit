@@ -1,10 +1,3 @@
-import { joiResolver } from '@hookform/resolvers/joi'
-import axios, { AxiosError } from 'axios'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import Form from '../components/Form'
-import { useToast } from '../contexts/toast'
-import getAxiosError from '../utils/functions/getAxiosError'
-import { useRouter } from 'next/router'
 import { IImage } from '../types/common'
 import Head from 'next/head'
 import Header from '../components/Header'
@@ -16,7 +9,6 @@ import CreateAPostStep1 from '../components/CreateAPostStep1'
 import CreateAPostStep2 from '../components/CreateAPostStep2'
 import GlassWrapper from '../components/GlassWrapper'
 import ShapeContainer from '../components/ShapeContainer'
-import addPostSchema, { AddPostSchema } from '../schemas/addPostSchema'
 import { getCsrfToken } from 'next-auth/react'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => ({
@@ -30,26 +22,6 @@ interface CreateAPostProps {
 const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
   const [step, setStep] = useState<0 | 1 | 2>(0)
   const [images, setImages] = useState<IImage[]>()
-  const resolver = joiResolver(addPostSchema)
-  const methods = useForm<AddPostSchema>({ resolver })
-  const { setToast } = useToast()
-  const router = useRouter()
-
-  const submitHandler: SubmitHandler<AddPostSchema> = async (data) => {
-    try {
-      await axios.post('http://localhost:3000/api/post', { ...data, images })
-      router.push('/profile')
-    } catch (e) {
-      type FieldsNames = keyof AddPostSchema
-      const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)
-
-      if (name) {
-        return methods.setError(name, { message }, { shouldFocus: true })
-      }
-
-      setToast({ message, error: true })
-    }
-  }
 
   const titles = ['Where is it?', 'Show us what it is', 'Post!']
 
@@ -68,22 +40,18 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
         >
           <ShapeContainer>
             <h1 className="mb-16">{titles[step]}</h1>
-            <Form
-              name="createPost"
-              method="post"
-              methods={methods}
-              submitHandler={submitHandler}
+            <CreateAPostStep0 step={step} setStep={setStep} />
+            <CreateAPostStep1
+              step={step}
+              setStep={setStep}
+              setImages={setImages}
+            />
+            <CreateAPostStep2
+              step={step}
+              setStep={setStep}
+              images={images}
               csrfToken={csrfToken}
-              className="h-full"
-            >
-              <CreateAPostStep0 step={step} setStep={setStep} />
-              <CreateAPostStep1
-                step={step}
-                setStep={setStep}
-                setImages={setImages}
-              />
-              <CreateAPostStep2 step={step} setStep={setStep} />
-            </Form>
+            />
           </ShapeContainer>
         </GlassWrapper>
       </div>

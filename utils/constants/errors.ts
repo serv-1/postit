@@ -18,7 +18,7 @@ const err = {
   PASSWORD_SAME: 'The password cannot be the same as the other fields\' value.' as const,
 	/* User image */
 	IMAGE_INVALID: 'An image is expected. (.jpeg, .jpg, .png, .gif)' as const,
-	IMAGE_TOO_BIG: 'The image\'s size cannot exceed 1 megabyte.' as const,
+	IMAGE_TOO_BIG: 'The image size cannot exceed 1 megabyte.' as const,
 	IMAGE_REQUIRED: 'The image is required.' as const,
 	/* Description */
 	DESCRIPTION_INVALID: 'The description is invalid.' as const,
