@@ -43,6 +43,7 @@ type InputProps<FormFields extends FieldValues> = {
 
 const Input = <FormFields extends FieldValues>({
   type,
+  id,
   name,
   registerOptions,
   needFocus,
@@ -65,7 +66,7 @@ const Input = <FormFields extends FieldValues>({
   const attributes = {
     type,
     ...register(name, registerOptions),
-    id: name,
+    id: id || name,
     'aria-describedby': classNames(`${name}Feedback`, ariaDescribedBy),
     ...props,
   }

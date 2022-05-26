@@ -5,6 +5,7 @@ import EyeSlash from '../public/static/images/eye-slash-fill.svg'
 import Input from './Input'
 
 interface PasswordInputProps {
+  id?: string
   needFocus?: boolean
   bgColor?: string
   noRightRadius?: boolean
@@ -12,6 +13,7 @@ interface PasswordInputProps {
 }
 
 const PasswordInput = <FormFields extends { password: string }>({
+  id,
   needFocus,
   bgColor,
   noRightRadius,
@@ -21,6 +23,7 @@ const PasswordInput = <FormFields extends { password: string }>({
 
   return (
     <Input<FormFields>
+      id={id}
       name={'password' as FieldPath<FormFields>}
       type={showPassword ? 'text' : 'password'}
       registerOptions={{ onChange }}

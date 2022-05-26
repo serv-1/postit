@@ -52,8 +52,9 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
         submitHandler={submitHandler}
       >
         <div className="mb-16">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="signInEmail">Email</label>
           <Input<SignInSchema>
+            id="signInEmail"
             type="email"
             name="email"
             needFocus
@@ -63,7 +64,7 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
         </div>
 
         <div className="mb-16">
-          <label htmlFor="password" className="inline-block w-1/2">
+          <label htmlFor="signInPassword" className="inline-block w-1/2">
             Password
           </label>
           <button
@@ -73,7 +74,10 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
           >
             Forgot password?
           </button>
-          <PasswordInput<SignInSchema> bgColor="bg-fuchsia-50 md:bg-fuchsia-100" />
+          <PasswordInput<SignInSchema>
+            id="signInPassword"
+            bgColor="bg-fuchsia-50 md:bg-fuchsia-100"
+          />
           <InputError<SignInSchema> inputName="password" />
         </div>
 

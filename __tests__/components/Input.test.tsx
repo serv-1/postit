@@ -54,6 +54,13 @@ it('renders', async () => {
   expect(container).not.toBeInTheDocument()
 })
 
+it('uses the given id', () => {
+  render(<Input<FormFields> type="text" id="turing" name="test" />)
+
+  const input = screen.getByRole('textbox')
+  expect(input).toHaveAttribute('id', 'turing')
+})
+
 it('has the focus', () => {
   render(<Input<FormFields> type="text" name="test" needFocus />)
   expect(setFocus).toHaveBeenNthCalledWith(1, 'test')
