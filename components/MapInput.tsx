@@ -7,6 +7,7 @@ interface Prediction {
   lon: number
   place: string
   address: string
+  location: string
 }
 
 type AutoCompleteResponse = {
@@ -14,13 +15,30 @@ type AutoCompleteResponse = {
   lon: string
   display_place: string
   display_address: string
+  type: string
+  address: {
+    name?: string
+    house_number?: string
+    road?: string
+    neighbourhood?: string
+    suburb?: string
+    island?: string
+    city?: string
+    county?: string
+    state?: string
+    state_code?: string
+    postcode?: string
+    country?: string
+    country_code?: string
+  }
 }[]
 
 interface MapInputProps {
   setLatLon: React.Dispatch<React.SetStateAction<[number, number] | undefined>>
+  setLocation: React.Dispatch<React.SetStateAction<string | undefined>>
 }
 
-const MapInput = ({ setLatLon }: MapInputProps) => {
+const MapInput = ({ setLatLon, setLocation }: MapInputProps) => {
   const [predictions, setPredictions] = useState<Prediction[]>()
   const [error, setError] = useState<string>()
   const [activePredictionId, setActivePredictionId] = useState('prediction-0')
@@ -33,7 +51,9 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
     const value = (e.target as HTMLInputElement).value
     count.current++
 
-    if (count.current !== 2) {
+    if (value.length > 200) {
+      return setError(err.LOCATION_MAX)
+    } else if (count.current !== 2) {
       return
     } else if (count.current === 2 && !value.trim()) {
       count.current = 0
@@ -42,17 +62,29 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
 
     try {
       const res = await axios.get<AutoCompleteResponse>(
-        `https://api.locationiq.com/v1/autocomplete.php?key=pk.956a05610e523c7773a4307bbd557cf4&dedupe=1&q=${value}`
+        `https://api.locationiq.com/v1/autocomplete.php?key=pk.956a05610e523c7773a4307bbd557cf4&dedupe=1&tag=place:city,town,village,hamlet&q=${value}`
       )
 
       const predictions: Prediction[] = []
 
-      for (const { lat, lon, display_place, display_address } of res.data) {
+      for (const item of res.data) {
+        const { lat, lon, address, display_address, display_place } = item
+        const { name, postcode, county, state, country } = address
+
+        const values: string[] = []
+
+        if (name) values.push(name)
+        if (postcode) values.push(postcode.split(';')[0])
+        if (county) values.push(county)
+        if (state) values.push(state)
+        if (country) values.push(country)
+
         predictions.push({
           lat: +lat,
           lon: +lon,
           place: display_place,
           address: display_address,
+          location: values.join(', '),
         })
       }
 
@@ -95,6 +127,7 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
         ;(e.target as HTMLInputElement).value = predictions[idNb].place
         setIsOpen(false)
         setLatLon([predictions[idNb].lat, predictions[idNb].lon])
+        setLocation(predictions[idNb].location)
         e.preventDefault()
         break
       }
@@ -151,6 +184,7 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
                       if (!inputRef.current) return
                       inputRef.current.value = prediction.place
                       setLatLon([prediction.lat, prediction.lon])
+                      setLocation(prediction.location)
                       setIsOpen(false)
                       e.preventDefault()
                     }}

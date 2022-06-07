@@ -22,13 +22,13 @@ const options = categories.map((category) => ({
 interface CreateAPostStep2Props {
   csrfToken?: string
   images?: IImage[]
-  latLon?: [number, number]
+  location?: string
   step: 0 | 1 | 2
   setStep: React.Dispatch<React.SetStateAction<0 | 1 | 2>>
 }
 
 const CreateAPostStep2 = (props: CreateAPostStep2Props) => {
-  const { csrfToken, images, latLon, step, setStep } = props
+  const { csrfToken, images, location, step, setStep } = props
 
   const { setToast } = useToast()
   const router = useRouter()
@@ -39,7 +39,7 @@ const CreateAPostStep2 = (props: CreateAPostStep2Props) => {
 
   const submitHandler: SubmitHandler<AddPostSchema> = async (data) => {
     try {
-      const _data = { ...data, images, latLon }
+      const _data = { ...data, images, location }
       await axios.post('http://localhost:3000/api/post', _data)
       router.push('/profile')
     } catch (e) {

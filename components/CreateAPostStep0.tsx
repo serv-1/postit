@@ -17,13 +17,14 @@ const MapInvalidateSize = dynamic(() => import('./MapInvalidateSize'), {
 interface CreateAPostStep0Props {
   step: 0 | 1 | 2
   setStep: React.Dispatch<React.SetStateAction<0 | 1 | 2>>
-  latLon?: [number, number]
-  setLatLon: React.Dispatch<React.SetStateAction<[number, number] | undefined>>
+  location?: string
+  setLocation: React.Dispatch<React.SetStateAction<string | undefined>>
 }
 
 const CreateAPostStep0 = (props: CreateAPostStep0Props) => {
-  const { step, setStep, setLatLon, latLon } = props
+  const { step, setStep, setLocation, location } = props
   const [isOpen, setIsOpen] = useState(false)
+  const [latLon, setLatLon] = useState<[number, number]>()
 
   return (
     <div
@@ -51,7 +52,7 @@ const CreateAPostStep0 = (props: CreateAPostStep0Props) => {
           isOpen ? 'w-screen h-screen absolute top-0 left-0' : 'hidden'
         }
       >
-        <MapInput setLatLon={setLatLon} />
+        <MapInput setLatLon={setLatLon} setLocation={setLocation} />
         <Map className="w-screen h-screen" zoom={12}>
           <MapInvalidateSize resize={isOpen} />
           <MapFlyToLatLon latLon={latLon} />
@@ -68,7 +69,7 @@ const CreateAPostStep0 = (props: CreateAPostStep0Props) => {
           type="submit"
           color="primary"
           onClick={() => setStep(1)}
-          disabled={!latLon}
+          disabled={!location}
         >
           Next →
         </Button>

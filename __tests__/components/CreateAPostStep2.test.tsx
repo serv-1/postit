@@ -18,7 +18,7 @@ beforeEach(() => {
 })
 
 const images: IImage[] = [{ base64: 'azerty', ext: 'jpg' }]
-const latLon: [number, number] = [42, 48]
+const location = 'Paris, Ile-de-France, France'
 
 it('has the "hidden" class if the given step isn\'t its step', () => {
   render(<CreateAPostStep2 images={images} step={0} setStep={() => null} />)
@@ -41,7 +41,7 @@ test('the user is redirected to its profile after a valid submission', async () 
     <CreateAPostStep2
       csrfToken="csrf"
       images={images}
-      latLon={latLon}
+      location={location}
       step={2}
       setStep={() => null}
     />
@@ -75,7 +75,7 @@ test('the user is redirected to its profile after a valid submission', async () 
         categories: ['furniture'],
         price: 40,
         images,
-        latLon,
+        location,
       }
     )
     expect(router.push).toHaveBeenNthCalledWith(1, '/profile')
@@ -91,7 +91,7 @@ test('an error renders if the server fails to create the post', async () => {
     <CreateAPostStep2
       csrfToken="csrf"
       images={images}
-      latLon={latLon}
+      location={location}
       step={2}
       setStep={() => null}
     />
@@ -129,7 +129,7 @@ test("an error renders if the server fails to validate the request's data", asyn
     <CreateAPostStep2
       csrfToken="csrf"
       images={images}
-      latLon={latLon}
+      location={location}
       step={2}
       setStep={() => null}
     />

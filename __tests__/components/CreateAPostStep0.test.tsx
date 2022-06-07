@@ -4,7 +4,7 @@ import CreateAPostStep0 from '../../components/CreateAPostStep0'
 
 it('has the "hidden" class if the given step isn\'t the current step', async () => {
   render(
-    <CreateAPostStep0 step={1} setStep={() => null} setLatLon={() => null} />
+    <CreateAPostStep0 step={1} setStep={() => null} setLocation={() => null} />
   )
 
   await screen.findByTestId('leaflet-map')
@@ -17,7 +17,7 @@ it('has the "hidden" class if the given step isn\'t the current step', async () 
 
 test('the modal displays and hides', async () => {
   render(
-    <CreateAPostStep0 step={0} setStep={() => null} setLatLon={() => null} />
+    <CreateAPostStep0 step={0} setStep={() => null} setLocation={() => null} />
   )
 
   await screen.findByTestId('leaflet-map')
@@ -37,7 +37,7 @@ test('the modal displays and hides', async () => {
 
 test('the "Next" button is disabled when the user don\'t specify an address', async () => {
   render(
-    <CreateAPostStep0 step={0} setStep={() => null} setLatLon={() => null} />
+    <CreateAPostStep0 step={0} setStep={() => null} setLocation={() => null} />
   )
 
   await screen.findByTestId('leaflet-map')
@@ -54,8 +54,8 @@ test('the "Next" button passes to the next step', async () => {
     <CreateAPostStep0
       step={0}
       setStep={setStep}
-      latLon={[10, 20]}
-      setLatLon={() => null}
+      location="Oslo, Norway"
+      setLocation={() => null}
     />
   )
 

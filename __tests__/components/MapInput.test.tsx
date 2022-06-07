@@ -11,7 +11,7 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 it('renders the prediction list each times the input value has been modified 2 times', async () => {
-  render(<MapInput setLatLon={() => null} />)
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   expect(input).toHaveAttribute('aria-expanded', 'false')
@@ -24,13 +24,13 @@ it('renders the prediction list each times the input value has been modified 2 t
 
   const predictions = await screen.findAllByRole('option')
 
-  expect(predictions[0]).toHaveTextContent(/empire state building/i)
-  expect(predictions[0]).toHaveTextContent(/united states/i)
+  expect(predictions[0]).toHaveTextContent(/oslo/i)
+  expect(predictions[0]).toHaveTextContent(/norway/i)
   expect(predictions[0]).toHaveAttribute('id', 'prediction-0')
   expect(predictions[0]).toHaveAttribute('aria-selected', 'true')
   expect(predictions[0]).toHaveClass('bg-fuchsia-200')
 
-  expect(predictions[1]).toHaveTextContent(/eiffel tower/i)
+  expect(predictions[1]).toHaveTextContent(/paris/i)
   expect(predictions[1]).toHaveTextContent(/france/i)
   expect(predictions[1]).toHaveAttribute('id', 'prediction-1')
   expect(predictions[1]).toHaveAttribute('aria-selected', 'false')
@@ -41,21 +41,36 @@ it('renders the prediction list each times the input value has been modified 2 t
 })
 
 it("doesn't render the prediction list if the query is empty or composed of white spaces", async () => {
-  render(<MapInput setLatLon={() => null} />)
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'a')
 
   await userEvent.keyboard('{Backspace}')
   await expect(screen.findByRole('listbox')).rejects.toThrow()
+})
 
-  input.value = ''
+it("doesn't render the prediction list if the query is white spaces", async () => {
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+
+  const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, '  ')
+
   await expect(screen.findByRole('listbox')).rejects.toThrow()
 })
 
+it('renders an error if the query is too long', async () => {
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+
+  const input = screen.getByRole<HTMLInputElement>('combobox')
+  await userEvent.type(input, new Uint8Array(201).toString())
+
+  const alert = await screen.findByRole('alert')
+  expect(alert).toHaveTextContent(err.LOCATION_MAX)
+})
+
 it('renders an error if the server fails to fetch the predictions', async () => {
-  render(<MapInput setLatLon={() => null} />)
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -82,7 +97,7 @@ it('renders an error if the server send no response', async () => {
   const axiosGet = jest.spyOn(require('axios'), 'get')
   axiosGet.mockRejectedValue({})
 
-  render(<MapInput setLatLon={() => null} />)
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -101,7 +116,7 @@ it('removes the error if the predictions are about to be fetched again', async (
     )
   )
 
-  render(<MapInput setLatLon={() => null} />)
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -119,7 +134,7 @@ it('removes the error if the predictions are about to be fetched again', async (
 })
 
 test('arrow up/down moves the visual focus between each options', async () => {
-  render(<MapInput setLatLon={() => null} />)
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -159,18 +174,22 @@ test('arrow up/down moves the visual focus between each options', async () => {
 })
 
 test('tab, enter or clicking a prediction assigns its value to the input value and unmounts the prediction list', async () => {
-  const prediction1LatLon = [40, -73]
-  const prediction2LatLon = [48, 22]
+  const prediction1LatLon = [59, 10]
+  const prediction2LatLon = [48, 2]
+  const prediction1Location = 'Oslo, Norway'
+  const prediction2Location = 'Paris, Ile-de-France, France'
 
   const setLatLon = jest.fn()
-  render(<MapInput setLatLon={setLatLon} />)
+  const setLocation = jest.fn()
+  render(<MapInput setLatLon={setLatLon} setLocation={setLocation} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
-
   let predictionList = await screen.findByRole('listbox')
   await userEvent.tab()
   expect(setLatLon).toHaveBeenNthCalledWith(1, prediction1LatLon)
+  expect(setLocation).toHaveBeenNthCalledWith(1, prediction1Location)
+  expect(input).toHaveValue('Oslo')
   expect(predictionList).not.toBeInTheDocument()
 
   await userEvent.type(input, 'bb')
@@ -178,12 +197,16 @@ test('tab, enter or clicking a prediction assigns its value to the input value a
   await userEvent.keyboard('{ArrowDown}')
   await userEvent.keyboard('{Enter}')
   expect(setLatLon).toHaveBeenNthCalledWith(2, prediction2LatLon)
+  expect(setLocation).toHaveBeenNthCalledWith(2, prediction2Location)
+  expect(input).toHaveValue('Paris')
   expect(predictionList).not.toBeInTheDocument()
 
   await userEvent.type(input, 'cc')
   const prediction = (await screen.findAllByRole('option'))[0]
   await userEvent.click(prediction)
   expect(setLatLon).toHaveBeenNthCalledWith(3, prediction1LatLon)
+  expect(setLocation).toHaveBeenNthCalledWith(3, prediction1Location)
+  expect(input).toHaveValue('Oslo')
   expect(prediction).not.toBeInTheDocument()
   expect(input).toHaveFocus()
 })
@@ -196,7 +219,7 @@ test("the prediction list doesn't render if there is 0 prediction", async () => 
     )
   )
 
-  render(<MapInput setLatLon={() => null} />)
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -205,7 +228,7 @@ test("the prediction list doesn't render if there is 0 prediction", async () => 
 })
 
 it('renders/unmounts the prediction list if the input is focused in/out', async () => {
-  render(<MapInput setLatLon={() => null} />)
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -230,7 +253,7 @@ it('renders/unmounts the error if the input is focused in/out', async () => {
     )
   )
 
-  render(<MapInput setLatLon={() => null} />)
+  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')

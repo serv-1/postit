@@ -25,8 +25,8 @@ test('renders the title related to the actually displayed step', async () => {
   const title = screen.getByRole('heading', { level: 1 })
   expect(title).toHaveTextContent(/where/i)
 
-  const latLonInput = screen.getByLabelText(/location/i)
-  await userEvent.type(latLonInput, 'aa')
+  const locationInput = screen.getByLabelText(/location/i)
+  await userEvent.type(locationInput, 'aa')
 
   await screen.findByRole('listbox')
   await userEvent.tab()
@@ -44,11 +44,11 @@ test('renders the title related to the actually displayed step', async () => {
   expect(title).toHaveTextContent(/post/i)
 })
 
-test('the uploaded images and latitude/longitude are sent with the request', async () => {
+test('the uploaded images and the location are sent with the request', async () => {
   render(<CreateAPost csrfToken="csrf" />)
 
-  const latLonInput = screen.getByLabelText(/location/i)
-  await userEvent.type(latLonInput, 'aa')
+  const locationInput = screen.getByLabelText(/location/i)
+  await userEvent.type(locationInput, 'aa')
 
   await screen.findByRole('listbox')
   await userEvent.tab()
@@ -85,7 +85,7 @@ test('the uploaded images and latitude/longitude are sent with the request', asy
         categories: ['furniture'],
         price: 40,
         images: [{ base64: 'ZGF0YQ==', ext: 'jpg' }],
-        latLon: [40, -73],
+        location: 'Oslo, Norway',
       }
     )
   })
