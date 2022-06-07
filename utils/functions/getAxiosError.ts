@@ -12,10 +12,8 @@ interface Response<TName> {
  * @param e error thrown
  * @returns error's name (if any) and message
  */
-const getAxiosError = <TName extends string>(
-  e: AxiosError<Response<TName>>
-) => {
-  const res = e.response
+const getAxiosError = <TName extends string>(e: unknown) => {
+  const res = (e as AxiosError<Response<TName>>).response
 
   if (!res) {
     return { message: err.NO_RESPONSE }

@@ -22,6 +22,7 @@ interface CreateAPostProps {
 const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
   const [step, setStep] = useState<0 | 1 | 2>(0)
   const [images, setImages] = useState<IImage[]>()
+  const [latLon, setLatLon] = useState<[number, number]>()
 
   const titles = ['Where is it?', 'Show us what it is', 'Post!']
 
@@ -40,17 +41,10 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
         >
           <ShapeContainer>
             <h1 className="mb-16">{titles[step]}</h1>
-            <CreateAPostStep0 step={step} setStep={setStep} />
-            <CreateAPostStep1
-              step={step}
-              setStep={setStep}
-              setImages={setImages}
-            />
+            <CreateAPostStep0 {...{ step, setStep, latLon, setLatLon }} />
+            <CreateAPostStep1 {...{ step, setStep, setImages }} />
             <CreateAPostStep2
-              step={step}
-              setStep={setStep}
-              images={images}
-              csrfToken={csrfToken}
+              {...{ step, setStep, images, latLon, csrfToken }}
             />
           </ShapeContainer>
         </GlassWrapper>

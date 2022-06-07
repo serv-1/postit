@@ -10,4 +10,5 @@ module.exports = {
 
     return config
   },
+  images: { domains: ['maps.locationiq.com'] },
 }

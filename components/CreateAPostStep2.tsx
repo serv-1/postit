@@ -8,7 +8,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { IImage } from '../types/common'
 import Form from './Form'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import getAxiosError from '../utils/functions/getAxiosError'
 import { useToast } from '../contexts/toast'
 import { useRouter } from 'next/router'
@@ -21,13 +21,14 @@ const options = categories.map((category) => ({
 
 interface CreateAPostStep2Props {
   csrfToken?: string
-  images: React.SetStateAction<IImage[] | undefined>
-  step: React.SetStateAction<0 | 1 | 2>
+  images?: IImage[]
+  latLon?: [number, number]
+  step: 0 | 1 | 2
   setStep: React.Dispatch<React.SetStateAction<0 | 1 | 2>>
 }
 
 const CreateAPostStep2 = (props: CreateAPostStep2Props) => {
-  const { csrfToken, images, step, setStep } = props
+  const { csrfToken, images, latLon, step, setStep } = props
 
   const { setToast } = useToast()
   const router = useRouter()
@@ -38,11 +39,11 @@ const CreateAPostStep2 = (props: CreateAPostStep2Props) => {
 
   const submitHandler: SubmitHandler<AddPostSchema> = async (data) => {
     try {
-      await axios.post('http://localhost:3000/api/post', { ...data, images })
+      const _data = { ...data, images, latLon }
+      await axios.post('http://localhost:3000/api/post', _data)
       router.push('/profile')
     } catch (e) {
-      type FieldsNames = keyof AddPostSchema
-      const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)
+      const { name, message } = getAxiosError<keyof AddPostSchema>(e)
 
       if (name) {
         return methods.setError(name, { message }, { shouldFocus: true })

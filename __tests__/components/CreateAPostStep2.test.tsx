@@ -18,6 +18,7 @@ beforeEach(() => {
 })
 
 const images: IImage[] = [{ base64: 'azerty', ext: 'jpg' }]
+const latLon: [number, number] = [42, 48]
 
 it('has the "hidden" class if the given step isn\'t its step', () => {
   render(<CreateAPostStep2 images={images} step={0} setStep={() => null} />)
@@ -40,6 +41,7 @@ test('the user is redirected to its profile after a valid submission', async () 
     <CreateAPostStep2
       csrfToken="csrf"
       images={images}
+      latLon={latLon}
       step={2}
       setStep={() => null}
     />
@@ -51,8 +53,10 @@ test('the user is redirected to its profile after a valid submission', async () 
   const priceInput = screen.getByRole('spinbutton', { name: /price/i })
   await userEvent.type(priceInput, '40')
 
-  const select = screen.getByLabelText('Categories')
-  await selectEvent.select(select, 'furniture')
+  const categoriesSelect = screen.getByLabelText(/categories/i)
+  // https://github.com/romgain/react-select-event/issues/97
+  selectEvent.openMenu(categoriesSelect)
+  await selectEvent.select(categoriesSelect, 'furniture')
 
   const descriptionInput = screen.getByRole('textbox', { name: /description/i })
   await userEvent.type(descriptionInput, 'A magnificent modern table.')
@@ -71,6 +75,7 @@ test('the user is redirected to its profile after a valid submission', async () 
         categories: ['furniture'],
         price: 40,
         images,
+        latLon,
       }
     )
     expect(router.push).toHaveBeenNthCalledWith(1, '/profile')
@@ -86,6 +91,7 @@ test('an error renders if the server fails to create the post', async () => {
     <CreateAPostStep2
       csrfToken="csrf"
       images={images}
+      latLon={latLon}
       step={2}
       setStep={() => null}
     />
@@ -98,6 +104,8 @@ test('an error renders if the server fails to create the post', async () => {
   await userEvent.type(priceInput, '40')
 
   const categoriesSelect = screen.getByLabelText('Categories')
+  // https://github.com/romgain/react-select-event/issues/97
+  selectEvent.openMenu(categoriesSelect)
   await selectEvent.select(categoriesSelect, 'furniture')
 
   const descriptionInput = screen.getByRole('textbox', { name: /description/i })
@@ -121,6 +129,7 @@ test("an error renders if the server fails to validate the request's data", asyn
     <CreateAPostStep2
       csrfToken="csrf"
       images={images}
+      latLon={latLon}
       step={2}
       setStep={() => null}
     />
@@ -133,6 +142,8 @@ test("an error renders if the server fails to validate the request's data", asyn
   await userEvent.type(priceInput, '40')
 
   const categoriesSelect = screen.getByLabelText('Categories')
+  // https://github.com/romgain/react-select-event/issues/97
+  selectEvent.openMenu(categoriesSelect)
   await selectEvent.select(categoriesSelect, 'furniture')
 
   const descriptionInput = screen.getByRole('textbox', { name: /description/i })

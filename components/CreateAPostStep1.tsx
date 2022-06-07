@@ -9,7 +9,7 @@ import readAsDataUrl from '../utils/functions/readAsDataUrl'
 import Button from './Button'
 
 interface CreateAPostStep1Props {
-  step: React.SetStateAction<0 | 1 | 2>
+  step: 0 | 1 | 2
   setStep: React.Dispatch<React.SetStateAction<0 | 1 | 2>>
   setImages: React.Dispatch<React.SetStateAction<IImage[] | undefined>>
 }

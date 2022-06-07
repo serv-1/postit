@@ -134,7 +134,11 @@ it("updates the query string's data", async () => {
   await userEvent.type(maxPriceInput, '100')
 
   const categoriesSelect = screen.getByLabelText(/categories/i)
-  await selectEvent.select(categoriesSelect, ['furniture', 'pet'])
+  // https://github.com/romgain/react-select-event/issues/97
+  selectEvent.openMenu(categoriesSelect)
+  await selectEvent.select(categoriesSelect, 'furniture')
+  selectEvent.openMenu(categoriesSelect)
+  await selectEvent.select(categoriesSelect, 'pet')
 
   const submitBtn = screen.getByRole('button', { name: /search/i })
   await userEvent.click(submitBtn)
