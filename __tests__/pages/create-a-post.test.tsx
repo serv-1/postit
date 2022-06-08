@@ -44,7 +44,7 @@ test('renders the title related to the actually displayed step', async () => {
   expect(title).toHaveTextContent(/post/i)
 })
 
-test('the uploaded images and the location are sent with the request', async () => {
+test('the uploaded images are sent with the request', async () => {
   render(<CreateAPost csrfToken="csrf" />)
 
   const locationInput = screen.getByLabelText(/location/i)

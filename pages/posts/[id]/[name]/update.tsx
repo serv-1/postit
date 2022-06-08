@@ -26,6 +26,7 @@ import updatePostSchema, {
   UpdatePostSchema,
 } from '../../../../schemas/updatePostSchema'
 import { getCsrfToken } from 'next-auth/react'
+import PostLocationModal from '../../../../components/PostLocationModal'
 
 const options = categories.map((category) => ({
   label: category,
@@ -219,6 +220,19 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
                   <label htmlFor="images">New images</label>
                   <Input type="file" name="images" />
                   <InputError inputName="images" />
+                </div>
+              </Accordion>
+
+              <Accordion title="Location" id="location" headingLevel={2}>
+                <div className="mb-16">
+                  Actual location
+                  <div className="bg-fuchsia-100 rounded-8 p-8">
+                    {post.location}
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="location">New location</label>
+                  <PostLocationModal />
                 </div>
               </Accordion>
 

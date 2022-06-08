@@ -30,6 +30,7 @@ const post = {
   categories: ['furniture' as const, 'pet' as const],
   price: 5000,
   images: ['static/images/post/table.jpeg'],
+  location: 'Oslo, Norway',
   userId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
 }
 
@@ -68,6 +69,12 @@ it('renders', async () => {
 
   const image = screen.getByRole('img')
   expect(image).toHaveAttribute('src', post.images[0])
+
+  const locationBtn = screen.getByRole('button', { name: /location/i })
+  await userEvent.click(locationBtn)
+
+  const location = screen.getByText(post.location)
+  expect(location).toBeInTheDocument()
 })
 
 test('an alert renders if the post is updated', async () => {

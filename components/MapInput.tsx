@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import { FormEvent, KeyboardEvent, useRef, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
 import err from '../utils/constants/errors'
 
 interface Prediction {
@@ -35,10 +36,9 @@ type AutoCompleteResponse = {
 
 interface MapInputProps {
   setLatLon: React.Dispatch<React.SetStateAction<[number, number] | undefined>>
-  setLocation: React.Dispatch<React.SetStateAction<string | undefined>>
 }
 
-const MapInput = ({ setLatLon, setLocation }: MapInputProps) => {
+const MapInput = ({ setLatLon }: MapInputProps) => {
   const [predictions, setPredictions] = useState<Prediction[]>()
   const [error, setError] = useState<string>()
   const [activePredictionId, setActivePredictionId] = useState('prediction-0')
@@ -46,6 +46,8 @@ const MapInput = ({ setLatLon, setLocation }: MapInputProps) => {
 
   const inputRef = useRef<HTMLInputElement>(null)
   const count = useRef(0)
+
+  const { register, setValue } = useFormContext()
 
   const onInput = async (e: FormEvent<HTMLInputElement>) => {
     const value = (e.target as HTMLInputElement).value
@@ -127,7 +129,7 @@ const MapInput = ({ setLatLon, setLocation }: MapInputProps) => {
         ;(e.target as HTMLInputElement).value = predictions[idNb].place
         setIsOpen(false)
         setLatLon([predictions[idNb].lat, predictions[idNb].lon])
-        setLocation(predictions[idNb].location)
+        setValue('location', predictions[idNb].location)
         e.preventDefault()
         break
       }
@@ -136,6 +138,7 @@ const MapInput = ({ setLatLon, setLocation }: MapInputProps) => {
 
   return (
     <div className="absolute top-[10px] left-[54px] z-[999] w-[calc(100%-64px)] max-w-[360px] md:left-1/2 md:-translate-x-1/2">
+      <input type="hidden" {...register('location')} />
       <input
         className="p-8 border-b-2 transition-colors duration-200 rounded outline-none bg-fuchsia-50 placeholder:text-fuchsia-900/50 w-full border-fuchsia-900/25 focus-within:border-fuchsia-900/75 text-base"
         ref={inputRef}
@@ -184,7 +187,7 @@ const MapInput = ({ setLatLon, setLocation }: MapInputProps) => {
                       if (!inputRef.current) return
                       inputRef.current.value = prediction.place
                       setLatLon([prediction.lat, prediction.lon])
-                      setLocation(prediction.location)
+                      setValue('location', prediction.location)
                       setIsOpen(false)
                       e.preventDefault()
                     }}

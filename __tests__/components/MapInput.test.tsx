@@ -6,12 +6,18 @@ import handlers from '../../mocks/locationiq/autocomplete'
 import server from '../../mocks/server'
 import err from '../../utils/constants/errors'
 
+const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
+const setValue = jest.fn()
+
+beforeEach(() =>
+  useFormContext.mockReturnValue({ setValue, register: () => null })
+)
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 it('renders the prediction list each times the input value has been modified 2 times', async () => {
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   expect(input).toHaveAttribute('aria-expanded', 'false')
@@ -41,7 +47,7 @@ it('renders the prediction list each times the input value has been modified 2 t
 })
 
 it("doesn't render the prediction list if the query is empty or composed of white spaces", async () => {
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'a')
@@ -51,7 +57,7 @@ it("doesn't render the prediction list if the query is empty or composed of whit
 })
 
 it("doesn't render the prediction list if the query is white spaces", async () => {
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, '  ')
@@ -60,7 +66,7 @@ it("doesn't render the prediction list if the query is white spaces", async () =
 })
 
 it('renders an error if the query is too long', async () => {
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, new Uint8Array(201).toString())
@@ -70,7 +76,7 @@ it('renders an error if the query is too long', async () => {
 })
 
 it('renders an error if the server fails to fetch the predictions', async () => {
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -97,7 +103,7 @@ it('renders an error if the server send no response', async () => {
   const axiosGet = jest.spyOn(require('axios'), 'get')
   axiosGet.mockRejectedValue({})
 
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -116,7 +122,7 @@ it('removes the error if the predictions are about to be fetched again', async (
     )
   )
 
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -134,7 +140,7 @@ it('removes the error if the predictions are about to be fetched again', async (
 })
 
 test('arrow up/down moves the visual focus between each options', async () => {
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -180,15 +186,14 @@ test('tab, enter or clicking a prediction assigns its value to the input value a
   const prediction2Location = 'Paris, Ile-de-France, France'
 
   const setLatLon = jest.fn()
-  const setLocation = jest.fn()
-  render(<MapInput setLatLon={setLatLon} setLocation={setLocation} />)
+  render(<MapInput setLatLon={setLatLon} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
   let predictionList = await screen.findByRole('listbox')
   await userEvent.tab()
   expect(setLatLon).toHaveBeenNthCalledWith(1, prediction1LatLon)
-  expect(setLocation).toHaveBeenNthCalledWith(1, prediction1Location)
+  expect(setValue).toHaveBeenNthCalledWith(1, 'location', prediction1Location)
   expect(input).toHaveValue('Oslo')
   expect(predictionList).not.toBeInTheDocument()
 
@@ -197,7 +202,7 @@ test('tab, enter or clicking a prediction assigns its value to the input value a
   await userEvent.keyboard('{ArrowDown}')
   await userEvent.keyboard('{Enter}')
   expect(setLatLon).toHaveBeenNthCalledWith(2, prediction2LatLon)
-  expect(setLocation).toHaveBeenNthCalledWith(2, prediction2Location)
+  expect(setValue).toHaveBeenNthCalledWith(2, 'location', prediction2Location)
   expect(input).toHaveValue('Paris')
   expect(predictionList).not.toBeInTheDocument()
 
@@ -205,7 +210,7 @@ test('tab, enter or clicking a prediction assigns its value to the input value a
   const prediction = (await screen.findAllByRole('option'))[0]
   await userEvent.click(prediction)
   expect(setLatLon).toHaveBeenNthCalledWith(3, prediction1LatLon)
-  expect(setLocation).toHaveBeenNthCalledWith(3, prediction1Location)
+  expect(setValue).toHaveBeenNthCalledWith(3, 'location', prediction1Location)
   expect(input).toHaveValue('Oslo')
   expect(prediction).not.toBeInTheDocument()
   expect(input).toHaveFocus()
@@ -219,7 +224,7 @@ test("the prediction list doesn't render if there is 0 prediction", async () => 
     )
   )
 
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -228,7 +233,7 @@ test("the prediction list doesn't render if there is 0 prediction", async () => 
 })
 
 it('renders/unmounts the prediction list if the input is focused in/out', async () => {
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')
@@ -253,7 +258,7 @@ it('renders/unmounts the error if the input is focused in/out', async () => {
     )
   )
 
-  render(<MapInput setLatLon={() => null} setLocation={() => null} />)
+  render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
   await userEvent.type(input, 'aa')

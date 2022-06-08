@@ -2,10 +2,17 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CreateAPostStep0 from '../../components/CreateAPostStep0'
 
+const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
+
+beforeEach(() => {
+  useFormContext.mockReturnValue({
+    getValues: () => null,
+    register: () => null,
+  })
+})
+
 it('has the "hidden" class if the given step isn\'t the current step', async () => {
-  render(
-    <CreateAPostStep0 step={1} setStep={() => null} setLocation={() => null} />
-  )
+  render(<CreateAPostStep0 step={1} setStep={() => null} />)
 
   await screen.findByTestId('leaflet-map')
   await screen.findByTestId('mapFlyToLatLon')
@@ -15,30 +22,8 @@ it('has the "hidden" class if the given step isn\'t the current step', async () 
   expect(container).toHaveClass('hidden')
 })
 
-test('the modal displays and hides', async () => {
-  render(
-    <CreateAPostStep0 step={0} setStep={() => null} setLocation={() => null} />
-  )
-
-  await screen.findByTestId('leaflet-map')
-  await screen.findByTestId('mapFlyToLatLon')
-  await screen.findByTestId('mapInvalidateSize')
-
-  const openBtn = screen.getByRole('button', { name: /open/i })
-  await userEvent.click(openBtn)
-
-  const modal = screen.getByRole('dialog')
-  expect(modal).not.toHaveClass('hidden')
-
-  const closeBtn = screen.getByRole('button', { name: /close/i })
-  await userEvent.click(closeBtn)
-  expect(modal).toHaveClass('hidden')
-})
-
 test('the "Next" button is disabled when the user don\'t specify an address', async () => {
-  render(
-    <CreateAPostStep0 step={0} setStep={() => null} setLocation={() => null} />
-  )
+  render(<CreateAPostStep0 step={0} setStep={() => null} />)
 
   await screen.findByTestId('leaflet-map')
   await screen.findByTestId('mapFlyToLatLon')
@@ -49,15 +34,13 @@ test('the "Next" button is disabled when the user don\'t specify an address', as
 })
 
 test('the "Next" button passes to the next step', async () => {
+  useFormContext.mockReturnValue({
+    getValues: () => 'Oslo, Norway',
+    register: () => null,
+  })
   const setStep = jest.fn()
-  render(
-    <CreateAPostStep0
-      step={0}
-      setStep={setStep}
-      location="Oslo, Norway"
-      setLocation={() => null}
-    />
-  )
+
+  render(<CreateAPostStep0 step={0} setStep={setStep} />)
 
   await screen.findByTestId('leaflet-map')
   await screen.findByTestId('mapFlyToLatLon')
