@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import ChevronUp from '../public/static/images/chevron-up.svg'
 import ChevronDown from '../public/static/images/chevron-down.svg'
 import classNames from 'classnames'

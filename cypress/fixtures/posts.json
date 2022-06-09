@@ -4,20 +4,23 @@
     "description": "Magnificent Table",
     "categories": ["furniture"],
     "price": 2000,
-    "images": ["table.jpeg"]
+    "images": ["table.jpeg"],
+    "location": "Oslo, Norway"
   },
   {
     "name": "Modern Table",
     "description": "Breathtaking Modern Table",
     "categories": ["furniture"],
     "price": 4000,
-    "images": ["modern-table.jpeg"]
+    "images": ["modern-table.jpeg"],
+    "location": "Berlin, Germany"
   },
   {
     "name": "Cat",
     "description": "Amazingly Awesome Cat",
     "categories": ["pet", "cat"],
     "price": 7000,
-    "images": ["cat.jpeg"]
+    "images": ["cat.jpeg"],
+    "location": "Paris, France"
   }
 ]

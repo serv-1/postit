@@ -7,6 +7,7 @@ const VALUE = {
   description: 'magnificent table',
   categories: ['furniture'],
   price: 20,
+  location: 'Oslo, Norway',
 }
 
 it('passes', () => {

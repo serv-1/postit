@@ -72,6 +72,7 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
           <ShapeContainer>
             <h1 className="mb-16">{titles[step]}</h1>
             <Form
+              method="post"
               methods={methods}
               submitHandler={submitHandler}
               csrfToken={csrfToken}

@@ -10,6 +10,7 @@ export interface UpdatePostApiSchema {
   categories?: Categories[]
   price?: number
   images?: IImage[]
+  location?: string
 }
 
 const updatePostApiSchema = object<UpdatePostApiSchema>({

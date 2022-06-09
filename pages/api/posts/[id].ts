@@ -185,6 +185,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       if (reqBody.name) update.name = reqBody.name
       if (reqBody.description) update.description = reqBody.description
       if (reqBody.categories) update.categories = reqBody.categories
+      if (reqBody.location) update.location = reqBody.location
 
       try {
         await dbConnect()

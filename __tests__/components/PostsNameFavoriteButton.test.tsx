@@ -12,7 +12,9 @@ const user: IUser = {
   email: 'bobby@bobby.bobby',
   image: '/bobby.jpeg',
   posts: [],
-  favPosts: [{ id: '0', name: 'table', image: '/table.jpeg' }],
+  favPosts: [
+    { id: '0', name: 'table', image: '/table.jpeg', location: 'Oslo, Norway' },
+  ],
 }
 
 const getCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')

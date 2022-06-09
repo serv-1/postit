@@ -3,6 +3,15 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import Modal from '../../components/Modal'
 
+const nanoid = jest.spyOn(require('nanoid'), 'nanoid')
+
+beforeEach(() => {
+  nanoid
+    .mockReturnValue('nanoidMock0')
+    .mockReturnValueOnce('nanoidMock1')
+    .mockReturnValueOnce('nanoidMock2')
+})
+
 it('renders', async () => {
   const setIsOpen = jest.fn()
 
@@ -122,4 +131,77 @@ test('when the modal is closed, the focus goes back to the last element focused 
   await userEvent.click(closeBtn)
 
   expect(openBtn).toHaveFocus()
+})
+
+test('the scroll is disabled if the modal is opened and enabled again if the modal is closed', () => {
+  const { unmount } = render(<Modal setIsOpen={() => null}>Ah</Modal>)
+
+  expect(document.body.className).toBe(' overflow-hidden')
+
+  unmount()
+  expect(document.body.className).toBe('')
+})
+
+test('the scroll is disabled if the modal is displayed and enabled again if the modal is hidden', () => {
+  const { rerender } = render(
+    <Modal setIsOpen={() => null} isHidden={false}>
+      Ah
+    </Modal>
+  )
+
+  expect(document.body.className).toBe(' overflow-hidden')
+
+  rerender(
+    <Modal setIsOpen={() => null} isHidden>
+      Ah
+    </Modal>
+  )
+  expect(document.body.className).toBe('')
+})
+
+test('the scroll is enabled again if the modal is closed after being opened', () => {
+  const { unmount } = render(
+    <Modal setIsOpen={() => null} isHidden={false}>
+      Ah
+    </Modal>
+  )
+
+  expect(document.body.className).toBe(' overflow-hidden')
+
+  unmount()
+  expect(document.body.className).toBe('')
+})
+
+test('the scroll is correctly handled with nested modals', async () => {
+  const Test = () => {
+    const [isChildOpen, setIsChildOpen] = useState(true)
+    const [isParentOpen, setIsParentOpen] = useState(true)
+
+    return isParentOpen ? (
+      <Modal setIsOpen={setIsParentOpen}>
+        Parent Modal
+        <button onClick={() => setIsParentOpen(false)}>Close Parent</button>
+        {isChildOpen && (
+          <Modal setIsOpen={setIsChildOpen}>
+            Child Modal
+            <button onClick={() => setIsChildOpen(false)}>Close child</button>
+          </Modal>
+        )}
+      </Modal>
+    ) : null
+  }
+
+  render(<Test />)
+
+  expect(document.body.className).toBe(' overflow-hidden')
+
+  const closeChildBtn = screen.getByRole('button', { name: /child/i })
+  await userEvent.click(closeChildBtn)
+
+  expect(document.body.className).toBe(' overflow-hidden')
+
+  const closeParentBtn = screen.getByRole('button', { name: /parent/i })
+  await userEvent.click(closeParentBtn)
+
+  expect(document.body.className).toBe('')
 })

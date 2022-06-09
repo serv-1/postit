@@ -34,17 +34,16 @@ const PostLocationModal = () => {
         </div>
       </button>
       <Modal
+        isHidden={!isOpen}
         setIsOpen={setIsOpen}
-        className={
-          isOpen ? 'w-screen h-screen absolute top-0 left-0' : 'hidden'
-        }
+        className={isOpen ? 'w-screen h-screen fixed top-0 left-0' : 'hidden'}
       >
         <MapInput setLatLon={setLatLon} />
         <Map className="w-screen h-screen" zoom={12}>
           <MapInvalidateSize resize={isOpen} />
           <MapFlyToLatLon latLon={latLon} />
         </Map>
-        <div className="absolute bottom-[30px] left-1/2 -translate-x-1/2 z-[999] md:left-auto md:translate-x-0 md:right-[10px] md:top-[10px]">
+        <div className="absolute bottom-[30px] left-1/2 -translate-x-1/2 z-[999] md:bottom-auto md:left-auto md:translate-x-0 md:right-[10px] md:top-[10px]">
           <DotButton
             type="button"
             onClick={() => setIsOpen(false)}

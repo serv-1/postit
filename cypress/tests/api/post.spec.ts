@@ -12,6 +12,7 @@ const defaultBody = {
   categories: ['furniture'],
   price: 4000,
   images: [createImage(10), createImage(20)],
+  location: 'Oslo, Norway',
 }
 
 describe('/api/post', () => {
@@ -92,6 +93,7 @@ describe('/api/post', () => {
         expect(post.categories).to.have.members(defaultBody.categories)
         expect(post.price).to.eq(defaultBody.price * 100)
         expect(post.images).to.have.length(5)
+        expect(post.location).to.eq(defaultBody.location)
         expect(post.userId).to.eq(this.uId)
 
         cy.task<UserModel>('getUser', this.uId).then((user) => {

@@ -31,7 +31,7 @@ jest.mock('./components/Header', () => ({
   default: () => <header></header>,
 }))
 
-jest.mock('nanoid', () => ({ __esModule: true, nanoid: () => 'id' }))
+jest.mock('nanoid', () => ({ __esModule: true, nanoid: () => 'nanoidMock' }))
 
 jest.mock('./components/MapFlyToLatLon', () => ({
   __esModule: true,

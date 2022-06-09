@@ -129,7 +129,6 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
             <h1>Update the post</h1>
             <p className="my-16">Only fill the inputs you want to update.</p>
             <Form
-              name="createPost"
               method="post"
               methods={methods}
               submitHandler={submitHandler}

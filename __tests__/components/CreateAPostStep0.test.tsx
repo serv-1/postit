@@ -3,12 +3,11 @@ import userEvent from '@testing-library/user-event'
 import CreateAPostStep0 from '../../components/CreateAPostStep0'
 
 const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
+const useWatch = jest.spyOn(require('react-hook-form'), 'useWatch')
 
 beforeEach(() => {
-  useFormContext.mockReturnValue({
-    getValues: () => null,
-    register: () => null,
-  })
+  useFormContext.mockReturnValue({ setValue: () => null, register: () => null })
+  useWatch.mockReturnValue(null)
 })
 
 it('has the "hidden" class if the given step isn\'t the current step', async () => {
@@ -34,10 +33,7 @@ test('the "Next" button is disabled when the user don\'t specify an address', as
 })
 
 test('the "Next" button passes to the next step', async () => {
-  useFormContext.mockReturnValue({
-    getValues: () => 'Oslo, Norway',
-    register: () => null,
-  })
+  useWatch.mockReturnValue('Oslo, Norway')
   const setStep = jest.fn()
 
   render(<CreateAPostStep0 step={0} setStep={setStep} />)

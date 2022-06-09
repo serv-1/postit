@@ -16,13 +16,14 @@ type ModalProps = Omit<
 > & {
   children: ReactNode
   setIsOpen: Dispatch<SetStateAction<boolean>>
+  isHidden?: boolean
 }
 
-const Modal = ({ children, setIsOpen, ...rest }: ModalProps) => {
+const Modal = ({ children, setIsOpen, isHidden, ...rest }: ModalProps) => {
   const focusableEls =
     "a[href]:not([tabindex='-1']), area[href]:not([tabindex='-1']), input:not([disabled]):not([tabindex='-1']), select:not([disabled]):not([tabindex='-1']), textarea:not([disabled]):not([tabindex='-1']), button:not([disabled]):not([tabindex='-1']), iframe:not([tabindex='-1']), [tabindex]:not([tabindex='-1']), [contentEditable=true]:not([tabindex='-1'])"
 
-  const [isContainerMount, setIsContainerMount] = useState(false)
+  const [isContainerMounted, setIsContainerMounted] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
   const idRef = useRef('a' + nanoid())
   const restoreFocusRef = useRef(document.activeElement as HTMLElement)
@@ -39,7 +40,7 @@ const Modal = ({ children, setIsOpen, ...rest }: ModalProps) => {
 
     container.addEventListener('click', onClick)
     document.body.appendChild(container)
-    setIsContainerMount(true)
+    setIsContainerMounted(true)
 
     return () => {
       container.remove()
@@ -52,9 +53,27 @@ const Modal = ({ children, setIsOpen, ...rest }: ModalProps) => {
     if (!modalRef.current) return
     const el = modalRef.current.querySelectorAll<HTMLElement>(focusableEls)[0]
     if (el) el.focus()
-  }, [isContainerMount])
+  }, [isContainerMounted])
 
-  if (!isContainerMount) return null
+  useEffect(() => {
+    const _class = ' overflow-hidden'
+
+    if (document.body.className.includes(_class)) return
+
+    if (isHidden) {
+      document.body.className = document.body.className.replace(_class, '')
+    } else if (isHidden === false) {
+      document.body.className += _class
+    } else {
+      document.body.className += _class
+    }
+
+    return () => {
+      document.body.className = document.body.className.replace(_class, '')
+    }
+  }, [isHidden])
+
+  if (!isContainerMounted) return null
 
   return createPortal(
     <div

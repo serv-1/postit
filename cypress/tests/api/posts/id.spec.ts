@@ -33,7 +33,7 @@ describe('/api/posts/:id', () => {
       })
     })
 
-    it.only('200 - Get the post', function () {
+    it('200 - Get the post', function () {
       cy.task('reset')
 
       cy.task<string[]>('addUsers', JSON.stringify([u1, u2])).then(
@@ -60,6 +60,7 @@ describe('/api/posts/:id', () => {
                 categories: p1.categories,
                 price: p1.price / 100,
                 images: p1Images,
+                location: p1.location,
                 user: {
                   id: userId,
                   name: u1.name,
@@ -409,6 +410,51 @@ describe('PUT', () => {
         })
 
         cy.task('deleteImages', 'posts')
+      })
+    })
+  })
+
+  describe('location', () => {
+    it('422 - Invalid location', function () {
+      cy.task('reset')
+
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
+          cy.signIn(u1.email, u1.password)
+
+          const url = `/api/posts/${pId}`
+          const body = { location: 1 }
+
+          cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
+            expect(res.status).to.eq(422)
+            expect(res.body).to.have.property('message', err.LOCATION_INVALID)
+          })
+        })
+      })
+    })
+
+    it('200 - location updated', function () {
+      cy.task('reset')
+
+      cy.task<string>('addUser', u1).then((userId) => {
+        const p = { ...p1, userId }
+
+        cy.task<string>('addPost', p).then((pId) => {
+          cy.signIn(u1.email, u1.password)
+
+          const url = `/api/posts/${pId}`
+          const body = { location: 'Paris, France' }
+
+          cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
+            expect(res.status).to.eq(200)
+          })
+
+          cy.task<PostModel>('getPostByUserId', userId).then((post) => {
+            expect(post.location).to.eq('Paris, France')
+          })
+        })
       })
     })
   })
