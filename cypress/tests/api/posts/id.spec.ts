@@ -72,6 +72,7 @@ describe('/api/posts/:id', () => {
                       name: p2.name,
                       price: p2.price / 100,
                       image: '/static/images/posts/' + p2.images[0],
+                      location: p2.location,
                     },
                   ],
                 },

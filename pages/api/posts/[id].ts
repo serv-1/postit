@@ -69,6 +69,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                           name: 1,
                           price: 1,
                           image: 1,
+                          location: 1,
                         },
                       },
                     ],

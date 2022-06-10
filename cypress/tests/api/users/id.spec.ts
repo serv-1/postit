@@ -57,12 +57,13 @@ describe('/api/users/:id', () => {
               categories: p1.categories,
               price: p1.price / 100,
               images: p1Images,
+              location: p1.location,
             })
           })
 
           cy.signIn(u1.email, u1.password)
 
-          const body = { action: 'push', favPostId: pId }
+          const body = { favPostId: pId }
           cy.req({ method: 'PUT', url: '/api/user', body, csrfToken: true })
 
           cy.req<IUser>({ url: `/api/users/${userId}` }).then((res) => {

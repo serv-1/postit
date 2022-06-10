@@ -13,6 +13,12 @@ interface Match {
   categories?: { $all: Categories[] }
 }
 
+interface TextClause {
+  text: { query: string; path: string }
+}
+
+type Search = TextClause | { compound: { must: TextClause[] } }
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
@@ -32,6 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     minPrice: +req.query.minPrice || undefined,
     maxPrice: +req.query.maxPrice || undefined,
     categories: queryCategories,
+    location: req.query.location,
   } as SearchPostSchema
 
   const result = validate(searchPostSchema, reqQuery)
@@ -40,10 +47,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(422).json({ name: result.name, message: result.message })
   }
 
-  const { query, page, minPrice, maxPrice, categories } = result.value
+  const { query, page, minPrice, maxPrice, categories, location } = result.value
 
   try {
     await dbConnect()
+
+    const $search: Search = location
+      ? {
+          compound: {
+            must: [
+              { text: { query, path: 'name' } },
+              { text: { query: location, path: 'location' } },
+            ],
+          },
+        }
+      : { text: { query, path: 'name' } }
 
     const $match: Match = {}
 
@@ -60,7 +78,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const result = await Post.aggregate([
-      { $search: { text: { query, path: 'name' } } },
+      { $search },
       { $match },
       {
         $facet: {
@@ -80,14 +98,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               },
             },
             {
-              $unset: [
-                '_id',
-                '__v',
-                'userId',
-                'description',
-                'categories',
-                'images',
-              ],
+              $project: {
+                _id: 0,
+                id: 1,
+                name: 1,
+                price: 1,
+                image: 1,
+                location: 1,
+              },
             },
             { $limit: 20 },
           ],

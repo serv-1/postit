@@ -24,6 +24,7 @@ describe('/api/posts/search', () => {
         categories: i <= 4 ? ['pet'] : ['pet', 'cat'],
         price: i <= 4 ? i * 2 * 1000 : i * 10000,
         images: ['cat' + i + '.jpeg'],
+        location: i <= 4 ? 'Tokyo, Japan' : 'Ao shima, Japan',
         userId: new Types.ObjectId('f0f0f0f0f0f0f0f0f0f0f0f0'),
       })
     }
@@ -59,6 +60,7 @@ describe('/api/posts/search', () => {
       expect(res.body.totalPages).to.eq(1)
       expect(res.body.totalPosts).to.eq(4)
       expect(res.body.posts[0].name).to.eq('Blue Cat 1')
+      expect(res.body.posts).to.have.length(4)
     })
   })
 
@@ -116,6 +118,16 @@ describe('/api/posts/search', () => {
       expect(res.status).to.eq(200)
       expect(res.body.totalPages).to.eq(2)
       expect(res.body.totalPosts).to.eq(36)
+    })
+  })
+
+  it('200 - Posts found by location', () => {
+    const url = '/api/posts/search?query=Cat&location=Tokyo'
+
+    cy.req<Response>({ url }).then((res) => {
+      expect(res.status).to.eq(200)
+      expect(res.body.posts[0].location).to.eq('Tokyo, Japan')
+      expect(res.body.posts).to.have.length(4)
     })
   })
 

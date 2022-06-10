@@ -7,10 +7,18 @@ const VALUE = {
   minPrice: 10,
   maxPrice: 20,
   categories: ['furniture'],
+  location: 'Oslo, Norway',
 }
 
 it('passes', () => {
   const result = searchPostSchema.validate(VALUE)
+  expect(result).not.toHaveProperty('error')
+  expect(result).not.toHaveProperty('warning')
+})
+
+it('allows minPrice to be undefined with a defined maxPrice', () => {
+  const value = { ...VALUE, minPrice: undefined, maxPrice: 20 }
+  const result = searchPostSchema.validate(value)
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 })
