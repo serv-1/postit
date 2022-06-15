@@ -72,7 +72,7 @@ it('renders an error if the query is too long', async () => {
   await userEvent.type(input, new Uint8Array(201).toString())
 
   const alert = await screen.findByRole('alert')
-  expect(alert).toHaveTextContent(err.LOCATION_MAX)
+  expect(alert).toHaveTextContent(err.ADDRESS_MAX)
 })
 
 it('renders an error if the server fails to fetch the predictions', async () => {
@@ -182,8 +182,8 @@ test('arrow up/down moves the visual focus between each options', async () => {
 test('tab, enter or clicking a prediction assigns its value to the input value and unmounts the prediction list', async () => {
   const prediction1LatLon = [59, 10]
   const prediction2LatLon = [48, 2]
-  const prediction1Location = 'Oslo, Norway'
-  const prediction2Location = 'Paris, Ile-de-France, France'
+  const prediction1Address = 'Oslo, Norway'
+  const prediction2Address = 'Paris, Ile-de-France, France'
 
   const setLatLon = jest.fn()
   render(<MapInput setLatLon={setLatLon} />)
@@ -193,7 +193,7 @@ test('tab, enter or clicking a prediction assigns its value to the input value a
   let predictionList = await screen.findByRole('listbox')
   await userEvent.tab()
   expect(setLatLon).toHaveBeenNthCalledWith(1, prediction1LatLon)
-  expect(setValue).toHaveBeenNthCalledWith(1, 'location', prediction1Location)
+  expect(setValue).toHaveBeenNthCalledWith(1, 'address', prediction1Address)
   expect(input).toHaveValue('Oslo')
   expect(predictionList).not.toBeInTheDocument()
 
@@ -202,7 +202,7 @@ test('tab, enter or clicking a prediction assigns its value to the input value a
   await userEvent.keyboard('{ArrowDown}')
   await userEvent.keyboard('{Enter}')
   expect(setLatLon).toHaveBeenNthCalledWith(2, prediction2LatLon)
-  expect(setValue).toHaveBeenNthCalledWith(2, 'location', prediction2Location)
+  expect(setValue).toHaveBeenNthCalledWith(2, 'address', prediction2Address)
   expect(input).toHaveValue('Paris')
   expect(predictionList).not.toBeInTheDocument()
 
@@ -210,7 +210,7 @@ test('tab, enter or clicking a prediction assigns its value to the input value a
   const prediction = (await screen.findAllByRole('option'))[0]
   await userEvent.click(prediction)
   expect(setLatLon).toHaveBeenNthCalledWith(3, prediction1LatLon)
-  expect(setValue).toHaveBeenNthCalledWith(3, 'location', prediction1Location)
+  expect(setValue).toHaveBeenNthCalledWith(3, 'address', prediction1Address)
   expect(input).toHaveValue('Oslo')
   expect(prediction).not.toBeInTheDocument()
   expect(input).toHaveFocus()

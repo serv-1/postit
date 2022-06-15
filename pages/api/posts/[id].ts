@@ -69,7 +69,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                           name: 1,
                           price: 1,
                           image: 1,
-                          location: 1,
+                          address: 1,
                         },
                       },
                     ],
@@ -186,7 +186,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       if (reqBody.name) update.name = reqBody.name
       if (reqBody.description) update.description = reqBody.description
       if (reqBody.categories) update.categories = reqBody.categories
-      if (reqBody.location) update.location = reqBody.location
+      if (reqBody.address) {
+        update.address = reqBody.address
+        update.latLon = reqBody.latLon
+      }
 
       try {
         await dbConnect()

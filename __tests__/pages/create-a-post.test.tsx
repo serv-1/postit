@@ -26,8 +26,8 @@ test('renders the title related to the actually displayed step', async () => {
   const title = screen.getByRole('heading', { level: 1 })
   expect(title).toHaveTextContent(/where/i)
 
-  const locationInput = screen.getByLabelText(/location/i)
-  await userEvent.type(locationInput, 'aa')
+  const addressInput = screen.getByLabelText(/address/i)
+  await userEvent.type(addressInput, 'aa')
 
   await screen.findByRole('listbox')
   await userEvent.tab()
@@ -45,11 +45,11 @@ test('renders the title related to the actually displayed step', async () => {
   expect(title).toHaveTextContent(/post/i)
 })
 
-test('the uploaded images are sent with the request', async () => {
+test('the uploaded images and the latitude/longitude are sent with the request', async () => {
   render(<CreateAPost csrfToken="csrf" />)
 
-  const locationInput = screen.getByLabelText(/location/i)
-  await userEvent.type(locationInput, 'aa')
+  const addressInput = screen.getByRole('combobox', { name: /address/i })
+  await userEvent.type(addressInput, 'aa')
 
   await screen.findByRole('listbox')
   await userEvent.tab()
@@ -86,7 +86,8 @@ test('the uploaded images are sent with the request', async () => {
         categories: ['furniture'],
         price: 40,
         images: [{ base64: 'ZGF0YQ==', ext: 'jpg' }],
-        location: 'Oslo, Norway',
+        address: 'Oslo, Norway',
+        latLon: [59, 10],
       }
     )
   })
@@ -95,8 +96,8 @@ test('the uploaded images are sent with the request', async () => {
 test('the user is redirected to its profile after a valid submission', async () => {
   render(<CreateAPost csrfToken="csrf" />)
 
-  const locationInput = screen.getByLabelText(/location/i)
-  await userEvent.type(locationInput, 'aa')
+  const addressInput = screen.getByLabelText(/address/i)
+  await userEvent.type(addressInput, 'aa')
 
   await screen.findByRole('listbox')
   await userEvent.tab()
@@ -133,7 +134,8 @@ test('the user is redirected to its profile after a valid submission', async () 
         categories: ['furniture'],
         price: 40,
         images: [{ base64: 'ZGF0YQ==', ext: 'jpg' }],
-        location: 'Oslo, Norway',
+        address: 'Oslo, Norway',
+        latLon: [59, 10],
       }
     )
     expect(router.push).toHaveBeenNthCalledWith(1, '/profile')
@@ -147,8 +149,8 @@ test('an error renders if the server fails to create the post', async () => {
 
   render(<CreateAPost csrfToken="csrf" />)
 
-  const locationInput = screen.getByLabelText(/location/i)
-  await userEvent.type(locationInput, 'aa')
+  const addressInput = screen.getByLabelText(/address/i)
+  await userEvent.type(addressInput, 'aa')
 
   await screen.findByRole('listbox')
   await userEvent.tab()
@@ -187,8 +189,8 @@ test("an error renders if the server fails to validate the request's data", asyn
 
   render(<CreateAPost csrfToken="csrf" />)
 
-  const locationInput = screen.getByLabelText(/location/i)
-  await userEvent.type(locationInput, 'aa')
+  const addressInput = screen.getByLabelText(/address/i)
+  await userEvent.type(addressInput, 'aa')
 
   await screen.findByRole('listbox')
   await userEvent.tab()

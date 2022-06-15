@@ -7,6 +7,7 @@ import postHandlers from './post'
 import postsIdHandlers from './posts/[id]'
 import searchPostsHandlers from './posts/search'
 import autoCompleteHandlers from './locationiq/autocomplete'
+import searchHandlers from './locationiq/search'
 
 const server = setupServer(
   ...userHandlers,
@@ -16,7 +17,8 @@ const server = setupServer(
   ...postHandlers,
   ...postsIdHandlers,
   ...searchPostsHandlers,
-  ...autoCompleteHandlers
+  ...autoCompleteHandlers,
+  ...searchHandlers
 )
 
 export default server

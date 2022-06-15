@@ -8,7 +8,7 @@ export interface AddPostSchema {
   description: string
   categories: Categories[]
   price: number
-  location: string
+  address: string
 }
 
 const addPostSchema = object<AddPostSchema>({

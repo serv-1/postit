@@ -38,7 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     minPrice: +req.query.minPrice || undefined,
     maxPrice: +req.query.maxPrice || undefined,
     categories: queryCategories,
-    location: req.query.location,
+    address: req.query.address,
   } as SearchPostSchema
 
   const result = validate(searchPostSchema, reqQuery)
@@ -47,17 +47,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(422).json({ name: result.name, message: result.message })
   }
 
-  const { query, page, minPrice, maxPrice, categories, location } = result.value
+  const { query, page, minPrice, maxPrice, categories, address } = result.value
 
   try {
     await dbConnect()
 
-    const $search: Search = location
+    const $search: Search = address
       ? {
           compound: {
             must: [
               { text: { query, path: 'name' } },
-              { text: { query: location, path: 'location' } },
+              { text: { query: address, path: 'address' } },
             ],
           },
         }
@@ -104,7 +104,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 name: 1,
                 price: 1,
                 image: 1,
-                location: 1,
+                address: 1,
               },
             },
             { $limit: 20 },

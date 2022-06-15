@@ -7,7 +7,7 @@ const VALUE = {
   description: 'magnificent table',
   categories: ['furniture'],
   price: 20,
-  location: 'Oslo, Norway',
+  address: 'Oslo, Norway',
   csrfToken: 'csrfToken',
 }
 
@@ -17,7 +17,7 @@ it('passes', () => {
   expect(result).not.toHaveProperty('warning')
 })
 
-it('allows name, description, price and location to be an empty string', () => {
+it('allows name, description, price and address to be an empty string', () => {
   let result = Joi.object(updatePost).validate({ ...VALUE, name: '' })
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
@@ -30,7 +30,7 @@ it('allows name, description, price and location to be an empty string', () => {
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 
-  result = Joi.object(updatePost).validate({ ...VALUE, location: '' })
+  result = Joi.object(updatePost).validate({ ...VALUE, address: '' })
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 })

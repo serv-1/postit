@@ -23,6 +23,7 @@ const PostList = ({ posts, columns = 3 }: PostListProps) => {
             name={post.name}
             price={post.price}
             image={'image' in post ? post.image : post.images[0]}
+            address={post.address}
           />
         </li>
       ))}

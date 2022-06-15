@@ -12,9 +12,13 @@ const MapInvalidateSize = dynamic(() => import('./MapInvalidateSize'), {
   ssr: false,
 })
 
-const PostLocationModal = () => {
+interface PostAddressModalProps {
+  latLon?: [number, number]
+  setLatLon: React.Dispatch<React.SetStateAction<[number, number] | undefined>>
+}
+
+const PostAddressModal = ({ latLon, setLatLon }: PostAddressModalProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [latLon, setLatLon] = useState<[number, number]>()
 
   return (
     <>
@@ -57,4 +61,4 @@ const PostLocationModal = () => {
   )
 }
 
-export default PostLocationModal
+export default PostAddressModal

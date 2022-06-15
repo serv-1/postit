@@ -1,17 +1,25 @@
 import Post from '../../components/Post'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 const defaultPost = {
   id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
   name: 'Cat',
   price: 5000,
   image: 'data:image/jpeg;base64,base64=',
+  address: 'Oslo, Norway',
 }
 
-it('renders', () => {
-  const { id, name, image } = defaultPost
+it('renders', async () => {
+  const { id, name, image, address } = defaultPost
 
   render(<Post {...defaultPost} />)
+
+  const addressBtn = screen.getByRole('button')
+  await userEvent.click(addressBtn)
+
+  const addressText = screen.getByText(address)
+  expect(addressText).toBeInTheDocument()
 
   const img = screen.getByRole('img')
   expect(img).toHaveAttribute('src', image)

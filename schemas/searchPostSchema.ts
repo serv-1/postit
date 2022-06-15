@@ -2,7 +2,7 @@ import Joi from 'joi'
 import { Categories } from '../types/common'
 import err from '../utils/constants/errors'
 import categoriesSchema from './categoriesSchema'
-import locationSchema from './locationSchema'
+import addressSchema from './addressSchema'
 import object from './object'
 import pageSchema from './pageSchema'
 import priceSchema from './priceSchema'
@@ -14,7 +14,7 @@ export interface SearchPostSchema {
   minPrice?: string
   maxPrice?: string
   categories?: Categories[]
-  location?: string
+  address?: string
 }
 
 const searchPostSchema = object({
@@ -30,7 +30,7 @@ const searchPostSchema = object({
       .messages({ 'number.min': err.MAX_PRICE_MIN }),
   }),
   categories: categoriesSchema,
-  location: locationSchema,
+  address: addressSchema.allow(''),
 })
 
 export default searchPostSchema

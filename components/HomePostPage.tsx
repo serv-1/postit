@@ -50,7 +50,7 @@ const HomePostPage = () => {
   return posts && posts.length > 0 ? (
     <div className="col-span-full lg:col-start-5 lg:row-span-full mb-32">
       <div className="mb-16" role="status">
-        {totalPosts} posts found
+        {totalPosts} post{totalPosts !== 1 ? 's' : ''} found
       </div>
       <PostList posts={posts} />
       <Pagination totalPages={totalPages} />

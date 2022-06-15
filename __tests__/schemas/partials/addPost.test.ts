@@ -7,7 +7,7 @@ const VALUE = {
   description: 'magnificent table',
   categories: ['furniture'],
   price: 20,
-  location: 'Oslo, Norway',
+  address: 'Oslo, Norway',
   csrfToken: 'csrfToken',
 }
 
@@ -33,9 +33,9 @@ it('fails when any property is undefined', () => {
   error = Joi.object(addPost).validate(v3).error
   expect(error?.details[0].message).toBe(err.PRICE_REQUIRED)
 
-  const v4 = { ...VALUE, location: undefined }
+  const v4 = { ...VALUE, address: undefined }
   error = Joi.object(addPost).validate(v4).error
-  expect(error?.details[0].message).toBe(err.LOCATION_REQUIRED)
+  expect(error?.details[0].message).toBe(err.ADDRESS_REQUIRED)
 })
 
 it("fails when the minimum value isn't reached", () => {

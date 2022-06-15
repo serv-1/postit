@@ -21,7 +21,7 @@ const SeeAllPhotosModal = ({ sources }: SeeAllPhotosModalProps) => {
       {isOpen && (
         <Modal
           setIsOpen={setIsOpen}
-          className="fixed top-0 left-0 w-screen h-screen bg-fuchsia-50 z-10"
+          className="fixed top-0 left-0 w-screen h-screen bg-fuchsia-50 z-[9999]"
         >
           <div className="relative w-full h-full overflow-y-auto md:p-16 md:flex md:flex-col md:flex-nowrap lg:max-w-[1200px] lg:mx-auto">
             <div className="absolute top-8 right-8 z-20 md:static md:shadow-none md:self-end md:mb-16">

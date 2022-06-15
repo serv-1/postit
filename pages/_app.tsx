@@ -6,6 +6,8 @@ import { ComponentType, useEffect } from 'react'
 import { ToastProvider } from '../contexts/toast'
 import Toast from '../components/Toast'
 import '../styles/globals.css'
+import '../styles/popup.css'
+import '../node_modules/leaflet/dist/leaflet.css'
 
 export type PageType = ComponentType<{}> & {
   needAuth?: true

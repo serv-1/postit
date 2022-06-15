@@ -13,13 +13,13 @@ import { IFavPost, IUserPost } from '../types/common'
 
 interface FavPostProps {
   isFavPost?: false
-  posts: IUserPost[]
+  posts: IFavPost[]
   altText: string
 }
 
 interface PostProps {
   isFavPost: true
-  posts: IFavPost[]
+  posts: IUserPost[]
   altText: string
 }
 

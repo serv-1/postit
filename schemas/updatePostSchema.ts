@@ -10,7 +10,7 @@ export interface UpdatePostSchema {
   categories?: Categories[]
   price?: number
   images?: FileList
-  location?: string
+  address?: string
 }
 
 const updatePostSchema = object<UpdatePostSchema>({

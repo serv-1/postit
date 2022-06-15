@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import PostLocationModal from '../../components/PostLocationModal'
+import PostAddressModal from '../../components/PostAddressModal'
 
 jest.mock('react-hook-form', () => ({
   __esModule: true,
@@ -8,7 +8,7 @@ jest.mock('react-hook-form', () => ({
 }))
 
 test('the modal displays and hides', async () => {
-  render(<PostLocationModal />)
+  render(<PostAddressModal setLatLon={() => null} />)
 
   await screen.findByTestId('leaflet-map')
   await screen.findByTestId('mapFlyToLatLon')

@@ -57,7 +57,8 @@ describe('/api/users/:id', () => {
               categories: p1.categories,
               price: p1.price / 100,
               images: p1Images,
-              location: p1.location,
+              address: p1.address,
+              latLon: p1.latLon,
             })
           })
 

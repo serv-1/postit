@@ -9,7 +9,7 @@ const smtpToken = Cypress.env('smtpToken')
 const cleanInboxUrl = `${smtpBaseUrl}/api/v1/inboxes/1577170/clean?api_token=${smtpToken}`
 const getInboxMsgUrl = `${smtpBaseUrl}/api/v1/inboxes/1577170/messages?api_token=${smtpToken}`
 
-describe('User sign in and register', () => {
+describe.skip('User sign in and register', () => {
   it('Sign in with Google and sign out', () => {
     cy.task('GoogleSocialLogin', {
       username,

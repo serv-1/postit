@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import PostList from '../../components/PostList'
+import { IUserPost } from '../../types/common'
 
-const defaultPosts = [
+const defaultPosts: Omit<IUserPost, 'user'>[] = [
   {
     id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
     name: 'Cat',
@@ -9,7 +10,8 @@ const defaultPosts = [
     categories: ['pet' as const, 'cat' as const],
     price: 50,
     images: ['LSDklsjLS.jpeg'],
-    userId: 'f1f1f1f1f1f1f1f1f1f1f1f1',
+    address: 'Oslo, Norway',
+    latLon: [17, 22],
   },
 ]
 
@@ -19,8 +21,8 @@ it('renders', () => {
   const list = screen.getByRole('list')
   expect(list).toHaveClass('md:grid-cols-[1fr,1fr,1fr]')
 
-  const post = screen.getByText(/cat/i)
-  expect(post).toBeInTheDocument()
+  const img = screen.getByRole('img')
+  expect(img).toHaveAttribute('src', defaultPosts[0].images[0])
 })
 
 it('renders with 2 columns', () => {
@@ -28,4 +30,12 @@ it('renders with 2 columns', () => {
 
   const list = screen.getByRole('list')
   expect(list).toHaveClass('md:grid-cols-[1fr,1fr]')
+})
+
+it('renders the image', () => {
+  const post = [{ ...defaultPosts[0], image: 'image.jpeg' }]
+  render(<PostList posts={post} />)
+
+  const img = screen.getByRole('img')
+  expect(img).toHaveAttribute('src', 'image.jpeg')
 })

@@ -1,19 +1,19 @@
-import locationSchema from '../../schemas/locationSchema'
+import addressSchema from '../../schemas/addressSchema'
 import err from '../../utils/constants/errors'
 
 it('passes and trim the result', () => {
-  const result = locationSchema.validate(' Oslo, Norway ')
+  const result = addressSchema.validate(' Oslo, Norway ')
   expect(result.value).toBe('Oslo, Norway')
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 })
 
 it('fails if the value is an empty string', () => {
-  const { error: e } = locationSchema.validate('')
-  expect(e?.details[0].message).toBe(err.LOCATION_REQUIRED)
+  const { error: e } = addressSchema.validate('')
+  expect(e?.details[0].message).toBe(err.ADDRESS_REQUIRED)
 })
 
 it('fails if the value is not a string', () => {
-  const { error: e } = locationSchema.validate(1)
-  expect(e?.details[0].message).toBe(err.LOCATION_INVALID)
+  const { error: e } = addressSchema.validate(1)
+  expect(e?.details[0].message).toBe(err.ADDRESS_INVALID)
 })

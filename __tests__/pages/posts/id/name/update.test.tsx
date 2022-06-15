@@ -24,14 +24,15 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const post = {
-  id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
+  id: '0',
   name: 'Table',
   description: 'Magnificent table',
   categories: ['furniture' as const, 'pet' as const],
   price: 5000,
   images: ['static/images/post/table.jpeg'],
-  location: 'Oslo, Norway',
-  userId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
+  address: 'Oslo, Norway',
+  latLon: [17, 22] as [number, number],
+  userId: '1',
 }
 
 it('renders', async () => {
@@ -70,11 +71,11 @@ it('renders', async () => {
   const image = screen.getByRole('img')
   expect(image).toHaveAttribute('src', post.images[0])
 
-  const locationBtn = screen.getByRole('button', { name: /location/i })
-  await userEvent.click(locationBtn)
+  const addressBtn = screen.getByRole('button', { name: /address/i })
+  await userEvent.click(addressBtn)
 
-  const location = screen.getByText(post.location)
-  expect(location).toBeInTheDocument()
+  const address = screen.getByText(post.address)
+  expect(address).toBeInTheDocument()
 })
 
 test('an alert renders if the post is updated', async () => {
@@ -169,4 +170,36 @@ test("an error renders if an image can't be read as data url", async () => {
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent('error')
+})
+
+test('the form send the latitude/longitude along the address when it is updated', async () => {
+  const axiosPut = jest.spyOn(require('axios'), 'put')
+
+  render(<UpdatePost post={post} csrfToken="csrf" />)
+
+  const addressBtn = screen.getByRole('button', { name: /address/i })
+  await userEvent.click(addressBtn)
+
+  const input = screen.getByRole('combobox', { name: /address/i })
+  await userEvent.type(input, 'aa')
+
+  await screen.findByRole('listbox')
+  await userEvent.tab()
+
+  const submitBtn = screen.getByRole('button', { name: /update/i })
+  await userEvent.click(submitBtn)
+
+  await waitFor(() => {
+    expect(axiosPut).toHaveBeenNthCalledWith(
+      1,
+      'http://localhost:3000/api/posts/0',
+      {
+        csrfToken: 'csrf',
+        address: 'Oslo, Norway',
+        latLon: [59, 10],
+      }
+    )
+  })
+
+  axiosPut.mockRestore()
 })

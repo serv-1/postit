@@ -26,10 +26,9 @@ const Modal = ({ children, setIsOpen, isHidden, ...rest }: ModalProps) => {
   const [isContainerMounted, setIsContainerMounted] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
   const idRef = useRef('a' + nanoid())
-  const restoreFocusRef = useRef(document.activeElement as HTMLElement)
 
   useEffect(() => {
-    const restoreFocus = restoreFocusRef.current
+    const restoreFocus = document.activeElement as HTMLElement
     const container = document.createElement('div')
     container.setAttribute('id', idRef.current)
 

@@ -12,7 +12,8 @@ export interface PostModel {
   price: number
   images: string[]
   userId: Types.ObjectId
-  location: string
+  address: string
+  latLon: [number, number]
 }
 
 const postSchema = new Schema<PostModel, Model<PostModel>, PostModel>({
@@ -47,9 +48,13 @@ const postSchema = new Schema<PostModel, Model<PostModel>, PostModel>({
     type: Schema.Types.ObjectId,
     required: true,
   },
-  location: {
+  address: {
     type: String,
-    required: [true, err.LOCATION_REQUIRED],
+    required: [true, err.ADDRESS_REQUIRED],
+  },
+  latLon: {
+    type: [Number, Number],
+    required: true,
   },
 })
 

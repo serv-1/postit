@@ -8,7 +8,7 @@ interface Prediction {
   lon: number
   place: string
   address: string
-  location: string
+  postAddress: string
 }
 
 type AutoCompleteResponse = {
@@ -16,21 +16,13 @@ type AutoCompleteResponse = {
   lon: string
   display_place: string
   display_address: string
-  type: string
   address: {
     name?: string
-    house_number?: string
-    road?: string
-    neighbourhood?: string
-    suburb?: string
-    island?: string
     city?: string
     county?: string
     state?: string
-    state_code?: string
     postcode?: string
     country?: string
-    country_code?: string
   }
 }[]
 
@@ -54,7 +46,7 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
     count.current++
 
     if (value.length > 200) {
-      return setError(err.LOCATION_MAX)
+      return setError(err.ADDRESS_MAX)
     } else if (count.current !== 2) {
       return
     } else if (count.current === 2 && !value.trim()) {
@@ -86,7 +78,7 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
           lon: +lon,
           place: display_place,
           address: display_address,
-          location: values.join(', '),
+          postAddress: values.join(', '),
         })
       }
 
@@ -129,7 +121,7 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
         ;(e.target as HTMLInputElement).value = predictions[idNb].place
         setIsOpen(false)
         setLatLon([predictions[idNb].lat, predictions[idNb].lon])
-        setValue('location', predictions[idNb].location)
+        setValue('address', predictions[idNb].postAddress)
         e.preventDefault()
         break
       }
@@ -138,12 +130,12 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
 
   return (
     <div className="absolute top-[10px] left-[54px] z-[999] w-[calc(100%-64px)] max-w-[360px] md:left-1/2 md:-translate-x-1/2">
-      <input type="hidden" {...register('location')} />
+      <input type="hidden" {...register('address')} />
       <input
         className="p-8 border-b-2 transition-colors duration-200 rounded outline-none bg-fuchsia-50 placeholder:text-fuchsia-900/50 w-full border-fuchsia-900/25 focus-within:border-fuchsia-900/75 text-base"
         ref={inputRef}
         type="text"
-        name="location"
+        name="address"
         onInput={onInput}
         onKeyDown={onKeyDown}
         onFocus={() => setIsOpen(true)}
@@ -153,7 +145,7 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
         aria-expanded={!!predictions && predictions.length > 0}
         aria-controls="predictionList"
         aria-activedescendant={activePredictionId}
-        aria-label="Location"
+        aria-label="Address"
       />
       {isOpen &&
         (error ? (
@@ -187,7 +179,7 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
                       if (!inputRef.current) return
                       inputRef.current.value = prediction.place
                       setLatLon([prediction.lat, prediction.lon])
-                      setValue('location', prediction.location)
+                      setValue('address', prediction.postAddress)
                       setIsOpen(false)
                       e.preventDefault()
                     }}

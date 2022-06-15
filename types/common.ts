@@ -8,7 +8,10 @@ export interface IPost extends Omit<PostModel, '_id' | 'userId'> {
 }
 
 export interface ILightPost
-  extends Omit<IPost, 'user' | 'categories' | 'description' | 'images'> {
+  extends Omit<
+    IPost,
+    'user' | 'categories' | 'description' | 'images' | 'latLon'
+  > {
   image: string
 }
 

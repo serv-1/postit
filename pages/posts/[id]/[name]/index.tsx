@@ -16,18 +16,22 @@ import { getSession } from 'next-auth/react'
 import PostsNameFavoriteButton from '../../../../components/PostsNameFavoriteButton'
 import PostsNameUpdateButtons from '../../../../components/PostsNameUpdateButtons'
 import formatToUrl from '../../../../utils/functions/formatToUrl'
+import PostPageMap from '../../../../components/PostPageMap'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const id = ctx.params?.id
+  const postId = ctx.params?.id
   const session = await getSession(ctx)
 
   try {
-    const post = await axios.get<IPost>(`http://localhost:3000/api/posts/${id}`)
-    const user = session
-      ? await axios.get<IUser>(`http://localhost:3000/api/users/${session.id}`)
-      : undefined
+    const url = 'http://localhost:3000/api/posts/' + postId
+    const props: NameProps = { post: (await axios.get<IPost>(url)).data }
 
-    return { props: { post: post.data, user: user?.data } }
+    if (session) {
+      const url = 'http://localhost:3000/api/users/' + session.id
+      props.user = (await axios.get<IUser>(url)).data
+    }
+
+    return { props }
   } catch (e) {
     return { notFound: true }
   }
@@ -109,12 +113,7 @@ const Name = ({ post, user }: NameProps) => {
             {addSpacesToNb(post.price)}€
           </span>
           <p className="my-16">{post.description}</p>
-          <figure>
-            <div className="h-[200px] bg-fuchsia-200 rounded-8 lg:h-[250px]"></div>
-            <figcaption className="text-center">
-              Location name (work in progress)
-            </figcaption>
-          </figure>
+          <PostPageMap address={post.address} latLon={post.latLon} />
         </section>
         {(!user || user.id !== post.user.id) && post.user.posts.length > 0 && (
           <section className="col-span-full mb-32 md:col-span-5 lg:col-span-8">

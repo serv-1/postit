@@ -26,7 +26,8 @@ import updatePostSchema, {
   UpdatePostSchema,
 } from '../../../../schemas/updatePostSchema'
 import { getCsrfToken } from 'next-auth/react'
-import PostLocationModal from '../../../../components/PostLocationModal'
+import PostAddressModal from '../../../../components/PostAddressModal'
+import { useState } from 'react'
 
 const options = categories.map((category) => ({
   label: category,
@@ -52,6 +53,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
 type FilteredData = Omit<UpdatePostSchema, 'images'> & {
   images?: IImage[]
+  latLon?: [number, number]
 }
 
 interface UpdatePostProps {
@@ -60,6 +62,8 @@ interface UpdatePostProps {
 }
 
 const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
+  const [latLon, setLatLon] = useState<[number, number]>()
+
   const methods = useForm<UpdatePostSchema>({
     resolver: joiResolver(updatePostSchema),
   })
@@ -69,6 +73,8 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
   const submitHandler: SubmitHandler<UpdatePostSchema> = async (data) => {
     const { images, ...rest } = data
     const filteredData: FilteredData = rest
+
+    if (rest.address) filteredData.latLon = latLon
 
     for (const entry of Object.entries(filteredData) as Entries<typeof data>) {
       if (!entry[1]) delete filteredData[entry[0]]
@@ -222,16 +228,16 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
                 </div>
               </Accordion>
 
-              <Accordion title="Location" id="location" headingLevel={2}>
+              <Accordion title="Address" id="address" headingLevel={2}>
                 <div className="mb-16">
-                  Actual location
+                  Actual address
                   <div className="bg-fuchsia-100 rounded-8 p-8">
-                    {post.location}
+                    {post.address}
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="location">New location</label>
-                  <PostLocationModal />
+                  <label htmlFor="address">New address</label>
+                  <PostAddressModal setLatLon={setLatLon} latLon={latLon} />
                 </div>
               </Accordion>
 

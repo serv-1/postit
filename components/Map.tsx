@@ -1,17 +1,18 @@
 import { MapContainer, TileLayer } from 'react-leaflet'
 
 interface MapProps {
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
   zoom: number
+  center?: [number, number]
 }
 
-const Map = ({ children, className, zoom }: MapProps) => {
+const Map = ({ children, className, zoom, center }: MapProps) => {
   return (
     <div data-testid="leaflet-map">
       <MapContainer
         className={className}
-        center={[37.777, -122.42]}
+        center={center || [37.777, -122.42]}
         zoom={zoom}
         scrollWheelZoom={true}
       >

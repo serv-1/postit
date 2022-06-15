@@ -5,7 +5,8 @@
     "categories": ["furniture"],
     "price": 2000,
     "images": ["table.jpeg"],
-    "location": "Oslo, Norway"
+    "address": "Oslo, Norway",
+    "latLon": [42, 58]
   },
   {
     "name": "Modern Table",
@@ -13,7 +14,8 @@
     "categories": ["furniture"],
     "price": 4000,
     "images": ["modern-table.jpeg"],
-    "location": "Berlin, Germany"
+    "address": "Berlin, Germany",
+    "latLon": [17, 81]
   },
   {
     "name": "Cat",
@@ -21,6 +23,7 @@
     "categories": ["pet", "cat"],
     "price": 7000,
     "images": ["cat.jpeg"],
-    "location": "Paris, France"
+    "address": "Paris, France",
+    "latLon": [23, 66]
   }
 ]

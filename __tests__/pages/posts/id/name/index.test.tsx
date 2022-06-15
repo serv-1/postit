@@ -13,6 +13,11 @@ jest.mock('../../../../../components/PostsNameUpdateButtons', () => ({
   default: () => <button>update</button>,
 }))
 
+jest.mock('../../../../../components/PostPageMap', () => ({
+  __esModule: true,
+  default: () => <div></div>,
+}))
+
 const post: IPost = {
   id: '0',
   name: 'Table',
@@ -20,6 +25,8 @@ const post: IPost = {
   categories: ['furniture' as const],
   price: 5000.12,
   images: ['/table.jpeg'],
+  address: 'Oslo, Norway',
+  latLon: [17, 45],
   user: {
     id: '0',
     name: 'John Doe',
@@ -104,6 +111,7 @@ it("renders author's other posts section if the user is unauthenticated and the 
     name: 'Chair',
     price: 25,
     image: '/static/images/posts/chair.jpeg',
+    address: 'Oslo, Norway',
     id: '0',
   }
   const p = { ...post, user: { ...post.user, posts: [userPost] } }
@@ -122,6 +130,7 @@ it("renders author's other posts section if the signed in user isn't the post au
     name: 'Chair',
     price: 25,
     image: '/static/images/posts/chair.jpeg',
+    address: 'Oslo, Norway',
     id: '0',
   }
   const p = { ...post, user: { ...post.user, posts: [userPost] } }
@@ -138,6 +147,7 @@ it("doesn't render author's other posts section if the signed in user is the pos
     name: 'Chair',
     price: 25,
     image: '/static/images/posts/chair.jpeg',
+    address: 'Oslo, Norway',
     id: '0',
   }
   const p = { ...post, user: { ...post.user, posts: [userPost] } }

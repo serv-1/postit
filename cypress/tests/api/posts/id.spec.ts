@@ -60,7 +60,8 @@ describe('/api/posts/:id', () => {
                 categories: p1.categories,
                 price: p1.price / 100,
                 images: p1Images,
-                location: p1.location,
+                address: p1.address,
+                latLon: p1.latLon,
                 user: {
                   id: userId,
                   name: u1.name,
@@ -72,7 +73,7 @@ describe('/api/posts/:id', () => {
                       name: p2.name,
                       price: p2.price / 100,
                       image: '/static/images/posts/' + p2.images[0],
-                      location: p2.location,
+                      address: p2.address,
                     },
                   ],
                 },
@@ -415,8 +416,8 @@ describe('PUT', () => {
     })
   })
 
-  describe('location', () => {
-    it('422 - Invalid location', function () {
+  describe('address', () => {
+    it('422 - Invalid address', function () {
       cy.task('reset')
 
       cy.task<string>('addUser', u1).then((userId) => {
@@ -426,17 +427,17 @@ describe('PUT', () => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${pId}`
-          const body = { location: 1 }
+          const body = { address: 1 }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
             expect(res.status).to.eq(422)
-            expect(res.body).to.have.property('message', err.LOCATION_INVALID)
+            expect(res.body).to.have.property('message', err.ADDRESS_INVALID)
           })
         })
       })
     })
 
-    it('200 - location updated', function () {
+    it('200 - address updated', function () {
       cy.task('reset')
 
       cy.task<string>('addUser', u1).then((userId) => {
@@ -446,14 +447,15 @@ describe('PUT', () => {
           cy.signIn(u1.email, u1.password)
 
           const url = `/api/posts/${pId}`
-          const body = { location: 'Paris, France' }
+          const body = { address: 'Paris, France', latLon: [17, 22] }
 
           cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
           })
 
           cy.task<PostModel>('getPostByUserId', userId).then((post) => {
-            expect(post.location).to.eq('Paris, France')
+            expect(post.address).to.eq('Paris, France')
+            expect(post.latLon).to.have.members([17, 22])
           })
         })
       })

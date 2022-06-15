@@ -45,10 +45,13 @@ const err = {
 	QUERY_INVALID: 'Your query is invalid.' as const,
 	QUERY_REQUIRED: 'You must express a query.' as const,
 	QUERY_MAX: 'Your query cannot exceed 90 characters.' as const,
-	/* Location */
-	LOCATION_INVALID: 'Your location is invalid.' as const,
-	LOCATION_REQUIRED: 'The location is required.' as const,
-	LOCATION_MAX: 'Your location cannot exceed 200 characters.' as const,
+	/* Address */
+	ADDRESS_INVALID: 'Your address is invalid.' as const,
+	ADDRESS_REQUIRED: 'The address is required.' as const,
+	ADDRESS_MAX: 'Your address cannot exceed 200 characters.' as const,
+	/* LatLon */
+	LATLON_INVALID: 'The latitude/longitude are invalid.' as const,
+	LATLON_REQUIRED: 'The latitude/longitude are required.' as const,
 	/* Data */
   DATA_INVALID: 'The given data are invalid.' as const,
 	/* Server */

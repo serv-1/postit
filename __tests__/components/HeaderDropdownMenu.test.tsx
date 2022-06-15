@@ -6,11 +6,6 @@ import userEvent from '@testing-library/user-event'
 import { rest } from 'msw'
 import err from '../../utils/constants/errors'
 
-jest.mock('react-popper', () => ({
-  __esModule: true,
-  usePopper: () => ({ styles: {}, attributes: {} }),
-}))
-
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
@@ -31,30 +26,6 @@ test('the user image loads', async () => {
 
   const userImage = await screen.findByRole('img')
   expect(userImage).toHaveAttribute('src')
-})
-
-it('opens and closes', async () => {
-  const { container } = render(<HeaderDropdownMenu />)
-
-  await screen.findByRole('img')
-
-  const openBtn = screen.getByRole('button')
-  await userEvent.click(openBtn)
-
-  let dropdownMenu = screen.getByRole('list')
-  expect(dropdownMenu).toBeInTheDocument()
-
-  await userEvent.click(openBtn)
-  expect(dropdownMenu).not.toBeInTheDocument()
-
-  await userEvent.click(openBtn)
-  dropdownMenu = screen.getByRole('list')
-
-  await userEvent.click(dropdownMenu)
-  expect(dropdownMenu).toBeInTheDocument()
-
-  await userEvent.click(container)
-  expect(dropdownMenu).not.toBeInTheDocument()
 })
 
 test('the sign out link signs out the user', async () => {

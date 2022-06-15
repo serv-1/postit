@@ -43,7 +43,7 @@ test("a request is sent to fetch the posts matching the url query string's data"
 
   render(<HomePostPage />)
 
-  const nbOfPostsFound = await screen.findByText(/2/)
+  const nbOfPostsFound = await screen.findByText(/2 posts found/i)
   expect(nbOfPostsFound).toBeInTheDocument()
 
   const post1 = await screen.findByRole('link', { name: /blue cat/i })
@@ -51,6 +51,39 @@ test("a request is sent to fetch the posts matching the url query string's data"
 
   const post2 = await screen.findByRole('link', { name: /red cat/i })
   expect(post2).toBeInTheDocument()
+})
+
+test('if there is only one post found, "post" is in the singular', async () => {
+  server.use(
+    rest.get('http://localhost:3000/api/posts/search', (req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json({
+          posts: [
+            {
+              id: '0',
+              name: 'Blue cat',
+              description: 'Magnificent blue cat',
+              categories: ['cat'],
+              price: 50,
+              images: ['LKDFlkjdlskjLJFsjLK.jpeg'],
+              userId: '0',
+            },
+          ],
+          totalPosts: 1,
+          totalPages: 1,
+        })
+      )
+    })
+  )
+
+  const search = '?query=cat'
+  Object.defineProperty(window, 'location', { get: () => ({ search }) })
+
+  render(<HomePostPage />)
+
+  const nbOfPostsFound = await screen.findByText(/1 post found/i)
+  expect(nbOfPostsFound).toBeInTheDocument()
 })
 
 test('an error renders if the server fails to fetch the posts', async () => {

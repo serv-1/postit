@@ -11,7 +11,9 @@ beforeEach(() => {
 })
 
 it('has the "hidden" class if the given step isn\'t the current step', async () => {
-  render(<CreateAPostStep0 step={1} setStep={() => null} />)
+  render(
+    <CreateAPostStep0 step={1} setStep={() => null} setLatLon={() => null} />
+  )
 
   await screen.findByTestId('leaflet-map')
   await screen.findByTestId('mapFlyToLatLon')
@@ -22,7 +24,9 @@ it('has the "hidden" class if the given step isn\'t the current step', async () 
 })
 
 test('the "Next" button is disabled when the user don\'t specify an address', async () => {
-  render(<CreateAPostStep0 step={0} setStep={() => null} />)
+  render(
+    <CreateAPostStep0 step={0} setStep={() => null} setLatLon={() => null} />
+  )
 
   await screen.findByTestId('leaflet-map')
   await screen.findByTestId('mapFlyToLatLon')
@@ -36,7 +40,7 @@ test('the "Next" button passes to the next step', async () => {
   useWatch.mockReturnValue('Oslo, Norway')
   const setStep = jest.fn()
 
-  render(<CreateAPostStep0 step={0} setStep={setStep} />)
+  render(<CreateAPostStep0 step={0} setStep={setStep} setLatLon={() => null} />)
 
   await screen.findByTestId('leaflet-map')
   await screen.findByTestId('mapFlyToLatLon')

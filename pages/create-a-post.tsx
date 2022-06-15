@@ -30,6 +30,7 @@ interface CreateAPostProps {
 const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
   const [step, setStep] = useState<0 | 1 | 2>(0)
   const [images, setImages] = useState<IImage[]>()
+  const [latLon, setLatLon] = useState<[number, number]>()
 
   const titles = ['Where is it?', 'Show us what it is', 'Post!']
 
@@ -42,7 +43,7 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
 
   const submitHandler: SubmitHandler<AddPostSchema> = async (data) => {
     try {
-      const _data = { ...data, images }
+      const _data = { ...data, images, latLon }
       await axios.post('http://localhost:3000/api/post', _data)
       router.push('/profile')
     } catch (e) {
@@ -78,7 +79,12 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
               csrfToken={csrfToken}
               className="h-full"
             >
-              <CreateAPostStep0 step={step} setStep={setStep} />
+              <CreateAPostStep0
+                step={step}
+                setStep={setStep}
+                latLon={latLon}
+                setLatLon={setLatLon}
+              />
               <CreateAPostStep1
                 step={step}
                 setStep={setStep}

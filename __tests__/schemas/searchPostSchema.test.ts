@@ -7,7 +7,7 @@ const VALUE = {
   minPrice: 10,
   maxPrice: 20,
   categories: ['furniture'],
-  location: 'Oslo, Norway',
+  address: 'Oslo, Norway',
 }
 
 it('passes', () => {
@@ -23,7 +23,7 @@ it('allows minPrice to be undefined with a defined maxPrice', () => {
   expect(result).not.toHaveProperty('warning')
 })
 
-it('allows minPrice and maxPrice to be an empty string', () => {
+it('allows minPrice, maxPrice and address to be an empty string', () => {
   let result = searchPostSchema.validate({ ...VALUE, minPrice: '' })
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
@@ -34,6 +34,10 @@ it('allows minPrice and maxPrice to be an empty string', () => {
 
   const value = { ...VALUE, minPrice: '', maxPrice: '' }
   result = searchPostSchema.validate(value)
+  expect(result).not.toHaveProperty('error')
+  expect(result).not.toHaveProperty('warning')
+
+  result = searchPostSchema.validate({ ...VALUE, address: '' })
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 })
