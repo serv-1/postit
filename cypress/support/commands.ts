@@ -38,26 +38,27 @@ Cypress.Commands.add('signIn', async (email: string, password: string) => {
   }
 })
 
-Cypress.Commands.add('req', <T extends unknown>(options: ReqParams) => {
-  const {
+Cypress.Commands.add(
+  'req',
+  <T extends unknown>({
     failOnStatusCode = false,
     csrfToken = false,
     method = 'GET',
     url = '/',
     body = {},
-    ...rest
-  } = options
+    ...options
+  }: ReqParams) => {
+    if (csrfToken && typeof body !== 'string') {
+      cy.request('http://localhost:3000/api/auth/csrf').then((res) => {
+        cy.wrap({ csrfToken: res.body.csrfToken, ...body }).as('body')
+      })
+    } else {
+      cy.wrap(body).as('body')
+    }
 
-  if (csrfToken && typeof body !== 'string') {
-    cy.request('http://localhost:3000/api/auth/csrf').then((res) => {
-      cy.wrap({ csrfToken: res.body.csrfToken, ...body }).as('body')
+    return cy.get('@body').then((body) => {
+      const opts = { method, url, failOnStatusCode, body, ...options }
+      return cy.request<T>(opts).then((res) => res)
     })
-  } else {
-    cy.wrap(body).as('body')
   }
-
-  return cy.get('@body').then((body) => {
-    const opts = { method, url, failOnStatusCode, body, ...rest }
-    return cy.request<T>(opts).then((res) => res)
-  })
-})
+)

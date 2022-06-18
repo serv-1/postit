@@ -29,7 +29,7 @@ declare global {
   namespace Cypress {
     interface Chainable {
       signIn(email: string, password: string): void
-      req<T extends unknown>(options?: ReqParams): Chainable<Response<T>>
+      req<T extends unknown>(options: ReqParams): Chainable<Response<T>>
     }
   }
 }

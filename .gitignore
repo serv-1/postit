@@ -41,3 +41,6 @@ yarn-error.log*
 # images
 /public/static/images/posts
 /public/static/images/users
+
+# config
+cypress.json
