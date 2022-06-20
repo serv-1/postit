@@ -61,7 +61,11 @@ const Select = <FormFields extends FieldValues = FieldValues>({
     indicatorSeparator: () => ({ display: 'none' }),
   }
 
-  const value = options.filter(({ value }) => field.value?.includes(value))
+  const value = options.filter(({ value }) => {
+    if (Array.isArray(field.value)) {
+      field.value.includes(value)
+    }
+  })
 
   const onChange = (val: MultiValue<Option>) =>
     field.onChange(val.map(({ value }) => value))

@@ -2,8 +2,9 @@ import categories from '../categories'
 import { PostModel } from '../models/Post'
 import { UserModel } from '../models/User'
 
-export interface IPost extends Omit<PostModel, '_id' | 'userId'> {
+export interface IPost extends Omit<PostModel, '_id' | 'userId' | 'latLon'> {
   id: string
+  latLon: [number, number]
   user: Omit<IUser, 'posts'> & { posts: ILightPost[] }
 }
 

@@ -132,12 +132,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         updatePostApiSchema,
         req.body as UpdatePostApiSchema
       )
-      const reqBody = result.value
 
       if ('message' in result) {
         return res.status(422).json({ message: result.message })
       }
 
+      const reqBody = result.value
       const csrfTokenCookie = req.cookies['next-auth.csrf-token']
 
       if (!isCsrfTokenValid(csrfTokenCookie, reqBody.csrfToken)) {

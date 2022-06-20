@@ -5,7 +5,7 @@ type ValidateReturn<Value> =
       value: NonNullable<Value>
     }
   | {
-      value: Value
+      value?: Value
       name: string | number
       message: string
     }

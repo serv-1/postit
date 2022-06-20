@@ -11,19 +11,19 @@ import { getCsrfToken } from 'next-auth/react'
 import { useState } from 'react'
 import { IFavPost, IUserPost } from '../types/common'
 
-interface FavPostProps {
+interface UserPostProps {
   isFavPost?: false
-  posts: IFavPost[]
-  altText: string
-}
-
-interface PostProps {
-  isFavPost: true
   posts: IUserPost[]
   altText: string
 }
 
-const ProfilePostList = (props: FavPostProps | PostProps) => {
+interface FavPostProps {
+  isFavPost: true
+  posts: IFavPost[]
+  altText: string
+}
+
+const ProfilePostList = (props: FavPostProps | UserPostProps) => {
   const [posts, setPosts] = useState(props.posts)
   const { setToast } = useToast()
 

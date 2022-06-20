@@ -1,5 +1,13 @@
 import { DeleteResult } from 'mongodb'
-import { models, model, Schema, Model, Types, Query } from 'mongoose'
+import {
+  models,
+  model,
+  Schema,
+  Model,
+  Types,
+  Query,
+  HydratedDocument,
+} from 'mongoose'
 import { Categories } from '../types/common'
 import err from '../utils/constants/errors'
 import User from './User'
@@ -16,7 +24,7 @@ export interface PostModel {
   latLon: number[]
 }
 
-const postSchema = new Schema<PostModel, Model<PostModel>, PostModel>({
+const postSchema = new Schema<PostModel>({
   name: {
     type: String,
     required: [true, err.NAME_REQUIRED],
@@ -31,10 +39,7 @@ const postSchema = new Schema<PostModel, Model<PostModel>, PostModel>({
   categories: {
     type: [String],
     required: [true, err.CATEGORIES_REQUIRED],
-    validate: [
-      validateCategories,
-      'At least one category is required. (10 maximum)',
-    ],
+    validate: [validateCategories, err.CATEGORIES_REQUIRED],
   },
   price: {
     type: Number,
@@ -42,7 +47,7 @@ const postSchema = new Schema<PostModel, Model<PostModel>, PostModel>({
   },
   images: {
     type: [String],
-    validate: [validateImages, 'At least one image is required. (5 maximum)'],
+    validate: [validateImages, err.IMAGES_REQUIRED],
   },
   userId: {
     type: Schema.Types.ObjectId,
@@ -58,13 +63,13 @@ const postSchema = new Schema<PostModel, Model<PostModel>, PostModel>({
   },
 })
 
-postSchema.pre('save', async function () {
+postSchema.pre<HydratedDocument<PostModel>>('save', async function () {
   const update = { $push: { postsIds: this._id } }
   await User.updateOne({ _id: this.userId }, update).lean().exec()
 })
 
-postSchema.post('insertMany', async function (posts) {
-  for (const post of posts as PostModel[]) {
+postSchema.post<PostModel[]>('insertMany', async function (posts) {
+  for (const post of posts) {
     const update = { $push: { postsIds: post._id } }
     await User.updateOne({ _id: post.userId }, update).lean().exec()
   }
