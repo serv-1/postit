@@ -17,7 +17,7 @@ export interface SearchPostSchema {
   address?: string
 }
 
-const searchPostSchema = object({
+const searchPostSchema = object<SearchPostSchema>({
   query: querySchema.required(),
   page: pageSchema,
   minPrice: priceSchema.allow('').default(0),

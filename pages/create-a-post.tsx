@@ -44,8 +44,8 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
   const submitHandler: SubmitHandler<AddPostSchema> = async (data) => {
     try {
       const _data = { ...data, images, latLon }
-      await axios.post('http://localhost:3000/api/post', _data)
-      router.push('/profile')
+      const res = await axios.post('http://localhost:3000/api/post', _data)
+      router.push(res.headers['location'])
     } catch (e) {
       const { name, message } = getAxiosError<keyof AddPostSchema>(e)
 

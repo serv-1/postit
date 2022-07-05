@@ -23,7 +23,7 @@ const AuthenticationRegisterForm = () => {
 
   const submitHandler: SubmitHandler<AddUserSchema> = async (data) => {
     try {
-      await axios.post('http://localhost:3000/api/user', data)
+      const axiosRes = await axios.post('http://localhost:3000/api/user', data)
 
       await signIn('email', {
         email: data.email,
@@ -44,7 +44,7 @@ const AuthenticationRegisterForm = () => {
         })
       }
 
-      router.push('/profile')
+      router.push(axiosRes.headers['location'])
     } catch (e) {
       type FieldsNames = keyof AddUserSchema
       const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)

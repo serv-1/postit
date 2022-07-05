@@ -6,9 +6,7 @@ import { MongoError } from 'mongodb'
 import err from '../../utils/constants/errors'
 import validate from '../../utils/functions/validate'
 import { getSession } from 'next-auth/react'
-import updateUserApiSchema, {
-  UpdateUserApiSchema,
-} from '../../schemas/updateUserApiSchema'
+import updateUserApiSchema from '../../schemas/updateUserApiSchema'
 import isCsrfTokenValid from '../../utils/functions/isCsrfTokenValid'
 import isBase64ValueTooBig from '../../utils/functions/isBase64ValueTooBig'
 import { unlink } from 'fs/promises'
@@ -16,7 +14,7 @@ import { cwd } from 'process'
 import createFile from '../../utils/functions/createFile'
 import csrfTokenSchema from '../../schemas/csrfTokenSchema'
 import { UpdateQuery } from 'mongoose'
-import addUserSchema, { AddUserSchema } from '../../schemas/addUserSchema'
+import addUserSchema from '../../schemas/addUserSchema'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
@@ -27,10 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(403).json({ message: err.FORBIDDEN })
       }
 
-      const result = validate(
-        updateUserApiSchema,
-        req.body as UpdateUserApiSchema
-      )
+      const result = validate(updateUserApiSchema, req.body)
 
       if ('message' in result) {
         return res.status(422).json({ message: result.message })
@@ -83,34 +78,44 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           return res.status(404).json({ message: err.USER_NOT_FOUND })
         }
 
-        const favPostsIds = user.favPostsIds.map((id) => id.toString())
-        const action = favPostsIds.includes(reqBody.favPostId) ? 'pull' : 'push'
+        const ids = user.favPostsIds.map((id) => id.toString())
+        const action = ids.includes(reqBody.favPostId) ? 'pull' : 'push'
 
         update = { [`$${action}`]: { favPostsIds: reqBody.favPostId } }
+      } else if ('discussionId' in reqBody) {
+        const user = await User.findById(session.id).lean().exec()
+
+        if (!user) {
+          return res.status(404).json({ message: err.USER_NOT_FOUND })
+        }
+
+        const ids = user.discussionsIds.map((id) => id.toString())
+        const action = ids.includes(reqBody.discussionId) ? 'pull' : 'push'
+
+        update = { [`$${action}`]: { discussionsIds: reqBody.discussionId } }
       }
 
-      try {
-        await dbConnect()
-        await User.updateOne({ _id: session.id }, update).exec()
-      } catch (e) {
-        res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
-      }
+      await dbConnect()
+      await User.updateOne({ _id: session.id }, update).exec()
 
       res.status(200).end()
       break
     }
     case 'POST': {
-      const result = validate(addUserSchema, req.body as AddUserSchema)
+      const result = validate(addUserSchema, req.body)
 
       if ('message' in result) {
         const { name, message } = result
         return res.status(422).json({ name, message })
       }
 
+      await dbConnect()
+
       try {
-        await dbConnect()
         await new User(result.value).save()
-        res.status(200).end()
+
+        res.setHeader('Location', '/profile')
+        res.status(201).end()
       } catch (e) {
         if ((e as MongoError).code === 11000) {
           const json = { message: err.EMAIL_USED, name: 'email' }
@@ -127,8 +132,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(403).json({ message: err.FORBIDDEN })
       }
 
-      const csrfToken = req.body?.csrfToken as string | undefined
-      const result = validate(csrfTokenSchema, csrfToken)
+      const result = validate<string>(csrfTokenSchema, req.body?.csrfToken)
 
       if ('message' in result) {
         return res.status(422).json({ message: result.message })
@@ -150,12 +154,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await unlink(cwd() + '/public/static/images/users/' + user.image)
       }
 
-      try {
-        await dbConnect()
-        await User.deleteOne({ _id: session.id }).exec()
-      } catch (e) {
-        res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
-      }
+      await dbConnect()
+      await User.deleteOne({ _id: session.id }).exec()
 
       res.status(200).end()
       break

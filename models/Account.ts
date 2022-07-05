@@ -18,19 +18,19 @@ export interface AccountModel {
 }
 
 const accountSchema = new Schema<AccountModel>({
-  type: { type: String, required: true },
-  provider: { type: String, required: true },
-  providerAccountId: { type: String, required: true },
-  refresh_token: { type: String, required: true },
+  type: String,
+  provider: String,
+  providerAccountId: String,
+  refresh_token: String,
   access_token: String,
   expires_at: Number,
   token_type: String,
-  scope: { type: String, required: true },
-  id_token: { type: String, required: true },
-  userId: { type: Schema.Types.ObjectId, required: true },
-  oauth_token_secret: { type: String, required: true },
-  oauth_token: { type: String, required: true },
-  session_state: { type: String, required: true },
+  scope: String,
+  id_token: String,
+  userId: Schema.Types.ObjectId,
+  oauth_token_secret: String,
+  oauth_token: String,
+  session_state: String,
 })
 
 export default (models.Account as Model<AccountModel>) ||

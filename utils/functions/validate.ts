@@ -17,10 +17,10 @@ type ValidateReturn<Value> =
  * @param value value that will be validated against the schema
  * @returns validated value with the error's name (if any) and message
  */
-const validate = <TSchema, TValue>(
+const validate = <TSchema>(
   schema: Schema<TSchema>,
-  value: TValue
-): ValidateReturn<TValue> => {
+  value: unknown
+): ValidateReturn<TSchema> => {
   const result = schema.validate(value)
 
   if (!result.error) {

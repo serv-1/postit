@@ -2,7 +2,7 @@ import updateUserApiSchema from '../../schemas/updateUserApiSchema'
 import err from '../../utils/constants/errors'
 
 const csrfToken = 'csrfToken'
-const favPostId = 'f0f0f0f0f0f0f0f0f0f0f0f0'
+const id = 'f0f0f0f0f0f0f0f0f0f0f0f0'
 
 it('passes', () => {
   const v1 = { csrfToken, name: 'bob' }
@@ -25,8 +25,13 @@ it('passes', () => {
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 
-  const v5 = { csrfToken, favPostId }
+  const v5 = { csrfToken, favPostId: id }
   result = updateUserApiSchema.validate(v5)
+  expect(result).not.toHaveProperty('error')
+  expect(result).not.toHaveProperty('warning')
+
+  const v6 = { csrfToken, discussionId: id }
+  result = updateUserApiSchema.validate(v6)
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 })

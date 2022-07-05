@@ -11,9 +11,7 @@ import csrfTokenSchema from '../../../schemas/csrfTokenSchema'
 import isCsrfTokenValid from '../../../utils/functions/isCsrfTokenValid'
 import createFile from '../../../utils/functions/createFile'
 import { unlink } from 'fs/promises'
-import updatePostApiSchema, {
-  UpdatePostApiSchema,
-} from '../../../schemas/updatePostApiSchema'
+import updatePostApiSchema from '../../../schemas/updatePostApiSchema'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
@@ -89,7 +87,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                   },
                 },
                 {
-                  $unset: ['_id', 'postsIds', '__v', 'password', 'favPostsIds'],
+                  $unset: [
+                    '_id',
+                    'postsIds',
+                    '__v',
+                    'password',
+                    'favPostsIds',
+                    'discussionsIds',
+                  ],
                 },
               ],
               as: 'user',
@@ -128,10 +133,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(403).json({ message: err.FORBIDDEN })
       }
 
-      const result = validate(
-        updatePostApiSchema,
-        req.body as UpdatePostApiSchema
-      )
+      const result = validate(updatePostApiSchema, req.body)
 
       if ('message' in result) {
         return res.status(422).json({ message: result.message })
@@ -191,12 +193,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         update.latLon = reqBody.latLon
       }
 
-      try {
-        await dbConnect()
-        await Post.updateOne({ _id: id }, update).exec()
-      } catch (e) {
-        res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
-      }
+      await dbConnect()
+      await Post.updateOne({ _id: id }, update).exec()
 
       res.status(200).end()
       break
@@ -209,7 +207,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       const csrfToken: string | undefined = req.body?.csrfToken
-      const result = validate(csrfTokenSchema, csrfToken)
+      const result = validate<string>(csrfTokenSchema, csrfToken)
 
       if ('message' in result) {
         return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
@@ -235,12 +233,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await unlink(cwd() + '/public/static/images/posts/' + image)
       }
 
-      try {
-        await dbConnect()
-        await Post.deleteOne({ _id: id }).exec()
-      } catch (e) {
-        res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
-      }
+      await dbConnect()
+      await Post.deleteOne({ _id: id }).exec()
 
       res.status(200).end()
       break

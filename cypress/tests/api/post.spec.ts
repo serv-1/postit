@@ -3,6 +3,7 @@ import { Buffer } from 'buffer'
 import { PostModel } from '../../../models/Post'
 import u1 from '../../fixtures/user1.json'
 import { UserModel } from '../../../models/User'
+import formatToUrl from '../../../utils/functions/formatToUrl'
 
 const url = '/api/post'
 
@@ -70,7 +71,7 @@ describe('/api/post', () => {
       })
     })
 
-    it('200 - Post created', function () {
+    it('201 - Post created', function () {
       cy.signIn(u1.email, u1.password)
 
       const body = {
@@ -85,21 +86,25 @@ describe('/api/post', () => {
       }
 
       cy.req({ url, method: 'POST', csrfToken: true, body }).then((res) => {
-        expect(res.status).to.eq(200)
-      })
+        expect(res.status).to.eq(201)
 
-      cy.task<PostModel>('getPostByUserId', this.uId).then((post) => {
-        expect(post.name).to.eq(defaultBody.name)
-        expect(post.description).to.eq(defaultBody.description)
-        expect(post.categories).to.have.members(defaultBody.categories)
-        expect(post.price).to.eq(defaultBody.price * 100)
-        expect(post.images).to.have.length(5)
-        expect(post.address).to.eq(defaultBody.address)
-        expect(post.latLon).to.have.members(defaultBody.latLon)
-        expect(post.userId).to.eq(this.uId)
+        cy.task<PostModel>('getPostByUserId', this.uId).then((post) => {
+          expect(res.headers['location']).to.eq(
+            `/api/posts/${post._id.toString()}/${formatToUrl(post.name)}`
+          )
 
-        cy.task<UserModel>('getUser', this.uId).then((user) => {
-          expect(user.postsIds).to.include(post._id)
+          expect(post.name).to.eq(defaultBody.name)
+          expect(post.description).to.eq(defaultBody.description)
+          expect(post.categories).to.have.members(defaultBody.categories)
+          expect(post.price).to.eq(defaultBody.price * 100)
+          expect(post.images).to.have.length(5)
+          expect(post.address).to.eq(defaultBody.address)
+          expect(post.latLon).to.have.members(defaultBody.latLon)
+          expect(post.userId).to.eq(this.uId)
+
+          cy.task<UserModel>('getUser', this.uId).then((user) => {
+            expect(user.postsIds).to.include(post._id)
+          })
         })
       })
 

@@ -65,6 +65,7 @@ export default NextAuth({
               image: 'default.jpg',
               postsIds: [],
               favPostsIds: [],
+              discussionIds: [],
             }
           ).exec()
         }

@@ -52,6 +52,17 @@ const err = {
 	/* LatLon */
 	LATLON_INVALID: 'The latitude/longitude are invalid.' as const,
 	LATLON_REQUIRED: 'The latitude/longitude are required.' as const,
+	/* Message */
+	MESSAGE_INVALID: 'The message is invalid.' as const,
+	MESSAGE_REQUIRED: 'The message is required.' as const,
+	MESSAGE_MAX: 'The message cannot exceed 500 characters.' as const,
+	/* Created at */
+	CREATED_AT_INVALID: 'The creation date is invalid.' as const,
+	CREATED_AT_REQUIRED: 'The creation date is required.' as const,
+	/* Channel name */
+	CHANNEL_NAME_INVALID: 'The channel name is invalid.' as const,
+	CHANNEL_NAME_REQUIRED: 'The channel name is required.' as const,
+	CHANNEL_NAME_MAX: 'The channel name cannot exceed 146 characters.' as const,
 	/* Data */
   DATA_INVALID: 'The given data are invalid.' as const,
 	/* Server */
@@ -64,6 +75,7 @@ const err = {
 	USER_NOT_FOUND: 'User not found.' as const,
 	IMAGE_NOT_FOUND: 'Image not found.' as const,
 	POST_NOT_FOUND: 'Post not found.' as const,
+	DISCUSSION_NOT_FOUND: 'Discussion not found.' as const,
 	/* csrf token */
 	CSRF_TOKEN_INVALID: 'Something weird happen! Try to refresh the page or sign out and sign in again.' as const,
 	/* Default */

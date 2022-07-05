@@ -9,7 +9,7 @@ import {
   HydratedDocument,
 } from 'mongoose'
 import { Categories } from '../types/common'
-import err from '../utils/constants/errors'
+import Discussion from './Discussion'
 import User from './User'
 
 export interface PostModel {
@@ -22,45 +22,19 @@ export interface PostModel {
   userId: Types.ObjectId
   address: string
   latLon: number[]
+  discussionsIds: Types.ObjectId[]
 }
 
 const postSchema = new Schema<PostModel>({
-  name: {
-    type: String,
-    required: [true, err.NAME_REQUIRED],
-    maxLength: [90, err.NAME_MAX],
-  },
-  description: {
-    type: String,
-    required: [true, err.DESCRIPTION_REQUIRED],
-    minLength: [10, err.DESCRIPTION_MIN],
-    maxLength: [300, err.DESCRIPTION_MAX],
-  },
-  categories: {
-    type: [String],
-    required: [true, err.CATEGORIES_REQUIRED],
-    validate: [validateCategories, err.CATEGORIES_REQUIRED],
-  },
-  price: {
-    type: Number,
-    min: [1, err.PRICE_REQUIRED],
-  },
-  images: {
-    type: [String],
-    validate: [validateImages, err.IMAGES_REQUIRED],
-  },
-  userId: {
-    type: Schema.Types.ObjectId,
-    required: true,
-  },
-  address: {
-    type: String,
-    required: [true, err.ADDRESS_REQUIRED],
-  },
-  latLon: {
-    type: [Number],
-    required: [true, err.LATLON_REQUIRED],
-  },
+  name: String,
+  description: String,
+  categories: [String],
+  price: Number,
+  images: [String],
+  userId: Schema.Types.ObjectId,
+  address: String,
+  latLon: [Number],
+  discussionsIds: [Schema.Types.ObjectId],
 })
 
 postSchema.pre<HydratedDocument<PostModel>>('save', async function () {
@@ -91,19 +65,21 @@ postSchema.pre<Query<DeleteResult, PostModel>>('deleteOne', async function () {
   )
     .lean()
     .exec()
+
+  const post = await Post.findById(id).lean().exec()
+
+  for (const id of (post as NonNullable<typeof post>).discussionsIds) {
+    await Discussion.findByIdAndUpdate(
+      id,
+      { $unset: { postId: '' } },
+      { omitUndefined: true }
+    )
+      .lean()
+      .exec()
+  }
 })
 
-export default (models.Post as Model<PostModel>) ||
-  model<PostModel>('Post', postSchema)
+const Post =
+  (models.Post as Model<PostModel>) || model<PostModel>('Post', postSchema)
 
-function validateCategories(value: string[]) {
-  if (value.length < 1) return false
-  else if (value.length > 10) return false
-  return true
-}
-
-function validateImages(value: string[]) {
-  if (value.length < 1) return false
-  else if (value.length > 5) return false
-  return true
-}
+export default Post

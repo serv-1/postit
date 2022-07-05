@@ -10,11 +10,12 @@ const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 const router = { push: jest.fn() }
+const setToast = jest.fn()
 
 beforeEach(() => {
   axiosPost.mockResolvedValue({})
   useRouter.mockReturnValue(router)
-  useToast.mockReturnValue({})
+  useToast.mockReturnValue({ setToast })
 })
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
@@ -93,7 +94,9 @@ test('the uploaded images and the latitude/longitude are sent with the request',
   })
 })
 
-test('the user is redirected to its profile after a valid submission', async () => {
+test('the user is redirected to the post page after a valid submission', async () => {
+  axiosPost.mockResolvedValue({ headers: { location: '/api/posts/0/Table' } })
+
   render(<CreateAPost csrfToken="csrf" />)
 
   const addressInput = screen.getByLabelText(/address/i)
@@ -138,13 +141,11 @@ test('the user is redirected to its profile after a valid submission', async () 
         latLon: [59, 10],
       }
     )
-    expect(router.push).toHaveBeenNthCalledWith(1, '/profile')
+    expect(router.push).toHaveBeenNthCalledWith(1, '/api/posts/0/Table')
   })
 })
 
 test('an error renders if the server fails to create the post', async () => {
-  const setToast = jest.fn()
-  useToast.mockReturnValue({ setToast })
   axiosPost.mockRejectedValue({ response: { data: { message: err.DEFAULT } } })
 
   render(<CreateAPost csrfToken="csrf" />)

@@ -49,79 +49,75 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const { query, page, minPrice, maxPrice, categories, address } = result.value
 
-  try {
-    await dbConnect()
+  await dbConnect()
 
-    const $search: Search = address
-      ? {
-          compound: {
-            must: [
-              { text: { query, path: 'name' } },
-              { text: { query: address, path: 'address' } },
-            ],
-          },
-        }
-      : { text: { query, path: 'name' } }
-
-    const $match: Match = {}
-
-    if (minPrice && minPrice !== '0') {
-      $match.price = { $gte: +minPrice * 100 }
-    }
-
-    if (maxPrice && maxPrice !== '0') {
-      $match.price = { ...$match.price, $lte: +maxPrice * 100 }
-    }
-
-    if (categories) {
-      $match.categories = { $all: categories }
-    }
-
-    const result = await Post.aggregate([
-      { $search },
-      { $match },
-      {
-        $facet: {
-          posts: [
-            { $sort: { name: 1, _id: 1 } },
-            { $skip: page ? (+page - 1) * 10 : 0 },
-            {
-              $set: {
-                id: { $toString: '$_id' },
-                price: { $divide: ['$price', 100] },
-                image: {
-                  $concat: [
-                    '/static/images/posts/',
-                    { $arrayElemAt: ['$images', 0] },
-                  ],
-                },
-              },
-            },
-            {
-              $project: {
-                _id: 0,
-                id: 1,
-                name: 1,
-                price: 1,
-                image: 1,
-                address: 1,
-              },
-            },
-            { $limit: 20 },
+  const $search: Search = address
+    ? {
+        compound: {
+          must: [
+            { text: { query, path: 'name' } },
+            { text: { query: address, path: 'address' } },
           ],
-          totalPosts: [{ $count: 'total' }],
         },
-      },
-    ]).exec()
+      }
+    : { text: { query, path: 'name' } }
 
-    res.status(200).json({
-      posts: result[0].posts,
-      totalPosts: result[0].totalPosts[0]?.total || 0,
-      totalPages: Math.ceil(result[0].totalPosts[0]?.total / 20) || 0,
-    })
-  } catch (e) {
-    res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
+  const $match: Match = {}
+
+  if (minPrice && minPrice !== '0') {
+    $match.price = { $gte: +minPrice * 100 }
   }
+
+  if (maxPrice && maxPrice !== '0') {
+    $match.price = { ...$match.price, $lte: +maxPrice * 100 }
+  }
+
+  if (categories) {
+    $match.categories = { $all: categories }
+  }
+
+  const searchResult = await Post.aggregate([
+    { $search },
+    { $match },
+    {
+      $facet: {
+        posts: [
+          { $sort: { name: 1, _id: 1 } },
+          { $skip: page ? (+page - 1) * 10 : 0 },
+          {
+            $set: {
+              id: { $toString: '$_id' },
+              price: { $divide: ['$price', 100] },
+              image: {
+                $concat: [
+                  '/static/images/posts/',
+                  { $arrayElemAt: ['$images', 0] },
+                ],
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              id: 1,
+              name: 1,
+              price: 1,
+              image: 1,
+              address: 1,
+            },
+          },
+          { $limit: 20 },
+        ],
+        totalPosts: [{ $count: 'total' }],
+      },
+    },
+  ]).exec()
+
+  res.status(200).json({
+    posts: searchResult[0].posts,
+    totalPosts: searchResult[0].totalPosts[0]?.total || 0,
+    totalPages: Math.ceil(searchResult[0].totalPosts[0]?.total / 20) || 0,
+  })
 }
 
 export default handler

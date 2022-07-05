@@ -7,9 +7,8 @@ import err from '../../utils/constants/errors'
 import isBase64ValueTooBig from '../../utils/functions/isBase64ValueTooBig'
 import validate from '../../utils/functions/validate'
 import createFile from '../../utils/functions/createFile'
-import addPostApiSchema, {
-  AddPostApiSchema,
-} from '../../schemas/addPostApiSchema'
+import formatToUrl from '../../utils/functions/formatToUrl'
+import addPostApiSchema from '../../schemas/addPostApiSchema'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getSession({ req })
@@ -22,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  const result = validate(addPostApiSchema, req.body as AddPostApiSchema)
+  const result = validate(addPostApiSchema, req.body)
 
   if ('message' in result) {
     return res.status(422).json({ name: result.name, message: result.message })
@@ -37,36 +36,33 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const { price, images, ...rest } = result.value
 
-  try {
-    await dbConnect()
+  await dbConnect()
 
-    const imagesUri: string[] = []
+  const imagesUri: string[] = []
 
-    for (const { base64, ext } of images) {
-      if (isBase64ValueTooBig(base64, 1000000)) {
-        const json = { name: 'images', message: err.IMAGE_TOO_BIG }
-        return res.status(413).json(json)
-      }
-
-      const path = '/public/static/images/posts/'
-      const fname = await createFile(base64, ext, path, { enc: 'base64' })
-
-      imagesUri.push(fname)
+  for (const { base64, ext } of images) {
+    if (isBase64ValueTooBig(base64, 1000000)) {
+      const json = { name: 'images', message: err.IMAGE_TOO_BIG }
+      return res.status(413).json(json)
     }
 
-    const post = new Post({
-      ...rest,
-      price: price * 100,
-      images: imagesUri,
-      userId: session.id,
-    })
+    const path = '/public/static/images/posts/'
+    const fname = await createFile(base64, ext, path, { enc: 'base64' })
 
-    await post.save()
-  } catch (e) {
-    res.status(500).json({ message: err.DEFAULT })
+    imagesUri.push(fname)
   }
 
-  res.status(200).end()
+  const post = new Post({
+    ...rest,
+    price: price * 100,
+    images: imagesUri,
+    userId: session.id,
+  })
+
+  await post.save()
+
+  res.setHeader('Location', `/api/posts/${post.id}/${formatToUrl(post.name)}`)
+  res.status(201).end()
 }
 
 export default handler

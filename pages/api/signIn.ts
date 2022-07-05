@@ -4,7 +4,7 @@ import dbConnect from '../../utils/functions/dbConnect'
 import crypto from 'crypto'
 import { Buffer } from 'buffer'
 import err from '../../utils/constants/errors'
-import signInSchema, { SignInSchema } from '../../schemas/signInSchema'
+import signInSchema from '../../schemas/signInSchema'
 import validate from '../../utils/functions/validate'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  const result = validate(signInSchema, req.body as SignInSchema)
+  const result = validate(signInSchema, req.body)
 
   if ('message' in result) {
     return res.status(422).json({ name: result.name, message: result.message })
@@ -20,8 +20,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const { email, password } = result.value
 
+  await dbConnect()
+
   try {
-    await dbConnect()
     const user = await User.findOne({ email }).exec()
 
     if (!user) {

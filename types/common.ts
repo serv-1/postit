@@ -1,4 +1,5 @@
 import categories from '../categories'
+import { DiscussionModel } from '../models/Discussion'
 import { PostModel } from '../models/Post'
 import { UserModel } from '../models/User'
 
@@ -32,6 +33,14 @@ export interface IUser
 export interface IImage {
   base64: string
   ext: 'jpg' | 'jpeg' | 'png' | 'gif'
+}
+
+export interface IDiscussion
+  extends Omit<DiscussionModel, '_id' | 'postId' | 'buyerId' | 'sellerId'> {
+  id: string
+  postId?: string
+  buyerId?: string
+  sellerId?: string
 }
 
 export type Categories = typeof categories[0]

@@ -16,6 +16,7 @@ const env = {
   EMAIL_FROM: getEnvVar('EMAIL_FROM'),
   BASE_URL: getEnvVar('BASE_URL'),
   NEXTAUTH_URL: getEnvVar('NEXTAUTH_URL'),
+  PUSHER_ENCRYPTION_KEY: getEnvVar('PUSHER_ENCRYPTION_KEY'),
 }
 
 export default env

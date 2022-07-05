@@ -8,6 +8,7 @@ import env from '../../utils/constants/env'
 import { readdir, unlink } from 'fs/promises'
 import { cwd } from 'process'
 import createFile from '../../utils/functions/createFile'
+import Discussion, { DiscussionModel } from '../../models/Discussion'
 
 type UserToAdd = Omit<UserModel, '_id' | 'postsIds' | 'image'> & {
   postsIds?: string
@@ -15,6 +16,7 @@ type UserToAdd = Omit<UserModel, '_id' | 'postsIds' | 'image'> & {
 }
 type PostToAdd = Omit<PostModel, '_id'>
 type AccountToAdd = Omit<AccountModel, '_id'>
+type DiscussionToAdd = Omit<DiscussionModel, '_id'>
 
 interface CreateFileParams {
   data: string | Buffer
@@ -71,6 +73,10 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
       const addedAccounts = await Account.insertMany(JSON.parse(accounts))
       return addedAccounts.map((account) => account._id.toString())
     },
+    async addDiscussion(discussion: DiscussionToAdd): Promise<string> {
+      const addedDiscussion = await new Discussion(discussion).save()
+      return addedDiscussion._id.toString()
+    },
     async getUser(idOrEmail: string): Promise<UserModel | null> {
       await connect(env.MONGODB_URI)
 
@@ -87,6 +93,10 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
     async getPostByUserId(id: string): Promise<PostModel | null> {
       await connect(env.MONGODB_URI)
       return await Post.findOne({ userId: id }).lean().exec()
+    },
+    async getDiscussionByPostId(id: string): Promise<DiscussionModel | null> {
+      await connect(env.MONGODB_URI)
+      return await Discussion.findOne({ postId: id }).lean().exec()
     },
     GoogleSocialLogin: GoogleSocialLogin,
   })

@@ -43,6 +43,7 @@ describe('/api/users/:id', () => {
             image: '/static/images/' + u1.image,
             posts: [],
             favPosts: [],
+            discussionsIds: [],
           })
         })
 
@@ -59,6 +60,7 @@ describe('/api/users/:id', () => {
               images: p1Images,
               address: p1.address,
               latLon: p1.latLon,
+              discussionsIds: [],
             })
           })
 

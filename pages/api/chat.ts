@@ -1,32 +1,30 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import User from '../../models/User'
-import forgotPwSchema from '../../schemas/forgotPwSchema'
+import pusher from '../../utils/functions/initPusher'
 import err from '../../utils/constants/errors'
-import dbConnect from '../../utils/functions/dbConnect'
 import validate from '../../utils/functions/validate'
+import { getSession } from 'next-auth/react'
+import chatApiSchema from '../../schemas/chatApiSchema'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  const result = validate(forgotPwSchema, req.body)
+  const session = await getSession({ req })
+  if (!session) {
+    return res.status(403).json({ message: err.FORBIDDEN })
+  }
 
+  const result = validate(chatApiSchema, req.body)
   if ('message' in result) {
     return res.status(422).json({ message: result.message })
   }
 
-  const { email } = result.value
+  const { channelName, message } = result.value
 
-  await dbConnect()
+  pusher.trigger(channelName, 'message', message)
 
-  const user = await User.findOne({ email }).lean().exec()
-
-  if (!user) {
-    return res.status(422).json({ message: err.EMAIL_UNKNOWN })
-  }
-
-  res.status(200).end()
+  res.end()
 }
 
 export default handler

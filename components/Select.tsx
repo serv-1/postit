@@ -63,7 +63,7 @@ const Select = <FormFields extends FieldValues = FieldValues>({
 
   const value = options.filter(({ value }) => {
     if (Array.isArray(field.value)) {
-      field.value.includes(value)
+      return field.value.includes(value)
     }
   })
 

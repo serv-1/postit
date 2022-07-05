@@ -15,6 +15,7 @@ export type UpdateUserApiSchema =
   | { csrfToken: string; password: string }
   | { csrfToken: string; image: IImage }
   | { csrfToken: string; favPostId: string }
+  | { csrfToken: string; discussionId: string }
 
 const updateUserApiSchema = object<UpdateUserApiSchema>({
   csrfToken: csrfTokenSchema,
@@ -23,8 +24,9 @@ const updateUserApiSchema = object<UpdateUserApiSchema>({
   password: passwordSchema,
   image: imageSchema,
   favPostId: idSchema,
+  discussionId: idSchema,
 })
-  .xor('name', 'email', 'password', 'image', 'favPostId')
+  .xor('name', 'email', 'password', 'image', 'favPostId', 'discussionId')
   .messages({ 'object.xor': err.DATA_INVALID })
 
 export default updateUserApiSchema
