@@ -7,16 +7,15 @@ import Link from '../../../../components/Link'
 import PostList from '../../../../components/PostList'
 import Image from 'next/image'
 import ArrowLeft from '../../../../public/static/images/arrow-left.svg'
-import ChatFill from '../../../../public/static/images/chat-fill.svg'
 import SeeAllPhotosModal from '../../../../components/SeeAllPhotosModal'
 import Header from '../../../../components/Header'
 import DotButton from '../../../../components/DotButton'
-import Button from '../../../../components/Button'
-import { getSession } from 'next-auth/react'
-import PostsNameFavoriteButton from '../../../../components/PostsNameFavoriteButton'
-import PostsNameUpdateButtons from '../../../../components/PostsNameUpdateButtons'
+import { getCsrfToken, getSession } from 'next-auth/react'
+import PostPageFavoriteButton from '../../../../components/PostPageFavoriteButton'
+import PostPageUpdateButtons from '../../../../components/PostPageUpdateButtons'
 import formatToUrl from '../../../../utils/functions/formatToUrl'
 import PostPageMap from '../../../../components/PostPageMap'
+import PostPageContactModal from '../../../../components/PostPageContactModal'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const postId = ctx.params?.id
@@ -31,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       props.user = (await axios.get<IUser>(url)).data
     }
 
-    return { props }
+    return { props: { ...props, csrfToken: await getCsrfToken(ctx) } }
   } catch (e) {
     return { notFound: true }
   }
@@ -40,9 +39,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 interface NameProps {
   post: IPost
   user?: IUser
+  csrfToken?: string
 }
 
-const Name = ({ post, user }: NameProps) => {
+const Name = ({ post, user, csrfToken }: NameProps) => {
   return (
     <>
       <Head>
@@ -68,14 +68,14 @@ const Name = ({ post, user }: NameProps) => {
           </div>
           {user?.id === post.user.id ? (
             <div className="absolute top-8 right-8 md:hidden">
-              <PostsNameUpdateButtons
+              <PostPageUpdateButtons
                 id={post.id}
                 name={post.name}
                 isDotButton
               />
             </div>
           ) : (
-            <PostsNameFavoriteButton postId={post.id} user={user} />
+            <PostPageFavoriteButton postId={post.id} user={user} />
           )}
           <SeeAllPhotosModal sources={post.images} />
         </div>
@@ -94,15 +94,23 @@ const Name = ({ post, user }: NameProps) => {
                 </Link>
               </span>
             )}
-            <div className="hidden md:block md:mt-16 md:text-base">
+            <div className="md:mt-16 md:text-base">
               {user?.id === post.user.id ? (
-                <div className="flex flex-row flex-nowrap">
-                  <PostsNameUpdateButtons id={post.id} name={post.name} />
+                <div className="hidden md:flex flex-row flex-nowrap">
+                  <PostPageUpdateButtons id={post.id} name={post.name} />
                 </div>
               ) : (
-                <Button color="primary" fullWidth>
-                  Contact
-                </Button>
+                <PostPageContactModal
+                  postId={post.id}
+                  postName={post.name}
+                  sellerId={post.user.id}
+                  csrfToken={csrfToken}
+                  discussionId={
+                    user?.discussionsIds.filter((id) => {
+                      if (post.discussionsIds.includes(id)) return id
+                    })[0]
+                  }
+                />
               )}
             </div>
           </div>
@@ -129,11 +137,6 @@ const Name = ({ post, user }: NameProps) => {
             <PostList posts={post.user.posts} columns={2} />
           </section>
         )}
-        <div className="fixed bottom-8 right-8 md:hidden">
-          <DotButton>
-            <ChatFill className="w-full h-full" />
-          </DotButton>
-        </div>
       </main>
     </>
   )

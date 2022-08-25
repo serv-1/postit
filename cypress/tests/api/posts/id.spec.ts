@@ -3,14 +3,11 @@ import { PostModel } from '../../../../models/Post'
 import { UserModel } from '../../../../models/User'
 import u1 from '../../../fixtures/user1.json'
 import u2 from '../../../fixtures/user2.json'
-import { IDiscussion, IImage, IPost } from '../../../../types/common'
+import { IImage, IPost } from '../../../../types/common'
 import { DiscussionModel } from '../../../../models/Discussion'
 
 type Posts = Omit<IPost, 'id' | 'userId'>[]
 const [p1, p2]: Posts = require('../../../fixtures/posts.json')
-
-type Discussion = Omit<IDiscussion, 'id'>
-const d1: Discussion = require('../../../fixtures/discussion.json')
 
 describe('/api/posts/:id', () => {
   it('405 - Method not allowed', function () {
@@ -48,7 +45,11 @@ describe('/api/posts/:id', () => {
           ]
 
           cy.task<string[]>('addPosts', JSON.stringify(posts)).then((pIds) => {
-            const discussion = { ...d1, postId: pIds[0] }
+            const discussion = {
+              messages: [{ message: 'yo', userId: 'f0f0f0f0f0f0f0f0f0f0f0f0' }],
+              postName: 'table',
+              postId: pIds[0],
+            }
 
             cy.task<string>('addDiscussion', discussion).then((dId) => {
               cy.req<IPost>({ url: `/api/posts/${pIds[0]}` }).then((res) => {
@@ -585,20 +586,14 @@ describe('/api/posts/:id', () => {
           })
 
           const discussion = {
-            messages: [
-              {
-                message: 'yo yo',
-                createdAt: new Date().toISOString(),
-                isBuyerMsg: false,
-              },
-            ],
+            messages: [{ message: 'yo', userId: 'f0f0f0f0f0f0f0f0f0f0f0f0' }],
             postId: pId,
+            postName: p1.name,
             buyerId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
             sellerId: 'f1f1f1f1f1f1f1f1f1f1f1f1',
-            channelName: '0',
           }
 
-          cy.task('addDiscussion', discussion).then(() => {
+          cy.task<string>('addDiscussion', discussion).then((id) => {
             cy.signIn(u1.email, u1.password)
 
             const body = { favPostId: pId }
@@ -618,8 +613,9 @@ describe('/api/posts/:id', () => {
               expect(user.favPostsIds).to.not.include(pId)
             })
 
-            cy.task<DiscussionModel>('getDiscussionByPostId', pId).then((d) => {
-              expect(d).to.eq(null)
+            cy.task<DiscussionModel>('getDiscussion', id).then((d) => {
+              // expect(d).to.eq(null)
+              expect(d).not.to.have.property('postId')
             })
           })
         })

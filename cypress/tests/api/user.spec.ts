@@ -4,10 +4,8 @@ import u1 from '../../fixtures/user1.json'
 import u2 from '../../fixtures/user2.json'
 import { Buffer } from 'buffer'
 import { DiscussionModel } from '../../../models/Discussion'
-import { IDiscussion } from '../../../types/common'
-
-type Discussion = Omit<IDiscussion, 'id'>
-const d1: Discussion = require('../../fixtures/discussion.json')
+import getClientPusher from '../../../utils/functions/getClientPusher'
+import { DeferredPromise } from '../../../types/common'
 
 const url = '/api/user'
 
@@ -58,6 +56,7 @@ describe('/api/user', () => {
         expect(user.email).to.eq(email)
         expect(user.password).to.not.eq(undefined)
         expect(user.image).to.eq(image)
+        expect(user.hasUnseenMessages).to.eq(false)
       })
     })
   })
@@ -299,7 +298,11 @@ describe('/api/user', () => {
     describe('discussion', () => {
       before(() => {
         cy.task('reset')
-        cy.task<string>('addUser', u1).then((uId) => cy.wrap(uId).as('uId'))
+        cy.task<string>('addUser', {
+          ...u1,
+          discussionsIds: ['f0f0f0f0f0f0f0f0f0f0f0f0'],
+          hasUnseenMessages: true,
+        }).then((uId) => cy.wrap(uId).as('uId'))
       })
 
       it('422 - Invalid discussion id', function () {
@@ -317,6 +320,20 @@ describe('/api/user', () => {
       it('200 - Discussion id updated', function () {
         cy.signIn(u1.email, u1.password)
 
+        const pusher = getClientPusher()
+
+        let deferred: DeferredPromise<string> | null = null
+        const promise = new Promise((resolve, reject) => {
+          deferred = { resolve, reject }
+        })
+
+        cy.task<UserModel>('getUser', this.uId).then((u) => {
+          const channel = pusher.subscribe('private-' + u.channelName)
+          channel.bind('discussion-deleted', (id: string) => {
+            deferred?.resolve(id)
+          })
+        })
+
         const url = '/api/user'
         const body = { discussionId: 'f0f0f0f0f0f0f0f0f0f0f0f0' }
 
@@ -324,16 +341,11 @@ describe('/api/user', () => {
           expect(res.status).to.eq(200)
         })
 
-        cy.task<UserModel>('getUser', this.uId).then((user) => {
-          expect(user.discussionsIds).to.include(body.discussionId)
-        })
+        cy.task<UserModel>('getUser', this.uId).then((u) => {
+          expect(u.discussionsIds).to.not.include(body.discussionId)
+          expect(u.hasUnseenMessages).to.be.false
 
-        cy.req({ url, method: 'PUT', body, csrfToken: true }).then((res) => {
-          expect(res.status).to.eq(200)
-        })
-
-        cy.task<UserModel>('getUser', this.uId).then((user) => {
-          expect(user.discussionsIds).to.not.include(body.discussionId)
+          promise.then((data) => expect(data).to.eq(body.discussionId))
         })
       })
     })
@@ -409,19 +421,17 @@ describe('/api/user', () => {
         cy.signIn(u1.email, u1.password)
 
         const discussion = {
-          ...d1,
+          messages: [{ message: 'yo', userId: 'f0f0f0f0f0f0f0f0f0f0f0f0' }],
+          postName: 'table',
           postId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
           buyerId: this.u1Id,
         }
 
-        cy.task('addDiscussion', discussion).then(() => {
+        cy.task<string>('addDiscussion', discussion).then((id) => {
           cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
           })
-          cy.task<DiscussionModel>(
-            'getDiscussionByPostId',
-            discussion.postId
-          ).then((d) => {
+          cy.task<DiscussionModel>('getDiscussion', id).then((d) => {
             expect(d).not.to.exist
           })
         })
@@ -429,16 +439,17 @@ describe('/api/user', () => {
 
       it("deletes the discussions where the other user exist and doesn't have the discussion id", function () {
         const discussion = {
-          ...d1,
+          messages: [{ message: 'yo', userId: 'f0f0f0f0f0f0f0f0f0f0f0f0' }],
+          postName: 'table',
           postId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
           buyerId: this.u1Id,
           sellerId: this.u2Id,
         }
 
-        cy.task<string>('addDiscussion', discussion).then((dId) => {
+        cy.task<string>('addDiscussion', discussion).then((id) => {
           cy.signIn(u2.email, u2.password)
 
-          const body = { discussionId: dId }
+          const body = { discussionId: id }
           cy.req({ url: '/api/user', method: 'PUT', body, csrfToken: true })
 
           cy.signIn(u1.email, u1.password)
@@ -447,10 +458,7 @@ describe('/api/user', () => {
             expect(res.status).to.eq(200)
           })
 
-          cy.task<DiscussionModel>(
-            'getDiscussionByPostId',
-            discussion.postId
-          ).then((d) => {
+          cy.task<DiscussionModel>('getDiscussion', id).then((d) => {
             expect(d).not.to.exist
           })
         })
@@ -460,23 +468,19 @@ describe('/api/user', () => {
         cy.signIn(u1.email, u1.password)
 
         const discussion = {
-          messages: d1.messages,
-          postName: d1.postName,
-          channelName: d1.channelName,
+          messages: [{ message: 'yo', userId: 'f0f0f0f0f0f0f0f0f0f0f0f0' }],
+          postName: 'table',
           postId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
           buyerId: this.u1Id,
           sellerId: this.u2Id,
         }
 
-        cy.task('addDiscussion', discussion).then(() => {
+        cy.task<string>('addDiscussion', discussion).then((id) => {
           cy.req({ url, method: 'DELETE', csrfToken: true }).then((res) => {
             expect(res.status).to.eq(200)
           })
 
-          cy.task<DiscussionModel>(
-            'getDiscussionByPostId',
-            discussion.postId
-          ).then((d) => {
+          cy.task<DiscussionModel>('getDiscussion', id).then((d) => {
             expect(d.buyerId).not.to.exist
           })
         })

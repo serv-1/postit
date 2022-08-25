@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useToast } from '../contexts/toast'
 import { ILightPost } from '../types/common'
@@ -31,7 +31,7 @@ const HomePostPage = () => {
         setTotalPosts(data.totalPosts)
         setTotalPages(data.totalPages)
       } catch (e) {
-        const { message } = getAxiosError(e as AxiosError)
+        const { message } = getAxiosError(e)
         setToast({ message, error: true })
       }
     }

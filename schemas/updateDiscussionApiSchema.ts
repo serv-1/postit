@@ -1,14 +1,14 @@
 import csrfTokenSchema from './csrfTokenSchema'
-import messageSchema, { MessageSchema } from './messageSchema'
+import messageSchema from './messageSchema'
 import object from './object'
 
-export interface UpdateDiscussionApiSchema {
-  message: MessageSchema
+export type UpdateDiscussionApiSchema = {
   csrfToken: string
+  message?: string
 }
 
 const updateDiscussionApiSchema = object<UpdateDiscussionApiSchema>({
-  message: messageSchema.required(),
+  message: messageSchema,
   csrfToken: csrfTokenSchema,
 })
 

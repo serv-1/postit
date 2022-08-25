@@ -1,4 +1,4 @@
-import PostsNameUpdateButtons from '../../components/PostsNameUpdateButtons'
+import PostPageUpdateButtons from '../../components/PostPageUpdateButtons'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
@@ -18,7 +18,7 @@ beforeEach(() => {
 })
 
 it('renders', () => {
-  render(<PostsNameUpdateButtons id="0" name="table" />)
+  render(<PostPageUpdateButtons id="0" name="table" />)
 
   const link = screen.getByRole('link')
   expect(link).toHaveAttribute('href', '/posts/0/table/update')
@@ -31,7 +31,7 @@ it('renders', () => {
 })
 
 it('renders as dot buttons', () => {
-  render(<PostsNameUpdateButtons id="0" name="table" isDotButton />)
+  render(<PostPageUpdateButtons id="0" name="table" isDotButton />)
 
   const editBtn = screen.queryByText(/edit/i)
   expect(editBtn).not.toBeInTheDocument()
@@ -41,14 +41,14 @@ it('renders as dot buttons', () => {
 })
 
 test('the user is redirected to its profile if the post has been deleted', async () => {
-  const { rerender } = render(<PostsNameUpdateButtons id="0" name="table" />)
+  const { rerender } = render(<PostPageUpdateButtons id="0" name="table" />)
 
   let deleteBtn = screen.getByRole('button', { name: /delete/i })
   await userEvent.click(deleteBtn)
 
   await waitFor(() => expect(push).toHaveBeenNthCalledWith(1, '/profile'))
 
-  rerender(<PostsNameUpdateButtons id="0" name="table" isDotButton />)
+  rerender(<PostPageUpdateButtons id="0" name="table" isDotButton />)
 
   deleteBtn = screen.getByRole('button', { name: /delete/i })
   await userEvent.click(deleteBtn)
@@ -60,7 +60,7 @@ test('an error renders if the server fails to delete the post', async () => {
   axiosDelete.mockRejectedValue({
     response: { data: { message: err.DEFAULT } },
   })
-  render(<PostsNameUpdateButtons id="0" name="table" />)
+  render(<PostPageUpdateButtons id="0" name="table" />)
 
   const deleteBtn = screen.getByRole('button', { name: /delete/i })
   await userEvent.click(deleteBtn)

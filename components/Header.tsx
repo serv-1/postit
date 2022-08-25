@@ -3,6 +3,8 @@ import { signIn, useSession } from 'next-auth/react'
 import { ComponentPropsWithoutRef, ReactNode } from 'react'
 import HeaderDropdownMenu from './HeaderDropdownMenu'
 import Link from './Link'
+import PlusCircle from '../public/static/images/plus-circle.svg'
+import dynamic from 'next/dynamic'
 
 interface HeaderWithChildrenProps extends ComponentPropsWithoutRef<'header'> {
   children: ReactNode
@@ -18,6 +20,10 @@ interface HeaderWithoutChildrenProps
 type HeaderProps = HeaderWithChildrenProps | HeaderWithoutChildrenProps
 
 const Header = ({ children, noMenu, className, ...props }: HeaderProps) => {
+  const HeaderChatListModal = dynamic(() => import('./HeaderChatListModal'), {
+    ssr: false,
+  })
+
   const { status } = useSession()
 
   const _className = classNames(
@@ -49,13 +55,16 @@ const Header = ({ children, noMenu, className, ...props }: HeaderProps) => {
           </Link>
         ) : status === 'authenticated' ? (
           <nav>
-            <ul className="flex items-center h-32 md:h-40">
-              <li className="mr-8 md:mr-16">
+            <ul className="flex flex-row flew-nowrap gap-x-8 items-center">
+              <li>
+                <HeaderChatListModal />
+              </li>
+              <li>
                 <Link
                   href="/create-a-post"
-                  className="block bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold"
+                  className="text-fuchsia-600 w-40 h-40 block hover:text-fuchsia-900 transition-colors duration-200"
                 >
-                  Create a post
+                  <PlusCircle className="w-full h-full" />
                 </Link>
               </li>
               <li>

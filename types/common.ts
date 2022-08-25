@@ -1,19 +1,18 @@
 import categories from '../categories'
-import { DiscussionModel } from '../models/Discussion'
+import { DiscussionModel, MessageModel } from '../models/Discussion'
 import { PostModel } from '../models/Post'
 import { UserModel } from '../models/User'
 
-export interface IPost extends Omit<PostModel, '_id' | 'userId' | 'latLon'> {
+export interface IPost
+  extends Omit<PostModel, '_id' | 'userId' | 'latLon' | 'discussionsIds'> {
   id: string
+  discussionsIds: string[]
   latLon: [number, number]
-  user: Omit<IUser, 'posts'> & { posts: ILightPost[] }
+  user: Pick<IUser, 'id' | 'name' | 'email' | 'image'> & { posts: ILightPost[] }
 }
 
 export interface ILightPost
-  extends Omit<
-    IPost,
-    'user' | 'categories' | 'description' | 'images' | 'latLon'
-  > {
+  extends Pick<IPost, 'id' | 'name' | 'price' | 'address'> {
   image: string
 }
 
@@ -21,11 +20,12 @@ export type IFavPost = Omit<ILightPost, 'price'>
 export type IUserPost = Omit<IPost, 'user'>
 
 export interface IUser
-  extends Omit<
+  extends Pick<
     UserModel,
-    '_id' | 'postsIds' | 'favPostsIds' | 'password' | 'emailVerified'
+    'name' | 'email' | 'image' | 'channelName' | 'hasUnseenMessages'
   > {
   id: string
+  discussionsIds: string[]
   posts: IUserPost[]
   favPosts: IFavPost[]
 }
@@ -35,12 +35,21 @@ export interface IImage {
   ext: 'jpg' | 'jpeg' | 'png' | 'gif'
 }
 
+export interface IMessage extends Omit<MessageModel, 'userId'> {
+  userId: string
+}
+
 export interface IDiscussion
-  extends Omit<DiscussionModel, '_id' | 'postId' | 'buyerId' | 'sellerId'> {
+  extends Pick<DiscussionModel, 'postName' | 'channelName'> {
   id: string
   postId?: string
-  buyerId?: string
-  sellerId?: string
+  buyer: { id?: string; name: string; image: string }
+  seller: { id?: string; name: string; image: string }
+  messages: IMessage[]
+}
+
+export type JSONDiscussion = Omit<IDiscussion, 'messages'> & {
+  messages: (Omit<IMessage, 'createdAt'> & { createdAt: string })[]
 }
 
 export type Categories = typeof categories[0]
@@ -50,3 +59,14 @@ export type Entries<O> = {
 }[keyof O][]
 
 export type UnPromise<T> = T extends Promise<infer U> ? U : T
+export type UnArray<T> = T extends Array<infer U> ? U : T
+
+export interface DeferredPromise<T extends unknown> {
+  resolve: (value: T) => void
+  reject: (reason?: any) => void
+}
+
+export interface DiscussionEventData {
+  discussionId: string
+  userId: string
+}

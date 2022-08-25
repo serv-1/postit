@@ -8,32 +8,28 @@ import {
   HydratedDocument,
   Query,
 } from 'mongoose'
-import { fieldEncryption } from 'mongoose-field-encryption'
-import cyConfig from '../cypress.json'
+import { nanoid } from 'nanoid'
 import Post from './Post'
 import User from './User'
 
-interface MessageModel {
+export interface MessageModel {
   message: string
   createdAt: Date
-  isBuyerMsg: Boolean
+  userId: Types.ObjectId
+  seen: boolean
 }
 
 const messageSchema = new Schema<MessageModel>({
   message: String,
-  createdAt: Date,
-  isBuyerMsg: Boolean,
-})
-
-messageSchema.plugin(fieldEncryption, {
-  fields: ['message'],
-  secret: cyConfig.env.secret,
+  createdAt: { type: Date, default: Date.now },
+  userId: Schema.Types.ObjectId,
+  seen: { type: Boolean, default: false },
 })
 
 export interface DiscussionModel {
   _id: Types.ObjectId
   messages: MessageModel[]
-  postId: Types.ObjectId
+  postId?: Types.ObjectId
   buyerId?: Types.ObjectId
   sellerId?: Types.ObjectId
   postName: string
@@ -46,7 +42,7 @@ const discussionSchema = new Schema<DiscussionModel>({
   buyerId: Schema.Types.ObjectId,
   sellerId: Schema.Types.ObjectId,
   postName: String,
-  channelName: String,
+  channelName: { type: String, default: () => nanoid() },
 })
 
 discussionSchema.pre<HydratedDocument<DiscussionModel>>(
@@ -66,6 +62,7 @@ discussionSchema.pre<HydratedDocument<DiscussionModel>>(
 
     await User.findByIdAndUpdate(this.sellerId, {
       $push: { discussionsIds: this._id },
+      hasUnseenMessages: true,
     })
       .lean()
       .exec()

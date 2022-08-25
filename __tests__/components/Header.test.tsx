@@ -9,8 +9,15 @@ jest.mock('../../components/HeaderDropdownMenu', () => ({
 }))
 
 const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
+const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
-beforeEach(() => useSession.mockReturnValue({ status: 'loading' }))
+beforeEach(() => {
+  useSession.mockReturnValue({
+    data: { id: '0', channelName: 'test' },
+    status: 'loading',
+  })
+  useToast.mockReturnValue({ setToast: () => null })
+})
 
 test("the default menu doesn't render", () => {
   render(<Header noMenu />)
@@ -55,7 +62,7 @@ test('the sign in link renders if the user is unauthenticated', () => {
 })
 
 test('the menu renders if the user is authenticated', () => {
-  useSession.mockReturnValue({ status: 'authenticated' })
+  useSession.mockReturnValue({ data: { id: '0' }, status: 'authenticated' })
   render(<Header />)
 
   const menu = screen.getAllByRole('list')[0]

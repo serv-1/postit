@@ -1,16 +1,18 @@
 import { DiscussionModel } from '../../../models/Discussion'
 import { PostModel } from '../../../models/Post'
 import { UserModel } from '../../../models/User'
-import { IDiscussion, IPost } from '../../../types/common'
+import {
+  DeferredPromise,
+  DiscussionEventData,
+  IPost,
+} from '../../../types/common'
 import err from '../../../utils/constants/errors'
 import u1 from '../../fixtures/user1.json'
 import u2 from '../../fixtures/user2.json'
+import getClientPusher from '../../../utils/functions/getClientPusher'
 
 type Posts = Omit<IPost, 'id' | 'userId'>[]
 const [p1]: Posts = require('../../fixtures/posts.json')
-
-type Discussion = Omit<IDiscussion, 'id'>
-const d1: Discussion = require('../../fixtures/discussion.json')
 
 describe('/api/discussion', () => {
   const url = '/api/discussion'
@@ -40,10 +42,10 @@ describe('/api/discussion', () => {
   describe('POST', () => {
     const method = 'POST'
     const body = {
-      message: d1.messages[0],
+      message: 'yo',
       postId: id,
       sellerId: id,
-      postName: d1.postName,
+      postName: 'table',
     }
 
     it('422 - Invalid request body', function () {
@@ -64,8 +66,19 @@ describe('/api/discussion', () => {
       })
     })
 
+    it('404 - Seller not found', function () {
+      cy.signIn(u1.email, u1.password)
+
+      cy.req({ url, method, body, csrfToken: true }).then((res) => {
+        expect(res.status).to.eq(404)
+        expect(res.body).to.have.property('message', err.USER_NOT_FOUND)
+      })
+    })
+
     it('201 - Discussion created', function () {
       cy.task('reset')
+
+      const pusher = getClientPusher()
 
       cy.task<string[]>('addUsers', JSON.stringify([u1, u2])).then(
         ([u1Id, u2Id]) => {
@@ -74,12 +87,40 @@ describe('/api/discussion', () => {
           cy.task<string>('addPost', { ...p1, userId: u1Id }).then((pId) => {
             const b = { ...body, postId: pId, sellerId: u2Id }
 
+            const eventName = 'discussion-created'
+            let u1Deferred: DeferredPromise<DiscussionEventData> | null = null
+            let u2Deferred: DeferredPromise<DiscussionEventData> | null = null
+
+            const u1Promise = new Promise<DiscussionEventData>(
+              (resolve, reject) => (u1Deferred = { resolve, reject })
+            )
+            const u2Promise = new Promise<DiscussionEventData>(
+              (resolve, reject) => (u2Deferred = { resolve, reject })
+            )
+
+            cy.task<UserModel>('getUser', u1Id).then((u) => {
+              const channel = pusher.subscribe('private-' + u.channelName)
+              channel.bind(eventName, (data: DiscussionEventData) => {
+                u1Deferred?.resolve(data)
+              })
+            })
+
+            cy.task<UserModel>('getUser', u2Id).then((u) => {
+              const channel = pusher.subscribe('private-' + u.channelName)
+              channel.bind(eventName, (data: DiscussionEventData) => {
+                u2Deferred?.resolve(data)
+              })
+            })
+
             cy.req({ url, method, body: b, csrfToken: true }).then((res) => {
               expect(res.status).to.eq(201)
 
-              cy.task<DiscussionModel>('getDiscussionByPostId', pId).then(
+              cy.task<DiscussionModel>('getDiscussion', body.postName).then(
                 (d) => {
-                  expect(d.messages[0].message).not.to.eq(b.message.message)
+                  expect(d.messages[0]).to.have.property('createdAt')
+                  expect(d.messages[0]).to.have.property('seen', false)
+                  expect(d.messages[0]).to.have.property('userId', u1Id)
+                  expect(d.messages[0]).to.have.property('message', b.message)
                   expect(d.channelName).to.exist
                   expect(d).to.include({
                     postId: pId,
@@ -98,7 +139,23 @@ describe('/api/discussion', () => {
 
                   cy.task<UserModel>('getUser', u2Id).then((u) => {
                     expect(u.discussionsIds).to.include(d._id)
+                    expect(u.hasUnseenMessages).to.be.true
                   })
+
+                  u1Promise.then((data) => {
+                    expect(data).to.eql({
+                      discussionId: d._id.toString(),
+                      userId: u1Id,
+                    })
+                  })
+                  u2Promise.then((data) => {
+                    expect(data).to.eql({
+                      discussionId: d._id.toString(),
+                      userId: u1Id,
+                    })
+                  })
+
+                  pusher.disconnect()
                 }
               )
             })

@@ -1,32 +1,47 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { rest } from 'msw'
 import HomePostPage from '../../components/HomePostPage'
-import server from '../../mocks/server'
-import err from '../../utils/constants/errors'
-
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
 
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+const axiosGet = jest.spyOn(require('axios'), 'get')
 
-beforeEach(() => useToast.mockReturnValue({ setToast: () => null }))
+const searchData = {
+  posts: [
+    {
+      id: '0',
+      name: 'Blue cat',
+      price: 50,
+      image: 'blue-cat.jpeg',
+      address: 'Paris, France',
+    },
+    {
+      id: '1',
+      name: 'Red cat',
+      price: 100,
+      image: 'red-cat.jpeg',
+      address: 'Oslo, Norway',
+    },
+  ],
+  totalPosts: 2,
+  totalPages: 1,
+}
 
-test("an informative text renders if the user hasn't searched something yet", () => {
+const setToast = jest.fn()
+
+beforeEach(() => {
+  useToast.mockReturnValue({ setToast })
+  axiosGet.mockReturnValue({ data: searchData })
+})
+
+it('renders an informative text if no posts have been fetched yet', () => {
   render(<HomePostPage />)
   const text = screen.getByRole('status')
   expect(text).toHaveTextContent(/search something/i)
 })
 
-test('an informative text renders if no posts have been found', async () => {
-  server.use(
-    rest.get('http://localhost:3000/api/posts/search', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({ posts: [], totalPosts: 0, totalPages: 0 })
-      )
-    })
-  )
+it('renders an informative text if no posts have been found', async () => {
+  axiosGet.mockResolvedValue({
+    data: { posts: [], totalPosts: 0, totalPages: 0 },
+  })
 
   const search = '?query=ohNooo'
   Object.defineProperty(window, 'location', { get: () => ({ search }) })
@@ -37,7 +52,7 @@ test('an informative text renders if no posts have been found', async () => {
   await waitFor(() => expect(text).toHaveTextContent(/no posts found/i))
 })
 
-test("a request is sent to fetch the posts matching the url query string's data", async () => {
+it("fetches the posts matching the url query string's data", async () => {
   const search = '?query=cat'
   Object.defineProperty(window, 'location', { get: () => ({ search }) })
 
@@ -53,29 +68,22 @@ test("a request is sent to fetch the posts matching the url query string's data"
   expect(post2).toBeInTheDocument()
 })
 
-test('if there is only one post found, "post" is in the singular', async () => {
-  server.use(
-    rest.get('http://localhost:3000/api/posts/search', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          posts: [
-            {
-              id: '0',
-              name: 'Blue cat',
-              description: 'Magnificent blue cat',
-              categories: ['cat'],
-              price: 50,
-              images: ['LKDFlkjdlskjLJFsjLK.jpeg'],
-              userId: '0',
-            },
-          ],
-          totalPosts: 1,
-          totalPages: 1,
-        })
-      )
-    })
-  )
+it('renders "post" in the singular if there is only one found post', async () => {
+  axiosGet.mockResolvedValue({
+    data: {
+      posts: [
+        {
+          id: '0',
+          name: 'blue cat',
+          price: 50,
+          image: 'blue-cat.jpeg',
+          address: 'Tokyo, Japan',
+        },
+      ],
+      totalPosts: 1,
+      totalPages: 1,
+    },
+  })
 
   const search = '?query=cat'
   Object.defineProperty(window, 'location', { get: () => ({ search }) })
@@ -86,15 +94,8 @@ test('if there is only one post found, "post" is in the singular', async () => {
   expect(nbOfPostsFound).toBeInTheDocument()
 })
 
-test('an error renders if the server fails to fetch the posts', async () => {
-  const setToast = jest.fn()
-  useToast.mockReturnValue({ setToast })
-
-  server.use(
-    rest.get('http://localhost:3000/api/posts/search', (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ message: err.QUERY_REQUIRED }))
-    })
-  )
+it('renders an alert if the server fails to fetch the posts', async () => {
+  axiosGet.mockRejectedValue({ response: { data: { message: 'error' } } })
 
   const search = '?oh=no'
   Object.defineProperty(window, 'location', { get: () => ({ search }) })
@@ -102,9 +103,7 @@ test('an error renders if the server fails to fetch the posts', async () => {
   render(<HomePostPage />)
 
   await waitFor(() => {
-    expect(setToast).toHaveBeenNthCalledWith(1, {
-      message: err.QUERY_REQUIRED,
-      error: true,
-    })
+    const toast = { message: 'error', error: true }
+    expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })

@@ -1,6 +1,7 @@
 import { randomBytes, scryptSync } from 'crypto'
 import { DeleteResult } from 'mongodb'
 import { models, model, Schema, Model, Types, Query } from 'mongoose'
+import { nanoid } from 'nanoid'
 import Account from './Account'
 import Discussion from './Discussion'
 import Post from './Post'
@@ -15,6 +16,8 @@ export interface UserModel {
   postsIds: Types.ObjectId[]
   favPostsIds: Types.ObjectId[]
   discussionsIds: Types.ObjectId[]
+  channelName: string
+  hasUnseenMessages: boolean
 }
 
 const userSchema = new Schema<UserModel>({
@@ -26,6 +29,8 @@ const userSchema = new Schema<UserModel>({
   postsIds: [Schema.Types.ObjectId],
   favPostsIds: [Schema.Types.ObjectId],
   discussionsIds: [Schema.Types.ObjectId],
+  channelName: { type: String, default: () => nanoid() },
+  hasUnseenMessages: { type: Boolean, default: false },
 })
 
 userSchema.pre('save', function (next) {

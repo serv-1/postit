@@ -1,4 +1,3 @@
-import Joi from 'joi'
 import { IImage } from '../types/common'
 import err from '../utils/constants/errors'
 import csrfTokenSchema from './csrfTokenSchema'
@@ -27,6 +26,9 @@ const updateUserApiSchema = object<UpdateUserApiSchema>({
   discussionId: idSchema,
 })
   .xor('name', 'email', 'password', 'image', 'favPostId', 'discussionId')
-  .messages({ 'object.xor': err.DATA_INVALID })
+  .messages({
+    'object.xor': err.DATA_INVALID,
+    'object.missing': err.DATA_INVALID,
+  })
 
 export default updateUserApiSchema

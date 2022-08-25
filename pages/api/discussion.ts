@@ -1,10 +1,11 @@
-import { nanoid } from 'nanoid'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import Discussion from '../../models/Discussion'
+import User from '../../models/User'
 import addDiscussionApiSchema from '../../schemas/addDiscussionApiSchema'
 import err from '../../utils/constants/errors'
 import dbConnect from '../../utils/functions/dbConnect'
+import getServerPusher from '../../utils/functions/getServerPusher'
 import isCsrfTokenValid from '../../utils/functions/isCsrfTokenValid'
 import validate from '../../utils/functions/validate'
 
@@ -37,13 +38,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await dbConnect()
 
   const discussion = new Discussion({
-    messages: [message],
+    messages: [{ message, userId: session.id }],
     ...rest,
     buyerId: session.id,
-    channelName: nanoid(),
   })
 
   await discussion.save()
+
+  const seller = await User.findById(rest.sellerId).lean().exec()
+
+  if (!seller) {
+    return res.status(404).json({ message: err.USER_NOT_FOUND })
+  }
+
+  const pusher = getServerPusher()
+  pusher.trigger(
+    [session.channelName, 'private-' + seller.channelName],
+    'discussion-created',
+    { discussionId: discussion._id.toString(), userId: session.id }
+  )
 
   res.status(201).end()
 }

@@ -68,6 +68,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     {
       $set: {
         id: { $toString: '$_id' },
+        channelName: { $concat: ['private-', '$channelName'] },
         image: {
           $cond: [
             { $regexMatch: { input: '$image', regex: /default/ } },
@@ -77,18 +78,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
       },
     },
-    {
-      $project: {
-        _id: 0,
-        id: 1,
-        name: 1,
-        email: 1,
-        image: 1,
-        posts: 1,
-        favPosts: 1,
-        discussionsIds: 1,
-      },
-    },
+    { $unset: ['_id', 'password', 'emailVerified', '__v'] },
   ]).exec()
 
   if (!user.length) {

@@ -61,7 +61,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await post.save()
 
-  res.setHeader('Location', `/api/posts/${post.id}/${formatToUrl(post.name)}`)
+  res.setHeader('Location', `/posts/${post.id}/${formatToUrl(post.name)}`)
   res.status(201).end()
 }
 

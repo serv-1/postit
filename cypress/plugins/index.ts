@@ -83,7 +83,7 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
       if (idOrEmail.includes('@')) {
         return await User.findOne({ email: idOrEmail }).lean().exec()
       } else {
-        return await User.findOne({ _id: idOrEmail }).lean().exec()
+        return await User.findById(idOrEmail).lean().exec()
       }
     },
     async getAccountByUserId(id: string): Promise<AccountModel | null> {
@@ -94,9 +94,16 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
       await connect(env.MONGODB_URI)
       return await Post.findOne({ userId: id }).lean().exec()
     },
-    async getDiscussionByPostId(id: string): Promise<DiscussionModel | null> {
+    async getDiscussion(idOrPostName: string): Promise<DiscussionModel | null> {
       await connect(env.MONGODB_URI)
-      return await Discussion.findOne({ postId: id }).lean().exec()
+
+      if (idOrPostName.length === 24) {
+        return await Discussion.findById(idOrPostName).lean().exec()
+      } else {
+        return await Discussion.findOne({ postName: idOrPostName })
+          .lean()
+          .exec()
+      }
     },
     GoogleSocialLogin: GoogleSocialLogin,
   })

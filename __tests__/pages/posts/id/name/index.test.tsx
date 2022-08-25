@@ -3,12 +3,12 @@ import Name from '../../../../../pages/posts/[id]/[name]'
 import { ILightPost, IPost, IUser } from '../../../../../types/common'
 import userEvent from '@testing-library/user-event'
 
-jest.mock('../../../../../components/PostsNameFavoriteButton', () => ({
+jest.mock('../../../../../components/PostPageFavoriteButton', () => ({
   __esModule: true,
   default: () => <button>favorite</button>,
 }))
 
-jest.mock('../../../../../components/PostsNameUpdateButtons', () => ({
+jest.mock('../../../../../components/PostPageUpdateButtons', () => ({
   __esModule: true,
   default: () => <button>update</button>,
 }))
@@ -16,6 +16,11 @@ jest.mock('../../../../../components/PostsNameUpdateButtons', () => ({
 jest.mock('../../../../../components/PostPageMap', () => ({
   __esModule: true,
   default: () => <div></div>,
+}))
+
+jest.mock('../../../../../components/PostPageContactModal', () => ({
+  __esModule: true,
+  default: () => <button>contact</button>,
 }))
 
 const post: IPost = {
@@ -27,13 +32,13 @@ const post: IPost = {
   images: ['/table.jpeg'],
   address: 'Oslo, Norway',
   latLon: [17, 45],
+  discussionsIds: [],
   user: {
     id: '0',
     name: 'John Doe',
     email: 'johndoe@test.com',
     image: '/default.jpg',
     posts: [],
-    favPosts: [],
   },
 }
 
@@ -44,12 +49,16 @@ const user: IUser = {
   image: '/bob.jpeg',
   posts: [],
   favPosts: [],
+  discussionsIds: [],
+  channelName: 'test',
+  hasUnseenMessages: false,
 }
 
 const useToast = jest.spyOn(
   require('../../../../../contexts/toast'),
   'useToast'
 )
+
 beforeEach(() => useToast.mockReturnValue({ setToast: () => null }))
 
 it('renders', () => {

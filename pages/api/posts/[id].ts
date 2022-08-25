@@ -87,14 +87,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                   },
                 },
                 {
-                  $unset: [
-                    '_id',
-                    'postsIds',
-                    '__v',
-                    'password',
-                    'favPostsIds',
-                    'discussionsIds',
-                  ],
+                  $project: {
+                    _id: 0,
+                    id: 1,
+                    name: 1,
+                    email: 1,
+                    image: 1,
+                    posts: 1,
+                  },
                 },
               ],
               as: 'user',

@@ -5,7 +5,6 @@ import nextAuthHandlers from './nextAuth'
 import verifyEmailHandlers from './verifyEmail'
 import postHandlers from './post'
 import postsIdHandlers from './posts/[id]'
-import searchPostsHandlers from './posts/search'
 import autoCompleteHandlers from './locationiq/autocomplete'
 import searchHandlers from './locationiq/search'
 
@@ -16,7 +15,6 @@ const server = setupServer(
   ...verifyEmailHandlers,
   ...postHandlers,
   ...postsIdHandlers,
-  ...searchPostsHandlers,
   ...autoCompleteHandlers,
   ...searchHandlers
 )

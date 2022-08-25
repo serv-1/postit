@@ -5,10 +5,11 @@ import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/email'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from '../../../lib/mongodb'
-import User from '../../../models/User'
+import User, { UserModel } from '../../../models/User'
 import dbConnect from '../../../utils/functions/dbConnect'
 import env from '../../../utils/constants/env'
 import getAxiosError from '../../../utils/functions/getAxiosError'
+import { nanoid } from 'nanoid'
 
 export default NextAuth({
   providers: [
@@ -47,39 +48,46 @@ export default NextAuth({
       maxAge: 3600,
     }),
   ],
-  pages: {
-    signIn: '/authentication',
-    verifyRequest: '/mail-sent',
-  },
+  pages: { signIn: '/authentication', verifyRequest: '/mail-sent' },
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
         token.id = user.id
+        let channelName: string = ''
 
         if (account.provider === 'google' && user.image.includes('https://')) {
           await dbConnect()
-          await User.updateOne(
-            { _id: user.id },
-            {
-              emailVerified: new Date(),
-              image: 'default.jpg',
-              postsIds: [],
-              favPostsIds: [],
-              discussionIds: [],
-            }
-          ).exec()
+
+          channelName = nanoid()
+
+          await User.findByIdAndUpdate(user.id, {
+            emailVerified: new Date(),
+            image: 'default.jpg',
+            postsIds: [],
+            favPostsIds: [],
+            discussionIds: [],
+            channelName,
+          }).exec()
+
+          channelName = 'private-' + channelName
+        } else {
+          const u = (await User.findById(user.id).lean().exec()) as UserModel
+          channelName = 'private-' + u.channelName
         }
+
+        token.channelName = channelName
       }
       return token
     },
     async session({ session, token }) {
-      if (token) session.id = token.id
+      if (token) {
+        session.id = token.id
+        session.channelName = token.channelName
+      }
       return session
     },
   },
-  session: {
-    strategy: 'jwt',
-  },
+  session: { strategy: 'jwt' },
   secret: env.SECRET,
   adapter: MongoDBAdapter(clientPromise),
 })

@@ -36,7 +36,10 @@ describe('/api/users/:id', () => {
       cy.task('addUser', u1).then((userId) => {
         cy.req<IUser>({ url: `/api/users/${userId}` }).then((res) => {
           expect(res.status).to.eq(200)
-          expect(res.body).to.eql({
+          expect(res.body)
+            .to.have.property('channelName')
+            .to.include('private-')
+          expect(res.body).to.deep.include({
             id: userId,
             name: u1.name,
             email: u1.email,

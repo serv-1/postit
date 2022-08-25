@@ -41,3 +41,9 @@ it('fails if there is too many properties', () => {
   const { error: e } = updateUserApiSchema.validate(value)
   expect(e?.details[0].message).toBe(err.DATA_INVALID)
 })
+
+it('fails if there is missing properties', () => {
+  const value = { csrfToken }
+  const { error: e } = updateUserApiSchema.validate(value)
+  expect(e?.details[0].message).toBe(err.DATA_INVALID)
+})

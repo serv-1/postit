@@ -1,4 +1,4 @@
-import PostsNameFavoriteButton from '../../components/PostsNameFavoriteButton'
+import PostPageFavoriteButton from '../../components/PostPageFavoriteButton'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { IUser } from '../../types/common'
@@ -11,9 +11,12 @@ const user: IUser = {
   name: 'Bobby',
   email: 'bobby@bobby.bobby',
   image: '/bobby.jpeg',
+  discussionsIds: [],
+  hasUnseenMessages: false,
+  channelName: 'test',
   posts: [],
   favPosts: [
-    { id: '0', name: 'table', image: '/table.jpeg', location: 'Oslo, Norway' },
+    { id: '0', name: 'table', image: '/table.jpeg', address: 'Oslo, Norway' },
   ],
 }
 
@@ -30,7 +33,7 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 it('renders', () => {
-  render(<PostsNameFavoriteButton postId="0" />)
+  render(<PostPageFavoriteButton postId="0" />)
 
   const heartBtn = screen.getByRole('button', { name: /favorite/i })
   expect(heartBtn).toHaveAttribute('title', 'Add to favorite')
@@ -42,7 +45,7 @@ it('renders', () => {
 })
 
 test('the user can add or delete the post to its favorite', async () => {
-  render(<PostsNameFavoriteButton postId="0" user={user} />)
+  render(<PostPageFavoriteButton postId="0" user={user} />)
 
   let heartBtn = screen.getByRole('button', { name: /favorite/i })
   expect(heartBtn).toHaveAttribute('title', 'Delete from favorite')
@@ -92,7 +95,7 @@ test('an error renders if the server fails to update the user favorite post list
     })
   )
 
-  render(<PostsNameFavoriteButton postId="0" user={user} />)
+  render(<PostPageFavoriteButton postId="0" user={user} />)
 
   const heartBtn = screen.getByRole('button', { name: /favorite/i })
   await userEvent.click(heartBtn)
@@ -106,7 +109,7 @@ test('an error renders if the server fails to update the user favorite post list
 })
 
 test("unauthenticated users can't add the post to their favorite list", async () => {
-  render(<PostsNameFavoriteButton postId="0" />)
+  render(<PostPageFavoriteButton postId="0" />)
 
   const heartBtn = screen.getByRole('button', { name: /favorite/i })
   await userEvent.click(heartBtn)

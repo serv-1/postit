@@ -1,10 +1,20 @@
 import classNames from 'classnames'
+import { useEffect } from 'react'
 import { useToast } from '../contexts/toast'
 import X from '../public/static/images/x.svg'
 
 const Toast = () => {
   const { toast, setToast } = useToast()
   const { message, error } = toast
+
+  useEffect(() => {
+    if (!message) return
+
+    const id = setTimeout(() => setToast({}), 12500)
+
+    return () => clearTimeout(id)
+  }, [message, setToast])
+
   return message ? (
     <div className="w-full z-[9999] absolute top-16 animate-[fadeInDown_.3s_ease-out] flex flex-row flex-nowrap justify-center">
       <div
@@ -20,6 +30,7 @@ const Toast = () => {
         <button
           className="text-fuchsia-200 bg-fuchsia-50/[.15] rounded hover:text-fuchsia-50 hover:bg-fuchsia-50/50 transition-colors duration-200"
           onClick={() => setToast({})}
+          aria-label="Close"
         >
           <X className="w-24 h-24" />
         </button>

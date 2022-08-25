@@ -9,13 +9,13 @@ import { getCsrfToken } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import Button from './Button'
 
-interface PostsNameUpdateButtonsProps {
+interface PostPageUpdateButtonsProps {
   id: string
   name: string
   isDotButton?: boolean
 }
 
-const PostsNameUpdateButtons = (props: PostsNameUpdateButtonsProps) => {
+const PostPageUpdateButtons = (props: PostPageUpdateButtonsProps) => {
   const { setToast } = useToast()
   const router = useRouter()
 
@@ -60,4 +60,4 @@ const PostsNameUpdateButtons = (props: PostsNameUpdateButtonsProps) => {
   )
 }
 
-export default PostsNameUpdateButtons
+export default PostPageUpdateButtons

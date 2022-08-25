@@ -90,7 +90,7 @@ describe('/api/post', () => {
 
         cy.task<PostModel>('getPostByUserId', this.uId).then((post) => {
           expect(res.headers['location']).to.eq(
-            `/api/posts/${post._id.toString()}/${formatToUrl(post.name)}`
+            `/posts/${post._id.toString()}/${formatToUrl(post.name)}`
           )
 
           expect(post.name).to.eq(defaultBody.name)

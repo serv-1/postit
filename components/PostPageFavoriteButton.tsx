@@ -8,12 +8,12 @@ import Heart from '../public/static/images/heart.svg'
 import HeartFill from '../public/static/images/heart-fill.svg'
 import { IUser } from '../types/common'
 
-interface PostsNameFavoriteButtonProps {
+interface PostPageFavoriteButtonProps {
   postId: string
   user?: IUser
 }
 
-const PostsNameFavoriteButton = (props: PostsNameFavoriteButtonProps) => {
+const PostPageFavoriteButton = (props: PostPageFavoriteButtonProps) => {
   const { postId, user } = props
   const { setToast } = useToast()
   const [isFavPost, setIsFavPost] = useState(false)
@@ -81,4 +81,4 @@ const PostsNameFavoriteButton = (props: PostsNameFavoriteButtonProps) => {
   )
 }
 
-export default PostsNameFavoriteButton
+export default PostPageFavoriteButton

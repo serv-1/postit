@@ -80,6 +80,8 @@ const err = {
 	CSRF_TOKEN_INVALID: 'Something weird happen! Try to refresh the page or sign out and sign in again.' as const,
 	/* Default */
 	DEFAULT: 'Something go boom! Try your action again or just wait if it still doesn\'t work.' as const,
+	/* Misc */
+	CANNOT_SEND_MSG: 'You cannot send a message because your interlocutor has deleted its account.' as const,
 }
 
 export default err

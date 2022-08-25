@@ -15,6 +15,7 @@ import createFile from '../../utils/functions/createFile'
 import csrfTokenSchema from '../../schemas/csrfTokenSchema'
 import { UpdateQuery } from 'mongoose'
 import addUserSchema from '../../schemas/addUserSchema'
+import getServerPusher from '../../utils/functions/getServerPusher'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
@@ -92,7 +93,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const ids = user.discussionsIds.map((id) => id.toString())
         const action = ids.includes(reqBody.discussionId) ? 'pull' : 'push'
 
-        update = { [`$${action}`]: { discussionsIds: reqBody.discussionId } }
+        update = {
+          [`$${action}`]: { discussionsIds: reqBody.discussionId },
+          hasUnseenMessages: false,
+        }
+
+        const pusher = getServerPusher()
+        pusher.trigger(
+          'private-' + user.channelName,
+          'discussion-deleted',
+          reqBody.discussionId
+        )
       }
 
       await dbConnect()
