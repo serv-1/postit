@@ -6,12 +6,14 @@ import { useToast } from '../contexts/toast'
 import getAxiosError from '../utils/functions/getAxiosError'
 import axios, { AxiosError } from 'axios'
 import Popup from './Popup'
+import { Session } from 'next-auth'
 
 const HeaderDropdownMenu = () => {
   const [image, setImage] = useState<string>()
+
   const { setToast } = useToast()
-  const { data, status } = useSession()
-  const id = data?.id
+  const { data } = useSession() as { data: Session }
+  const { id } = data
 
   useEffect(() => {
     const getImage = async () => {
@@ -23,8 +25,8 @@ const HeaderDropdownMenu = () => {
         setToast({ message, error: true })
       }
     }
-    if (status === 'authenticated') getImage()
-  }, [id, setToast, status])
+    getImage()
+  }, [id, setToast])
 
   return (
     <Popup

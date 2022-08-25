@@ -24,6 +24,9 @@ const user = {
   image: 'john.jpeg',
   posts: [],
   favPosts: [],
+  discussionsIds: [],
+  hasUnseenMessages: false,
+  channelName: 'test',
 }
 
 it('renders', () => {

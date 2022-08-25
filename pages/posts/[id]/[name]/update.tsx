@@ -8,7 +8,6 @@ import Accordion from '../../../../components/Accordion'
 import ExpandedImageModal from '../../../../components/ExpandedImageModal'
 import Form from '../../../../components/Form'
 import Header from '../../../../components/Header'
-import HeaderDropdownMenu from '../../../../components/HeaderDropdownMenu'
 import Input from '../../../../components/Input'
 import InputError from '../../../../components/InputError'
 import Select from '../../../../components/Select'
@@ -127,9 +126,7 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
         <title>Update {post.name} - Filanad</title>
       </Head>
       <div className="flex flex-col flex-nowrap justify-center items-center">
-        <Header className="w-full max-w-[450px] py-4 mb-8 md:max-w-full">
-          <HeaderDropdownMenu />
-        </Header>
+        <Header />
         <GlassWrapper padding="p-32">
           <ShapeContainer>
             <h1>Update the post</h1>

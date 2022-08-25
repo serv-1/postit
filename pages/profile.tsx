@@ -45,14 +45,7 @@ const Profile = ({ user, csrfToken }: ProfileProps) => {
       <Head>
         <title>Profile - Filanad</title>
       </Head>
-      <Header>
-        <Link
-          href="/create-a-post"
-          className="bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold mr-8 md:mr-16"
-        >
-          Create a post
-        </Link>
-      </Header>
+      <Header />
       <main
         data-cy="profile"
         className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-24"
@@ -85,28 +78,28 @@ const Profile = ({ user, csrfToken }: ProfileProps) => {
           </div>
           <div className="mb-32 md:bg-fuchsia-100 md:p-32 md:rounded-16">
             <TabsProvider defaultValue="post">
-              <TabList className="flex flex-row flew-nowrap mb-16 md:justify-center md:mb-32">
+              <TabList className="flex flex-row flew-nowrap gap-x-8 mb-16 md:gap-x-16 md:justify-center md:mb-32">
                 <Tab
                   value="post"
-                  baseClass="p-8 w-full font-bold md:w-[150px] rounded-l-full"
-                  activeClass="bg-fuchsia-400 text-fuchsia-900"
-                  inactiveClass="bg-fuchsia-200 text-fuchsia-400 hover:bg-fuchsia-400 hover:text-fuchsia-900 transition-colors duration-200"
+                  baseClass="p-8 w-full md:w-[125px] rounded-8"
+                  activeClass="bg-fuchsia-200 text-fuchsia-900 font-bold"
+                  inactiveClass="bg-transparent text-fuchsia-600 hover:bg-fuchsia-50 transition-colors duration-200"
                 >
                   Post
                 </Tab>
                 <Tab
                   value="favorite"
-                  baseClass="p-8 w-full font-bold md:w-[150px]"
-                  activeClass="bg-fuchsia-400 text-fuchsia-900"
-                  inactiveClass="bg-fuchsia-200 text-fuchsia-400 hover:bg-fuchsia-400 hover:text-fuchsia-900 transition-colors duration-200"
+                  baseClass="p-8 w-full md:w-[125px] rounded-8"
+                  activeClass="bg-fuchsia-200 text-fuchsia-900 font-bold"
+                  inactiveClass="bg-transparent text-fuchsia-600 hover:bg-fuchsia-50 transition-colors duration-200"
                 >
                   Favorite
                 </Tab>
                 <Tab
                   value="account"
-                  baseClass="p-8 w-full font-bold md:w-[150px] rounded-r-full"
-                  activeClass="bg-fuchsia-400 text-fuchsia-900"
-                  inactiveClass="bg-fuchsia-200 text-fuchsia-400 hover:bg-fuchsia-400 hover:text-fuchsia-900 transition-colors duration-200"
+                  baseClass="p-8 w-full md:w-[125px] rounded-8"
+                  activeClass="bg-fuchsia-200 text-fuchsia-900 font-bold"
+                  inactiveClass="bg-transparent text-fuchsia-600 hover:bg-fuchsia-50 transition-colors duration-200"
                 >
                   Account
                 </Tab>

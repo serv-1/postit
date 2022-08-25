@@ -1,52 +1,57 @@
 import { render, screen } from '@testing-library/react'
-import Name from '../../../../pages/users/[id]/[name]'
+import UserPage from '../../../../pages/users/[id]/[name]'
+
+const user = {
+  id: '0',
+  name: 'john',
+  email: 'john@jo.hn',
+  image: 'john.jpeg',
+  posts: [],
+  favPosts: [],
+  discussionsIds: [],
+  hasUnseenMessages: false,
+  channelName: 'test',
+}
+const post = {
+  id: '0',
+  name: 'table',
+  description: 'magnificent table',
+  categories: ['furniture' as const],
+  price: 50,
+  images: ['table.jpeg'],
+  userId: '0',
+  discussionsIds: [],
+  address: 'Oslo, Norway',
+  latLon: [58, 42] as [number, number],
+}
 
 it('renders', () => {
-  const user = {
-    id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
-    name: 'John Doe',
-    email: 'johndoe@test.com',
-    image: '/img.jpeg',
-    posts: [],
-  }
-
-  render(<Name user={user} />)
+  render(<UserPage user={user} />)
 
   const title = screen.getByRole('heading')
   expect(title).toHaveTextContent(user.name)
 
   const img = screen.getByRole('img')
   expect(img).toHaveAttribute('src', user.image)
+  expect(img.getAttribute('alt')).toContain(user.name)
 
   const posts = screen.getByRole('status')
   expect(posts).toHaveTextContent(user.name)
 })
 
 it('renders the user posts', () => {
-  const user = {
-    id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
-    name: 'John Doe',
-    email: 'johndoe@test.com',
-    image: '/img.jpeg',
-    posts: [
-      {
-        id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
-        name: 'Table',
-        description: 'Magnificent table',
-        categories: ['furniture' as const],
-        price: 50,
-        images: ['/table.jpeg'],
-        userId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
-      },
-    ],
-  }
-
-  render(<Name user={user} />)
+  render(<UserPage user={{ ...user, posts: [post, { ...post, id: '1' }] }} />)
 
   const title = screen.getByRole('heading', { level: 2 })
-  expect(title).toHaveTextContent(String(user.posts.length))
+  expect(title).toHaveTextContent('Its 2 posts')
 
-  const regex = new RegExp(user.posts[0].name, 'i')
-  const post = screen.getByText(regex)
-  expect(post).toBeInTheDocument()
+  const postsNames = screen.getAllByText(/table/i)
+  expect(postsNames).toHaveLength(2)
+})
+
+it('renders "post" in the singular if there is only one post', () => {
+  render(<UserPage user={{ ...user, posts: [post] }} />)
+
+  const title = screen.getByRole('heading', { level: 2 })
+  expect(title).toHaveTextContent('Its 1 post')
 })

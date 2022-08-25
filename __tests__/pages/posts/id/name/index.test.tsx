@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import Name from '../../../../../pages/posts/[id]/[name]'
+import PostPage from '../../../../../pages/posts/[id]/[name]'
 import { ILightPost, IPost, IUser } from '../../../../../types/common'
 import userEvent from '@testing-library/user-event'
 
@@ -62,7 +62,7 @@ const useToast = jest.spyOn(
 beforeEach(() => useToast.mockReturnValue({ setToast: () => null }))
 
 it('renders', () => {
-  render(<Name post={post} />)
+  render(<PostPage post={post} />)
 
   const documentTitle = screen.getByTestId('documentTitle')
   expect(documentTitle).toHaveTextContent(post.name)
@@ -94,7 +94,7 @@ it('renders', () => {
 })
 
 it('renders the update buttons if the signed in user is the post author', () => {
-  render(<Name post={post} user={user} />)
+  render(<PostPage post={post} user={user} />)
 
   const updateBtnsText = screen.getByText(/manage your post/i)
   expect(updateBtnsText).toBeInTheDocument()
@@ -107,7 +107,7 @@ test('the arrow left redirect to the previous page', async () => {
   const back = jest.fn()
   Object.defineProperty(window, 'history', { get: () => ({ back }) })
 
-  render(<Name post={post} />)
+  render(<PostPage post={post} />)
 
   const arrowLeft = screen.getByRole('button', { name: /go back/i })
   await userEvent.click(arrowLeft)
@@ -125,7 +125,7 @@ it("renders author's other posts section if the user is unauthenticated and the 
   }
   const p = { ...post, user: { ...post.user, posts: [userPost] } }
 
-  render(<Name post={p} />)
+  render(<PostPage post={p} />)
 
   const otherPostsTitle = screen.getByRole('heading', { level: 2 })
   expect(otherPostsTitle).toHaveTextContent(p.user.name + "'s other posts")
@@ -145,7 +145,7 @@ it("renders author's other posts section if the signed in user isn't the post au
   const p = { ...post, user: { ...post.user, posts: [userPost] } }
   const u = { ...user, id: '1' }
 
-  render(<Name post={p} user={u} />)
+  render(<PostPage post={p} user={u} />)
 
   const otherPostsTitle = screen.getByRole('heading', { level: 2 })
   expect(otherPostsTitle).toBeInTheDocument()
@@ -161,7 +161,7 @@ it("doesn't render author's other posts section if the signed in user is the pos
   }
   const p = { ...post, user: { ...post.user, posts: [userPost] } }
 
-  render(<Name post={p} user={user} />)
+  render(<PostPage post={p} user={user} />)
 
   const otherPostsTitle = screen.queryByRole('heading', { level: 2 })
   expect(otherPostsTitle).not.toBeInTheDocument()

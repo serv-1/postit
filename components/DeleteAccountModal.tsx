@@ -25,7 +25,7 @@ const DeleteAccountModal = () => {
 
   return (
     <>
-      <Button color="primary" fullWidth onClick={() => setIsOpen(true)}>
+      <Button color="danger" fullWidth onClick={() => setIsOpen(true)}>
         Delete account
       </Button>
       {isOpen && (
@@ -51,13 +51,13 @@ const DeleteAccountModal = () => {
             </div>
             <div className="flex flex-row flew-nowrap gap-x-24">
               <Button
-                color="secondary"
+                color="primary"
                 fullWidth
                 onClick={() => setIsOpen(false)}
               >
                 Cancel
               </Button>
-              <Button color="primary" fullWidth onClick={deleteUser}>
+              <Button color="danger" fullWidth onClick={deleteUser}>
                 Delete
               </Button>
             </div>

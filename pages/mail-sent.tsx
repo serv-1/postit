@@ -17,7 +17,7 @@ const MailSent = () => {
         <title>Mail sent! - Filanad</title>
       </Head>
       <div className="flex flex-col flex-nowrap justify-center items-center">
-        <Header noMenu className="px-0 py-4" />
+        <Header />
         <GlassWrapper minHeight="md:min-h-[480px]">
           <LeftPanel>
             <SendCheck className="w-[160px] h-[160px] mx-auto mb-32 md:hidden" />

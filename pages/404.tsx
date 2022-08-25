@@ -15,7 +15,7 @@ const Page404 = () => (
       <title>Not found - Filanad</title>
     </Head>
     <div className="flex flex-col flex-nowrap justify-center items-center">
-      <Header noMenu className="px-0 py-4" />
+      <Header />
       <GlassWrapper minHeight="md:min-h-[480px]">
         <LeftPanel padding="md:py-32 md:pl-32 md:pr-8">
           <div className="text-[128px] font-bold leading-[104px] mb-8 tracking-[.1em] text-center [text-shadow:2px_2px_0_#E879F9,4px_4px_0_#701A75] md:text-[64px] md:leading-[64px] md:mb-0 md:tracking-normal md:text-right md:[text-shadow:-2px_2px_0_#FDF4FF,-4px_4px_0_#A21CAF] md:relative md:top-1/2 md:-translate-y-1/2">

@@ -23,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   try {
     const url = 'http://localhost:3000/api/posts/' + postId
-    const props: NameProps = { post: (await axios.get<IPost>(url)).data }
+    const props: PostPageProps = { post: (await axios.get<IPost>(url)).data }
 
     if (session) {
       const url = 'http://localhost:3000/api/users/' + session.id
@@ -36,19 +36,21 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 }
 
-interface NameProps {
+interface PostPageProps {
   post: IPost
   user?: IUser
   csrfToken?: string
 }
 
-const Name = ({ post, user, csrfToken }: NameProps) => {
+const PostPage = ({ post, user, csrfToken }: PostPageProps) => {
   return (
     <>
       <Head>
         <title>{post.name} - Filanad</title>
       </Head>
-      <Header className="hidden md:flex" />
+      <div className="hidden md:flex">
+        <Header />
+      </div>
       <main className="grid grid-cols-4 md:grid-cols-8 md:grid-rows-[auto,1fr] lg:grid-cols-12 gap-x-24">
         <div className="relative col-span-full h-[360px] -ml-16 w-[calc(100%+32px)] md:col-span-5 md:ml-0 md:w-full md:rounded-16 md:overflow-hidden lg:col-span-8">
           <Image
@@ -142,4 +144,4 @@ const Name = ({ post, user, csrfToken }: NameProps) => {
   )
 }
 
-export default Name
+export default PostPage
