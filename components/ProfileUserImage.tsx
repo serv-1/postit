@@ -5,7 +5,7 @@ import { useToast } from '../contexts/toast'
 import getAxiosError from '../utils/functions/getAxiosError'
 import isImageValid from '../utils/functions/isImageValid'
 import readAsDataUrl from '../utils/functions/readAsDataUrl'
-import { IImage } from '../types/common'
+import { Image as IImage } from '../types/common'
 import { getCsrfToken } from 'next-auth/react'
 import Plus from '../public/static/images/plus.svg'
 

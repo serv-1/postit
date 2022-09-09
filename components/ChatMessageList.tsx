@@ -3,16 +3,16 @@ import { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
 import { useToast } from '../contexts/toast'
-import { IDiscussion, IMessage, JSONDiscussion, UnArray } from '../types/common'
+import { Discussion, Message, JSONDiscussion, UnArray } from '../types/common'
 import getAxiosError from '../utils/functions/getAxiosError'
 import getClientPusher from '../utils/functions/getClientPusher'
 import ChatMessage from './ChatMessage'
 
 interface DiscussionDataState {
   channelName: string
-  messages: IMessage[]
-  buyer: IDiscussion['buyer']
-  seller: IDiscussion['seller']
+  messages: Message[]
+  buyer: Discussion['buyer']
+  seller: Discussion['seller']
 }
 
 interface ChatMessageListProps {

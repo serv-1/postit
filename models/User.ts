@@ -3,7 +3,7 @@ import { DeleteResult } from 'mongodb'
 import { models, model, Schema, Model, Types, Query } from 'mongoose'
 import { nanoid } from 'nanoid'
 import Account from './Account'
-import Discussion from './Discussion'
+import Discussion, { DiscussionModel } from './Discussion'
 import Post from './Post'
 
 export interface UserModel {
@@ -42,31 +42,19 @@ userSchema.pre('save', function (next) {
   next()
 })
 
-userSchema.pre<Model<UserModel>>('insertMany', function (next, users) {
-  for (const user of users as UserModel[]) {
-    const salt = randomBytes(16).toString('hex')
-    const hash = scryptSync(user.password as string, salt, 64).toString('hex')
-
-    user.password = `${salt}:${hash}`
-  }
-
-  next()
-})
-
 userSchema.pre<Query<DeleteResult, UserModel>>('deleteOne', async function () {
-  const userId = this.getFilter()._id
+  const userId = this.getFilter()._id.toString()
 
   await Account.deleteOne({ userId }).lean().exec()
   await Post.deleteMany({ userId }).lean().exec()
 
-  const user = await User.findById(userId).lean().exec()
+  const user = (await User.findById(userId).lean().exec()) as UserModel
 
-  for (const id of (user as NonNullable<typeof user>).discussionsIds) {
-    const discussion = await Discussion.findById(id).exec()
-    const disc = discussion as NonNullable<typeof discussion>
+  for (const id of user.discussionsIds) {
+    const discussion = (await Discussion.findById(id).exec()) as DiscussionModel
 
-    const buyerId = disc.buyerId?.toString()
-    const sellerId = disc.sellerId?.toString()
+    const buyerId = discussion.buyerId?.toString()
+    const sellerId = discussion.sellerId?.toString()
 
     const otherUserId = buyerId === userId ? sellerId : buyerId
     const otherUser = await User.findById(otherUserId).lean().exec()
@@ -75,8 +63,13 @@ userSchema.pre<Query<DeleteResult, UserModel>>('deleteOne', async function () {
     if (!discussionsIds?.includes(id.toString())) {
       await Discussion.deleteOne({ _id: id }).lean().exec()
     } else {
-      disc[buyerId === userId ? 'buyerId' : 'sellerId'] = undefined
-      await disc.save()
+      await Discussion.updateOne(
+        { _id: discussion._id },
+        { $unset: { [buyerId === userId ? 'buyerId' : 'sellerId']: '' } },
+        { omitUndefined: true }
+      )
+        .lean()
+        .exec()
     }
   }
 })

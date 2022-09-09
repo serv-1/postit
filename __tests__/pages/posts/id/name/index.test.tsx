@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import PostPage from '../../../../../pages/posts/[id]/[name]'
-import { ILightPost, IPost, IUser } from '../../../../../types/common'
+import PostPage, { PostPageProps } from '../../../../../pages/posts/[id]/[name]'
+import { LightPost } from '../../../../../types/common'
 import userEvent from '@testing-library/user-event'
 
 jest.mock('../../../../../components/PostPageFavoriteButton', () => ({
@@ -23,7 +23,7 @@ jest.mock('../../../../../components/PostPageContactModal', () => ({
   default: () => <button>contact</button>,
 }))
 
-const post: IPost = {
+const post: PostPageProps['post'] = {
   id: '0',
   name: 'Table',
   description: 'Magnificent table',
@@ -33,22 +33,16 @@ const post: IPost = {
   address: 'Oslo, Norway',
   latLon: [17, 45],
   discussionsIds: [],
-  user: {
-    id: '0',
-    name: 'John Doe',
-    email: 'johndoe@test.com',
-    image: '/default.jpg',
-    posts: [],
-  },
+  user: { id: '0', name: 'John Doe', posts: [] },
 }
 
-const user: IUser = {
+const user: PostPageProps['user'] = {
   id: '0',
   name: 'Bob',
   email: 'bob@bob.bob',
   image: '/bob.jpeg',
-  posts: [],
-  favPosts: [],
+  postsIds: [],
+  favPostsIds: [],
   discussionsIds: [],
   channelName: 'test',
   hasUnseenMessages: false,
@@ -116,7 +110,7 @@ test('the arrow left redirect to the previous page', async () => {
 })
 
 it("renders author's other posts section if the user is unauthenticated and the author has created another post", () => {
-  const userPost: ILightPost = {
+  const userPost: LightPost = {
     name: 'Chair',
     price: 25,
     image: '/static/images/posts/chair.jpeg',
@@ -135,7 +129,7 @@ it("renders author's other posts section if the user is unauthenticated and the 
 })
 
 it("renders author's other posts section if the signed in user isn't the post author and the author has created another post", () => {
-  const userPost: ILightPost = {
+  const userPost: LightPost = {
     name: 'Chair',
     price: 25,
     image: '/static/images/posts/chair.jpeg',
@@ -152,7 +146,7 @@ it("renders author's other posts section if the signed in user isn't the post au
 })
 
 it("doesn't render author's other posts section if the signed in user is the post author", () => {
-  const userPost: ILightPost = {
+  const userPost: LightPost = {
     name: 'Chair',
     price: 25,
     image: '/static/images/posts/chair.jpeg',

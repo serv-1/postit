@@ -1,8 +1,9 @@
-import { isValidObjectId, Types } from 'mongoose'
+import { isValidObjectId } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import User from '../../../models/User'
 import dbConnect from '../../../utils/functions/dbConnect'
 import err from '../../../utils/constants/errors'
+import catchError from '../../../utils/functions/catchError'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
@@ -17,75 +18,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await dbConnect()
 
-  const user = await User.aggregate([
-    { $match: { _id: new Types.ObjectId(id) } },
-    {
-      $lookup: {
-        from: 'posts',
-        let: { postsIds: '$postsIds' },
-        pipeline: [
-          { $match: { $expr: { $in: ['$_id', '$$postsIds'] } } },
-          {
-            $set: {
-              id: { $toString: '$_id' },
-              price: { $divide: ['$price', 100] },
-              images: {
-                $map: {
-                  input: '$images',
-                  as: 'image',
-                  in: { $concat: ['/static/images/posts/', '$$image'] },
-                },
-              },
-            },
-          },
-          { $unset: ['_id', '__v', 'userId'] },
-        ],
-        as: 'posts',
-      },
-    },
-    {
-      $lookup: {
-        from: 'posts',
-        let: { favPostsIds: '$favPostsIds' },
-        pipeline: [
-          { $match: { $expr: { $in: ['$_id', '$$favPostsIds'] } } },
-          {
-            $set: {
-              id: { $toString: '$_id' },
-              image: {
-                $concat: [
-                  '/static/images/posts/',
-                  { $arrayElemAt: ['$images', 0] },
-                ],
-              },
-            },
-          },
-          { $project: { _id: 0, id: 1, image: 1, name: 1 } },
-        ],
-        as: 'favPosts',
-      },
-    },
-    {
-      $set: {
-        id: { $toString: '$_id' },
-        channelName: { $concat: ['private-', '$channelName'] },
-        image: {
-          $cond: [
-            { $regexMatch: { input: '$image', regex: /default/ } },
-            { $concat: ['/static/images/', '$image'] },
-            { $concat: ['/static/images/users/', '$image'] },
-          ],
-        },
-      },
-    },
-    { $unset: ['_id', 'password', 'emailVerified', '__v'] },
-  ]).exec()
+  const user = await User.findById(id).lean().exec()
 
-  if (!user.length) {
+  if (!user) {
     return res.status(404).json({ message: err.USER_NOT_FOUND })
   }
 
-  res.status(200).json(user[0])
+  res.status(200).json({
+    id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+    hasUnseenMessages: user.hasUnseenMessages,
+    channelName: 'private-' + user.channelName,
+    image: '/static/images/users/' + user.image,
+    postsIds: user.postsIds.map((i) => i.toString()),
+    favPostsIds: user.favPostsIds.map((i) => i.toString()),
+    discussionsIds: user.discussionsIds.map((i) => i.toString()),
+  })
 }
 
-export default handler
+export default catchError(handler)

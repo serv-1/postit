@@ -1,20 +1,20 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useToast } from '../contexts/toast'
-import { ILightPost } from '../types/common'
+import { LightPost } from '../types/common'
 import getAxiosError from '../utils/functions/getAxiosError'
 import PostList from './PostList'
 import Pagination from './Pagination'
 import Blob from '../public/static/images/blob.svg'
 
 interface Response {
-  posts: ILightPost[]
+  posts: LightPost[]
   totalPages: number
   totalPosts: number
 }
 
 const HomePostPage = () => {
-  const [posts, setPosts] = useState<ILightPost[]>()
+  const [posts, setPosts] = useState<LightPost[]>()
   const [totalPosts, setTotalPosts] = useState<number>(0)
   const [totalPages, setTotalPages] = useState<number>(0)
 

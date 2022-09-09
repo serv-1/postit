@@ -5,7 +5,6 @@ import User, { UserModel } from '../../models/User'
 import { MongoError } from 'mongodb'
 import err from '../../utils/constants/errors'
 import validate from '../../utils/functions/validate'
-import { getSession } from 'next-auth/react'
 import updateUserApiSchema from '../../schemas/updateUserApiSchema'
 import isCsrfTokenValid from '../../utils/functions/isCsrfTokenValid'
 import isBase64ValueTooBig from '../../utils/functions/isBase64ValueTooBig'
@@ -16,167 +15,135 @@ import csrfTokenSchema from '../../schemas/csrfTokenSchema'
 import { UpdateQuery } from 'mongoose'
 import addUserSchema from '../../schemas/addUserSchema'
 import getServerPusher from '../../utils/functions/getServerPusher'
+import getSessionAndUser from '../../utils/functions/getSessionAndUser'
+import catchError from '../../utils/functions/catchError'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  switch (req.method) {
-    case 'PUT': {
-      const session = await getSession({ req })
+  if (!['POST', 'PUT', 'DELETE'].includes(req.method || '')) {
+    return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
+  }
 
-      if (!session) {
-        return res.status(403).json({ message: err.FORBIDDEN })
-      }
+  if (req.method === 'POST') {
+    const result = validate(addUserSchema, req.body)
 
-      const result = validate(updateUserApiSchema, req.body)
-
-      if ('message' in result) {
-        return res.status(422).json({ message: result.message })
-      }
-
-      const reqBody = result.value
-      const csrfTokenCookie = req.cookies['next-auth.csrf-token']
-
-      if (!isCsrfTokenValid(csrfTokenCookie, reqBody.csrfToken)) {
-        return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
-      }
-
-      let update: UpdateQuery<UserModel> = {}
-
-      if ('image' in reqBody) {
-        const { ext, base64 } = reqBody.image
-
-        if (isBase64ValueTooBig(base64, 1000000)) {
-          return res.status(413).json({ message: err.IMAGE_TOO_BIG })
-        }
-
-        const user = await User.findById(session.id).lean().exec()
-
-        if (!user) {
-          return res.status(404).json({ message: err.USER_NOT_FOUND })
-        }
-
-        const path = '/public/static/images/users/'
-
-        if (user.image.split('.')[0] !== 'default') {
-          await unlink(cwd() + path + user.image)
-        }
-
-        const fname = await createFile(base64, ext, path, { enc: 'base64' })
-
-        update = { image: fname }
-      } else if ('password' in reqBody) {
-        const salt = randomBytes(16).toString('hex')
-        const hash = scryptSync(reqBody.password, salt, 64)
-
-        update = { password: `${salt}:${hash.toString('hex')}` }
-      } else if ('name' in reqBody) {
-        update = { name: reqBody.name }
-      } else if ('email' in reqBody) {
-        update = { email: reqBody.email }
-      } else if ('favPostId' in reqBody) {
-        const user = await User.findById(session.id).lean().exec()
-
-        if (!user) {
-          return res.status(404).json({ message: err.USER_NOT_FOUND })
-        }
-
-        const ids = user.favPostsIds.map((id) => id.toString())
-        const action = ids.includes(reqBody.favPostId) ? 'pull' : 'push'
-
-        update = { [`$${action}`]: { favPostsIds: reqBody.favPostId } }
-      } else if ('discussionId' in reqBody) {
-        const user = await User.findById(session.id).lean().exec()
-
-        if (!user) {
-          return res.status(404).json({ message: err.USER_NOT_FOUND })
-        }
-
-        const ids = user.discussionsIds.map((id) => id.toString())
-        const action = ids.includes(reqBody.discussionId) ? 'pull' : 'push'
-
-        update = {
-          [`$${action}`]: { discussionsIds: reqBody.discussionId },
-          hasUnseenMessages: false,
-        }
-
-        const pusher = getServerPusher()
-        pusher.trigger(
-          'private-' + user.channelName,
-          'discussion-deleted',
-          reqBody.discussionId
-        )
-      }
-
-      await dbConnect()
-      await User.updateOne({ _id: session.id }, update).exec()
-
-      res.status(200).end()
-      break
+    if ('message' in result) {
+      const { name, message } = result
+      return res.status(422).json({ name, message })
     }
-    case 'POST': {
-      const result = validate(addUserSchema, req.body)
 
-      if ('message' in result) {
-        const { name, message } = result
-        return res.status(422).json({ name, message })
+    await dbConnect()
+
+    try {
+      const user = await new User(result.value).save()
+
+      res.setHeader('Location', '/profile')
+      return res.status(201).json({ id: user._id.toString() })
+    } catch (e) {
+      if ((e as MongoError).code === 11000) {
+        return res.status(422).json({ message: err.EMAIL_USED, name: 'email' })
       }
-
-      await dbConnect()
-
-      try {
-        await new User(result.value).save()
-
-        res.setHeader('Location', '/profile')
-        res.status(201).end()
-      } catch (e) {
-        if ((e as MongoError).code === 11000) {
-          const json = { message: err.EMAIL_USED, name: 'email' }
-          return res.status(422).json(json)
-        }
-        res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
-      }
-      break
+      throw null
     }
-    case 'DELETE': {
-      const session = await getSession({ req })
+  }
 
-      if (!session) {
-        return res.status(403).json({ message: err.FORBIDDEN })
+  const { session, user } = await getSessionAndUser(req)
+  if (!session || !user) {
+    return res.status(401).json({ message: err.UNAUTHORIZED })
+  }
+
+  const result = validate<string>(csrfTokenSchema, req.body?.csrfToken)
+  const csrfTokenCookie = req.cookies['next-auth.csrf-token']
+
+  if (!result.value || !isCsrfTokenValid(csrfTokenCookie, result.value)) {
+    return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
+  }
+
+  if (req.method === 'PUT') {
+    const result = validate(updateUserApiSchema, req.body)
+
+    if ('message' in result) {
+      return res.status(422).json({ message: result.message })
+    }
+
+    const reqBody = result.value
+    let update: UpdateQuery<UserModel> = {}
+
+    if ('name' in reqBody) {
+      update = { name: reqBody.name }
+    } else if ('email' in reqBody) {
+      update = { email: reqBody.email }
+    } else if ('password' in reqBody) {
+      const salt = randomBytes(16).toString('hex')
+      const hash = scryptSync(reqBody.password, salt, 64)
+
+      update = { password: salt + ':' + hash.toString('hex') }
+    } else if ('image' in reqBody) {
+      const { ext, base64 } = reqBody.image
+
+      if (isBase64ValueTooBig(base64, 1000000)) {
+        return res.status(413).json({ message: err.IMAGE_TOO_BIG })
       }
 
-      const result = validate<string>(csrfTokenSchema, req.body?.csrfToken)
-
-      if ('message' in result) {
-        return res.status(422).json({ message: result.message })
-      }
-
-      const csrfTokenCookie = req.cookies['next-auth.csrf-token']
-
-      if (!isCsrfTokenValid(csrfTokenCookie, result.value)) {
-        return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
-      }
-
-      const user = await User.findById(session.id).lean().exec()
-
-      if (!user) {
-        return res.status(404).json({ message: err.USER_NOT_FOUND })
-      }
+      const path = '/public/static/images/users/'
 
       if (user.image.split('.')[0] !== 'default') {
-        await unlink(cwd() + '/public/static/images/users/' + user.image)
+        await unlink(cwd() + path + user.image)
       }
 
-      await dbConnect()
-      await User.deleteOne({ _id: session.id }).exec()
+      const fname = await createFile(base64, ext, path, { enc: 'base64' })
 
-      res.status(200).end()
-      break
+      update = { image: fname }
+    } else if ('favPostId' in reqBody) {
+      const ids = user.favPostsIds.map((id) => id.toString())
+      const action = ids.includes(reqBody.favPostId) ? 'pull' : 'push'
+
+      update = { [`$${action}`]: { favPostsIds: reqBody.favPostId } }
+    } else if ('discussionId' in reqBody) {
+      const ids = user.discussionsIds.map((id) => id.toString())
+      const action = ids.includes(reqBody.discussionId) ? 'pull' : 'push'
+
+      update = {
+        [`$${action}`]: { discussionsIds: reqBody.discussionId },
+        hasUnseenMessages: false,
+      }
+
+      const pusher = getServerPusher()
+      pusher.trigger(
+        'private-' + user.channelName,
+        'discussion-deleted',
+        reqBody.discussionId
+      )
     }
-    default:
-      return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
+
+    await dbConnect()
+
+    try {
+      await User.updateOne({ _id: session.id }, update, {
+        runValidators: true,
+      })
+        .lean()
+        .exec()
+    } catch (e) {
+      if ((e as MongoError).code === 11000) {
+        return res.status(422).json({ message: err.EMAIL_USED })
+      }
+      throw null
+    }
+
+    return res.status(204).end()
   }
+
+  if (user.image.split('.')[0] !== 'default') {
+    await unlink(cwd() + '/public/static/images/users/' + user.image)
+  }
+
+  await dbConnect()
+  await User.deleteOne({ _id: session.id }).lean().exec()
+
+  res.status(204).end()
 }
 
-export default handler
+export default catchError(handler)
 
 export const config = {
   api: {

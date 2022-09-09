@@ -1,4 +1,4 @@
-import { IDiscussion, JSONDiscussion } from '../types/common'
+import { Discussion, JSONDiscussion } from '../types/common'
 import { useEffect, useRef, useState } from 'react'
 import getAxiosError from '../utils/functions/getAxiosError'
 import { useToast } from '../contexts/toast'
@@ -10,8 +10,8 @@ import OpenHeaderChatModalButton from './OpenHeaderChatModalButton'
 import ChatModal from './ChatModal'
 
 interface DiscussionDataState {
-  buyer: IDiscussion['buyer']
-  seller: IDiscussion['seller']
+  buyer: Discussion['buyer']
+  seller: Discussion['seller']
   postName: string
   channelName: string
 }

@@ -1,4 +1,4 @@
-import { IImage } from '../types/common'
+import { Image } from '../types/common'
 import Head from 'next/head'
 import Header from '../components/Header'
 import { useState } from 'react'
@@ -28,7 +28,7 @@ interface CreateAPostProps {
 
 const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
   const [step, setStep] = useState<0 | 1 | 2>(0)
-  const [images, setImages] = useState<IImage[]>()
+  const [images, setImages] = useState<Image[]>()
   const [latLon, setLatLon] = useState<[number, number]>()
 
   const titles = ['Where is it?', 'Show us what it is', 'Post!']

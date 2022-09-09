@@ -33,6 +33,7 @@ const post = {
   address: 'Oslo, Norway',
   latLon: [17, 22] as [number, number],
   userId: '1',
+  discussionsIds: [],
 }
 
 it('renders', async () => {

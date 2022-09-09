@@ -13,7 +13,7 @@ import InputError from '../../../../components/InputError'
 import Select from '../../../../components/Select'
 import TextArea from '../../../../components/TextArea'
 import { useToast } from '../../../../contexts/toast'
-import { Entries, IImage, IPost, IUserPost } from '../../../../types/common'
+import { Entries, Image, Post } from '../../../../types/common'
 import addSpacesToNb from '../../../../utils/functions/addSpacesToNb'
 import getAxiosError from '../../../../utils/functions/getAxiosError'
 import isImageValid from '../../../../utils/functions/isImageValid'
@@ -34,13 +34,13 @@ const options = categories.map((category) => ({
 }))
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const id = ctx.params?.id
+  const postId = ctx.params?.id
 
   try {
-    const res = await axios.get<IPost>(`http://localhost:3000/api/posts/${id}`)
+    const url = 'http://localhost:3000/api/posts/' + postId
     return {
       props: {
-        post: res.data,
+        post: (await axios.get<Post>(url)).data,
         background: 'bg-linear-page',
         csrfToken: await getCsrfToken(ctx),
       },
@@ -51,12 +51,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 }
 
 type FilteredData = Omit<UpdatePostSchema, 'images'> & {
-  images?: IImage[]
+  images?: Image[]
   latLon?: [number, number]
 }
 
 interface UpdatePostProps {
-  post: IUserPost
+  post: Post
   csrfToken?: string
 }
 
@@ -87,7 +87,7 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
           return methods.setError('images', { message }, { shouldFocus: true })
         }
 
-        const result = await readAsDataUrl<IImage['ext']>(images[i])
+        const result = await readAsDataUrl<Image['ext']>(images[i])
 
         if (typeof result === 'string') {
           methods.setError('images', { message: result }, { shouldFocus: true })

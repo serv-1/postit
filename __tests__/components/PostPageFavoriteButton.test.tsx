@@ -1,24 +1,9 @@
 import PostPageFavoriteButton from '../../components/PostPageFavoriteButton'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { IUser } from '../../types/common'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
-
-const user: IUser = {
-  id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
-  name: 'Bobby',
-  email: 'bobby@bobby.bobby',
-  image: '/bobby.jpeg',
-  discussionsIds: [],
-  hasUnseenMessages: false,
-  channelName: 'test',
-  posts: [],
-  favPosts: [
-    { id: '0', name: 'table', image: '/table.jpeg', address: 'Oslo, Norway' },
-  ],
-}
 
 const getCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
@@ -45,7 +30,7 @@ it('renders', () => {
 })
 
 test('the user can add or delete the post to its favorite', async () => {
-  render(<PostPageFavoriteButton postId="0" user={user} />)
+  render(<PostPageFavoriteButton postId="0" favPostsIds={['0']} />)
 
   let heartBtn = screen.getByRole('button', { name: /favorite/i })
   expect(heartBtn).toHaveAttribute('title', 'Delete from favorite')
@@ -64,8 +49,10 @@ test('the user can add or delete the post to its favorite', async () => {
   })
 
   heartBtn = screen.getByRole('button', { name: /favorite/i })
-  expect(heartBtn).toHaveAttribute('title', 'Add to favorite')
-  expect(heartBtn).toHaveAttribute('aria-label', 'Add to favorite')
+  await waitFor(() => {
+    expect(heartBtn).toHaveAttribute('title', 'Add to favorite')
+    expect(heartBtn).toHaveAttribute('aria-label', 'Add to favorite')
+  })
 
   heartIcons = screen.getAllByTestId(/heart/i)
   expect(heartIcons[0]).not.toHaveClass('opacity-0')
@@ -95,7 +82,7 @@ test('an error renders if the server fails to update the user favorite post list
     })
   )
 
-  render(<PostPageFavoriteButton postId="0" user={user} />)
+  render(<PostPageFavoriteButton postId="0" favPostsIds={['0']} />)
 
   const heartBtn = screen.getByRole('button', { name: /favorite/i })
   await userEvent.click(heartBtn)

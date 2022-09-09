@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useToast } from '../contexts/toast'
 import ChevronRight from '../public/static/images/chevron-right.svg'
 import X from '../public/static/images/x.svg'
-import { IUser } from '../types/common'
+import { User } from '../types/common'
 import getAxiosError from '../utils/functions/getAxiosError'
 
 interface OpenHeaderChatModalButtonProps {
@@ -39,7 +39,7 @@ const OpenHeaderChatModalButton = ({
           hasToDelete = true
         } else {
           const url = 'http://localhost:3000/api/users/' + interlocutor.id
-          const { data } = await axios.get<IUser>(url)
+          const { data } = await axios.get<User>(url)
 
           if (!data.discussionsIds.includes(discussionId)) {
             hasToDelete = true

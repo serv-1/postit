@@ -6,6 +6,7 @@ import { Buffer } from 'buffer'
 import err from '../../utils/constants/errors'
 import signInSchema from '../../schemas/signInSchema'
 import validate from '../../utils/functions/validate'
+import catchError from '../../utils/functions/catchError'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -22,30 +23,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await dbConnect()
 
-  try {
-    const user = await User.findOne({ email }).exec()
+  const user = await User.findOne({ email }).exec()
 
-    if (!user) {
-      return res.status(422).json({ name: 'email', message: err.EMAIL_UNKNOWN })
-    }
-
-    const [salt, hash] = (user.password as string).split(':')
-    const dbHash = Buffer.from(hash, 'hex')
-    const givenHash = crypto.scryptSync(password, salt, 64)
-
-    if (!crypto.timingSafeEqual(dbHash, givenHash)) {
-      const json = { name: 'password', message: err.PASSWORD_INVALID }
-      return res.status(422).json(json)
-    }
-
-    res.status(200).json({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-    })
-  } catch (e) {
-    res.status(500).json({ message: err.INTERNAL_SERVER_ERROR })
+  if (!user) {
+    return res.status(422).json({ name: 'email', message: err.EMAIL_UNKNOWN })
   }
+
+  const [salt, hash] = (user.password as string).split(':')
+  const dbHash = Buffer.from(hash, 'hex')
+  const givenHash = crypto.scryptSync(password, salt, 64)
+
+  if (!crypto.timingSafeEqual(dbHash, givenHash)) {
+    const json = { name: 'password', message: err.PASSWORD_INVALID }
+    return res.status(422).json(json)
+  }
+
+  res.status(200).json({
+    id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+  })
 }
 
-export default handler
+export default catchError(handler)

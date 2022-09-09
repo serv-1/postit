@@ -67,21 +67,24 @@ const err = {
   DATA_INVALID: 'The given data are invalid.' as const,
 	/* Server */
 	PARAMS_INVALID: 'One or many parameters are invalid.' as const,
-	INTERNAL_SERVER_ERROR: 'Server go boom! Try to refresh the page or come back later.' as const,
-	METHOD_NOT_ALLOWED: 'Request go boom! This method is not handled.' as const,
-	FORBIDDEN: 'You are not authorized.' as const,
+	INTERNAL_SERVER_ERROR: 'Something go wrong! Try to refresh the page or come back later.' as const,
+	METHOD_NOT_ALLOWED: 'This method is not allowed.' as const,
+	FORBIDDEN: 'You are not allowed.' as const,
+	UNAUTHORIZED: 'You need to be signed in.' as const,
 	NO_RESPONSE: 'The server didn\'t respond.' as const,
 	/* Resource Not Found */
 	USER_NOT_FOUND: 'User not found.' as const,
 	IMAGE_NOT_FOUND: 'Image not found.' as const,
 	POST_NOT_FOUND: 'Post not found.' as const,
 	DISCUSSION_NOT_FOUND: 'Discussion not found.' as const,
+	/* Resource already exists */
+	DISCUSSION_ALREADY_EXISTS: 'You already have started a discussion for this post.' as const,
 	/* csrf token */
-	CSRF_TOKEN_INVALID: 'Something weird happen! Try to refresh the page or sign out and sign in again.' as const,
+	CSRF_TOKEN_INVALID: 'Something weird happened! Try to refresh the page or sign out and sign in again.' as const,
 	/* Default */
-	DEFAULT: 'Something go boom! Try your action again or just wait if it still doesn\'t work.' as const,
+	DEFAULT: 'Something go wrong! Try your action again or just wait if it still doesn\'t work.' as const,
 	/* Misc */
-	CANNOT_SEND_MSG: 'You cannot send a message because your interlocutor has deleted its account.' as const,
+	CANNOT_SEND_MSG: 'You cannot send a message because your interlocutor has deleted its account or the discussion.' as const,
 }
 
 export default err

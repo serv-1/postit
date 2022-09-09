@@ -6,27 +6,26 @@ import getAxiosError from '../utils/functions/getAxiosError'
 import DotButton from './DotButton'
 import Heart from '../public/static/images/heart.svg'
 import HeartFill from '../public/static/images/heart-fill.svg'
-import { IUser } from '../types/common'
 
 interface PostPageFavoriteButtonProps {
   postId: string
-  user?: IUser
+  favPostsIds?: string[]
 }
 
 const PostPageFavoriteButton = (props: PostPageFavoriteButtonProps) => {
-  const { postId, user } = props
+  const { postId, favPostsIds } = props
   const { setToast } = useToast()
   const [isFavPost, setIsFavPost] = useState(false)
 
   useEffect(() => {
-    if (!user) return
-    for (const favPost of user.favPosts) {
-      if (favPost.id !== postId) continue
+    if (!favPostsIds) return
+    for (const favPostId of favPostsIds) {
+      if (favPostId !== postId) continue
       setIsFavPost(true)
     }
-  }, [postId, user])
+  }, [postId, favPostsIds])
 
-  const handleFavPost = user
+  const handleFavPost = favPostsIds
     ? async () => {
         try {
           await axios.put('http://localhost:3000/api/user', {

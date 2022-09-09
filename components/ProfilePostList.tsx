@@ -9,21 +9,15 @@ import axios, { AxiosError } from 'axios'
 import { useToast } from '../contexts/toast'
 import { getCsrfToken } from 'next-auth/react'
 import { useState } from 'react'
-import { IFavPost, IUserPost } from '../types/common'
+import { LighterPost } from '../types/common'
 
-interface UserPostProps {
-  isFavPost?: false
-  posts: IUserPost[]
+interface ProfilePostListProps {
+  isFavPost?: boolean
+  posts: LighterPost[]
   altText: string
 }
 
-interface FavPostProps {
-  isFavPost: true
-  posts: IFavPost[]
-  altText: string
-}
-
-const ProfilePostList = (props: FavPostProps | UserPostProps) => {
+const ProfilePostList = (props: ProfilePostListProps) => {
   const [posts, setPosts] = useState(props.posts)
   const { setToast } = useToast()
 
@@ -41,10 +35,7 @@ const ProfilePostList = (props: FavPostProps | UserPostProps) => {
       }
 
       setToast({ message: 'The post has been successfully deleted! 🎉' })
-      // https://github.com/microsoft/TypeScript/issues/44373
-      setPosts(
-        (posts as any[]).filter((post: IFavPost | IUserPost) => post.id !== id)
-      )
+      setPosts(posts.filter((post) => post.id !== id))
     } catch (e) {
       const { message } = getAxiosError(e as AxiosError)
       setToast({ message, error: true })
@@ -74,11 +65,7 @@ const ProfilePostList = (props: FavPostProps | UserPostProps) => {
           >
             <div className="relative flex-shrink-0 w-[100px] h-[100px] md:w-[150px] md:h-[150px]">
               <Image
-                src={
-                  props.isFavPost
-                    ? (post as IFavPost).image
-                    : (post as IUserPost).images[0]
-                }
+                src={post.image}
                 alt=""
                 layout="fill"
                 objectFit="cover"

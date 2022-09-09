@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { getSession } from 'next-auth/react'
 import Post from '../../models/Post'
 import isCsrfTokenValid from '../../utils/functions/isCsrfTokenValid'
 import dbConnect from '../../utils/functions/dbConnect'
@@ -9,16 +8,17 @@ import validate from '../../utils/functions/validate'
 import createFile from '../../utils/functions/createFile'
 import formatToUrl from '../../utils/functions/formatToUrl'
 import addPostApiSchema from '../../schemas/addPostApiSchema'
+import getSessionAndUser from '../../utils/functions/getSessionAndUser'
+import catchError from '../../utils/functions/catchError'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const session = await getSession({ req })
-
-  if (!session) {
-    return res.status(403).json({ message: err.FORBIDDEN })
-  }
-
   if (req.method !== 'POST') {
     return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
+  }
+
+  const { session, user } = await getSessionAndUser(req)
+  if (!session || !user) {
+    return res.status(401).json({ message: err.UNAUTHORIZED })
   }
 
   const result = validate(addPostApiSchema, req.body)
@@ -27,7 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(422).json({ name: result.name, message: result.message })
   }
 
-  const csrfTokenCookie = req.cookies['next-auth.csrf-token']
+  const csrfTokenCookie = req.cookies['next-auth.csrf-token'] || ''
   const csrfToken = result.value.csrfToken
 
   if (!isCsrfTokenValid(csrfTokenCookie, csrfToken)) {
@@ -62,10 +62,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await post.save()
 
   res.setHeader('Location', `/posts/${post.id}/${formatToUrl(post.name)}`)
-  res.status(201).end()
+  res.status(201).json({ id: post._id.toString() })
 }
 
-export default handler
+export default catchError(handler)
 
 export const config = {
   api: {

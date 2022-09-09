@@ -7,6 +7,7 @@ import dbConnect from '../../../utils/functions/dbConnect'
 import Post from '../../../models/Post'
 import validate from '../../../utils/functions/validate'
 import { Categories } from '../../../types/common'
+import catchError from '../../../utils/functions/catchError'
 
 interface Match {
   price?: { $gte?: number; $lte?: number }
@@ -83,7 +84,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       $facet: {
         posts: [
           { $sort: { name: 1, _id: 1 } },
-          { $skip: page ? (+page - 1) * 10 : 0 },
+          { $skip: page ? (+page - 1) * 20 : 0 },
           {
             $set: {
               id: { $toString: '$_id' },
@@ -120,4 +121,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   })
 }
 
-export default handler
+export default catchError(handler)

@@ -1,17 +1,18 @@
 import isBase64ValueTooBig from '../../../utils/functions/isBase64ValueTooBig'
-import { isValidObjectId, Types, UpdateQuery } from 'mongoose'
+import { isValidObjectId, UpdateQuery } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import Post, { PostModel } from '../../../models/Post'
 import dbConnect from '../../../utils/functions/dbConnect'
 import err from '../../../utils/constants/errors'
 import { cwd } from 'process'
-import { getSession } from 'next-auth/react'
 import validate from '../../../utils/functions/validate'
 import csrfTokenSchema from '../../../schemas/csrfTokenSchema'
 import isCsrfTokenValid from '../../../utils/functions/isCsrfTokenValid'
 import createFile from '../../../utils/functions/createFile'
 import { unlink } from 'fs/promises'
 import updatePostApiSchema from '../../../schemas/updatePostApiSchema'
+import getSessionAndUser from '../../../utils/functions/getSessionAndUser'
+import catchError from '../../../utils/functions/catchError'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
@@ -20,231 +21,110 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(422).json({ message: err.PARAMS_INVALID })
   }
 
-  switch (req.method) {
-    case 'GET': {
-      await dbConnect()
+  if (!['GET', 'PUT', 'DELETE'].includes(req.method || '')) {
+    return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
+  }
 
-      const post = await Post.aggregate(
-        [
-          { $match: { _id: new Types.ObjectId(id) } },
-          {
-            $lookup: {
-              from: 'users',
-              let: { userId: '$userId', postId: '$_id' },
-              pipeline: [
-                { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
-                {
-                  $lookup: {
-                    from: 'posts',
-                    let: { postsIds: '$postsIds' },
-                    pipeline: [
-                      {
-                        $match: {
-                          $expr: {
-                            $and: [
-                              { $ne: ['$_id', '$$postId'] },
-                              { $in: ['$_id', '$$postsIds'] },
-                            ],
-                          },
-                        },
-                      },
-                      {
-                        $set: {
-                          id: { $toString: '$_id' },
-                          price: { $divide: ['$price', 100] },
-                          image: {
-                            $concat: [
-                              '/static/images/posts/',
-                              { $arrayElemAt: ['$images', 0] },
-                            ],
-                          },
-                        },
-                      },
-                      {
-                        $project: {
-                          _id: 0,
-                          id: 1,
-                          name: 1,
-                          price: 1,
-                          image: 1,
-                          address: 1,
-                        },
-                      },
-                    ],
-                    as: 'posts',
-                  },
-                },
-                {
-                  $set: {
-                    id: { $toString: '$_id' },
-                    image: {
-                      $cond: [
-                        { $regexMatch: { input: '$image', regex: /default/ } },
-                        { $concat: ['/static/images/', '$image'] },
-                        { $concat: ['/static/images/users/', '$image'] },
-                      ],
-                    },
-                  },
-                },
-                {
-                  $project: {
-                    _id: 0,
-                    id: 1,
-                    name: 1,
-                    email: 1,
-                    image: 1,
-                    posts: 1,
-                  },
-                },
-              ],
-              as: 'user',
-            },
-          },
-          {
-            $set: {
-              id: { $toString: '$_id' },
-              price: { $divide: ['$price', 100] },
-              images: {
-                $map: {
-                  input: '$images',
-                  as: 'image',
-                  in: { $concat: ['/static/images/posts/', '$$image'] },
-                },
-              },
-              user: { $arrayElemAt: ['$user', 0] },
-            },
-          },
-          { $unset: ['_id', 'userId', '__v'] },
-        ],
-        {}
-      ).exec()
+  if (req.method === 'GET') {
+    await dbConnect()
 
-      if (!post.length) {
-        return res.status(404).json({ message: err.POST_NOT_FOUND })
-      }
+    const post = await Post.findById(id).lean().exec()
 
-      res.status(200).json(post[0])
-      break
+    if (!post) {
+      return res.status(404).json({ message: err.POST_NOT_FOUND })
     }
-    case 'PUT': {
-      const session = await getSession({ req })
 
-      if (!session) {
-        return res.status(403).json({ message: err.FORBIDDEN })
-      }
+    return res.status(200).json({
+      id: post._id.toString(),
+      name: post.name,
+      description: post.description,
+      categories: post.categories,
+      price: post.price / 100,
+      images: post.images.map((i) => '/static/images/posts/' + i),
+      address: post.address,
+      latLon: post.latLon,
+      discussionsIds: post.discussionsIds.map((i) => i.toString()),
+      userId: post.userId.toString(),
+    })
+  }
 
-      const result = validate(updatePostApiSchema, req.body)
+  const { session, user } = await getSessionAndUser(req)
+  if (!session || !user) {
+    return res.status(401).json({ message: err.UNAUTHORIZED })
+  }
 
-      if ('message' in result) {
-        return res.status(422).json({ message: result.message })
-      }
+  const result = validate<string>(csrfTokenSchema, req.body?.csrfToken)
+  const csrfTokenCookie = req.cookies['next-auth.csrf-token']
 
-      const reqBody = result.value
-      const csrfTokenCookie = req.cookies['next-auth.csrf-token']
+  if (!result.value || !isCsrfTokenValid(csrfTokenCookie, result.value)) {
+    return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
+  }
 
-      if (!isCsrfTokenValid(csrfTokenCookie, reqBody.csrfToken)) {
-        return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
-      }
+  const post = await Post.findById(id).lean().exec()
+  if (!post) {
+    return res.status(404).json({ message: err.POST_NOT_FOUND })
+  }
 
-      const post = await Post.findById(id).lean().exec()
+  if (session.id !== post.userId.toString()) {
+    return res.status(403).json({ message: err.FORBIDDEN })
+  }
 
-      if (!post) {
-        return res.status(404).json({ message: err.POST_NOT_FOUND })
-      }
+  if (req.method === 'PUT') {
+    const result = validate(updatePostApiSchema, req.body)
 
-      if (session.id !== post.userId.toString()) {
-        return res.status(422).json({ message: err.PARAMS_INVALID })
-      }
-
-      const update: UpdateQuery<PostModel> = {}
-
-      if (reqBody.images) {
-        const images: string[] = []
-        const path = '/public/static/images/posts/'
-
-        for (const { base64, ext } of reqBody.images) {
-          if (isBase64ValueTooBig(base64, 1000000)) {
-            return res.status(413).json({ message: err.IMAGE_TOO_BIG })
-          }
-
-          const fname = await createFile(base64, ext, path, { enc: 'base64' })
-
-          images.push(fname)
-        }
-
-        const post = await Post.findById(id).lean().exec()
-
-        if (!post) {
-          return res.status(404).json({ message: err.POST_NOT_FOUND })
-        }
-
-        for (const image of post.images) {
-          await unlink(cwd() + path + image)
-        }
-
-        update.images = images
-      }
-      if (reqBody.price) update.price = reqBody.price * 100
-      if (reqBody.name) update.name = reqBody.name
-      if (reqBody.description) update.description = reqBody.description
-      if (reqBody.categories) update.categories = reqBody.categories
-      if (reqBody.address) {
-        update.address = reqBody.address
-        update.latLon = reqBody.latLon
-      }
-
-      await dbConnect()
-      await Post.updateOne({ _id: id }, update).exec()
-
-      res.status(200).end()
-      break
+    if ('message' in result) {
+      return res.status(422).json({ message: result.message })
     }
-    case 'DELETE': {
-      const session = await getSession({ req })
 
-      if (!session) {
-        return res.status(403).json({ message: err.FORBIDDEN })
-      }
+    const reqBody = result.value
+    const update: UpdateQuery<PostModel> = {}
 
-      const csrfToken: string | undefined = req.body?.csrfToken
-      const result = validate<string>(csrfTokenSchema, csrfToken)
+    if (reqBody.images) {
+      const images: string[] = []
+      const path = '/public/static/images/posts/'
 
-      if ('message' in result) {
-        return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
-      }
+      for (const { base64, ext } of reqBody.images) {
+        if (isBase64ValueTooBig(base64, 1000000)) {
+          return res.status(413).json({ message: err.IMAGE_TOO_BIG })
+        }
 
-      const csrfTokenCookie = req.cookies['next-auth.csrf-token']
+        const fname = await createFile(base64, ext, path, { enc: 'base64' })
 
-      if (!isCsrfTokenValid(csrfTokenCookie, result.value)) {
-        return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
-      }
-
-      const post = await Post.findById(id).lean().exec()
-
-      if (!post) {
-        return res.status(404).json({ message: err.POST_NOT_FOUND })
-      }
-
-      if (session.id !== post.userId.toString()) {
-        return res.status(422).json({ message: err.PARAMS_INVALID })
+        images.push(fname)
       }
 
       for (const image of post.images) {
-        await unlink(cwd() + '/public/static/images/posts/' + image)
+        await unlink(cwd() + path + image)
       }
 
-      await dbConnect()
-      await Post.deleteOne({ _id: id }).exec()
-
-      res.status(200).end()
-      break
+      update.images = images
     }
-    default:
-      res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
+    if (reqBody.price) update.price = reqBody.price * 100
+    if (reqBody.name) update.name = reqBody.name
+    if (reqBody.description) update.description = reqBody.description
+    if (reqBody.categories) update.categories = reqBody.categories
+    if (reqBody.address) {
+      update.address = reqBody.address
+      update.latLon = reqBody.latLon
+    }
+
+    await dbConnect()
+    await Post.updateOne({ _id: id }, update).exec()
+
+    return res.status(204).end()
   }
+
+  for (const image of post.images) {
+    await unlink(cwd() + '/public/static/images/posts/' + image)
+  }
+
+  await dbConnect()
+  await Post.deleteOne({ _id: id }).exec()
+
+  res.status(204).end()
 }
 
-export default handler
+export default catchError(handler)
 
 export const config = {
   api: {

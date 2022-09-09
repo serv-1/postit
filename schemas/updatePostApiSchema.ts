@@ -1,4 +1,4 @@
-import { Categories, IImage } from '../types/common'
+import { Categories, Image } from '../types/common'
 import err from '../utils/constants/errors'
 import imagesSchema from './imagesSchema'
 import latLonSchema from './latLonSchema'
@@ -11,7 +11,7 @@ export interface UpdatePostApiSchema {
   description?: string
   categories?: Categories[]
   price?: number
-  images?: IImage[]
+  images?: Image[]
   address?: string
   latLon?: [number, number]
 }
@@ -21,7 +21,19 @@ const updatePostApiSchema = object<UpdatePostApiSchema>({
   images: imagesSchema,
   latLon: latLonSchema,
 })
+  .or(
+    'name',
+    'description',
+    'categories',
+    'price',
+    'images',
+    'address',
+    'latLon'
+  )
   .and('address', 'latLon')
-  .messages({ 'object.and': err.ADDRESS_INVALID })
+  .messages({
+    'object.and': err.ADDRESS_INVALID,
+    'object.missing': err.DATA_INVALID,
+  })
 
 export default updatePostApiSchema

@@ -2,7 +2,7 @@ import ProfileUserImage from '../components/ProfileUserImage'
 import axios from 'axios'
 import { getCsrfToken, getSession, signOut } from 'next-auth/react'
 import { GetServerSideProps } from 'next'
-import { IUser } from '../types/common'
+import { LightPost, Post, User } from '../types/common'
 import Head from 'next/head'
 import Header from '../components/Header'
 import Link from '../components/Link'
@@ -25,16 +25,41 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   try {
-    const { id } = session
-    const res = await axios.get<IUser>(`http://localhost:3000/api/users/${id}`)
-    return { props: { user: res.data, csrfToken: await getCsrfToken(ctx) } }
+    const { id: userId } = session
+
+    const url = 'http://localhost:3000/api/users/' + userId
+    const { data: user } = await axios.get<User>(url)
+
+    const posts: Post[] = []
+    const favPosts: Omit<LightPost, 'price' | 'address'>[] = []
+
+    for (const postId of user.postsIds) {
+      const url = 'http://localhost:3000/api/posts/' + postId
+      posts.push((await axios.get<Post>(url)).data)
+    }
+
+    for (const favPostId of user.favPostsIds) {
+      const url = 'http://localhost:3000/api/posts/' + favPostId
+      const { id, name, images } = (await axios.get<Post>(url)).data
+      favPosts.push({ id, name, image: images[0] })
+    }
+
+    return {
+      props: {
+        user: { ...user, posts, favPosts },
+        csrfToken: await getCsrfToken(ctx),
+      },
+    }
   } catch (e) {
     return { notFound: true }
   }
 }
 
 interface ProfileProps {
-  user: IUser
+  user: Omit<User, 'postsIds' | 'favPostsIds'> & {
+    posts: Post[]
+    favPosts: Omit<LightPost, 'price' | 'address'>[]
+  }
   csrfToken?: string
 }
 
@@ -106,7 +131,11 @@ const Profile = ({ user, csrfToken }: ProfileProps) => {
               </TabList>
               <TabPanel value="post">
                 <ProfilePostList
-                  posts={user.posts}
+                  posts={user.posts.map((post) => ({
+                    id: post.id,
+                    name: post.name,
+                    image: post.images[0],
+                  }))}
                   altText="You haven't created any posts yet."
                 />
               </TabPanel>

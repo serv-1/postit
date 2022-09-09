@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useToast } from '../contexts/toast'
 import CommentDiscussion from '../public/static/images/comment-discussion.svg'
 import X from '../public/static/images/x.svg'
-import { DiscussionEventData, IUser } from '../types/common'
+import { DiscussionEventData, User } from '../types/common'
 import getAxiosError from '../utils/functions/getAxiosError'
 import Modal from './Modal'
 import HeaderChatModal from './HeaderChatModal'
@@ -26,7 +26,7 @@ const HeaderChatListModal = () => {
     const getDiscussionsIds = async () => {
       try {
         const url = `http://localhost:3000/api/users/${session.id}`
-        const { data } = await axios.get<IUser>(url)
+        const { data } = await axios.get<User>(url)
 
         setDiscussionsIds(data.discussionsIds)
         setHasUnseenMessages(data.hasUnseenMessages)

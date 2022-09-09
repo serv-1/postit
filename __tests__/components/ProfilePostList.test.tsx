@@ -20,27 +20,13 @@ const setToast = jest.fn()
 beforeEach(() => useToast.mockReturnValue({ setToast }))
 
 const posts = [
-  {
-    id: '0',
-    name: 'table',
-    description: 'magnificent table',
-    categories: ['furniture' as const],
-    images: ['/table.jpeg'],
-    price: 99,
-  },
-  {
-    id: '1',
-    name: 'chair',
-    description: 'magnificent chair',
-    categories: ['furniture' as const],
-    images: ['/chair.jpeg'],
-    price: 99,
-  },
+  { id: '0', name: 'table', image: 'table.jpeg' },
+  { id: '1', name: 'chair', image: 'chair.jpeg' },
 ]
 
 const favPosts = [
-  { id: '0', name: 'table', image: '/table.jpeg' },
-  { id: '1', name: 'chair', image: '/chair.jpeg' },
+  { id: '0', name: 'table', image: 'table.jpeg' },
+  { id: '1', name: 'chair', image: 'chair.jpeg' },
 ]
 
 it('renders without posts', () => {
@@ -66,7 +52,7 @@ it('renders with posts', () => {
 
   const images = screen.getAllByRole('img')
   for (let i = 0; i < images.length; i++) {
-    expect(images[i]).toHaveAttribute('src', posts[i].images[0])
+    expect(images[i]).toHaveAttribute('src', posts[i].image)
   }
 
   const postName1 = screen.getByText(/table/i)

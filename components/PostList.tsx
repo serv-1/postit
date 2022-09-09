@@ -1,8 +1,8 @@
-import { ILightPost, IUserPost } from '../types/common'
+import { LightPost, Post as IPost } from '../types/common'
 import Post from './Post'
 
 interface PostListProps {
-  posts: ILightPost[] | IUserPost[]
+  posts: LightPost[] | IPost[]
   columns?: 3 | 2
 }
 

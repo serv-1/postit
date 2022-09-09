@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { GetServerSideProps } from 'next'
-import { IPost, IUser } from '../../../../types/common'
+import { LightPost, Post, User } from '../../../../types/common'
 import addSpacesToNb from '../../../../utils/functions/addSpacesToNb'
 import Head from 'next/head'
 import Link from '../../../../components/Link'
@@ -22,12 +22,29 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx)
 
   try {
-    const url = 'http://localhost:3000/api/posts/' + postId
-    const props: PostPageProps = { post: (await axios.get<IPost>(url)).data }
+    let url = 'http://localhost:3000/api/posts/' + postId
+    const { data: post } = await axios.get<Post>(url)
+
+    url = 'http://localhost:3000/api/users/' + post.userId
+    const { data: user } = await axios.get<User>(url)
+
+    const postsIds = user.postsIds.filter((id) => id !== postId)
+    const posts: LightPost[] = []
+
+    for (const postId of postsIds) {
+      const url = 'http://localhost:3000/api/posts/' + postId
+      const { data } = await axios.get<Post>(url)
+      const { id, name, price, address, images } = data
+      posts.push({ id, name, price, address, image: images[0] })
+    }
+
+    const props: PostPageProps = {
+      post: { ...post, user: { id: user.id, name: user.name, posts } },
+    }
 
     if (session) {
       const url = 'http://localhost:3000/api/users/' + session.id
-      props.user = (await axios.get<IUser>(url)).data
+      props.user = (await axios.get<User>(url)).data
     }
 
     return { props: { ...props, csrfToken: await getCsrfToken(ctx) } }
@@ -36,9 +53,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 }
 
-interface PostPageProps {
-  post: IPost
-  user?: IUser
+export interface PostPageProps {
+  post: Omit<Post, 'userId'> & {
+    user: Pick<User, 'id' | 'name'> & { posts: LightPost[] }
+  }
+  user?: User
   csrfToken?: string
 }
 
@@ -77,7 +96,10 @@ const PostPage = ({ post, user, csrfToken }: PostPageProps) => {
               />
             </div>
           ) : (
-            <PostPageFavoriteButton postId={post.id} user={user} />
+            <PostPageFavoriteButton
+              postId={post.id}
+              favPostsIds={user?.favPostsIds}
+            />
           )}
           <SeeAllPhotosModal sources={post.images} />
         </div>

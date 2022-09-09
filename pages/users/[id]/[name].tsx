@@ -4,22 +4,31 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Header from '../../../components/Header'
 import PostList from '../../../components/PostList'
-import { IUser } from '../../../types/common'
+import { Post, User } from '../../../types/common'
 import Blob from '../../../public/static/images/blob.svg'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const id = ctx.params?.id
+  const userId = ctx.params?.id
 
   try {
-    const res = await axios.get<IUser>(`http://localhost:3000/api/users/${id}`)
-    return { props: { user: res.data } }
+    const url = 'http://localhost:3000/api/users/' + userId
+    const { data: user } = await axios.get<User>(url)
+
+    const posts: Post[] = []
+
+    for (const postId of user.postsIds) {
+      const url = 'http://localhost:3000/api/posts/' + postId
+      posts.push((await axios.get<Post>(url)).data)
+    }
+
+    return { props: { user: { ...user, posts } } }
   } catch (e) {
     return { notFound: true }
   }
 }
 
 interface UserPageProps {
-  user: IUser
+  user: Omit<User, 'postsIds'> & { posts: Post[] }
 }
 
 const UserPage = ({ user }: UserPageProps) => {

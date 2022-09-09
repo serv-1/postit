@@ -7,7 +7,7 @@ const user = {
   email: 'john@jo.hn',
   image: 'john.jpeg',
   posts: [],
-  favPosts: [],
+  favPostsIds: [],
   discussionsIds: [],
   hasUnseenMessages: false,
   channelName: 'test',

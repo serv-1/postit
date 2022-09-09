@@ -3,6 +3,7 @@ import User from '../../models/User'
 import forgotPwSchema from '../../schemas/forgotPwSchema'
 import err from '../../utils/constants/errors'
 import dbConnect from '../../utils/functions/dbConnect'
+import catchError from '../../utils/functions/catchError'
 import validate from '../../utils/functions/validate'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -26,7 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(422).json({ message: err.EMAIL_UNKNOWN })
   }
 
-  res.status(200).end()
+  res.status(204).end()
 }
 
-export default handler
+export default catchError(handler)

@@ -3,53 +3,52 @@ import { DiscussionModel, MessageModel } from '../models/Discussion'
 import { PostModel } from '../models/Post'
 import { UserModel } from '../models/User'
 
-export interface IPost
+export interface Post
   extends Omit<PostModel, '_id' | 'userId' | 'latLon' | 'discussionsIds'> {
   id: string
   discussionsIds: string[]
   latLon: [number, number]
-  user: Pick<IUser, 'id' | 'name' | 'email' | 'image'> & { posts: ILightPost[] }
+  userId: string
 }
 
-export interface ILightPost
-  extends Pick<IPost, 'id' | 'name' | 'price' | 'address'> {
+export interface LightPost
+  extends Pick<Post, 'id' | 'name' | 'price' | 'address'> {
   image: string
 }
 
-export type IFavPost = Omit<ILightPost, 'price'>
-export type IUserPost = Omit<IPost, 'user'>
+export type LighterPost = Omit<LightPost, 'price' | 'address'>
 
-export interface IUser
+export interface User
   extends Pick<
     UserModel,
     'name' | 'email' | 'image' | 'channelName' | 'hasUnseenMessages'
   > {
   id: string
   discussionsIds: string[]
-  posts: IUserPost[]
-  favPosts: IFavPost[]
+  postsIds: string[]
+  favPostsIds: string[]
 }
 
-export interface IImage {
+export interface Image {
   base64: string
   ext: 'jpg' | 'jpeg' | 'png' | 'gif'
 }
 
-export interface IMessage extends Omit<MessageModel, 'userId'> {
+export interface Message extends Omit<MessageModel, 'userId'> {
   userId: string
 }
 
-export interface IDiscussion
+export interface Discussion
   extends Pick<DiscussionModel, 'postName' | 'channelName'> {
   id: string
   postId?: string
   buyer: { id?: string; name: string; image: string }
   seller: { id?: string; name: string; image: string }
-  messages: IMessage[]
+  messages: Message[]
 }
 
-export type JSONDiscussion = Omit<IDiscussion, 'messages'> & {
-  messages: (Omit<IMessage, 'createdAt'> & { createdAt: string })[]
+export type JSONDiscussion = Omit<Discussion, 'messages'> & {
+  messages: (Omit<Message, 'createdAt'> & { createdAt: string })[]
 }
 
 export type Categories = typeof categories[0]

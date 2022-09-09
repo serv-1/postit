@@ -42,13 +42,6 @@ postSchema.pre<HydratedDocument<PostModel>>('save', async function () {
   await User.updateOne({ _id: this.userId }, update).lean().exec()
 })
 
-postSchema.post<PostModel[]>('insertMany', async function (posts) {
-  for (const post of posts) {
-    const update = { $push: { postsIds: post._id } }
-    await User.updateOne({ _id: post.userId }, update).lean().exec()
-  }
-})
-
 postSchema.pre<Query<DeleteResult, PostModel>>('deleteOne', async function () {
   const id = this.getFilter()._id
 
@@ -66,11 +59,11 @@ postSchema.pre<Query<DeleteResult, PostModel>>('deleteOne', async function () {
     .lean()
     .exec()
 
-  const post = await Post.findById(id).lean().exec()
+  const post = (await Post.findById(id).lean().exec()) as PostModel
 
-  for (const id of (post as NonNullable<typeof post>).discussionsIds) {
-    await Discussion.findByIdAndUpdate(
-      id,
+  for (const id of post.discussionsIds) {
+    await Discussion.updateOne(
+      { _id: id },
       { $unset: { postId: '' } },
       { omitUndefined: true }
     )

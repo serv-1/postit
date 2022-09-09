@@ -13,3 +13,8 @@ it('fails if latLon is missing with address', () => {
   const { error: e } = updatePostApiSchema.validate(value)
   expect(e?.details[0].message).toBe(err.ADDRESS_INVALID)
 })
+
+it('fails if a property is missing', () => {
+  const { error: e } = updatePostApiSchema.validate({ csrfToken: 'token' })
+  expect(e?.details[0].message).toBe(err.DATA_INVALID)
+})
