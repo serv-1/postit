@@ -42,14 +42,14 @@ const Authentication = ({ providers }: AuthenticationProps) => {
   return (
     <>
       <Head>
-        <title>Authentication - Filanad</title>
+        <title>Authentication - PostIt</title>
       </Head>
-      <div className="flex flex-col flex-nowrap justify-center items-center">
+      <div className="flex flex-col justify-center items-center">
         <Link
           href="/"
           className="font-bold text-m-xl md:text-t-xl hover:text-fuchsia-600 transition-colors duration-200 p-16"
         >
-          Filanad
+          PostIt
         </Link>
         <GlassWrapper minHeight="min-h-[470px] md:min-h-[486px]">
           <LeftPanel>

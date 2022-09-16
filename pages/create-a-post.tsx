@@ -43,7 +43,7 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
   const submitHandler: SubmitHandler<AddPostSchema> = async (data) => {
     try {
       const _data = { ...data, images, latLon }
-      const res = await axios.post('http://localhost:3000/api/post', _data)
+      const res = await axios.post('/api/post', _data)
       router.push(res.headers['location'])
     } catch (e) {
       const { name, message } = getAxiosError<keyof AddPostSchema>(e)
@@ -59,9 +59,9 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
   return (
     <>
       <Head>
-        <title>Create a post - Filanad</title>
+        <title>Create a post - PostIt</title>
       </Head>
-      <div className="flex flex-col flex-nowrap justify-center items-center">
+      <div className="flex flex-col justify-center items-center">
         <Header />
         <GlassWrapper
           minHeight="min-h-[553.89px] md:min-h-[598px]"

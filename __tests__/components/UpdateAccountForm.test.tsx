@@ -78,7 +78,7 @@ test('an alert renders if the user password is updated', async () => {
 
 test('an alert renders if the server fails to update the user name', async () => {
   server.use(
-    rest.put('http://localhost:3000/api/user', (req, res, ctx) => {
+    rest.put('http://localhost/api/user', (req, res, ctx) => {
       return res(ctx.status(422), ctx.json({ message: err.NAME_INVALID }))
     })
   )
@@ -98,7 +98,7 @@ test('an alert renders if the server fails to update the user name', async () =>
 
 test('an alert renders if the server fails to update the user password', async () => {
   server.use(
-    rest.put('http://localhost:3000/api/user', (req, res, ctx) => {
+    rest.put('http://localhost/api/user', (req, res, ctx) => {
       return res(ctx.status(422), ctx.json({ message: err.PASSWORD_INVALID }))
     })
   )

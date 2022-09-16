@@ -3,7 +3,7 @@ import axios, { AxiosError } from 'axios'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import categories from '../../../../categories'
+import categories from '../../../../utils/constants/categories'
 import Accordion from '../../../../components/Accordion'
 import ExpandedImageModal from '../../../../components/ExpandedImageModal'
 import Form from '../../../../components/Form'
@@ -28,6 +28,8 @@ import { getCsrfToken } from 'next-auth/react'
 import PostAddressModal from '../../../../components/PostAddressModal'
 import { useState } from 'react'
 
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+
 const options = categories.map((category) => ({
   label: category,
   value: category,
@@ -37,14 +39,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const postId = ctx.params?.id
 
   try {
-    const url = 'http://localhost:3000/api/posts/' + postId
-    return {
-      props: {
-        post: (await axios.get<Post>(url)).data,
-        background: 'bg-linear-page',
-        csrfToken: await getCsrfToken(ctx),
-      },
-    }
+    const { data } = await axios.get<Post>(baseUrl + '/api/posts/' + postId)
+    const csrfToken = await getCsrfToken(ctx)
+    return { props: { post: data, background: 'bg-linear-page', csrfToken } }
   } catch (e) {
     return { notFound: true }
   }
@@ -103,10 +100,7 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
     }
 
     try {
-      await axios.put(
-        'http://localhost:3000/api/posts/' + post.id,
-        filteredData
-      )
+      await axios.put('/api/posts/' + post.id, filteredData)
       setToast({ message: 'The post has been updated! 🎉' })
     } catch (e) {
       type FieldsNames = keyof Required<UpdatePostSchema>
@@ -125,7 +119,7 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
       <Head>
         <title>Update {post.name} - Filanad</title>
       </Head>
-      <div className="flex flex-col flex-nowrap justify-center items-center">
+      <div className="flex flex-col justify-center items-center">
         <Header />
         <GlassWrapper padding="p-32">
           <ShapeContainer>
@@ -141,7 +135,7 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
               <Accordion title="Name" id="name" headingLevel={2}>
                 <div className="mb-16">
                   Actual name
-                  <div className="bg-fuchsia-100 rounded-8 p-8">
+                  <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
                     {post.name}
                   </div>
                 </div>
@@ -155,7 +149,7 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
               <Accordion title="Description" id="description" headingLevel={2}>
                 <div className="mb-16">
                   Actual description
-                  <div className="bg-fuchsia-100 rounded-8 p-8">
+                  <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
                     {post.description}
                   </div>
                 </div>
@@ -169,7 +163,7 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
               <Accordion title="Categories" id="categories" headingLevel={2}>
                 <div className="mb-16">
                   Actual categories
-                  <div className="bg-fuchsia-100 rounded-8 p-8">
+                  <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
                     {post.categories.join(', ')}
                   </div>
                 </div>
@@ -220,7 +214,7 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
                 </div>
                 <div>
                   <label htmlFor="images">New images</label>
-                  <Input type="file" name="images" />
+                  <Input type="file" multiple name="images" />
                   <InputError inputName="images" />
                 </div>
               </Accordion>
@@ -228,7 +222,7 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
               <Accordion title="Address" id="address" headingLevel={2}>
                 <div className="mb-16">
                   Actual address
-                  <div className="bg-fuchsia-100 rounded-8 p-8">
+                  <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
                     {post.address}
                   </div>
                 </div>

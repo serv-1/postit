@@ -7,6 +7,7 @@ import { Discussion, Message, JSONDiscussion, UnArray } from '../types/common'
 import getAxiosError from '../utils/functions/getAxiosError'
 import getClientPusher from '../utils/functions/getClientPusher'
 import ChatMessage from './ChatMessage'
+import styles from '../styles/chatScrollbar.module.css'
 
 interface DiscussionDataState {
   channelName: string
@@ -36,7 +37,7 @@ const ChatMessageList = (props: ChatMessageListProps) => {
 
     const getDiscussion = async () => {
       try {
-        const url = `http://localhost:3000/api/discussions/${discussionId}?csrfToken=${csrfToken}`
+        const url = `/api/discussions/${discussionId}?csrfToken=${csrfToken}`
         const { data } = await axios.get<JSONDiscussion>(url)
         const { messages: m, channelName, buyer, seller } = data
 
@@ -66,8 +67,7 @@ const ChatMessageList = (props: ChatMessageListProps) => {
     if (session.id !== lastMsg.userId && !lastMsg.seen) {
       const updateUnseenMessages = async () => {
         try {
-          const url = 'http://localhost:3000/api/discussions/' + discussionId
-          await axios.put(url, { csrfToken })
+          await axios.put('/api/discussions/' + discussionId, { csrfToken })
         } catch (e) {
           const { message } = getAxiosError(e)
           setToast({ message, error: true })
@@ -102,7 +102,10 @@ const ChatMessageList = (props: ChatMessageListProps) => {
   return (
     <div
       ref={msgListRef}
-      className="flex flex-col flex-nowrap h-full overflow-y-auto px-8 md:px-16"
+      className={
+        'flex flex-col h-full overflow-y-auto px-8 md:px-[12px] md:mx-4 ' +
+        styles.container
+      }
     >
       {discussionData &&
         discussionData.messages.map(({ message, createdAt, userId }, i) => {

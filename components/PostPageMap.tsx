@@ -35,7 +35,7 @@ const PostPageMap = ({ address, latLon }: PostPageMapProps) => {
           </DotButton>
         </div>
       </Map>
-      <div className="text-center">{address}</div>
+      <div className="text-center break-words">{address}</div>
       <Modal
         isHidden={!isOpen}
         className={

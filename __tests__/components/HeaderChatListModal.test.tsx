@@ -51,7 +51,7 @@ beforeEach(() => {
 it('opens/closes', async () => {
   render(<HeaderChatListModal />)
 
-  expect(axiosGet.mock.calls[0][0]).toBe('http://localhost:3000/api/users/0')
+  expect(axiosGet.mock.calls[0][0]).toBe('/api/users/0')
 
   const notifBadge = screen.queryByRole('status')
   expect(notifBadge).not.toBeInTheDocument()

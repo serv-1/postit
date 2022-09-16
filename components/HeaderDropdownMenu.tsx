@@ -18,7 +18,7 @@ const HeaderDropdownMenu = () => {
   useEffect(() => {
     const getImage = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/users/${id}`)
+        const res = await axios.get('/api/users/' + id)
         setImage(res.data.image)
       } catch (e) {
         const { message } = getAxiosError(e as AxiosError)

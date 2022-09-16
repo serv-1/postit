@@ -1,4 +1,4 @@
-const getEnvVar = (name: string): string => {
+const getEnvVar = (name: string) => {
   const envVar = process.env[name]
   if (!envVar) throw new Error(`Environment variable "${name}" is undefined.`)
   return envVar
@@ -14,11 +14,11 @@ const env = {
   EMAIL_USER: getEnvVar('EMAIL_USER'),
   EMAIL_PASS: getEnvVar('EMAIL_PASS'),
   EMAIL_FROM: getEnvVar('EMAIL_FROM'),
-  BASE_URL: getEnvVar('BASE_URL'),
+  VERCEL_URL: getEnvVar('NEXT_PUBLIC_VERCEL_URL'),
   NEXTAUTH_URL: getEnvVar('NEXTAUTH_URL'),
+  PUSHER_KEY: getEnvVar('NEXT_PUBLIC_PUSHER_KEY'),
+  PUSHER_CLUSTER: getEnvVar('NEXT_PUBLIC_PUSHER_CLUSTER'),
   PUSHER_ENCRYPTION_KEY: getEnvVar('PUSHER_ENCRYPTION_KEY'),
-  PUSHER_KEY: getEnvVar('PUSHER_KEY'),
-  PUSHER_CLUSTER: getEnvVar('PUSHER_CLUSTER'),
   PUSHER_SECRET: getEnvVar('PUSHER_SECRET'),
   PUSHER_APP_ID: getEnvVar('PUSHER_APP_ID'),
 }

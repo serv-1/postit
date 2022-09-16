@@ -8,8 +8,8 @@ const getClientPusher = () => {
 
   return () => {
     if (!pusher) {
-      pusher = new Pusher('b00613560b578f204a9a', {
-        cluster: 'eu',
+      pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
+        cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
         channelAuthorization: {
           endpoint: '/api/pusher/auth',
           transport: 'ajax',

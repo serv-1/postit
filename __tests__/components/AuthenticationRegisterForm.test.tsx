@@ -20,7 +20,7 @@ beforeEach(() => {
   useRouter.mockReturnValue(router)
 })
 
-it('registers the user, sends him a mail, signs in him and redirects him to its profile', async () => {
+it('registers the user and signs in him and redirects him to its profile', async () => {
   render(<AuthenticationRegisterForm />)
 
   const nameInput = screen.getByLabelText(/name/i)
@@ -37,12 +37,6 @@ it('registers the user, sends him a mail, signs in him and redirects him to its 
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    expect(signIn).toHaveBeenCalledWith('email', {
-      email: 'johndoe@test.com',
-      callbackUrl: 'http://localhost:3000/profile',
-      redirect: false,
-    })
-
     expect(router.push).toHaveBeenNthCalledWith(1, '/profile')
   })
 })
@@ -75,7 +69,7 @@ test('an error renders if the server fails to register the user', async () => {
   useToast.mockReturnValue({ setToast })
 
   server.use(
-    rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
+    rest.post('http://localhost/api/user', (req, res, ctx) => {
       return res(ctx.status(405), ctx.json({ message: err.METHOD_NOT_ALLOWED }))
     })
   )
@@ -102,7 +96,7 @@ test('an error renders if the server fails to register the user', async () => {
 
 test('an error renders if the server fails to validate the request data', async () => {
   server.use(
-    rest.post('http://localhost:3000/api/user', (req, res, ctx) => {
+    rest.post('http://localhost/api/user', (req, res, ctx) => {
       return res(
         ctx.status(422),
         ctx.json({ name: 'name', message: err.NAME_REQUIRED })

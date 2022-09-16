@@ -3,10 +3,10 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 const defaultPost = {
-  id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
+  id: '0',
   name: 'Cat',
   price: 5000,
-  image: 'data:image/jpeg;base64,base64=',
+  image: 'cat.jpeg',
   address: 'Oslo, Norway',
 }
 
@@ -33,13 +33,4 @@ it('renders', async () => {
 
   const priceText = screen.getByText(/5 000/)
   expect(priceText).toBeInTheDocument()
-})
-
-test("its name should be truncated if it's too long", () => {
-  const name = new Uint8Array(90).join('')
-
-  render(<Post {...defaultPost} name={name} />)
-
-  const text = screen.queryByText(name)
-  expect(text).not.toBeInTheDocument()
 })

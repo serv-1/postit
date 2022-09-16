@@ -12,9 +12,9 @@ export const getStaticProps: GetStaticProps = async () => ({
 const Page404 = () => (
   <>
     <Head>
-      <title>Not found - Filanad</title>
+      <title>Not found - PostIt</title>
     </Head>
-    <div className="flex flex-col flex-nowrap justify-center items-center">
+    <div className="flex flex-col justify-center items-center">
       <Header />
       <GlassWrapper minHeight="md:min-h-[480px]">
         <LeftPanel padding="md:py-32 md:pl-32 md:pr-8">

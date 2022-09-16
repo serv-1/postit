@@ -31,14 +31,14 @@ test('the form sends a mail to the user to sign in, which redirect him to its pr
   await waitFor(() => {
     expect(signIn).toHaveBeenNthCalledWith(1, 'email', {
       email: 'johndoe@test.com',
-      callbackUrl: 'http://localhost:3000/profile',
+      callbackUrl: 'undefined/profile',
     })
   })
 })
 
 test('an error renders if the server fails to verify the user email', async () => {
   server.use(
-    rest.post('http://localhost:3000/api/verifyEmail', (req, res, ctx) => {
+    rest.post('http://localhost/api/verifyEmail', (req, res, ctx) => {
       return res(ctx.status(500), ctx.json({ message: err.DEFAULT }))
     })
   )
@@ -59,7 +59,7 @@ test('an error renders if the server fails to verify the user email', async () =
 
 test('an error renders if the server fails to validate the request data', async () => {
   server.use(
-    rest.post('http://localhost:3000/api/verifyEmail', (req, res, ctx) => {
+    rest.post('http://localhost/api/verifyEmail', (req, res, ctx) => {
       return res(ctx.status(422), ctx.json({ message: err.EMAIL_INVALID }))
     })
   )

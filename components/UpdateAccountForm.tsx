@@ -45,15 +45,12 @@ const UpdateAccountForm = (props: UpdateAccountFormProps) => {
     schema = updateUserPwSchema
   }
 
-  const methods = useForm<TSchemas>({
-    resolver: joiResolver(schema),
-  })
-
+  const methods = useForm<TSchemas>({ resolver: joiResolver(schema) })
   const { setToast } = useToast()
 
   const submitHandler: SubmitHandler<TSchemas> = async (data) => {
     try {
-      await axios.put('http://localhost:3000/api/user', data)
+      await axios.put('/api/user', data)
       setToast({ message: `Your ${value} has been updated! 🎉` })
       if (setName) setName(data[value] as string)
     } catch (e) {

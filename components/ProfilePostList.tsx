@@ -23,15 +23,12 @@ const ProfilePostList = (props: ProfilePostListProps) => {
 
   const deletePost = async (id: string) => {
     try {
+      const csrfToken = await getCsrfToken()
+
       if (props.isFavPost) {
-        await axios.put('http://localhost:3000/api/user', {
-          csrfToken: await getCsrfToken(),
-          favPostId: id,
-        })
+        await axios.put('/api/user', { csrfToken, favPostId: id })
       } else {
-        await axios.delete(`http://localhost:3000/api/posts/${id}`, {
-          data: { csrfToken: await getCsrfToken() },
-        })
+        await axios.delete('/api/posts/' + id, { data: { csrfToken } })
       }
 
       setToast({ message: 'The post has been successfully deleted! 🎉' })
@@ -72,8 +69,10 @@ const ProfilePostList = (props: ProfilePostListProps) => {
                 className="rounded-l-8"
               />
             </div>
-            <div className="flex flex-row flex-nowrap w-full p-8 justify-between items-center text-fuchsia-600 md:p-16">
-              <div className="font-bold">{post.name}</div>
+            <div className="flex flex-row flex-nowrap min-w-0 w-full p-8 justify-between items-center text-fuchsia-600 md:p-16">
+              <div className="font-bold truncate mr-8 md:mr-16">
+                {post.name}
+              </div>
               <div>
                 <ChevronRight className="w-24 h-24 relative left-0 group-hover:left-8 transition-[left] duration-200" />
               </div>

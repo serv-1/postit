@@ -14,9 +14,9 @@ const MailSent = () => {
   return (
     <>
       <Head>
-        <title>Mail sent! - Filanad</title>
+        <title>Mail sent! - PostIt</title>
       </Head>
-      <div className="flex flex-col flex-nowrap justify-center items-center">
+      <div className="flex flex-col justify-center items-center">
         <Header />
         <GlassWrapper minHeight="md:min-h-[480px]">
           <LeftPanel>

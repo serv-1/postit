@@ -50,7 +50,7 @@ const App = ({ Component, pageProps }: NextAppProps) => {
             )}
             <footer className="text-s p-8">
               <p>
-                Copyright © {new Date().getFullYear()} Filanad. All rights
+                Copyright © {new Date().getFullYear()} PostIt. All rights
                 reserved.
               </p>
             </footer>

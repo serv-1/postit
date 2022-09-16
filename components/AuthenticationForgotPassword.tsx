@@ -10,6 +10,8 @@ import { useToast } from '../contexts/toast'
 import Button from './Button'
 import forgotPwSchema, { ForgotPwSchema } from '../schemas/forgotPwSchema'
 
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+
 interface AuthenticationFPProps {
   setForgotPassword: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -23,10 +25,10 @@ const AuthenticationForgotPassword = (props: AuthenticationFPProps) => {
 
   const submitHandler: SubmitHandler<ForgotPwSchema> = async (data) => {
     try {
-      await axios.post('http://localhost:3000/api/verifyEmail', data)
+      await axios.post('/api/verifyEmail', data)
       await signIn('email', {
         email: data.email,
-        callbackUrl: 'http://localhost:3000/profile',
+        callbackUrl: baseUrl + '/profile',
       })
     } catch (e) {
       const { message, status } = getAxiosError(e as AxiosError)

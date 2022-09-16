@@ -77,20 +77,16 @@ test('the uploaded images and the latitude/longitude are sent with the request',
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    expect(axiosPost).toHaveBeenNthCalledWith(
-      1,
-      'http://localhost:3000/api/post',
-      {
-        csrfToken: 'csrf',
-        name: 'Modern table',
-        description: 'A magnificent modern table.',
-        categories: ['furniture'],
-        price: 40,
-        images: [{ base64: 'ZGF0YQ==', ext: 'jpg' }],
-        address: 'Oslo, Norway',
-        latLon: [59, 10],
-      }
-    )
+    expect(axiosPost).toHaveBeenNthCalledWith(1, '/api/post', {
+      csrfToken: 'csrf',
+      name: 'Modern table',
+      description: 'A magnificent modern table.',
+      categories: ['furniture'],
+      price: 40,
+      images: [{ base64: 'ZGF0YQ==', ext: 'jpg' }],
+      address: 'Oslo, Norway',
+      latLon: [59, 10],
+    })
   })
 })
 
@@ -127,20 +123,16 @@ test('the user is redirected to the post page after a valid submission', async (
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    expect(axiosPost).toHaveBeenNthCalledWith(
-      1,
-      'http://localhost:3000/api/post',
-      {
-        csrfToken: 'csrf',
-        name: 'Modern table',
-        description: 'A magnificent modern table.',
-        categories: ['furniture'],
-        price: 40,
-        images: [{ base64: 'ZGF0YQ==', ext: 'jpg' }],
-        address: 'Oslo, Norway',
-        latLon: [59, 10],
-      }
-    )
+    expect(axiosPost).toHaveBeenNthCalledWith(1, '/api/post', {
+      csrfToken: 'csrf',
+      name: 'Modern table',
+      description: 'A magnificent modern table.',
+      categories: ['furniture'],
+      price: 40,
+      images: [{ base64: 'ZGF0YQ==', ext: 'jpg' }],
+      address: 'Oslo, Norway',
+      latLon: [59, 10],
+    })
     expect(router.push).toHaveBeenNthCalledWith(1, '/api/posts/0/Table')
   })
 })

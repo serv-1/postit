@@ -1,7 +1,7 @@
 import Form from './Form'
 import Input from './Input'
 import Select from './Select'
-import categories from '../categories'
+import categories from '../utils/constants/categories'
 import InputError from './InputError'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
@@ -66,15 +66,7 @@ const HomeSearchPosts = () => {
       role="search"
       className="relative"
     >
-      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] md:mr-8 lg:block lg:w-auto lg:mr-0">
-        <Input<SearchPostSchema>
-          name="query"
-          type="search"
-          placeholder="Umbrella, sofa, ..."
-        />
-        <InputError<SearchPostSchema> inputName="query" />
-      </div>
-      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] lg:block lg:w-auto">
+      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] lg:block lg:w-auto md:mr-8 lg:mr-0">
         <Select<SearchPostSchema>
           name="categories"
           options={options}
@@ -82,6 +74,14 @@ const HomeSearchPosts = () => {
           placeholder="Categories"
         />
         <InputError<SearchPostSchema> inputName="categories" />
+      </div>
+      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] lg:block lg:w-auto">
+        <Input<SearchPostSchema>
+          name="query"
+          type="search"
+          placeholder="Umbrella, sofa, ..."
+        />
+        <InputError<SearchPostSchema> inputName="query" />
       </div>
       <Popup
         placement="bottom-start"

@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
@@ -11,6 +11,8 @@ import env from '../../../utils/constants/env'
 import getAxiosError from '../../../utils/functions/getAxiosError'
 import { nanoid } from 'nanoid'
 
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+
 export default NextAuth({
   providers: [
     Credentials({
@@ -20,14 +22,14 @@ export default NextAuth({
       },
       async authorize(credentials, req) {
         try {
-          const res = await axios.post(env.BASE_URL + '/api/signIn', {
+          const res = await axios.post(baseUrl + '/api/signIn', {
             email: credentials?.email,
             password: credentials?.password,
           })
 
           return res.data
         } catch (e) {
-          throw new Error(JSON.stringify(getAxiosError(e as AxiosError)))
+          throw new Error(JSON.stringify(getAxiosError(e)))
         }
       },
     }),
@@ -60,14 +62,16 @@ export default NextAuth({
 
           channelName = nanoid()
 
-          await User.findByIdAndUpdate(user.id, {
-            emailVerified: new Date(),
-            image: 'default.jpg',
-            postsIds: [],
-            favPostsIds: [],
-            discussionIds: [],
-            channelName,
-          }).exec()
+          await User.updateOne(
+            { _id: user.id },
+            {
+              image: 'default.jpg',
+              postsIds: [],
+              favPostsIds: [],
+              discussionIds: [],
+              channelName,
+            }
+          ).exec()
 
           channelName = 'private-' + channelName
         } else {

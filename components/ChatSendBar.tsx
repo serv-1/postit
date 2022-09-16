@@ -49,9 +49,9 @@ const ChatSendBar = ({
 
       if (!discussionId) {
         const payload = { message, postId, sellerId, postName, csrfToken }
-        await axios.post('http://localhost:3000/api/discussion', payload)
+        await axios.post('/api/discussion', payload)
       } else {
-        const url = `http://localhost:3000/api/discussions/${discussionId}`
+        const url = '/api/discussions/' + discussionId
         await axios.put(url, { message, csrfToken })
       }
     } catch (e) {
@@ -76,7 +76,7 @@ const ChatSendBar = ({
       methods={methods}
       submitHandler={submitHandler}
       csrfToken={csrfToken}
-      className="flex flex-row flex-nowrap p-8 md:p-16"
+      className="flex flex-row flex-nowrap m-8 md:m-16"
     >
       <textarea
         {...methods.register('message')}

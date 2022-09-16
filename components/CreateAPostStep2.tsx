@@ -2,7 +2,7 @@ import Input from './Input'
 import InputError from './InputError'
 import Select from './Select'
 import TextArea from './TextArea'
-import categories from '../categories'
+import categories from '../utils/constants/categories'
 import Button from './Button'
 
 const options = categories.map((category) => ({

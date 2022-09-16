@@ -56,7 +56,7 @@ test('an error renders if the server fails to delete the user', async () => {
   useToast.mockReturnValue({ setToast })
 
   server.use(
-    rest.delete('http://localhost:3000/api/user', (req, res, ctx) => {
+    rest.delete('http://localhost/api/user', (req, res, ctx) => {
       return res(ctx.status(422), ctx.json({ message: err.PARAMS_INVALID }))
     })
   )

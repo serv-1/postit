@@ -133,12 +133,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const pusher = getServerPusher()
 
         pusher.trigger('private-' + user.channelName, 'new-message', '')
-        pusher.trigger(discussion.channelName, 'new-message', {
-          message: lastMsg.message,
-          createdAt: lastMsg.createdAt,
-          userId: lastMsg.userId.toString(),
-          seen: lastMsg.seen,
-        })
+        pusher.trigger(
+          'private-encrypted-' + discussion.channelName,
+          'new-message',
+          {
+            message: lastMsg.message,
+            createdAt: lastMsg.createdAt,
+            userId: lastMsg.userId.toString(),
+            seen: lastMsg.seen,
+          }
+        )
       } else {
         const messages = [...discussion.messages]
 

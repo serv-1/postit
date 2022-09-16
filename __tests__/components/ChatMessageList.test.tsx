@@ -54,7 +54,7 @@ it('renders', async () => {
   expect(images[1]).toHaveAttribute('src', 'jane.jpeg')
   expect(images[1].getAttribute('alt')).toContain('jane')
 
-  const url = 'http://localhost:3000/api/discussions/0?csrfToken=token'
+  const url = '/api/discussions/0?csrfToken=token'
   expect(axiosGet).toHaveBeenNthCalledWith(1, url)
 
   expect(axiosPut).not.toHaveBeenCalled()
@@ -92,7 +92,7 @@ it('updates the last unseen messages if the user has saw them', async () => {
   render(<ChatMessageList discussionId="0" csrfToken="token" />)
 
   await waitFor(() => {
-    const url = 'http://localhost:3000/api/discussions/0'
+    const url = '/api/discussions/0'
     expect(axiosPut).toHaveBeenNthCalledWith(1, url, { csrfToken: 'token' })
   })
 })

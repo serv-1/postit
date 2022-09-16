@@ -121,7 +121,7 @@ test('the providers render', async () => {
 
   await userEvent.click(googleBtn)
   expect(signIn).toHaveBeenNthCalledWith(1, 'google', {
-    callbackUrl: 'http://localhost:3000/profile',
+    callbackUrl: 'undefined/profile',
   })
 
   const emailBtn = screen.queryByRole('button', { name: /email/i })

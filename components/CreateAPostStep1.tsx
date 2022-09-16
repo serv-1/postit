@@ -64,7 +64,7 @@ const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
         step === 1 ? 'h-full flex flex-col gap-y-16 justify-between' : 'hidden'
       }
     >
-      <div className="flex flex-col flex-nowrap">
+      <div className="flex flex-col">
         <label
           tabIndex={0}
           htmlFor="images"
@@ -92,7 +92,7 @@ const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
             return (
               <div
                 key={i}
-                className="w-[123.3px] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-8 aspect-square flex flex-col flex-nowrap justify-center items-center md:bg-fuchsia-100"
+                className="w-[123.3px] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-8 aspect-square flex flex-col justify-center items-center md:bg-fuchsia-100"
               >
                 <PlusCircle className="w-24 h-24 mb-4" />
                 Photo n°{i + 1}

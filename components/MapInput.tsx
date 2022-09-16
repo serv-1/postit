@@ -3,6 +3,8 @@ import { FormEvent, KeyboardEvent, useRef, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import err from '../utils/constants/errors'
 
+const lIQToken = process.env.NEXT_PUBLIC_LOCATION_IQ_TOKEN
+
 interface Prediction {
   lat: number
   lon: number
@@ -56,7 +58,7 @@ const MapInput = ({ setLatLon }: MapInputProps) => {
 
     try {
       const res = await axios.get<AutoCompleteResponse>(
-        `https://api.locationiq.com/v1/autocomplete.php?key=pk.956a05610e523c7773a4307bbd557cf4&dedupe=1&tag=place:city,town,village,hamlet&q=${value}`
+        `https://api.locationiq.com/v1/autocomplete.php?key=${lIQToken}&dedupe=1&tag=place:city,town,village,hamlet&q=${value}`
       )
 
       const predictions: Prediction[] = []

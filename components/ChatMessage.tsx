@@ -17,7 +17,7 @@ const ChatMessage = (props: ChatMessageProps) => {
   return (
     <div
       className={
-        'relative flex flex-nowrap mb-32 cursor-pointer ' +
+        'relative flex flex-nowrap gap-x-8 mb-32 cursor-pointer ' +
         (isSignedInUser ? 'flex-row-reverse' : 'flex-row')
       }
       onClick={() => setShowDate(!showDate)}
@@ -34,8 +34,8 @@ const ChatMessage = (props: ChatMessageProps) => {
       </div>
       <div
         className={
-          'max-w-[248px] p-8 rounded-8 ' +
-          (isSignedInUser ? 'mr-8 bg-fuchsia-200' : 'ml-8 bg-fuchsia-300')
+          'max-w-[calc(100%-48px)] p-8 rounded-8 break-words ' +
+          (isSignedInUser ? 'bg-fuchsia-200' : 'bg-fuchsia-300')
         }
       >
         {message}

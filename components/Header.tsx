@@ -17,7 +17,7 @@ const Header = () => {
         href="/"
         className="font-bold text-m-xl md:text-t-xl hover:text-fuchsia-600 transition-colors duration-200"
       >
-        Filanad
+        PostIt
       </Link>
       {status === 'unauthenticated' ? (
         <Link

@@ -5,7 +5,7 @@ import HomeSearchPosts from '../../components/HomeSearchPosts'
 
 it("will fill the form inputs with the query string's data if any", async () => {
   const search =
-    '?query=cat&minPrice=10&maxPrice=100&address=Paris&categories=pet&categories=cat'
+    '?query=cat&minPrice=10&maxPrice=100&address=Paris&categories=game&categories=toy'
   Object.defineProperty(window, 'location', { get: () => ({ search }) })
 
   render(<HomeSearchPosts />)
@@ -29,7 +29,7 @@ it("will fill the form inputs with the query string's data if any", async () => 
   expect(addressInput).toHaveValue('Paris')
 
   const form = screen.getByRole('search')
-  expect(form).toHaveFormValues({ categories: ['pet', 'cat'] })
+  expect(form).toHaveFormValues({ categories: ['game', 'toy'] })
 })
 
 it("updates the query string's data", async () => {
@@ -62,18 +62,14 @@ it("updates the query string's data", async () => {
   await userEvent.type(addressInput, 'Paris')
 
   const categoriesSelect = screen.getByLabelText(/categories/i)
-  // https://github.com/romgain/react-select-event/issues/97
-  selectEvent.openMenu(categoriesSelect)
-  await selectEvent.select(categoriesSelect, 'furniture')
-  selectEvent.openMenu(categoriesSelect)
-  await selectEvent.select(categoriesSelect, 'pet')
+  await selectEvent.select(categoriesSelect, ['auto', 'moto'])
 
   const submitBtn = screen.getByRole('button', { name: /search/i })
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
     const query =
-      '?query=Table&minPrice=10&maxPrice=100&address=Paris&categories=furniture&categories=pet'
+      '?query=Table&minPrice=10&maxPrice=100&address=Paris&categories=auto&categories=moto'
     const state = { ...window.history.state, as: query, url: query }
 
     expect(pushState).toHaveBeenNthCalledWith(1, state, '', query)

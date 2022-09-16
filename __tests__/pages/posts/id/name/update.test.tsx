@@ -27,7 +27,7 @@ const post = {
   id: '0',
   name: 'Table',
   description: 'Magnificent table',
-  categories: ['furniture' as const, 'pet' as const],
+  categories: ['furniture' as const],
   price: 5000,
   images: ['static/images/post/table.jpeg'],
   address: 'Oslo, Norway',
@@ -96,7 +96,7 @@ test('an alert renders if the post is updated', async () => {
 
 test('an error renders if the server fails to update the post', async () => {
   server.use(
-    rest.put('http://localhost:3000/api/posts/:id', (req, res, ctx) => {
+    rest.put('http://localhost/api/posts/:id', (req, res, ctx) => {
       return res(ctx.status(500), ctx.json({ message: err.DEFAULT }))
     })
   )
@@ -114,7 +114,7 @@ test('an error renders if the server fails to update the post', async () => {
 
 test("an error renders if the server fails to validate the request's data", async () => {
   server.use(
-    rest.put('http://localhost:3000/api/posts/:id', (req, res, ctx) => {
+    rest.put('http://localhost/api/posts/:id', (req, res, ctx) => {
       return res(
         ctx.status(422),
         ctx.json({ name: 'name', message: err.NAME_MAX })
@@ -191,15 +191,11 @@ test('the form send the latitude/longitude along the address when it is updated'
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    expect(axiosPut).toHaveBeenNthCalledWith(
-      1,
-      'http://localhost:3000/api/posts/0',
-      {
-        csrfToken: 'csrf',
-        address: 'Oslo, Norway',
-        latLon: [59, 10],
-      }
-    )
+    expect(axiosPut).toHaveBeenNthCalledWith(1, '/api/posts/0', {
+      csrfToken: 'csrf',
+      address: 'Oslo, Norway',
+      latLon: [59, 10],
+    })
   })
 
   axiosPut.mockRestore()

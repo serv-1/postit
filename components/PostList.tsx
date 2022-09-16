@@ -3,21 +3,16 @@ import Post from './Post'
 
 interface PostListProps {
   posts: LightPost[] | IPost[]
-  columns?: 3 | 2
 }
 
-const PostList = ({ posts, columns = 3 }: PostListProps) => {
+const PostList = ({ posts }: PostListProps) => {
   return (
-    <ul
-      className={
-        'grid grid-cols-[1fr] gap-x-16 gap-y-8 ' +
-        (columns === 3
-          ? 'md:grid-cols-[1fr,1fr,1fr]'
-          : 'md:grid-cols-[1fr,1fr]')
-      }
-    >
+    <ul className="flex flex-col sm:flex-row flex-wrap gap-x-16 gap-y-8">
       {posts.map((post) => (
-        <li className="w-full h-full" key={post.id}>
+        <li
+          className="w-full h-full sm:w-[calc(50%-8px)] sm:h-[calc(50%-8px)] md:w-[calc(100%/3-32px/3)] md:h-[calc(100%/3-32px/3)]"
+          key={post.id}
+        >
           <Post
             id={post.id}
             name={post.name}

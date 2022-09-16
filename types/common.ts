@@ -1,4 +1,4 @@
-import categories from '../categories'
+import categories from '../utils/constants/categories'
 import { DiscussionModel, MessageModel } from '../models/Discussion'
 import { PostModel } from '../models/Post'
 import { UserModel } from '../models/User'

@@ -11,6 +11,8 @@ import PasswordInput from './PasswordInput'
 import Button from './Button'
 import signInSchema, { SignInSchema } from '../schemas/signInSchema'
 
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+
 interface AuthenticationSignInFormProps {
   providers: UnPromise<ReturnType<typeof getProviders>>
   setForgotPassword: React.Dispatch<React.SetStateAction<boolean>>
@@ -99,7 +101,7 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
                 fullWidth
                 data-cy={`${id}Btn`}
                 onClick={() =>
-                  signIn(id, { callbackUrl: 'http://localhost:3000/profile' })
+                  signIn(id, { callbackUrl: baseUrl + '/profile' })
                 }
               >
                 Sign in with {name}

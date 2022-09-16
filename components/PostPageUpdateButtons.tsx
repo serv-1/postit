@@ -21,9 +21,8 @@ const PostPageUpdateButtons = (props: PostPageUpdateButtonsProps) => {
 
   const deletePost = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/posts/${props.id}`, {
-        data: { csrfToken: await getCsrfToken() },
-      })
+      const csrfToken = await getCsrfToken()
+      await axios.delete('/api/posts/' + props.id, { data: { csrfToken } })
       router.push('/profile')
     } catch (e) {
       const { message } = getAxiosError(e as AxiosError)

@@ -1,35 +1,21 @@
 import { render, screen } from '@testing-library/react'
 import PostList from '../../components/PostList'
-import { IUserPost } from '../../types/common'
 
-const defaultPosts: Omit<IUserPost, 'user'>[] = [
+const defaultPosts = [
   {
-    id: 'f0f0f0f0f0f0f0f0f0f0f0f0',
+    id: '0',
     name: 'Cat',
-    description: 'Awesome Cat',
-    categories: ['pet' as const, 'cat' as const],
-    price: 50,
-    images: ['LSDklsjLS.jpeg'],
+    price: 40,
+    image: 'cat.jpeg',
     address: 'Oslo, Norway',
-    latLon: [17, 22],
   },
 ]
 
 it('renders', () => {
   render(<PostList posts={defaultPosts} />)
 
-  const list = screen.getByRole('list')
-  expect(list).toHaveClass('md:grid-cols-[1fr,1fr,1fr]')
-
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', defaultPosts[0].images[0])
-})
-
-it('renders with 2 columns', () => {
-  render(<PostList posts={defaultPosts} columns={2} />)
-
-  const list = screen.getByRole('list')
-  expect(list).toHaveClass('md:grid-cols-[1fr,1fr]')
+  expect(img).toHaveAttribute('src', defaultPosts[0].image)
 })
 
 it('renders the image', () => {

@@ -1,34 +1,29 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# PostIt
 
-## Getting Started
+## Summary
 
-First, run the development server:
+It is a web application where you can search objects or animals to buy them or create your own post.
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+As an unauthenticated user you can only search posts and create an account (or sign in with Google).
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+As an authenticated user you can:
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- create, update and delete your posts
+- add posts to your favorite post list
+- discuss with other users about their posts
+- update or delete your account
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Development
 
-## Learn More
+It is mainly built with Next.js and TypeScript.
+I have used MongoDB for the database, tailwindcss for the CSS and [Pusher](https://pusher.com/) for the communications in real time between users.
 
-To learn more about Next.js, take a look at the following resources:
+The authentication is done with NextAuth.js.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The API is tested with [Postman](https://www.postman.com/serv-1/workspace/ce865b5f-f710-4be2-bd31-c9b7418d2f5f/collection/17584909-58b49bb0-3d94-4dd8-aa6f-2d8a75ca5f9c).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+It is deployed on Vercel. Open [https://postid.vercel.app](https://postid.vercel.app) to play with.

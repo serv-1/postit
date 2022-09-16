@@ -23,13 +23,7 @@ const AuthenticationRegisterForm = () => {
 
   const submitHandler: SubmitHandler<AddUserSchema> = async (data) => {
     try {
-      const axiosRes = await axios.post('http://localhost:3000/api/user', data)
-
-      await signIn('email', {
-        email: data.email,
-        callbackUrl: 'http://localhost:3000/profile',
-        redirect: false,
-      })
+      const axiosRes = await axios.post('/api/user', data)
 
       const res = await signIn<'credentials'>('credentials', {
         email: data.email,

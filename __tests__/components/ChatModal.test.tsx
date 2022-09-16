@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ChatModal from '../../components/ChatModal'
+import server from '../../mocks/server'
 import getClientPusher from '../../utils/functions/getClientPusher'
 
 jest.mock('../../utils/functions/getClientPusher')
@@ -45,6 +46,10 @@ beforeEach(() => {
   const subscribe = () => ({ bind, unbind })
   ;(getClientPusher as jest.Mock).mockReturnValue({ subscribe })
 })
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 it('closes on click on the close button', async () => {
   const setIsOpen = jest.fn()

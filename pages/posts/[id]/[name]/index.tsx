@@ -17,23 +17,25 @@ import formatToUrl from '../../../../utils/functions/formatToUrl'
 import PostPageMap from '../../../../components/PostPageMap'
 import PostPageContactModal from '../../../../components/PostPageContactModal'
 
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const postId = ctx.params?.id
   const session = await getSession(ctx)
 
   try {
-    let url = 'http://localhost:3000/api/posts/' + postId
-    const { data: post } = await axios.get<Post>(url)
-
-    url = 'http://localhost:3000/api/users/' + post.userId
-    const { data: user } = await axios.get<User>(url)
+    const { data: post } = await axios.get<Post>(
+      baseUrl + '/api/posts/' + postId
+    )
+    const { data: user } = await axios.get<User>(
+      baseUrl + '/api/users/' + post.userId
+    )
 
     const postsIds = user.postsIds.filter((id) => id !== postId)
     const posts: LightPost[] = []
 
     for (const postId of postsIds) {
-      const url = 'http://localhost:3000/api/posts/' + postId
-      const { data } = await axios.get<Post>(url)
+      const { data } = await axios.get<Post>(baseUrl + '/api/posts/' + postId)
       const { id, name, price, address, images } = data
       posts.push({ id, name, price, address, image: images[0] })
     }
@@ -43,7 +45,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     }
 
     if (session) {
-      const url = 'http://localhost:3000/api/users/' + session.id
+      const url = baseUrl + '/api/users/' + session.id
       props.user = (await axios.get<User>(url)).data
     }
 
@@ -108,7 +110,7 @@ const PostPage = ({ post, user, csrfToken }: PostPageProps) => {
             {user?.id === post.user.id ? (
               <span className="hidden md:inline">Manage your post</span>
             ) : (
-              <span>
+              <span className="break-all">
                 Posted by{' '}
                 <Link
                   href={`/users/${post.user.id}/${formatToUrl(post.user.name)}`}
@@ -140,11 +142,11 @@ const PostPage = ({ post, user, csrfToken }: PostPageProps) => {
           </div>
         </div>
         <section className="col-span-full my-32 md:col-span-5 lg:col-span-8">
-          <h1 className="mb-8">{post.name}</h1>
+          <h1 className="mb-8 break-words">{post.name}</h1>
           <span className="text-m-2xl font-bold md:text-t-2xl">
             {addSpacesToNb(post.price)}€
           </span>
-          <p className="my-16">{post.description}</p>
+          <p className="my-16 break-words">{post.description}</p>
           <PostPageMap address={post.address} latLon={post.latLon} />
         </section>
         {(!user || user.id !== post.user.id) && post.user.posts.length > 0 && (
@@ -152,13 +154,13 @@ const PostPage = ({ post, user, csrfToken }: PostPageProps) => {
             <h2 className="mb-16">
               <Link
                 href={`/users/${post.user.id}/${formatToUrl(post.user.name)}`}
-                className="text-fuchsia-600 hover:underline"
+                className="text-fuchsia-600 hover:underline break-words"
               >
                 {post.user.name}
               </Link>
               {"'"}s other posts
             </h2>
-            <PostList posts={post.user.posts} columns={2} />
+            <PostList posts={post.user.posts} />
           </section>
         )}
       </main>

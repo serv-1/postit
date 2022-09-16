@@ -23,7 +23,7 @@ it('renders', () => {
   expect(msgContainer).toHaveClass('flex-row-reverse')
 
   const message = screen.getByText('Hi')
-  expect(message).toHaveClass('mr-8')
+  expect(message).toHaveClass('bg-fuchsia-200')
 
   const dateText = `${date.toLocaleDateString()}, ${date.toLocaleTimeString()}`
   const dateEl = screen.queryByText(dateText)
@@ -71,7 +71,7 @@ it("uses different css classnames if the author isn't the signed in user", async
   expect(msgContainer).toHaveClass('flex-row')
 
   const message = screen.getByText('Hi')
-  expect(message).toHaveClass('ml-8')
+  expect(message).toHaveClass('bg-fuchsia-300')
 
   await userEvent.click(message)
 

@@ -76,8 +76,7 @@ it("removes the discussion from the user's discussionsIds after a click on the r
   await userEvent.click(removeBtn)
 
   await waitFor(() => {
-    const url = 'http://localhost:3000/api/users/1'
-    expect(axiosGet).toHaveBeenNthCalledWith(1, url)
+    expect(axiosGet).toHaveBeenNthCalledWith(1, '/api/users/1')
 
     expect(axiosPut).toHaveBeenCalledTimes(1)
     const payload = { discussionId: '0', csrfToken: 'token' }
@@ -100,7 +99,7 @@ it('deletes the discussion if the interlocutor has deleted its account after a c
     const payload = { discussionId: '0', csrfToken: 'token' }
     expect(axiosPut.mock.calls[0][1]).toEqual(payload)
 
-    const url = 'http://localhost:3000/api/discussions/0?csrfToken=token'
+    const url = '/api/discussions/0?csrfToken=token'
     expect(axiosDelete).toHaveBeenNthCalledWith(1, url)
   })
 
@@ -116,15 +115,14 @@ it('deletes the discussion if the interlocutor has not the discussion id after a
   await userEvent.click(removeBtn)
 
   await waitFor(() => {
-    const getUrl = 'http://localhost:3000/api/users/1'
-    expect(axiosGet).toHaveBeenNthCalledWith(1, getUrl)
+    expect(axiosGet).toHaveBeenNthCalledWith(1, '/api/users/1')
 
     expect(axiosPut).toHaveBeenCalledTimes(1)
     const payload = { discussionId: '0', csrfToken: 'token' }
     expect(axiosPut.mock.calls[0][1]).toEqual(payload)
 
-    const deleteUrl = 'http://localhost:3000/api/discussions/0?csrfToken=token'
-    expect(axiosDelete).toHaveBeenNthCalledWith(1, deleteUrl)
+    const url = '/api/discussions/0?csrfToken=token'
+    expect(axiosDelete).toHaveBeenNthCalledWith(1, url)
   })
 })
 

@@ -10,6 +10,7 @@ import getAxiosError from '../utils/functions/getAxiosError'
 import Modal from './Modal'
 import HeaderChatModal from './HeaderChatModal'
 import getClientPusher from '../utils/functions/getClientPusher'
+import styles from '../styles/chatScrollbar.module.css'
 
 const HeaderChatListModal = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -25,8 +26,7 @@ const HeaderChatListModal = () => {
   useEffect(() => {
     const getDiscussionsIds = async () => {
       try {
-        const url = `http://localhost:3000/api/users/${session.id}`
-        const { data } = await axios.get<User>(url)
+        const { data } = await axios.get<User>('/api/users/' + session.id)
 
         setDiscussionsIds(data.discussionsIds)
         setHasUnseenMessages(data.hasUnseenMessages)
@@ -98,9 +98,9 @@ const HeaderChatListModal = () => {
           setIsOpen={setIsOpen}
           className="fixed top-0 left-0 w-screen h-screen z-[1001] md:flex md:justify-center md:items-center md:bg-fuchsia-900/25"
         >
-          <div className="bg-fuchsia-50 z-[1001] flex flex-col flex-nowrap h-full md:w-full md:max-w-[450px] md:max-h-[800px] md:rounded-16 md:shadow-[0_0_32px_rgba(112,26,117,0.25)]">
+          <div className="bg-fuchsia-50 z-[1001] flex flex-col h-full md:w-full md:max-w-[450px] md:max-h-[800px] md:rounded-16 md:shadow-[0_0_32px_rgba(112,26,117,0.25)]">
             <button
-              className="w-32 h-32 m-16 text-fuchsia-600 self-end hover:text-fuchsia-900 transition-colors duration-200"
+              className="w-32 h-32 mt-16 mx-16 text-fuchsia-600 self-end hover:text-fuchsia-900 transition-colors duration-200"
               aria-label="Close"
               onClick={() => setIsOpen(false)}
             >
@@ -116,13 +116,19 @@ const HeaderChatListModal = () => {
                 </p>
               </div>
             ) : (
-              discussionsIds.map((id) => (
-                <HeaderChatModal
-                  key={id}
-                  csrfToken={csrfToken}
-                  discussionId={id}
-                />
-              ))
+              <div
+                className={
+                  'overflow-y-auto px-[12px] py-16 mx-[4px] ' + styles.container
+                }
+              >
+                {discussionsIds.map((id) => (
+                  <HeaderChatModal
+                    key={id}
+                    csrfToken={csrfToken}
+                    discussionId={id}
+                  />
+                ))}
+              </div>
             )}
           </div>
         </Modal>

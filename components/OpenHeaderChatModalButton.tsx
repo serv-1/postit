@@ -38,7 +38,7 @@ const OpenHeaderChatModalButton = ({
         if (!interlocutor.id) {
           hasToDelete = true
         } else {
-          const url = 'http://localhost:3000/api/users/' + interlocutor.id
+          const url = '/api/users/' + interlocutor.id
           const { data } = await axios.get<User>(url)
 
           if (!data.discussionsIds.includes(discussionId)) {
@@ -46,11 +46,10 @@ const OpenHeaderChatModalButton = ({
           }
         }
 
-        const url = 'http://localhost:3000/api/user/'
-        await axios.put(url, { discussionId, csrfToken })
+        await axios.put('/api/user/', { discussionId, csrfToken })
 
         if (hasToDelete) {
-          const url = `http://localhost:3000/api/discussions/${discussionId}?csrfToken=${csrfToken}`
+          const url = `/api/discussions/${discussionId}?csrfToken=${csrfToken}`
           await axios.delete(url)
         }
       } catch (e) {

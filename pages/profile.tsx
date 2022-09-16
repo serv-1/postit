@@ -17,6 +17,8 @@ import ProfilePostList from '../components/ProfilePostList'
 import formatToUrl from '../utils/functions/formatToUrl'
 import { useState } from 'react'
 
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx)
 
@@ -27,21 +29,21 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
     const { id: userId } = session
 
-    const url = 'http://localhost:3000/api/users/' + userId
+    const url = baseUrl + '/api/users/' + userId
     const { data: user } = await axios.get<User>(url)
 
     const posts: Post[] = []
     const favPosts: Omit<LightPost, 'price' | 'address'>[] = []
 
     for (const postId of user.postsIds) {
-      const url = 'http://localhost:3000/api/posts/' + postId
+      const url = baseUrl + '/api/posts/' + postId
       posts.push((await axios.get<Post>(url)).data)
     }
 
     for (const favPostId of user.favPostsIds) {
-      const url = 'http://localhost:3000/api/posts/' + favPostId
-      const { id, name, images } = (await axios.get<Post>(url)).data
-      favPosts.push({ id, name, image: images[0] })
+      const url = baseUrl + '/api/posts/' + favPostId
+      const { data } = await axios.get<Post>(url)
+      favPosts.push({ id: data.id, name: data.name, image: data.images[0] })
     }
 
     return {
@@ -68,7 +70,7 @@ const Profile = ({ user, csrfToken }: ProfileProps) => {
   return (
     <>
       <Head>
-        <title>Profile - Filanad</title>
+        <title>Profile - PostIt</title>
       </Head>
       <Header />
       <main
@@ -76,27 +78,27 @@ const Profile = ({ user, csrfToken }: ProfileProps) => {
         className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-24"
       >
         <div className="col-span-full">
-          <div className="mb-32 p-8 md:flex md:flex-row md:flex-nowrap md:justify-between md:items-center md:bg-fuchsia-100 md:rounded-16 md:p-16">
-            <div className="flex flex-row flex-nowrap mb-8">
+          <div className="mb-32 p-8 md:flex md:flex-row md:flex-nowrap md:items-center md:bg-fuchsia-100 md:rounded-16 md:p-16">
+            <div className="flex-grow flex flex-row flex-nowrap items-center min-w-0 mb-8 md:mb-0 md:mr-16">
               <ProfileUserImage image={user.image} />
-              <div className="flex-grow flex flex-row flew-nowrap justify-between items-center md:gap-x-16">
-                <h1>{name}</h1>
-                <Link
-                  href="/sign-out"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    signOut({ callbackUrl: '/' })
-                  }}
-                  className="text-fuchsia-600 hover:text-fuchsia-900 transition-colors duration-200"
-                  aria-label="Sign out"
-                >
-                  <SignOut className="w-32 h-32" />
-                </Link>
-              </div>
+              <h1 className="truncate w-full mr-8 md:w-auto md:mr-16">
+                {name}
+              </h1>
+              <Link
+                href="/sign-out"
+                onClick={(e) => {
+                  e.preventDefault()
+                  signOut({ callbackUrl: '/' })
+                }}
+                className="text-fuchsia-600 hover:text-fuchsia-900 transition-colors duration-200"
+                aria-label="Sign out"
+              >
+                <SignOut className="w-32 h-32" />
+              </Link>
             </div>
             <Link
               href={`/users/${user.id}/${formatToUrl(name)}`}
-              className="bg-fuchsia-200 text-fuchsia-600 py-8 px-16 block w-full text-center font-bold rounded hover:bg-fuchsia-300 transition-colors duration-200 md:w-auto md:h-40"
+              className="bg-fuchsia-200 text-fuchsia-600 py-8 px-16 block shrink-0 text-center font-bold rounded hover:bg-fuchsia-300 transition-colors duration-200 md:h-40"
             >
               See my public profile
             </Link>

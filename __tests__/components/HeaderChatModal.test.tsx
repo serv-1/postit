@@ -71,7 +71,7 @@ it('opens/closes', async () => {
 
   expect(modal).not.toBeInTheDocument()
 
-  const url = 'http://localhost:3000/api/discussions/0?csrfToken=token'
+  const url = '/api/discussions/0?csrfToken=token'
   expect(axiosGet).toHaveBeenNthCalledWith(1, url)
 
   expect(bind).toHaveBeenCalledTimes(1)

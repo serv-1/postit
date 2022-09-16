@@ -23,9 +23,8 @@ const HomePostPage = () => {
   useEffect(() => {
     const onQueryStringChange = async () => {
       try {
-        const { data } = await axios.get<Response>(
-          `http://localhost:3000/api/posts/search${window.location.search}`
-        )
+        const url = '/api/posts/search' + window.location.search
+        const { data } = await axios.get<Response>(url)
 
         setPosts(data.posts)
         setTotalPosts(data.totalPosts)
@@ -48,7 +47,7 @@ const HomePostPage = () => {
   }, [setToast])
 
   return posts && posts.length > 0 ? (
-    <div className="col-span-full lg:col-start-5 lg:row-span-full mb-32">
+    <div className="col-span-full lg:col-start-5 lg:row-span-full my-32 lg:mt-0">
       <div className="mb-16" role="status">
         {totalPosts} post{totalPosts !== 1 ? 's' : ''} found
       </div>

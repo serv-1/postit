@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import categories from '../categories'
+import categories from '../utils/constants/categories'
 import err from '../utils/constants/errors'
 
 const categoriesSchema = Joi.array()

@@ -77,7 +77,7 @@ test('the user can add or delete the post to its favorite', async () => {
 
 test('an error renders if the server fails to update the user favorite post list', async () => {
   server.use(
-    rest.put('http://localhost:3000/api/user', (req, res, ctx) => {
+    rest.put('http://localhost/api/user', (req, res, ctx) => {
       return res(ctx.status(422), ctx.json({ message: err.DEFAULT }))
     })
   )

@@ -74,6 +74,7 @@ const Select = <FormFields extends FieldValues = FieldValues>({
     <ReactSelect
       isMulti
       {...field}
+      instanceId={field.name}
       inputId={field.name}
       options={options}
       styles={styles}

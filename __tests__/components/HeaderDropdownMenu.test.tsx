@@ -48,7 +48,7 @@ test('an error renders if the server fails to fetch the user image', async () =>
   useToast.mockReturnValue({ setToast })
 
   server.use(
-    rest.get('http://localhost:3000/api/users/:id', (req, res, ctx) => {
+    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
       return res(ctx.status(404), ctx.json({ message: err.USER_NOT_FOUND }))
     })
   )

@@ -7,18 +7,20 @@ import PostList from '../../../components/PostList'
 import { Post, User } from '../../../types/common'
 import Blob from '../../../public/static/images/blob.svg'
 
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const userId = ctx.params?.id
 
   try {
-    const url = 'http://localhost:3000/api/users/' + userId
+    const url = baseUrl + '/api/users/' + userId
     const { data: user } = await axios.get<User>(url)
 
     const posts: Post[] = []
 
     for (const postId of user.postsIds) {
-      const url = 'http://localhost:3000/api/posts/' + postId
-      posts.push((await axios.get<Post>(url)).data)
+      const { data } = await axios.get<Post>(baseUrl + '/api/posts/' + postId)
+      posts.push(data)
     }
 
     return { props: { user: { ...user, posts } } }
@@ -49,7 +51,7 @@ const UserPage = ({ user }: UserPageProps) => {
               className="rounded-full"
             />
           </div>
-          <h1 className="text-center">{user.name}</h1>
+          <h1 className="text-center break-words">{user.name}</h1>
         </section>
         {user.posts.length > 0 ? (
           <section className="col-span-full mb-32 lg:col-start-5 lg:row-span-full">

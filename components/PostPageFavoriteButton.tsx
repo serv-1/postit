@@ -28,10 +28,8 @@ const PostPageFavoriteButton = (props: PostPageFavoriteButtonProps) => {
   const handleFavPost = favPostsIds
     ? async () => {
         try {
-          await axios.put('http://localhost:3000/api/user', {
-            csrfToken: await getCsrfToken(),
-            favPostId: postId,
-          })
+          const csrfToken = await getCsrfToken()
+          await axios.put('/api/user', { csrfToken, favPostId: postId })
 
           setToast({
             message: `This post has been successfully ${

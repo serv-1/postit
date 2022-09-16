@@ -35,7 +35,7 @@ const HeaderChatModal = ({ csrfToken, discussionId }: HeaderChatModalProps) => {
   useEffect(() => {
     const getDiscussion = async () => {
       try {
-        const url = `http://localhost:3000/api/discussions/${discussionId}?csrfToken=${csrfToken}`
+        const url = `/api/discussions/${discussionId}?csrfToken=${csrfToken}`
         const { data } = await axios.get<JSONDiscussion>(url)
 
         const { messages, channelName, buyer, seller, postName } = data
@@ -71,7 +71,7 @@ const HeaderChatModal = ({ csrfToken, discussionId }: HeaderChatModalProps) => {
   const { buyer, seller, postName } = discussionData
 
   return (
-    <div className="px-16 mb-8 last:mb-0">
+    <div className="mb-8 last:mb-0">
       <OpenHeaderChatModalButton
         hasUnseenMessages={hasUnseenMessages}
         interlocutor={userId === buyer.id ? seller : buyer}

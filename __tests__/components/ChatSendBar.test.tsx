@@ -66,9 +66,8 @@ it('updates the discussion with the new message', async () => {
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    const url = 'http://localhost:3000/api/discussions/0'
     const payload = { message: 'boo', csrfToken: 'token' }
-    expect(axiosPut).toHaveBeenNthCalledWith(1, url, payload)
+    expect(axiosPut).toHaveBeenNthCalledWith(1, '/api/discussions/0', payload)
   })
 })
 

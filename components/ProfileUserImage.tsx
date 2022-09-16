@@ -35,10 +35,8 @@ const ProfileUserImage = ({ image: img }: ProfileUserImageProps) => {
       setToast({ message: result, error: true })
     } else {
       try {
-        await axios.put('http://localhost:3000/api/user', {
-          csrfToken: await getCsrfToken(),
-          image: result,
-        })
+        const csrfToken = await getCsrfToken()
+        await axios.put('/api/user', { csrfToken, image: result })
 
         setImage(`data:image/${result.ext};base64,${result.base64}`)
         setToast({ message: 'The image has been updated! 🎉' })
@@ -59,7 +57,7 @@ const ProfileUserImage = ({ image: img }: ProfileUserImageProps) => {
         }}
         htmlFor="userImage"
         aria-label="Change your profile image"
-        className="block relative w-[60px] h-[60px] group cursor-pointer md:w-[80px] md:h-[80px]"
+        className="block relative group cursor-pointer w-[60px] h-[60px] md:w-[80px] md:h-[80px]"
       >
         <Image
           src={image}
