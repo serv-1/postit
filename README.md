@@ -26,4 +26,4 @@ The API is tested with [Postman](https://www.postman.com/serv-1/workspace/ce865b
 
 ## Deployment
 
-It is deployed on Vercel. Open [https://postid.vercel.app](https://postid.vercel.app) to play with.
+It is deployed on Vercel. Open [https://postit-site.vercel.app](https://postit-site.vercel.app) to play with.
