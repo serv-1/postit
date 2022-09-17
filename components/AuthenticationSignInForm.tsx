@@ -99,7 +99,6 @@ const AuthenticationSignInForm = (props: AuthenticationSignInFormProps) => {
                 key={id}
                 color="primary"
                 fullWidth
-                data-cy={`${id}Btn`}
                 onClick={() =>
                   signIn(id, { callbackUrl: baseUrl + '/profile' })
                 }

@@ -44,7 +44,7 @@ const Authentication = ({ providers }: AuthenticationProps) => {
       <Head>
         <title>Authentication - PostIt</title>
       </Head>
-      <div className="flex flex-col justify-center items-center">
+      <main className="flex flex-col justify-center items-center row-span-2">
         <Link
           href="/"
           className="font-bold text-m-xl md:text-t-xl hover:text-fuchsia-600 transition-colors duration-200 p-16"
@@ -99,11 +99,9 @@ const Authentication = ({ providers }: AuthenticationProps) => {
             </div>
           </RightPanel>
         </GlassWrapper>
-      </div>
+      </main>
     </>
   )
 }
-
-Authentication.need2RowsGrid = true
 
 export default Authentication

@@ -68,7 +68,8 @@ export default NextAuth({
               image: 'default.jpg',
               postsIds: [],
               favPostsIds: [],
-              discussionIds: [],
+              discussionsIds: [],
+              hasUnseenMessages: false,
               channelName,
             }
           ).exec()

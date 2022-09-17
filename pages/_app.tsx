@@ -11,7 +11,6 @@ import '../node_modules/leaflet/dist/leaflet.css'
 
 export type PageType = ComponentType<{}> & {
   needAuth?: true
-  need2RowsGrid?: true
 }
 
 type NextAppProps = AppProps & { Component: PageType }
@@ -34,10 +33,7 @@ const App = ({ Component, pageProps }: NextAppProps) => {
         <ToastProvider>
           <div
             className={
-              'relative mx-16 grid min-h-screen ' +
-              (Component.need2RowsGrid
-                ? 'grid-rows-[1fr_auto]'
-                : 'grid-rows-[auto_1fr_auto]')
+              'relative mx-16 grid min-h-screen grid-rows-[auto_1fr_auto]'
             }
           >
             <Toast />

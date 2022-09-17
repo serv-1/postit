@@ -16,8 +16,10 @@ const MailSent = () => {
       <Head>
         <title>Mail sent! - PostIt</title>
       </Head>
-      <div className="flex flex-col justify-center items-center">
-        <Header />
+      <main className="flex flex-col justify-center items-center row-span-2">
+        <div className="w-full max-w-[450px] md:max-w-none">
+          <Header />
+        </div>
         <GlassWrapper minHeight="md:min-h-[480px]">
           <LeftPanel>
             <SendCheck className="w-[160px] h-[160px] mx-auto mb-32 md:hidden" />
@@ -29,11 +31,9 @@ const MailSent = () => {
             <SendCheck className="w-[260px] h-[260px] m-32" />
           </RightPanel>
         </GlassWrapper>
-      </div>
+      </main>
     </>
   )
 }
-
-MailSent.need2RowsGrid = true
 
 export default MailSent

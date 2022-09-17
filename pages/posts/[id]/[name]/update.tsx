@@ -119,7 +119,7 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
       <Head>
         <title>Update {post.name} - Filanad</title>
       </Head>
-      <div className="flex flex-col justify-center items-center">
+      <main className="flex flex-col justify-center items-center row-span-2">
         <Header />
         <GlassWrapper padding="p-32">
           <ShapeContainer>
@@ -238,12 +238,11 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
             </Form>
           </ShapeContainer>
         </GlassWrapper>
-      </div>
+      </main>
     </>
   )
 }
 
 UpdatePost.needAuth = true
-UpdatePost.need2RowsGrid = true
 
 export default UpdatePost

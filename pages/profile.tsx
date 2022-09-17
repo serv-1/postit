@@ -73,10 +73,7 @@ const Profile = ({ user, csrfToken }: ProfileProps) => {
         <title>Profile - PostIt</title>
       </Head>
       <Header />
-      <main
-        data-cy="profile"
-        className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-24"
-      >
+      <main className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-x-24">
         <div className="col-span-full">
           <div className="mb-32 p-8 md:flex md:flex-row md:flex-nowrap md:items-center md:bg-fuchsia-100 md:rounded-16 md:p-16">
             <div className="flex-grow flex flex-row flex-nowrap items-center min-w-0 mb-8 md:mb-0 md:mr-16">

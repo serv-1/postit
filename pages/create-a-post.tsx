@@ -61,7 +61,7 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
       <Head>
         <title>Create a post - PostIt</title>
       </Head>
-      <div className="flex flex-col justify-center items-center">
+      <main className="flex flex-col justify-center items-center row-span-2">
         <Header />
         <GlassWrapper
           minHeight="min-h-[553.89px] md:min-h-[598px]"
@@ -91,12 +91,11 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
             </Form>
           </ShapeContainer>
         </GlassWrapper>
-      </div>
+      </main>
     </>
   )
 }
 
 CreateAPost.needAuth = true
-CreateAPost.need2RowsGrid = true
 
 export default CreateAPost
