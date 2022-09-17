@@ -21,6 +21,7 @@ const env = {
   PUSHER_ENCRYPTION_KEY: getEnvVar('PUSHER_ENCRYPTION_KEY'),
   PUSHER_SECRET: getEnvVar('PUSHER_SECRET'),
   PUSHER_APP_ID: getEnvVar('PUSHER_APP_ID'),
+  CSRF_TOKEN_COOKIE_NAME: getEnvVar('CSRF_TOKEN_COOKIE_NAME'),
 }
 
 export default env

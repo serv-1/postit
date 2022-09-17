@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import Discussion from '../../models/Discussion'
 import User from '../../models/User'
 import addDiscussionApiSchema from '../../schemas/addDiscussionApiSchema'
+import env from '../../utils/constants/env'
 import err from '../../utils/constants/errors'
 import catchError from '../../utils/functions/catchError'
 import dbConnect from '../../utils/functions/dbConnect'
@@ -25,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(422).json({ message: result.message })
   }
 
-  const csrfTokenCookie = req.cookies['next-auth.csrf-token']
+  const csrfTokenCookie = req.cookies[env.CSRF_TOKEN_COOKIE_NAME]
   if (!isCsrfTokenValid(csrfTokenCookie, result.value.csrfToken)) {
     return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
   }

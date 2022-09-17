@@ -13,6 +13,7 @@ import { unlink } from 'fs/promises'
 import updatePostApiSchema from '../../../schemas/updatePostApiSchema'
 import getSessionAndUser from '../../../utils/functions/getSessionAndUser'
 import catchError from '../../../utils/functions/catchError'
+import env from '../../../utils/constants/env'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
@@ -54,7 +55,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const result = validate<string>(csrfTokenSchema, req.body?.csrfToken)
-  const csrfTokenCookie = req.cookies['next-auth.csrf-token']
+  const csrfTokenCookie = req.cookies[env.CSRF_TOKEN_COOKIE_NAME]
 
   if (!result.value || !isCsrfTokenValid(csrfTokenCookie, result.value)) {
     return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })

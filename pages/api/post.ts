@@ -10,6 +10,7 @@ import formatToUrl from '../../utils/functions/formatToUrl'
 import addPostApiSchema from '../../schemas/addPostApiSchema'
 import getSessionAndUser from '../../utils/functions/getSessionAndUser'
 import catchError from '../../utils/functions/catchError'
+import env from '../../utils/constants/env'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -27,7 +28,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(422).json({ name: result.name, message: result.message })
   }
 
-  const csrfTokenCookie = req.cookies['next-auth.csrf-token'] || ''
+  const csrfTokenCookie = req.cookies[env.CSRF_TOKEN_COOKIE_NAME] || ''
   const csrfToken = result.value.csrfToken
 
   if (!isCsrfTokenValid(csrfTokenCookie, csrfToken)) {
