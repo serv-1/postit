@@ -5,13 +5,11 @@ import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
 
-const getCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 const setToast = jest.fn()
 
 beforeEach(() => {
   useToast.mockReturnValue({ setToast })
-  getCsrfToken.mockResolvedValue('csrfToken')
 })
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())

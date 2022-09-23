@@ -32,7 +32,7 @@ const ChatModal = ({
 
   useEffect(() => {
     const p = pusher.current
-    const channel = p.subscribe(session.channelName)
+    const channel = p.subscribe('private-' + session.channelName)
 
     const discussionCreatedHandler = (d: DiscussionEventData) => setDiscussionId(d.discussionId) // prettier-ignore
     const discussionDeletedHandler = () => setDiscussionId(undefined)

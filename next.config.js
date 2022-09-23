@@ -10,6 +10,11 @@ module.exports = {
 
     return config
   },
-  images: { domains: ['maps.locationiq.com'] },
+  images: {
+    domains: [
+      'maps.locationiq.com',
+      'postit-images-bucket.s3.eu-west-3.amazonaws.com',
+    ],
+  },
   optimizeFonts: false,
 }

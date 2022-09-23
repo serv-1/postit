@@ -1,12 +1,14 @@
 import { render, screen } from '@testing-library/react'
 import PostList from '../../components/PostList'
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+
 const defaultPosts = [
   {
     id: '0',
     name: 'Cat',
     price: 40,
-    image: 'cat.jpeg',
+    image: 'keyName',
     address: 'Oslo, Norway',
   },
 ]
@@ -15,13 +17,5 @@ it('renders', () => {
   render(<PostList posts={defaultPosts} />)
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', defaultPosts[0].image)
-})
-
-it('renders the image', () => {
-  const post = [{ ...defaultPosts[0], image: 'image.jpeg' }]
-  render(<PostList posts={post} />)
-
-  const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', 'image.jpeg')
+  expect(img).toHaveAttribute('src', awsUrl + defaultPosts[0].image)
 })

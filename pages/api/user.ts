@@ -7,10 +7,6 @@ import err from '../../utils/constants/errors'
 import validate from '../../utils/functions/validate'
 import updateUserApiSchema from '../../schemas/updateUserApiSchema'
 import isCsrfTokenValid from '../../utils/functions/isCsrfTokenValid'
-import isBase64ValueTooBig from '../../utils/functions/isBase64ValueTooBig'
-import { unlink } from 'fs/promises'
-import { cwd } from 'process'
-import createFile from '../../utils/functions/createFile'
 import csrfTokenSchema from '../../schemas/csrfTokenSchema'
 import { UpdateQuery } from 'mongoose'
 import addUserSchema from '../../schemas/addUserSchema'
@@ -18,6 +14,7 @@ import getServerPusher from '../../utils/functions/getServerPusher'
 import getSessionAndUser from '../../utils/functions/getSessionAndUser'
 import catchError from '../../utils/functions/catchError'
 import env from '../../utils/constants/env'
+import deleteImage from '../../utils/functions/deleteImage'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!['POST', 'PUT', 'DELETE'].includes(req.method || '')) {
@@ -79,21 +76,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       update = { password: salt + ':' + hash.toString('hex') }
     } else if ('image' in reqBody) {
-      const { ext, base64 } = reqBody.image
-
-      if (isBase64ValueTooBig(base64, 1000000)) {
-        return res.status(413).json({ message: err.IMAGE_TOO_BIG })
+      if (user.image) {
+        await deleteImage(user.image)
       }
 
-      const path = '/public/static/images/users/'
-
-      if (user.image.split('.')[0] !== 'default') {
-        await unlink(cwd() + path + user.image)
-      }
-
-      const fname = await createFile(base64, ext, path, { enc: 'base64' })
-
-      update = { image: fname }
+      update = { image: reqBody.image }
     } else if ('favPostId' in reqBody) {
       const ids = user.favPostsIds.map((id) => id.toString())
       const action = ids.includes(reqBody.favPostId) ? 'pull' : 'push'
@@ -134,8 +121,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(204).end()
   }
 
-  if (user.image.split('.')[0] !== 'default') {
-    await unlink(cwd() + '/public/static/images/users/' + user.image)
+  if (user.image) {
+    await deleteImage(user.image)
   }
 
   await dbConnect()
@@ -145,11 +132,3 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 export default catchError(handler)
-
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '2mb',
-    },
-  },
-}

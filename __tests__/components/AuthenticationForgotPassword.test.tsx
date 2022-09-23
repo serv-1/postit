@@ -13,6 +13,7 @@ const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 const setToast = jest.fn()
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 
 beforeEach(() => {
   signIn.mockResolvedValue({ error: '' })
@@ -31,7 +32,7 @@ test('the form sends a mail to the user to sign in, which redirect him to its pr
   await waitFor(() => {
     expect(signIn).toHaveBeenNthCalledWith(1, 'email', {
       email: 'johndoe@test.com',
-      callbackUrl: 'undefined/profile',
+      callbackUrl: baseUrl + '/profile',
     })
   })
 })

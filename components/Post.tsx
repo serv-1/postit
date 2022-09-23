@@ -5,6 +5,8 @@ import Link from './Link'
 import Location from '../public/static/images/location.svg'
 import Popup from './Popup'
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+
 interface PostProps {
   id: string
   name: string
@@ -30,7 +32,7 @@ const Post = ({ id, name, price, image, address }: PostProps) => {
         }
       />
       <Image
-        src={image}
+        src={awsUrl + image}
         alt={name}
         layout="responsive"
         width="328"

@@ -13,6 +13,7 @@ const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const router = { push: jest.fn() }
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 
 beforeEach(() => {
   useRouter.mockReturnValue(router)
@@ -121,7 +122,7 @@ test('the providers render', async () => {
 
   await userEvent.click(googleBtn)
   expect(signIn).toHaveBeenNthCalledWith(1, 'google', {
-    callbackUrl: 'undefined/profile',
+    callbackUrl: baseUrl + '/profile',
   })
 
   const emailBtn = screen.queryByRole('button', { name: /email/i })

@@ -8,7 +8,7 @@ const handlers = [
         id: '0',
         name: 'john',
         email: 'john@test.com',
-        image: 'john.jpeg',
+        image: 'keyName',
         postsIds: [],
         favPostsIds: [],
         discussionsIds: [],

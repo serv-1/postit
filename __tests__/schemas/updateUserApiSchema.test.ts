@@ -20,7 +20,7 @@ it('passes', () => {
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 
-  const v4 = { csrfToken, image: { base64: 'af0=', ext: 'jpg' } }
+  const v4 = { csrfToken, image: 'keyName' }
   result = updateUserApiSchema.validate(v4)
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')

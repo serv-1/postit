@@ -83,7 +83,7 @@ const ChatMessageList = (props: ChatMessageListProps) => {
     if (!channelName) return
 
     const p = pusher.current
-    const channel = p.subscribe(channelName)
+    const channel = p.subscribe('private-encrypted-' + channelName)
 
     const newMessageHandler = (msg: UnArray<JSONDiscussion['messages']>) => {
       const m = { ...msg, createdAt: new Date(msg.createdAt) }

@@ -65,7 +65,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const pusher = getServerPusher()
   pusher.trigger(
-    [session.channelName, 'private-' + seller.channelName],
+    ['private-' + session.channelName, 'private-' + seller.channelName],
     'discussion-created',
     { discussionId: newDiscussion._id.toString(), userId: id }
   )

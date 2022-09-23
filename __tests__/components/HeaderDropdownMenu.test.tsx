@@ -13,19 +13,28 @@ afterAll(() => server.close())
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
 
+const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL
+
 beforeEach(() => {
   useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
   useToast.mockReturnValue({})
 })
 
-test('the user image loads', async () => {
+test('the default user image renders', () => {
   render(<HeaderDropdownMenu />)
 
-  const pulser = screen.getByRole('status')
-  expect(pulser).toBeInTheDocument()
+  const userImage = screen.getByRole('img')
+  expect(userImage).toHaveAttribute('src', defaultUserImage)
+})
 
-  const userImage = await screen.findByRole('img')
-  expect(userImage).toHaveAttribute('src')
+test('the fetched user image renders', async () => {
+  render(<HeaderDropdownMenu />)
+
+  const userImage = screen.getByRole('img')
+  await waitFor(() => {
+    expect(userImage).toHaveAttribute('src', awsUrl + '/keyName')
+  })
 })
 
 test('the sign out link signs out the user', async () => {
@@ -59,7 +68,4 @@ test('an error renders if the server fails to fetch the user image', async () =>
     const update = { message: err.USER_NOT_FOUND, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, update)
   })
-
-  const pulser = screen.getByRole('status')
-  expect(pulser).toBeInTheDocument()
 })

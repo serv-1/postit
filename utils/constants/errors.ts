@@ -17,7 +17,7 @@ const err = {
   PASSWORD_MAX: 'The password cannot exceed 20 characters.' as const,
   PASSWORD_SAME: 'The password cannot be the same as the other fields\' value.' as const,
 	/* User image */
-	IMAGE_INVALID: 'An image is expected. (.jpeg, .jpg, .png, .gif)' as const,
+	IMAGE_INVALID: 'An image is expected. (.jpeg (.jpg), .png, .gif)' as const,
 	IMAGE_TOO_BIG: 'The image size cannot exceed 1 megabyte.' as const,
 	IMAGE_REQUIRED: 'The image is required.' as const,
 	/* Description */
@@ -63,6 +63,9 @@ const err = {
 	CHANNEL_NAME_INVALID: 'The channel name is invalid.' as const,
 	CHANNEL_NAME_REQUIRED: 'The channel name is required.' as const,
 	CHANNEL_NAME_MAX: 'The channel name cannot exceed 146 characters.' as const,
+	/* Object key name (AWS S3) */
+	KEY_INVALID: 'The key is invalid.' as const,
+	KEY_REQUIRED: 'The key is required.' as const,
 	/* Data */
   DATA_INVALID: 'The given data are invalid.' as const,
 	/* Server */

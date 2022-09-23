@@ -10,7 +10,7 @@ const Toast = () => {
   useEffect(() => {
     if (!message) return
 
-    const id = setTimeout(() => setToast({}), 12500)
+    const id = setTimeout(() => setToast({}), 8000)
 
     return () => clearTimeout(id)
   }, [message, setToast])

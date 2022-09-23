@@ -23,13 +23,15 @@ jest.mock('../../../../../components/PostPageContactModal', () => ({
   default: () => <button>contact</button>,
 }))
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+
 const post: PostPageProps['post'] = {
   id: '0',
   name: 'Table',
   description: 'Magnificent table',
   categories: ['furniture' as const],
   price: 5000.12,
-  images: ['/table.jpeg'],
+  images: ['keyName'],
   address: 'Oslo, Norway',
   latLon: [17, 45],
   discussionsIds: [],
@@ -40,7 +42,7 @@ const user: PostPageProps['user'] = {
   id: '0',
   name: 'Bob',
   email: 'bob@bob.bob',
-  image: '/bob.jpeg',
+  image: 'keyName',
   postsIds: [],
   favPostsIds: [],
   discussionsIds: [],
@@ -62,7 +64,7 @@ it('renders', () => {
   expect(documentTitle).toHaveTextContent(post.name)
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', '/table.jpeg')
+  expect(img).toHaveAttribute('src', awsUrl + post.images[0])
   expect(img).toHaveAttribute('alt', post.name)
 
   const favBtn = screen.getByRole('button', { name: /favorite/i })
@@ -113,7 +115,7 @@ it("renders author's other posts section if the user is unauthenticated and the 
   const userPost: LightPost = {
     name: 'Chair',
     price: 25,
-    image: '/static/images/posts/chair.jpeg',
+    image: 'keyName',
     address: 'Oslo, Norway',
     id: '0',
   }
@@ -132,7 +134,7 @@ it("renders author's other posts section if the signed in user isn't the post au
   const userPost: LightPost = {
     name: 'Chair',
     price: 25,
-    image: '/static/images/posts/chair.jpeg',
+    image: 'keyName',
     address: 'Oslo, Norway',
     id: '0',
   }
@@ -149,7 +151,7 @@ it("doesn't render author's other posts section if the signed in user is the pos
   const userPost: LightPost = {
     name: 'Chair',
     price: 25,
-    image: '/static/images/posts/chair.jpeg',
+    image: 'keyName',
     address: 'Oslo, Norway',
     id: '0',
   }

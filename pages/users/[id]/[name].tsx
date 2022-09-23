@@ -8,6 +8,8 @@ import { Post, User } from '../../../types/common'
 import Blob from '../../../public/static/images/blob.svg'
 
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE as string
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const userId = ctx.params?.id
@@ -44,7 +46,7 @@ const UserPage = ({ user }: UserPageProps) => {
         <section className="col-span-full mb-32 bg-fuchsia-100 rounded-16 p-16 lg:sticky lg:col-span-4 lg:top-16">
           <div className="relative w-[100px] h-[100px] mx-auto mb-8 md:w-[125px] md:h-[125px]">
             <Image
-              src={user.image}
+              src={user.image ? awsUrl + user.image : defaultUserImage}
               alt={`${user.name} profile image`}
               layout="fill"
               objectFit="cover"
@@ -58,7 +60,15 @@ const UserPage = ({ user }: UserPageProps) => {
             <h2 className="mb-16">
               Its {user.posts.length} post{user.posts.length > 1 ? 's' : ''}
             </h2>
-            <PostList posts={user.posts} />
+            <PostList
+              posts={user.posts.map((p) => ({
+                id: p.id,
+                name: p.name,
+                price: p.price,
+                address: p.address,
+                image: p.images[0],
+              }))}
+            />
           </section>
         ) : (
           <div

@@ -89,12 +89,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             $set: {
               id: { $toString: '$_id' },
               price: { $divide: ['$price', 100] },
-              image: {
-                $concat: [
-                  '/static/images/posts/',
-                  { $arrayElemAt: ['$images', 0] },
-                ],
-              },
+              image: { $arrayElemAt: ['$images', 0] },
             },
           },
           {

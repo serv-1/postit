@@ -1,8 +1,8 @@
-import { LightPost, Post as IPost } from '../types/common'
+import { LightPost } from '../types/common'
 import Post from './Post'
 
 interface PostListProps {
-  posts: LightPost[] | IPost[]
+  posts: LightPost[]
 }
 
 const PostList = ({ posts }: PostListProps) => {
@@ -13,13 +13,7 @@ const PostList = ({ posts }: PostListProps) => {
           className="w-full h-full sm:w-[calc(50%-8px)] sm:h-[calc(50%-8px)] md:w-[calc(100%/3-32px/3)] md:h-[calc(100%/3-32px/3)]"
           key={post.id}
         >
-          <Post
-            id={post.id}
-            name={post.name}
-            price={post.price}
-            image={'image' in post ? post.image : post.images[0]}
-            address={post.address}
-          />
+          <Post {...post} />
         </li>
       ))}
     </ul>

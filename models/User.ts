@@ -10,7 +10,7 @@ export interface UserModel {
   _id: Types.ObjectId
   name: string
   email: string
-  image: string
+  image?: string
   password?: string
   emailVerified?: Date
   postsIds: Types.ObjectId[]
@@ -23,7 +23,7 @@ export interface UserModel {
 const userSchema = new Schema<UserModel>({
   name: String,
   email: { type: String, unique: true },
-  image: { type: String, default: 'default.jpg' },
+  image: { type: String },
   password: String,
   emailVerified: Date,
   postsIds: [Schema.Types.ObjectId],

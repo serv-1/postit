@@ -18,6 +18,7 @@ import PostPageMap from '../../../../components/PostPageMap'
 import PostPageContactModal from '../../../../components/PostPageContactModal'
 
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const postId = ctx.params?.id
@@ -75,7 +76,7 @@ const PostPage = ({ post, user, csrfToken }: PostPageProps) => {
       <main className="grid grid-cols-4 md:grid-cols-8 md:grid-rows-[auto,1fr] lg:grid-cols-12 gap-x-24">
         <div className="relative col-span-full h-[360px] -ml-16 w-[calc(100%+32px)] md:col-span-5 md:ml-0 md:w-full md:rounded-16 md:overflow-hidden lg:col-span-8">
           <Image
-            src={post.images[0]}
+            src={awsUrl + post.images[0]}
             alt={post.name}
             layout="fill"
             objectFit="cover"

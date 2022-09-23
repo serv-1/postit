@@ -2,11 +2,13 @@ import Post from '../../components/Post'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+
 const defaultPost = {
   id: '0',
   name: 'Cat',
   price: 5000,
-  image: 'cat.jpeg',
+  image: 'keyName',
   address: 'Oslo, Norway',
 }
 
@@ -22,7 +24,7 @@ it('renders', async () => {
   expect(addressText).toBeInTheDocument()
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', image)
+  expect(img).toHaveAttribute('src', awsUrl + image)
   expect(img).toHaveAttribute('alt', name)
 
   const link = screen.getByRole('link')

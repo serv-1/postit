@@ -1,19 +1,16 @@
-import isBase64ValueTooBig from '../../../utils/functions/isBase64ValueTooBig'
 import { isValidObjectId, UpdateQuery } from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import Post, { PostModel } from '../../../models/Post'
 import dbConnect from '../../../utils/functions/dbConnect'
 import err from '../../../utils/constants/errors'
-import { cwd } from 'process'
 import validate from '../../../utils/functions/validate'
 import csrfTokenSchema from '../../../schemas/csrfTokenSchema'
 import isCsrfTokenValid from '../../../utils/functions/isCsrfTokenValid'
-import createFile from '../../../utils/functions/createFile'
-import { unlink } from 'fs/promises'
 import updatePostApiSchema from '../../../schemas/updatePostApiSchema'
 import getSessionAndUser from '../../../utils/functions/getSessionAndUser'
 import catchError from '../../../utils/functions/catchError'
 import env from '../../../utils/constants/env'
+import deleteImage from '../../../utils/functions/deleteImage'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string
@@ -41,7 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       description: post.description,
       categories: post.categories,
       price: post.price / 100,
-      images: post.images.map((i) => '/static/images/posts/' + i),
+      images: post.images,
       address: post.address,
       latLon: post.latLon,
       discussionsIds: post.discussionsIds.map((i) => i.toString()),
@@ -81,24 +78,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const update: UpdateQuery<PostModel> = {}
 
     if (reqBody.images) {
-      const images: string[] = []
-      const path = '/public/static/images/posts/'
-
-      for (const { base64, ext } of reqBody.images) {
-        if (isBase64ValueTooBig(base64, 1000000)) {
-          return res.status(413).json({ message: err.IMAGE_TOO_BIG })
-        }
-
-        const fname = await createFile(base64, ext, path, { enc: 'base64' })
-
-        images.push(fname)
-      }
-
       for (const image of post.images) {
-        await unlink(cwd() + path + image)
+        await deleteImage(image)
       }
 
-      update.images = images
+      update.images = reqBody.images
     }
     if (reqBody.price) update.price = reqBody.price * 100
     if (reqBody.name) update.name = reqBody.name
@@ -116,7 +100,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   for (const image of post.images) {
-    await unlink(cwd() + '/public/static/images/posts/' + image)
+    await deleteImage(image)
   }
 
   await dbConnect()
@@ -126,11 +110,3 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 export default catchError(handler)
-
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '7mb',
-    },
-  },
-}

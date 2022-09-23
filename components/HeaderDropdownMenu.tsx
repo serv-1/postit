@@ -7,9 +7,13 @@ import getAxiosError from '../utils/functions/getAxiosError'
 import axios, { AxiosError } from 'axios'
 import Popup from './Popup'
 import { Session } from 'next-auth'
+import { User } from '../types/common'
+
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
 
 const HeaderDropdownMenu = () => {
-  const [image, setImage] = useState<string>()
+  const [image, setImage] = useState<string>(defaultUserImage as string)
 
   const { setToast } = useToast()
   const { data } = useSession() as { data: Session }
@@ -18,8 +22,8 @@ const HeaderDropdownMenu = () => {
   useEffect(() => {
     const getImage = async () => {
       try {
-        const res = await axios.get('/api/users/' + id)
-        setImage(res.data.image)
+        const { data } = await axios.get<User>('/api/users/' + id)
+        if (data.image) setImage(awsUrl + data.image)
       } catch (e) {
         const { message } = getAxiosError(e as AxiosError)
         setToast({ message, error: true })
@@ -36,22 +40,13 @@ const HeaderDropdownMenu = () => {
       arrowClassName="w-8 absolute top-4 before:absolute before:visible before:w-8 before:h-8 before:bg-fuchsia-50 before:rotate-45 -z-10"
       referenceClassName="w-full h-full relative cursor-pointer"
       referenceContent={
-        image ? (
-          <Image
-            src={image}
-            alt="Your profile image"
-            layout="fill"
-            objectFit="cover"
-            className="rounded-full"
-          />
-        ) : (
-          <div
-            className="w-full h-full rounded-full bg-fuchsia-300 animate-pulse"
-            role="status"
-          >
-            <span className="sr-only">Loading...</span>
-          </div>
-        )
+        <Image
+          src={image}
+          alt="Your profile image"
+          layout="fill"
+          objectFit="cover"
+          className="rounded-full"
+        />
       }
       popupClassName="z-10 pt-8"
       popupContent={

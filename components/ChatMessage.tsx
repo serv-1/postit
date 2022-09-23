@@ -1,10 +1,13 @@
 import Image from 'next/image'
 import { useState } from 'react'
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE as string
+
 interface ChatMessageProps {
   message: string
   createdAt: Date
-  image: string
+  image?: string
   name: string
   isSignedInUser: boolean
 }
@@ -24,7 +27,7 @@ const ChatMessage = (props: ChatMessageProps) => {
     >
       <div className="w-40 h-40">
         <Image
-          src={image}
+          src={image ? awsUrl + image : defaultUserImage}
           alt={name + "'s profile picture"}
           objectFit="cover"
           width={40}

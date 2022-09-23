@@ -1,4 +1,4 @@
-import { Categories, Image } from '../types/common'
+import { Categories } from '../types/common'
 import err from '../utils/constants/errors'
 import imagesSchema from './imagesSchema'
 import latLonSchema from './latLonSchema'
@@ -11,7 +11,7 @@ export interface UpdatePostApiSchema {
   description?: string
   categories?: Categories[]
   price?: number
-  images?: Image[]
+  images?: string[]
   address?: string
   latLon?: [number, number]
 }

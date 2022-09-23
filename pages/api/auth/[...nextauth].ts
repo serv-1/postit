@@ -4,7 +4,7 @@ import Credentials from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/email'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
-import clientPromise from '../../../lib/mongodb'
+import clientPromise from '../../../libs/mongodb'
 import User, { UserModel } from '../../../models/User'
 import dbConnect from '../../../utils/functions/dbConnect'
 import env from '../../../utils/constants/env'
@@ -65,7 +65,6 @@ export default NextAuth({
           await User.updateOne(
             { _id: user.id },
             {
-              image: 'default.jpg',
               postsIds: [],
               favPostsIds: [],
               discussionsIds: [],
@@ -73,11 +72,9 @@ export default NextAuth({
               channelName,
             }
           ).exec()
-
-          channelName = 'private-' + channelName
         } else {
           const u = (await User.findById(user.id).lean().exec()) as UserModel
-          channelName = 'private-' + u.channelName
+          channelName = u.channelName
         }
 
         token.channelName = channelName

@@ -74,7 +74,7 @@ it('opens/closes', async () => {
   const url = '/api/discussions/0?csrfToken=token'
   expect(axiosGet).toHaveBeenNthCalledWith(1, url)
 
-  expect(bind).toHaveBeenCalledTimes(1)
+  expect(bind).toHaveBeenCalledTimes(3)
 })
 
 it('renders a notification badge if there a new message', async () => {
@@ -130,6 +130,21 @@ it('renders a notification badge if there is a new message received in real time
 
   const notifBadge = screen.getByRole('status')
   expect(notifBadge).toBeInTheDocument()
+})
+
+it('does not render a notification badge if there is a new message but the modal is open', async () => {
+  render(<HeaderChatModal discussionId="0" csrfToken="token" />)
+
+  const openBtn = await screen.findByRole('button', { name: /open/i })
+  await userEvent.click(openBtn)
+
+  await waitFor(() => expect(bind).toHaveBeenCalledTimes(2))
+
+  const newMessageHandler = bind.mock.calls[1][1]
+  act(() => newMessageHandler())
+
+  const notifBadge = screen.queryByRole('status')
+  expect(notifBadge).not.toBeInTheDocument()
 })
 
 it('an alert renders if the server fails to fetch the discussion', async () => {

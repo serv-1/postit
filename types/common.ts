@@ -29,11 +29,6 @@ export interface User
   favPostsIds: string[]
 }
 
-export interface Image {
-  base64: string
-  ext: 'jpg' | 'jpeg' | 'png' | 'gif'
-}
-
 export interface Message extends Omit<MessageModel, 'userId'> {
   userId: string
 }
@@ -42,8 +37,8 @@ export interface Discussion
   extends Pick<DiscussionModel, 'postName' | 'channelName'> {
   id: string
   postId?: string
-  buyer: { id?: string; name: string; image: string }
-  seller: { id?: string; name: string; image: string }
+  buyer: { id?: string; name: string; image?: string }
+  seller: { id?: string; name: string; image?: string }
   messages: Message[]
 }
 

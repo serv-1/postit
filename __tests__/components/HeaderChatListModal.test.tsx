@@ -41,11 +41,13 @@ beforeEach(() => {
   axiosGet
     .mockResolvedValue({ data: discussion })
     .mockResolvedValueOnce({ data: user })
+
   useToast.mockReturnValue({ setToast })
-  subscribe.mockImplementation(() => ({ bind, unbind }))
-  ;(getClientPusher as jest.Mock).mockReturnValue({ subscribe })
   useSession.mockReturnValue({ data: { id: '0', channelName: 'test' } })
   getCsrfToken.mockResolvedValue('t')
+
+  subscribe.mockImplementation(() => ({ bind, unbind }))
+  ;(getClientPusher as jest.Mock).mockReturnValue({ subscribe })
 })
 
 it('opens/closes', async () => {
@@ -69,7 +71,7 @@ it('opens/closes', async () => {
 
   expect(modal).not.toBeInTheDocument()
   expect(axiosGet).toHaveBeenCalledTimes(1)
-  expect(bind).toHaveBeenCalledTimes(3)
+  expect(bind).toHaveBeenCalledTimes(9)
 })
 
 it('renders a notification badge if a discussion has been udpated', async () => {
@@ -153,6 +155,18 @@ it('does not render a notification badge if the discussion has been updated but 
 
   const modal = screen.getByRole('dialog')
   expect(modal).toBeInTheDocument()
+})
+
+it('the open chat list button is not red if the discussion has been updated in real time but the modal is open', async () => {
+  render(<HeaderChatListModal />)
+
+  const openBtn = screen.getByRole('button')
+  await userEvent.click(openBtn)
+
+  const newMessageHandler = bind.mock.calls[3][1]
+  act(() => newMessageHandler())
+
+  expect(openBtn.className).not.toContain('red')
 })
 
 it('unmounts the notification badge if the modal is open', async () => {

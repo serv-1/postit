@@ -54,17 +54,21 @@ const HeaderChatModal = ({ csrfToken, discussionId }: HeaderChatModalProps) => {
   useEffect(() => {
     if (!discussionData?.channelName) return
 
-    const newMessageHandler = () => setHasUnseenMessages(true)
+    const newMessageHandler = () => {
+      if (isOpen) return
+      setHasUnseenMessages(true)
+    }
 
     const p = pusher.current
-    const channel = p.subscribe(discussionData.channelName)
+    const channelName = 'private-encrypted-' + discussionData.channelName
+    const channel = p.subscribe(channelName)
 
     channel.bind('new-message', newMessageHandler)
 
     return () => {
       channel.unbind('new-message', newMessageHandler)
     }
-  }, [discussionData?.channelName])
+  }, [isOpen, discussionData?.channelName])
 
   if (!discussionData) return null
 

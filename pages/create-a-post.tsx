@@ -1,4 +1,3 @@
-import { Image } from '../types/common'
 import Head from 'next/head'
 import Header from '../components/Header'
 import { useState } from 'react'
@@ -28,7 +27,7 @@ interface CreateAPostProps {
 
 const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
   const [step, setStep] = useState<0 | 1 | 2>(0)
-  const [images, setImages] = useState<Image[]>()
+  const [images, setImages] = useState<File[]>([])
   const [latLon, setLatLon] = useState<[number, number]>()
 
   const titles = ['Where is it?', 'Show us what it is', 'Post!']
@@ -42,8 +41,19 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
 
   const submitHandler: SubmitHandler<AddPostSchema> = async (data) => {
     try {
-      const _data = { ...data, images, latLon }
+      const keys: string[] = []
+
+      for (const image of images) {
+        const res = await axios.put('/api/s3', { csrfToken: data.csrfToken })
+
+        await axios.put(res.data.url, image)
+
+        keys.push(res.data.key)
+      }
+
+      const _data = { ...data, images: keys, latLon }
       const res = await axios.post('/api/post', _data)
+
       router.push(res.headers['location'])
     } catch (e) {
       const { name, message } = getAxiosError<keyof AddPostSchema>(e)

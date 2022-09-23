@@ -2,7 +2,7 @@ import imagesSchema from '../../schemas/imagesSchema'
 import err from '../../utils/constants/errors'
 
 it('passes', () => {
-  const result = imagesSchema.validate([{ base64: 'Af0=', ext: 'jpg' }])
+  const result = imagesSchema.validate(['keyName'])
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 })
@@ -18,14 +18,7 @@ it('fails if the items are not images', () => {
 })
 
 it('fails if the value has too many items', () => {
-  const images = [
-    { base64: 'ad0=', ext: 'jpg' },
-    { base64: 'ad0=', ext: 'jpg' },
-    { base64: 'ad0=', ext: 'jpg' },
-    { base64: 'ad0=', ext: 'jpg' },
-    { base64: 'ad0=', ext: 'jpg' },
-    { base64: 'ad0=', ext: 'jpg' },
-  ]
+  const images = ['key', 'key', 'key', 'key', 'key', 'key']
   const { error: e } = imagesSchema.validate(images)
   expect(e?.details[0].message).toBe(err.IMAGES_MAX)
 })

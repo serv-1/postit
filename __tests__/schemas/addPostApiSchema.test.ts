@@ -7,7 +7,7 @@ const VALUE = {
   description: 'magnificent table',
   categories: ['furniture'],
   price: 20,
-  images: [{ base64: 'af0=', ext: 'jpg' }],
+  images: ['keyName'],
   address: 'Oslo, Norway',
   latLon: [17, 58],
 }

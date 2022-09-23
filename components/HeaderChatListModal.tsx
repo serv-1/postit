@@ -41,10 +41,10 @@ const HeaderChatListModal = () => {
 
   useEffect(() => {
     const p = pusher.current
-    const channel = p.subscribe(session.channelName)
+    const channel = p.subscribe('private-' + session.channelName)
 
     const newMessageHandler = () => {
-      if (!chatOpen.current) setHasUnseenMessages(true)
+      if (!chatOpen.current && !isOpen) setHasUnseenMessages(true)
     }
     const discussionCreatedHandler = (data: DiscussionEventData) => {
       setDiscussionsIds((ids) => [...ids, data.discussionId])
@@ -67,7 +67,7 @@ const HeaderChatListModal = () => {
       channel.unbind('discussion-deleted', discussionDeletedHandler)
       document.removeEventListener('chatOpen', chatOpenHandler)
     }
-  }, [session.channelName, session.id])
+  }, [isOpen, session.channelName, session.id])
 
   return (
     <>

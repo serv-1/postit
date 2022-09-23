@@ -1,9 +1,8 @@
-import { Image } from '../types/common'
 import err from '../utils/constants/errors'
 import csrfTokenSchema from './csrfTokenSchema'
 import emailSchema from './emailSchema'
 import idSchema from './idSchema'
-import imageSchema from './imageSchema'
+import keySchema from './keySchema'
 import nameSchema from './nameSchema'
 import object from './object'
 import passwordSchema from './passwordSchema'
@@ -12,7 +11,7 @@ export type UpdateUserApiSchema =
   | { csrfToken: string; name: string }
   | { csrfToken: string; email: string }
   | { csrfToken: string; password: string }
-  | { csrfToken: string; image: Image }
+  | { csrfToken: string; image: string }
   | { csrfToken: string; favPostId: string }
   | { csrfToken: string; discussionId: string }
 
@@ -21,7 +20,7 @@ const updateUserApiSchema = object<UpdateUserApiSchema>({
   name: nameSchema,
   email: emailSchema,
   password: passwordSchema,
-  image: imageSchema,
+  image: keySchema,
   favPostId: idSchema,
   discussionId: idSchema,
 })

@@ -11,6 +11,8 @@ import { getCsrfToken } from 'next-auth/react'
 import { useState } from 'react'
 import { LighterPost } from '../types/common'
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+
 interface ProfilePostListProps {
   isFavPost?: boolean
   posts: LighterPost[]
@@ -62,7 +64,7 @@ const ProfilePostList = (props: ProfilePostListProps) => {
           >
             <div className="relative flex-shrink-0 w-[100px] h-[100px] md:w-[150px] md:h-[150px]">
               <Image
-                src={post.image}
+                src={awsUrl + post.image}
                 alt=""
                 layout="fill"
                 objectFit="cover"

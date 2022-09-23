@@ -2,6 +2,9 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ChatMessage from '../../components/ChatMessage'
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
+
 it('renders', () => {
   const date = new Date()
 
@@ -9,14 +12,14 @@ it('renders', () => {
     <ChatMessage
       message="Hi"
       createdAt={date}
-      image="john.jpeg"
+      image="keyName"
       name="john"
       isSignedInUser={true}
     />
   )
 
   const image = screen.getByRole('img')
-  expect(image).toHaveAttribute('src', 'john.jpeg')
+  expect(image).toHaveAttribute('src', awsUrl + 'keyName')
   expect(image.getAttribute('alt')).toContain('john')
 
   const msgContainer = container.firstElementChild
@@ -28,6 +31,20 @@ it('renders', () => {
   const dateText = `${date.toLocaleDateString()}, ${date.toLocaleTimeString()}`
   const dateEl = screen.queryByText(dateText)
   expect(dateEl).not.toBeInTheDocument()
+})
+
+it('renders the default image', () => {
+  render(
+    <ChatMessage
+      message="Hi"
+      createdAt={new Date()}
+      name="john"
+      isSignedInUser={true}
+    />
+  )
+
+  const image = screen.getByRole('img')
+  expect(image).toHaveAttribute('src', defaultUserImage)
 })
 
 it('renders/unmounts the creation date on click', async () => {

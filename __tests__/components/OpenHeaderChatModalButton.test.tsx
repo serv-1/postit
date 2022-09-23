@@ -2,10 +2,13 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import OpenHeaderChatModalButton from '../../components/OpenHeaderChatModalButton'
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
+
 const props = {
   onClick: () => null,
   hasUnseenMessages: false,
-  interlocutor: { name: 'jane', image: 'jane.jpeg', id: '1' },
+  interlocutor: { name: 'jane', image: 'keyName', id: '1' },
   postName: 'table',
   csrfToken: 'token',
   discussionId: '0',
@@ -14,7 +17,7 @@ const interlocutor = {
   id: '1',
   name: 'jane',
   email: 'jane@ja.ne',
-  image: 'jane.jpeg',
+  image: 'keyName',
   discussionsIds: ['0'],
   posts: ['0'],
   favPosts: [],
@@ -45,7 +48,7 @@ it('renders', async () => {
   expect(notifBadge).not.toBeInTheDocument()
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', 'jane.jpeg')
+  expect(img).toHaveAttribute('src', awsUrl + 'keyName')
   expect(img).toHaveAttribute('alt', "jane's profile picture")
 
   const interlocutorName = screen.getByText('jane')
@@ -58,6 +61,14 @@ it('renders', async () => {
   await userEvent.click(openBtn)
 
   expect(onClick).toHaveBeenCalledTimes(1)
+})
+
+it('renders the default user image', () => {
+  const p = { ...props, interlocutor: { name: 'jane', id: '1' } }
+  render(<OpenHeaderChatModalButton {...p} />)
+
+  const img = screen.getByRole('img')
+  expect(img).toHaveAttribute('src', defaultUserImage)
 })
 
 it('renders a notification badge if there is a new message', async () => {

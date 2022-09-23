@@ -1,49 +1,58 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { ChangeEvent, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useToast } from '../contexts/toast'
 import getAxiosError from '../utils/functions/getAxiosError'
-import isImageValid from '../utils/functions/isImageValid'
-import readAsDataUrl from '../utils/functions/readAsDataUrl'
-import { Image as IImage } from '../types/common'
 import { getCsrfToken } from 'next-auth/react'
 import Plus from '../public/static/images/plus.svg'
+import err from '../utils/constants/errors'
+import isImage from '../utils/functions/isImage'
+import isImageTooBig from '../utils/functions/isImageTooBig'
+
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+
+interface Response {
+  url: string
+  key: string
+}
 
 interface ProfileUserImageProps {
-  image: string
+  image?: string
 }
 
 const ProfileUserImage = ({ image: img }: ProfileUserImageProps) => {
-  const [image, setImage] = useState(img)
+  const defaultImage = img ? awsUrl + img : '/static/images/default.jpg'
+
+  const [image, setImage] = useState(defaultImage)
   const { setToast } = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
 
   const updateImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
+    const file = e.target.files && e.target.files[0]
+    if (!file) return
 
-    if (!files || files.length === 0) return
-
-    const message = isImageValid(files[0])
-
-    if (message) {
-      return setToast({ message, error: true })
+    if (!isImage(file.type)) {
+      return setToast({ message: err.IMAGE_INVALID, error: true })
     }
 
-    const result = await readAsDataUrl<IImage['ext']>(files[0])
+    if (isImageTooBig(file.size)) {
+      return setToast({ message: err.IMAGE_TOO_BIG, error: true })
+    }
 
-    if (typeof result === 'string') {
-      setToast({ message: result, error: true })
-    } else {
-      try {
-        const csrfToken = await getCsrfToken()
-        await axios.put('/api/user', { csrfToken, image: result })
+    try {
+      const csrfToken = await getCsrfToken()
 
-        setImage(`data:image/${result.ext};base64,${result.base64}`)
-        setToast({ message: 'The image has been updated! 🎉' })
-      } catch (e) {
-        const { message } = getAxiosError(e as AxiosError)
-        setToast({ message, error: true })
-      }
+      const { data } = await axios.put<Response>('/api/s3', { csrfToken })
+
+      await axios.put(data.url, file)
+
+      await axios.put('/api/user/', { csrfToken, image: data.key })
+
+      setImage(awsUrl + data.key)
+      setToast({ message: 'The image has been updated! 🎉' })
+    } catch (e) {
+      const { message } = getAxiosError(e)
+      return setToast({ message, error: true })
     }
   }
 

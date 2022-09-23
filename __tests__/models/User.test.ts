@@ -50,7 +50,6 @@ describe('User model', () => {
       .exec()) as UserModel
 
     expect(savedUser.channelName).toBeTruthy()
-    expect(savedUser.image).toBe('default.jpg')
     expect(savedUser.hasUnseenMessages).toBe(false)
   })
 

@@ -1,5 +1,5 @@
 import { joiResolver } from '@hookform/resolvers/joi'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -13,11 +13,9 @@ import InputError from '../../../../components/InputError'
 import Select from '../../../../components/Select'
 import TextArea from '../../../../components/TextArea'
 import { useToast } from '../../../../contexts/toast'
-import { Entries, Image, Post } from '../../../../types/common'
+import { Entries, Post } from '../../../../types/common'
 import addSpacesToNb from '../../../../utils/functions/addSpacesToNb'
 import getAxiosError from '../../../../utils/functions/getAxiosError'
-import isImageValid from '../../../../utils/functions/isImageValid'
-import readAsDataUrl from '../../../../utils/functions/readAsDataUrl'
 import GlassWrapper from '../../../../components/GlassWrapper'
 import ShapeContainer from '../../../../components/ShapeContainer'
 import Button from '../../../../components/Button'
@@ -27,6 +25,9 @@ import updatePostSchema, {
 import { getCsrfToken } from 'next-auth/react'
 import PostAddressModal from '../../../../components/PostAddressModal'
 import { useState } from 'react'
+import isImage from '../../../../utils/functions/isImage'
+import err from '../../../../utils/constants/errors'
+import isImageTooBig from '../../../../utils/functions/isImageTooBig'
 
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 
@@ -48,7 +49,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 }
 
 type FilteredData = Omit<UpdatePostSchema, 'images'> & {
-  images?: Image[]
+  images?: string[]
   latLon?: [number, number]
 }
 
@@ -76,35 +77,42 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
       if (!entry[1]) delete filteredData[entry[0]]
     }
 
-    if (images) {
-      for (let i = 0; i < images.length; i++) {
-        const message = isImageValid(images[i])
+    try {
+      if (images) {
+        for (let i = 0; i < images.length; i++) {
+          if (!isImage(images[i].type)) {
+            return methods.setError(
+              'images',
+              { message: err.IMAGE_INVALID },
+              { shouldFocus: true }
+            )
+          }
 
-        if (message) {
-          return methods.setError('images', { message }, { shouldFocus: true })
-        }
+          if (isImageTooBig(images[i].size)) {
+            return methods.setError(
+              'images',
+              { message: err.IMAGE_TOO_BIG },
+              { shouldFocus: true }
+            )
+          }
 
-        const result = await readAsDataUrl<Image['ext']>(images[i])
+          const { data } = await axios.put('/api/s3', { csrfToken })
 
-        if (typeof result === 'string') {
-          methods.setError('images', { message: result }, { shouldFocus: true })
-          return
-        }
+          await axios.put(data.url, images[i])
 
-        if (filteredData.images) {
-          filteredData.images.push(result)
-        } else {
-          filteredData.images = [result]
+          if (filteredData.images) {
+            filteredData.images.push(data.key)
+          } else {
+            filteredData.images = [data.key]
+          }
         }
       }
-    }
 
-    try {
       await axios.put('/api/posts/' + post.id, filteredData)
       setToast({ message: 'The post has been updated! 🎉' })
     } catch (e) {
       type FieldsNames = keyof Required<UpdatePostSchema>
-      const { message, name } = getAxiosError<FieldsNames>(e as AxiosError)
+      const { message, name } = getAxiosError<FieldsNames>(e)
 
       if (name) {
         return methods.setError(name, { message }, { shouldFocus: true })

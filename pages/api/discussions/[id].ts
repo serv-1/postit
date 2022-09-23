@@ -62,7 +62,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         id: discussion._id.toString(),
         postId: discussion.postId?.toString(),
         postName: discussion.postName,
-        channelName: 'private-encrypted-' + discussion.channelName,
+        channelName: discussion.channelName,
         messages: discussion.messages.map((m) => ({
           userId: m.userId.toString(),
           message: m.message,
@@ -72,14 +72,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         buyer: {
           id: buyer?._id.toString(),
           name: buyer ? buyer.name : '[DELETED]',
-          image:
-            '/static/images/users/' + (buyer ? buyer.image : 'default.jpg'),
+          image: buyer?.image,
         },
         seller: {
           id: seller?._id.toString(),
           name: seller ? seller.name : '[DELETED]',
-          image:
-            '/static/images/users/' + (seller ? seller.image : 'default.jpg'),
+          image: seller?.image,
         },
       })
     }

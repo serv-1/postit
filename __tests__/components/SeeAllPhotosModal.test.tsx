@@ -2,8 +2,10 @@ import { render, screen } from '@testing-library/react'
 import SeeAllPhotosModal from '../../components/SeeAllPhotosModal'
 import userEvent from '@testing-library/user-event'
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+
 it('renders', async () => {
-  render(<SeeAllPhotosModal sources={['/img1']} />)
+  render(<SeeAllPhotosModal sources={['keyName']} />)
 
   const photosBtn = screen.getByRole('button', { name: /photos/i })
   await userEvent.click(photosBtn)
@@ -12,17 +14,17 @@ it('renders', async () => {
   expect(closeBtn).toHaveFocus()
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', '/img1')
+  expect(img).toHaveAttribute('src', awsUrl + 'keyName')
 
   const expandBtn = screen.getByRole('button', { name: /expand/i })
   await userEvent.click(expandBtn)
 
   const expandedImage = screen.getAllByRole('img')[1]
-  expect(expandedImage).toHaveAttribute('src', '/img1')
+  expect(expandedImage).toHaveAttribute('src', awsUrl + 'keyName')
 })
 
 it('closes', async () => {
-  render(<SeeAllPhotosModal sources={['/img1']} />)
+  render(<SeeAllPhotosModal sources={['keyName']} />)
 
   const photosBtn = screen.getByRole('button', { name: /photos/i })
   await userEvent.click(photosBtn)

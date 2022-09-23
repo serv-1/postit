@@ -1,4 +1,4 @@
-import { Categories, Image } from '../types/common'
+import { Categories } from '../types/common'
 import imagesSchema from './imagesSchema'
 import latLonSchema from './latLonSchema'
 import object from './object'
@@ -10,7 +10,7 @@ export interface AddPostApiSchema {
   description: string
   categories: Categories[]
   price: number
-  images: Image[]
+  images: string[]
   address: string
   latLon: [number, number]
 }

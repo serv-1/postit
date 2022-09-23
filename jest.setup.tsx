@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/extend-expect'
 import { ImageProps } from 'next/image'
 import { cloneElement as mockCloneElement, ReactNode } from 'react'
 import 'whatwg-fetch'
+import { loadEnvConfig } from '@next/env'
 
 jest.mock('next/head', () => ({
   __esModule: true,
@@ -42,3 +43,7 @@ jest.mock('./components/MapInvalidateSize', () => ({
   __esModule: true,
   default: () => <div data-testid="mapInvalidateSize"></div>,
 }))
+
+export default async function _loadEnvConfig() {
+  loadEnvConfig(process.cwd())
+}

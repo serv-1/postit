@@ -2,21 +2,20 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { ChangeHandler } from 'react-hook-form'
 import PlusCircle from '../public/static/images/plus-circle.svg'
-import { Image as IImage } from '../types/common'
 import err from '../utils/constants/errors'
-import isImageValid from '../utils/functions/isImageValid'
-import readAsDataUrl from '../utils/functions/readAsDataUrl'
+import isImage from '../utils/functions/isImage'
+import isImageTooBig from '../utils/functions/isImageTooBig'
 import Button from './Button'
 
 interface CreateAPostStep1Props {
   step: 0 | 1 | 2
   setStep: React.Dispatch<React.SetStateAction<0 | 1 | 2>>
-  setImages: React.Dispatch<React.SetStateAction<IImage[] | undefined>>
+  setImages: React.Dispatch<React.SetStateAction<File[]>>
 }
 
 const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
   const { step, setStep, setImages } = props
-  const [imageDataUrls, setImageDataUrls] = useState<string[]>()
+  const [imageSources, setImageSources] = useState<string[]>()
   const [error, setError] = useState<string>()
 
   const onChange: ChangeHandler = async (e) => {
@@ -24,35 +23,46 @@ const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
 
     if (files.length === 0) {
       setError(err.IMAGES_REQUIRED)
-      return setImageDataUrls(undefined)
+      return setImageSources(undefined)
     } else if (files.length > 5) {
       setError(err.IMAGES_MAX)
-      return setImageDataUrls(undefined)
+      return setImageSources(undefined)
     }
 
-    const dataUrls: string[] = []
-    const images: IImage[] = []
+    const imageSources: string[] = []
+    const images: File[] = []
 
     for (const file of files) {
-      const message = isImageValid(file)
-
-      if (message) {
-        setError(message)
-        return setImageDataUrls(undefined)
+      if (!isImage(file.type)) {
+        setError(err.IMAGE_INVALID)
+        return setImageSources(undefined)
       }
 
-      const result = await readAsDataUrl<IImage['ext']>(file)
-
-      if (typeof result === 'string') {
-        setError(result)
-        return setImageDataUrls(undefined)
+      if (isImageTooBig(file.size)) {
+        setError(err.IMAGE_TOO_BIG)
+        return setImageSources(undefined)
       }
 
-      dataUrls.push(`data:${file.type};base64,${result.base64}`)
-      images.push(result)
+      const addImageSource = async () => {
+        return new Promise((resolve) => {
+          const reader = new FileReader()
+
+          reader.onload = (e) => {
+            const result = e.target?.result as string
+            imageSources.push(result)
+            resolve(null)
+          }
+
+          reader.readAsDataURL(file)
+        })
+      }
+
+      await addImageSource()
+
+      images.push(file)
     }
 
-    setImageDataUrls(dataUrls)
+    setImageSources(imageSources)
     setError(undefined)
     setImages(images)
   }
@@ -76,11 +86,11 @@ const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
           className="flex flex-row flex-wrap gap-8 justify-center cursor-pointer"
         >
           {[0, 1, 2, 3, 4].map((i) => {
-            if (imageDataUrls && imageDataUrls[i]) {
+            if (imageSources && imageSources[i]) {
               return (
                 <div key={i} className="relative w-[123.3px] aspect-square">
                   <Image
-                    src={imageDataUrls[i]}
+                    src={imageSources[i]}
                     alt=""
                     layout="fill"
                     objectFit="cover"
@@ -128,7 +138,7 @@ const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
           fullWidth
           onClick={() => setStep(2)}
           type="button"
-          disabled={!imageDataUrls || imageDataUrls.length === 0}
+          disabled={!imageSources || imageSources.length === 0}
         >
           Next →
         </Button>

@@ -7,10 +7,13 @@ import X from '../public/static/images/x.svg'
 import { User } from '../types/common'
 import getAxiosError from '../utils/functions/getAxiosError'
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE as string
+
 interface OpenHeaderChatModalButtonProps {
   onClick: () => void
   hasUnseenMessages: boolean
-  interlocutor: { id?: string; name: string; image: string }
+  interlocutor: { id?: string; name: string; image?: string }
   postName: string
   csrfToken?: string
   discussionId: string
@@ -88,7 +91,11 @@ const OpenHeaderChatModalButton = ({
       >
         <div className="absolute -top-4 -left-[12px] w-64 h-64">
           <Image
-            src={interlocutor.image}
+            src={
+              interlocutor.image
+                ? awsUrl + interlocutor.image
+                : defaultUserImage
+            }
             alt={interlocutor.name + "'s profile picture"}
             objectFit="cover"
             width={64}

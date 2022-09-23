@@ -2,11 +2,13 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ExpandedImageModal from '../../components/ExpandedImageModal'
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL
+
 it('renders', async () => {
-  render(<ExpandedImageModal src="/img" btnClass="red" btnImgClass="blue" />)
+  render(<ExpandedImageModal src="keyName" btnClass="red" btnImgClass="blue" />)
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', '/img')
+  expect(img).toHaveAttribute('src', awsUrl + '/keyName')
   expect(img).toHaveClass('blue')
 
   const openBtn = screen.getByRole('button')
@@ -14,11 +16,11 @@ it('renders', async () => {
   await userEvent.click(openBtn)
 
   const expandedImg = screen.getAllByRole('img')[1]
-  expect(expandedImg).toHaveAttribute('src', '/img')
+  expect(expandedImg).toHaveAttribute('src', awsUrl + '/keyName')
 })
 
 it('closes', async () => {
-  render(<ExpandedImageModal src="/img" />)
+  render(<ExpandedImageModal src="keyName" />)
 
   const openBtn = screen.getByRole('button')
   await userEvent.click(openBtn)

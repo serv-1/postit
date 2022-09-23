@@ -19,14 +19,16 @@ const setToast = jest.fn()
 
 beforeEach(() => useToast.mockReturnValue({ setToast }))
 
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+
 const posts = [
-  { id: '0', name: 'table', image: 'table.jpeg' },
-  { id: '1', name: 'chair', image: 'chair.jpeg' },
+  { id: '0', name: 'table', image: 'keyName' },
+  { id: '1', name: 'chair', image: 'keyName' },
 ]
 
 const favPosts = [
-  { id: '0', name: 'table', image: 'table.jpeg' },
-  { id: '1', name: 'chair', image: 'chair.jpeg' },
+  { id: '0', name: 'table', image: 'keyName' },
+  { id: '1', name: 'chair', image: 'keyName' },
 ]
 
 it('renders without posts', () => {
@@ -52,7 +54,7 @@ it('renders with posts', () => {
 
   const images = screen.getAllByRole('img')
   for (let i = 0; i < images.length; i++) {
-    expect(images[i]).toHaveAttribute('src', posts[i].image)
+    expect(images[i]).toHaveAttribute('src', awsUrl + posts[i].image)
   }
 
   const postName1 = screen.getByText(/table/i)
@@ -78,7 +80,7 @@ it('renders with favorite posts', () => {
 
   const images = screen.getAllByRole('img')
   for (let i = 0; i < images.length; i++) {
-    expect(images[i]).toHaveAttribute('src', favPosts[i].image)
+    expect(images[i]).toHaveAttribute('src', awsUrl + favPosts[i].image)
   }
 
   const postName1 = screen.getByText(/table/i)

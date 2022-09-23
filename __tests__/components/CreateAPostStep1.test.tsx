@@ -2,16 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import CreateAPostStep1 from '../../components/CreateAPostStep1'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
-import RADU from '../../utils/functions/readAsDataUrl'
 
-jest.mock('../../utils/functions/readAsDataUrl')
-const mockReadAsDataUrl = RADU as jest.MockedFunction<typeof RADU>
-
-beforeEach(() => {
-  mockReadAsDataUrl.mockResolvedValue({ ext: 'jpeg', base64: 'azerty' })
-})
-
-it('has the "hidden" class if the given step isn\'t its step', () => {
+it('has the "hidden" class if the given step is not its step', () => {
   render(
     <CreateAPostStep1 step={0} setStep={() => null} setImages={() => null} />
   )
@@ -37,7 +29,7 @@ test('the images are uploaded', async () => {
   expect(images).toHaveLength(2)
 
   for (let i = 0; i < 2; i++) {
-    expect(images[i]).toHaveAttribute('src', 'data:image/jpeg;base64,azerty')
+    expect(images[i].getAttribute('src')).toContain('data:image/jpeg;base64,')
   }
 
   for (let i = 3; i < 6; i++) {
@@ -48,10 +40,7 @@ test('the images are uploaded', async () => {
   const alert = screen.queryByRole('alert')
   expect(alert).not.toBeInTheDocument()
 
-  await waitFor(() => {
-    const image = { base64: 'azerty', ext: 'jpeg' }
-    expect(setImages).toHaveBeenNthCalledWith(1, [image, image])
-  })
+  await waitFor(() => expect(setImages).toHaveBeenNthCalledWith(1, files))
 })
 
 test('the images can be uploaded by pressing Enter on the label while focusing it', async () => {
@@ -67,7 +56,7 @@ test('the images can be uploaded by pressing Enter on the label while focusing i
   expect(input).toHaveFocus()
 })
 
-test('the image placeholders are rendered if there is no uploaded images', async () => {
+test('the placeholders are rendered if there is no uploaded images', async () => {
   render(
     <CreateAPostStep1 step={1} setStep={() => null} setImages={() => null} />
   )
@@ -78,7 +67,7 @@ test('the image placeholders are rendered if there is no uploaded images', async
   }
 })
 
-test('the "Next" button is disabled when no images have been uploaded and enabled when there are', async () => {
+test('the "Next" button is disabled when no images have been uploaded and is enabled when there are', async () => {
   render(
     <CreateAPostStep1 step={1} setStep={() => null} setImages={() => null} />
   )
@@ -119,8 +108,7 @@ test('uploaded images are unmounted and an error renders if the user cancels the
   const files = [new File(['1'], '1.jpeg', { type: 'image/jpeg' })]
   await userEvent.upload(input, files)
 
-  const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', 'data:image/jpeg;base64,azerty')
+  const img = await screen.findByRole('img')
 
   await userEvent.upload(input, [])
   expect(img).not.toBeInTheDocument()
@@ -139,8 +127,7 @@ test('uploaded images are unmounted and an error renders if there is too many im
   const files = [new File(['1'], '1.jpeg', { type: 'image/jpeg' })]
   await userEvent.upload(input, files)
 
-  const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', 'data:image/jpeg;base64,azerty')
+  const img = await screen.findByRole('img')
 
   await userEvent.upload(input, [
     new File(['1'], '1.jpeg', { type: 'image/jpeg' }),
@@ -170,18 +157,18 @@ test('an error renders if an image is invalid', async () => {
   expect(input.nextElementSibling).toHaveFocus()
 })
 
-test("an error renders if an image can't be read as data url", async () => {
-  mockReadAsDataUrl.mockResolvedValue('error')
+test('an error renders if an image is too big', async () => {
   render(
     <CreateAPostStep1 step={1} setStep={() => null} setImages={() => null} />
   )
 
   const input = screen.getByLabelText(/images/i)
-  const files = [new File(['1'], '1.jpeg', { type: 'image/jpeg' })]
+  const data = new Uint8Array(1_000_001).toString()
+  const files = [new File([data], 'image.jpeg', { type: 'image/jpeg' })]
   await userEvent.upload(input, files)
 
   const alert = await screen.findByRole('alert')
-  expect(alert).toHaveTextContent('error')
+  expect(alert).toHaveTextContent(err.IMAGE_TOO_BIG)
   expect(input.nextElementSibling).toHaveFocus()
 })
 
@@ -199,5 +186,6 @@ test('an error is deleted after its resolution', async () => {
 
   image = new File(['data'], 'img.jpeg', { type: 'image/jpeg' })
   await userEvent.upload(input, image)
-  expect(alert).not.toBeInTheDocument()
+
+  await waitFor(() => expect(alert).not.toBeInTheDocument())
 })

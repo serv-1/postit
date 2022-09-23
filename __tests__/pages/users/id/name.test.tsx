@@ -1,11 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import UserPage from '../../../../pages/users/[id]/[name]'
 
+const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
+
 const user = {
   id: '0',
   name: 'john',
   email: 'john@jo.hn',
-  image: 'john.jpeg',
+  image: 'keyName',
   posts: [],
   favPostsIds: [],
   discussionsIds: [],
@@ -18,7 +20,7 @@ const post = {
   description: 'magnificent table',
   categories: ['furniture' as const],
   price: 50,
-  images: ['table.jpeg'],
+  images: ['keyName'],
   userId: '0',
   discussionsIds: [],
   address: 'Oslo, Norway',
@@ -37,6 +39,13 @@ it('renders', () => {
 
   const posts = screen.getByRole('status')
   expect(posts).toHaveTextContent(user.name)
+})
+
+it('renders the default user image', () => {
+  render(<UserPage user={{ ...user, image: undefined }} />)
+
+  const img = screen.getByRole('img')
+  expect(img).toHaveAttribute('src', defaultUserImage)
 })
 
 it('renders the user posts', () => {

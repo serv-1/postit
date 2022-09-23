@@ -48,7 +48,7 @@ it('does not render if there is no message to display', () => {
   expect(toast).not.toBeInTheDocument()
 })
 
-it('stops rendering after 12.5 seconds', async () => {
+it('stops rendering after 8 seconds', async () => {
   render(<Toast />)
 
   expect(setToast).not.toHaveBeenCalled()
