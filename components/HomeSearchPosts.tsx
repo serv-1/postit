@@ -66,7 +66,7 @@ const HomeSearchPosts = () => {
       role="search"
       className="relative"
     >
-      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] lg:block lg:w-auto md:mr-8 lg:mr-0">
+      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] md:align-top lg:block lg:w-auto md:mr-8 lg:mr-0">
         <Select<SearchPostSchema>
           name="categories"
           options={options}
@@ -75,7 +75,7 @@ const HomeSearchPosts = () => {
         />
         <InputError<SearchPostSchema> inputName="categories" />
       </div>
-      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] lg:block lg:w-auto">
+      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] md:align-top lg:block lg:w-auto">
         <Input<SearchPostSchema>
           name="query"
           type="search"

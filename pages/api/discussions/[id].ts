@@ -129,19 +129,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const { messages } = updatedDiscussion
         const lastMsg = messages[messages.length - 1] as MessageModel
-        const pusher = getServerPusher()
 
-        pusher.trigger('private-' + user.channelName, 'new-message', '')
-        pusher.trigger(
-          'private-encrypted-' + discussion.channelName,
-          'new-message',
+        await getServerPusher().triggerBatch([
           {
-            message: lastMsg.message,
-            createdAt: lastMsg.createdAt,
-            userId: lastMsg.userId.toString(),
-            seen: lastMsg.seen,
-          }
-        )
+            channel: 'private-' + user.channelName,
+            name: 'new-message',
+            data: '',
+          },
+          {
+            channel: 'private-encrypted-' + discussion.channelName,
+            name: 'new-message',
+            data: {
+              message: lastMsg.message,
+              createdAt: lastMsg.createdAt,
+              userId: lastMsg.userId.toString(),
+              seen: lastMsg.seen,
+            },
+          },
+        ])
       } else {
         const messages = [...discussion.messages]
 
@@ -176,14 +181,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             .exec()
         }
       }
-
-      return res.status(204).end()
+      break
     }
     case 'DELETE': {
       await Discussion.deleteOne({ _id: id }).lean().exec()
-      return res.status(204).end()
+      break
     }
   }
+
+  return res.status(204).end()
 }
 
 export default catchError(handler)

@@ -95,8 +95,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         hasUnseenMessages: false,
       }
 
-      const pusher = getServerPusher()
-      pusher.trigger(
+      await getServerPusher().trigger(
         'private-' + user.channelName,
         'discussion-deleted',
         reqBody.discussionId

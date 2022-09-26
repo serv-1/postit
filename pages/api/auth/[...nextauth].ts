@@ -65,6 +65,7 @@ export default NextAuth({
           await User.updateOne(
             { _id: user.id },
             {
+              image: '',
               postsIds: [],
               favPostsIds: [],
               discussionsIds: [],

@@ -42,10 +42,7 @@ it('opens/closes', async () => {
 })
 
 it("renders an alert if the user isn't signed in and click on the contact button", async () => {
-  useSession.mockReturnValue({
-    data: { channelName: 'test' },
-    status: 'unauthenticated',
-  })
+  useSession.mockReturnValue({ status: 'unauthenticated' })
 
   render(<PostPageContactModal postId="0" postName="table" sellerId="0" />)
 

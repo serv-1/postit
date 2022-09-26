@@ -63,8 +63,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(404).json({ message: err.USER_NOT_FOUND })
   }
 
-  const pusher = getServerPusher()
-  pusher.trigger(
+  await getServerPusher().trigger(
     ['private-' + session.channelName, 'private-' + seller.channelName],
     'discussion-created',
     { discussionId: newDiscussion._id.toString(), userId: id }

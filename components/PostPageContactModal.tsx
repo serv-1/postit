@@ -49,12 +49,16 @@ const PostPageContactModal = ({
           Contact
         </Button>
       </div>
-      <ChatModal
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        csrfToken={csrfToken}
-        {...(discussionId ? { discussionId } : { postId, postName, sellerId })}
-      />
+      {status === 'authenticated' && (
+        <ChatModal
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          csrfToken={csrfToken}
+          {...(discussionId
+            ? { discussionId }
+            : { postId, postName, sellerId })}
+        />
+      )}
     </>
   )
 }

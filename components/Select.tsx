@@ -59,6 +59,7 @@ const Select = <FormFields extends FieldValues = FieldValues>({
       }
     },
     indicatorSeparator: () => ({ display: 'none' }),
+    valueContainer: (provided) => ({ ...provided, overflowY: 'auto' }),
   }
 
   const value = options.filter(({ value }) => {
