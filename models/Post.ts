@@ -9,6 +9,7 @@ import {
   HydratedDocument,
 } from 'mongoose'
 import { Categories } from '../types/common'
+import deleteImage from '../utils/functions/deleteImage'
 import Discussion from './Discussion'
 import User from './User'
 
@@ -60,6 +61,10 @@ postSchema.pre<Query<DeleteResult, PostModel>>('deleteOne', async function () {
     .exec()
 
   const post = (await Post.findById(id).lean().exec()) as PostModel
+
+  for (const image of post.images) {
+    await deleteImage(image)
+  }
 
   for (const id of post.discussionsIds) {
     await Discussion.updateOne(

@@ -2,6 +2,7 @@ import { randomBytes, scryptSync } from 'crypto'
 import { DeleteResult } from 'mongodb'
 import { models, model, Schema, Model, Types, Query } from 'mongoose'
 import { nanoid } from 'nanoid'
+import deleteImage from '../utils/functions/deleteImage'
 import Account from './Account'
 import Discussion, { DiscussionModel } from './Discussion'
 import Post from './Post'
@@ -46,9 +47,16 @@ userSchema.pre<Query<DeleteResult, UserModel>>('deleteOne', async function () {
   const userId = this.getFilter()._id.toString()
 
   await Account.deleteOne({ userId }).lean().exec()
-  await Post.deleteMany({ userId }).lean().exec()
 
   const user = (await User.findById(userId).lean().exec()) as UserModel
+
+  if (user.image) {
+    await deleteImage(user.image)
+  }
+
+  for (const postId of user.postsIds) {
+    await Post.deleteOne({ _id: postId }).lean().exec()
+  }
 
   for (const id of user.discussionsIds) {
     const discussion = (await Discussion.findById(id).exec()) as DiscussionModel

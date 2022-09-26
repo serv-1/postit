@@ -99,10 +99,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(204).end()
   }
 
-  for (const image of post.images) {
-    await deleteImage(image)
-  }
-
   await dbConnect()
   await Post.deleteOne({ _id: id }).exec()
 

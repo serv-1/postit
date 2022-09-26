@@ -121,10 +121,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(204).end()
   }
 
-  if (user.image) {
-    await deleteImage(user.image)
-  }
-
   await dbConnect()
   await User.deleteOne({ _id: session.id }).lean().exec()
 

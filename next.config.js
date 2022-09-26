@@ -14,6 +14,7 @@ module.exports = {
     domains: [
       'maps.locationiq.com',
       'postit-images-bucket.s3.eu-west-3.amazonaws.com',
+      'postit-images-bucket-dev.s3.eu-west-3.amazonaws.com',
     ],
   },
   optimizeFonts: false,

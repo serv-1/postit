@@ -8,11 +8,18 @@ import User, { UserModel } from '../../models/User'
 import Account, { AccountModel } from '../../models/Account'
 import Post, { PostModel } from '../../models/Post'
 import Discussion from '../../models/Discussion'
+import deleteImage from '../../utils/functions/deleteImage'
 
 jest.unmock('nanoid')
 
+jest.mock('../../utils/functions/deleteImage', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}))
+
 describe('User model', () => {
   const scryptSync = jest.spyOn(require('crypto'), 'scryptSync')
+  const mockDeleteImage = deleteImage as jest.MockedFunction<typeof deleteImage>
 
   const user = {
     name: 'john',
@@ -53,7 +60,7 @@ describe('User model', () => {
     expect(savedUser.hasUnseenMessages).toBe(false)
   })
 
-  it('encrypts the password', async () => {
+  it("encrypts the user's the password", async () => {
     const savedUser = (await User.findOne({ email: user.email })
       .lean()
       .exec()) as UserModel
@@ -77,7 +84,20 @@ describe('User model', () => {
     expect(savedUser1.channelName).not.toBe(savedUser2.channelName)
   })
 
-  it('deletes its account and its posts', async () => {
+  it("deletes the user's image", async () => {
+    const savedUser = (await User.findOneAndUpdate(
+      { email: user.email },
+      { image: 'john.jpeg' }
+    )
+      .lean()
+      .exec()) as UserModel
+
+    await User.deleteOne({ _id: savedUser._id }).lean().exec()
+
+    expect(mockDeleteImage).toHaveBeenNthCalledWith(1, 'john.jpeg')
+  })
+
+  it("deletes the user's account", async () => {
     const savedUser = (await User.findOne({ email: user.email })
       .lean()
       .exec()) as UserModel
@@ -94,6 +114,22 @@ describe('User model', () => {
       oauth_token: 'abc',
       session_state: 'abc',
     }
+
+    await new Account(account).save()
+
+    await User.deleteOne({ _id: savedUser._id }).lean().exec()
+
+    const savedAccount = await Account.findOne({ userId: savedUser._id })
+      .lean()
+      .exec()
+
+    expect(savedAccount).toBeNull()
+  })
+
+  it("deletes the user's posts", async () => {
+    const savedUser = (await User.findOne({ email: user.email })
+      .lean()
+      .exec()) as UserModel
 
     const posts: Omit<PostModel, '_id'>[] = [
       {
@@ -120,22 +156,17 @@ describe('User model', () => {
       },
     ]
 
-    await new Account(account).save()
     await new Post(posts[0]).save()
     await new Post(posts[1]).save()
 
     await User.deleteOne({ _id: savedUser._id }).lean().exec()
 
-    const savedAccount = await Account.findOne({ userId: savedUser._id })
-      .lean()
-      .exec()
     const savedPosts = await Post.find({ userId: savedUser._id }).lean().exec()
 
-    expect(savedAccount).toBeNull()
     expect(savedPosts).toHaveLength(0)
   })
 
-  describe('When the buyer is deleted', () => {
+  describe('When a buyer is deleted', () => {
     it('deletes the discussions where the seller has deleted the discussion', async () => {
       const user2 = { ...user, email: 'jane@test.com' }
       await new User(user2).save()
@@ -255,7 +286,7 @@ describe('User model', () => {
     })
   })
 
-  describe('When the seller is deleted', () => {
+  describe('When a seller is deleted', () => {
     it('deletes the discussions where the buyer has deleted the discussion', async () => {
       const user2 = { ...user, email: 'jane@test.com' }
       await new User(user2).save()

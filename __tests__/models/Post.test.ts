@@ -7,11 +7,18 @@ import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import User, { UserModel } from '../../models/User'
 import Discussion, { DiscussionModel } from '../../models/Discussion'
+import deleteImage from '../../utils/functions/deleteImage'
 
 jest.unmock('nanoid')
 
+jest.mock('../../utils/functions/deleteImage', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}))
+
 describe('Post Model', () => {
   const scryptSync = jest.spyOn(require('crypto'), 'scryptSync')
+  const mockDeleteImage = deleteImage as jest.MockedFunction<typeof deleteImage>
 
   const user = {
     name: 'john',
@@ -87,7 +94,7 @@ describe('Post Model', () => {
   })
 
   it("deletes the deleted post's id from the favorite posts ids of any users", async () => {
-    let savedUser = (await User.findOne({ email: user.email })
+    const savedUser = (await User.findOne({ email: user.email })
       .lean()
       .exec()) as UserModel
 
@@ -129,8 +136,31 @@ describe('Post Model', () => {
     expect(savedUser2.favPostsIds).toHaveLength(0)
   })
 
+  it("deletes the deleted post's images", async () => {
+    const savedUser = (await User.findOne({ email: user.email })
+      .lean()
+      .exec()) as UserModel
+
+    const post = await new Post({
+      name: 'table',
+      description: 'I sell this table.',
+      categories: ['furniture'],
+      price: 40,
+      images: ['table1', 'table2'],
+      userId: savedUser._id,
+      address: 'Paris, France',
+      latLon: [42, 58],
+    }).save()
+
+    await Post.deleteOne({ _id: post._id }).lean().exec()
+
+    expect(mockDeleteImage).toHaveBeenCalledTimes(2)
+    expect(mockDeleteImage.mock.calls[0][0]).toBe('table1')
+    expect(mockDeleteImage.mock.calls[1][0]).toBe('table2')
+  })
+
   it("deletes the deleted post's id in each discussions in which it was", async () => {
-    let savedUser = (await User.findOne({ email: user.email })
+    const savedUser = (await User.findOne({ email: user.email })
       .lean()
       .exec()) as UserModel
 
