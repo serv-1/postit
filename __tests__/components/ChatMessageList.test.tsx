@@ -26,6 +26,7 @@ const JSONDiscussion = {
 const setToast = jest.fn()
 const bind = jest.fn()
 const unbind = jest.fn()
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 
 beforeEach(() => {
   Element.prototype.scroll = jest.fn()
@@ -49,9 +50,9 @@ it('renders', async () => {
   expect(msg2).toBeInTheDocument()
 
   const images = screen.getAllByRole('img')
-  expect(images[0]).toHaveAttribute('src', 'john.jpeg')
+  expect(images[0]).toHaveAttribute('src', awsUrl + 'john.jpeg')
   expect(images[0].getAttribute('alt')).toContain('john')
-  expect(images[1]).toHaveAttribute('src', 'jane.jpeg')
+  expect(images[1]).toHaveAttribute('src', awsUrl + 'jane.jpeg')
   expect(images[1].getAttribute('alt')).toContain('jane')
 
   const url = '/api/discussions/0?csrfToken=token'

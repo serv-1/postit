@@ -48,6 +48,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 }
 
+interface S3Res {
+  url: string
+  key: string
+  fields: Record<string, string>
+}
+
 type FilteredData = Omit<UpdatePostSchema, 'images'> & {
   images?: string[]
   latLon?: [number, number]
@@ -96,14 +102,19 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
             )
           }
 
-          const { data } = await axios.put('/api/s3', { csrfToken })
+          const res = await axios.get<S3Res>('/api/s3?csrfToken=' + csrfToken)
+          const { url, fields, key } = res.data
 
-          await axios.put(data.url, images[i])
+          const formData = new FormData()
+          Object.entries(fields).forEach(([k, v]) => formData.append(k, v))
+          formData.append('file', images[i])
+
+          await axios.post(url, formData)
 
           if (filteredData.images) {
-            filteredData.images.push(data.key)
+            filteredData.images.push(key)
           } else {
-            filteredData.images = [data.key]
+            filteredData.images = [key]
           }
         }
       }
@@ -112,10 +123,14 @@ const UpdatePost = ({ post, csrfToken }: UpdatePostProps) => {
       setToast({ message: 'The post has been updated! 🎉' })
     } catch (e) {
       type FieldsNames = keyof Required<UpdatePostSchema>
-      const { message, name } = getAxiosError<FieldsNames>(e)
+      const { message, name, status } = getAxiosError<FieldsNames>(e)
 
       if (name) {
         return methods.setError(name, { message }, { shouldFocus: true })
+      } else if (status === 400) {
+        return setToast({ message: err.IMAGE_TOO_BIG, error: true })
+      } else if (!message) {
+        return setToast({ message: err.DEFAULT, error: true })
       }
 
       setToast({ message, error: true })

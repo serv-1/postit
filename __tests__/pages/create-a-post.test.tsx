@@ -2,29 +2,37 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CreateAPost from '../../pages/create-a-post'
 import selectEvent from 'react-select-event'
-import server from '../../mocks/server'
 import err from '../../utils/constants/errors'
 
-const axiosPut = jest.spyOn(require('axios'), 'put')
+const axiosGet = jest.spyOn(require('axios'), 'get')
 const axiosPost = jest.spyOn(require('axios'), 'post')
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 const router = { push: jest.fn() }
 const setToast = jest.fn()
-const data = { url: 'presigned url', key: 'keyName' }
 const csrfToken = 'token'
+const data = { url: 'signed url', key: 'keyName', fields: {} }
+const postRes = { headers: { location: '/posts/0/Table' } }
+const locationIQRes = {
+  data: [
+    {
+      lat: 59,
+      lon: 10,
+      type: 'city',
+      display_place: 'Oslo',
+      display_address: 'Norway',
+      address: { name: 'Oslo', country: 'Norway' },
+    },
+  ],
+}
 
 beforeEach(() => {
-  axiosPut.mockResolvedValue({}).mockResolvedValueOnce({ data })
-  axiosPost.mockResolvedValue({})
+  axiosGet.mockResolvedValue({ data }).mockResolvedValueOnce(locationIQRes)
+  axiosPost.mockResolvedValue(postRes)
   useRouter.mockReturnValue(router)
   useToast.mockReturnValue({ setToast })
 })
-
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
 
 test('renders the title related to the actually displayed step', async () => {
   render(<CreateAPost csrfToken={csrfToken} />)
@@ -52,7 +60,10 @@ test('renders the title related to the actually displayed step', async () => {
 })
 
 test('the uploaded images and the latitude/longitude are sent with the request', async () => {
-  axiosPut.mockResolvedValueOnce({}).mockResolvedValueOnce({ data })
+  axiosPost
+    .mockResolvedValue(postRes)
+    .mockResolvedValueOnce({})
+    .mockResolvedValueOnce({})
 
   render(<CreateAPost csrfToken={csrfToken} />)
 
@@ -85,13 +96,24 @@ test('the uploaded images and the latitude/longitude are sent with the request',
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    expect(axiosPut.mock.calls[0][1]).toEqual({ csrfToken })
-    expect(axiosPut.mock.calls[1][0]).toBe(data.url)
-    expect(axiosPut.mock.calls[1][1]).toBe(images[0])
-    expect(axiosPut.mock.calls[3][0]).toBe(data.url)
-    expect(axiosPut.mock.calls[3][1]).toBe(images[1])
+    const getCalls = axiosGet.mock.calls
+    const getUrl = '/api/s3?csrfToken=' + csrfToken
+    expect(getCalls[1][0]).toBe(getUrl)
 
-    expect(axiosPost).toHaveBeenNthCalledWith(1, '/api/post', {
+    const postCalls = axiosPost.mock.calls
+    expect(postCalls[0][0]).toBe(data.url)
+    let formData = new FormData()
+    formData.append('file', images[0])
+    expect(postCalls[0][1]).toEqual(formData)
+
+    expect(getCalls[2][0]).toBe(getUrl)
+
+    expect(postCalls[1][0]).toBe(data.url)
+    formData.set('file', images[1])
+    expect(postCalls[1][1]).toEqual(formData)
+
+    expect(postCalls[2][0]).toBe('/api/post')
+    expect(postCalls[2][1]).toEqual({
       csrfToken,
       name: 'Modern table',
       description: 'A magnificent modern table.',
@@ -105,8 +127,6 @@ test('the uploaded images and the latitude/longitude are sent with the request',
 })
 
 test('the user is redirected to the post page after a valid submission', async () => {
-  axiosPost.mockResolvedValue({ headers: { location: '/posts/0/Table' } })
-
   render(<CreateAPost csrfToken={csrfToken} />)
 
   const addressInput = screen.getByLabelText(/address/i)
@@ -135,15 +155,15 @@ test('the user is redirected to the post page after a valid submission', async (
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    expect(router.push).toHaveBeenNthCalledWith(1, '/posts/0/Table')
+    expect(router.push).toHaveBeenNthCalledWith(1, postRes.headers.location)
   })
 })
 
 test('an error renders if the server fails to fetch the presigned url', async () => {
-  axiosPut
+  axiosGet
     .mockReset()
-    .mockResolvedValue({})
-    .mockRejectedValueOnce({ response: { data: { message: 'error' } } })
+    .mockRejectedValue({ response: { data: { message: 'error' } } })
+    .mockResolvedValueOnce(locationIQRes)
 
   render(<CreateAPost csrfToken={csrfToken} />)
 
@@ -174,15 +194,48 @@ test('an error renders if the server fails to fetch the presigned url', async ()
 
   await waitFor(() => {
     const toast = { message: 'error', error: true }
+    expect(setToast).toHaveBeenNthCalledWith(1, toast)
+  })
+})
+
+test('an error renders if the request to the presigned url fails because an image is too big', async () => {
+  axiosPost.mockRejectedValue({ response: { status: 400, data: 'xml' } })
+
+  render(<CreateAPost csrfToken={csrfToken} />)
+
+  const addressInput = screen.getByLabelText(/address/i)
+  await userEvent.type(addressInput, 'aa')
+
+  await screen.findByRole('listbox')
+  await userEvent.tab()
+
+  const imagesInput = screen.getByLabelText(/images/i)
+  const image = new File(['data'], 'img.jpg', { type: 'image/jpeg' })
+  await userEvent.upload(imagesInput, image)
+
+  const nameInput = screen.getByRole('textbox', { name: /name/i })
+  await userEvent.type(nameInput, 'Modern table')
+
+  const priceInput = screen.getByRole('spinbutton', { name: /price/i })
+  await userEvent.type(priceInput, '40')
+
+  const categoriesSelect = screen.getByLabelText(/categories/i)
+  await selectEvent.select(categoriesSelect, 'furniture')
+
+  const descriptionInput = screen.getByRole('textbox', { name: /description/i })
+  await userEvent.type(descriptionInput, 'A magnificent modern table.')
+
+  const submitBtn = screen.getByRole('button', { name: /post/i })
+  await userEvent.click(submitBtn)
+
+  await waitFor(() => {
+    const toast = { message: err.IMAGE_TOO_BIG, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })
 
 test('an error renders if the request to the presigned url fails', async () => {
-  axiosPut
-    .mockReset()
-    .mockRejectedValue({ response: { data: { message: 'error' } } })
-    .mockResolvedValueOnce({ data })
+  axiosPost.mockRejectedValue({ response: { status: 403, data: 'xml' } })
 
   render(<CreateAPost csrfToken={csrfToken} />)
 
@@ -212,13 +265,15 @@ test('an error renders if the request to the presigned url fails', async () => {
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    const toast = { message: 'error', error: true }
+    const toast = { message: err.DEFAULT, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })
 
 test('an error renders if the server fails to create the post', async () => {
-  axiosPost.mockRejectedValue({ response: { data: { message: err.DEFAULT } } })
+  axiosPost
+    .mockRejectedValue({ response: { data: { message: 'error' } } })
+    .mockResolvedValueOnce({})
 
   render(<CreateAPost csrfToken={csrfToken} />)
 
@@ -248,15 +303,17 @@ test('an error renders if the server fails to create the post', async () => {
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    const toast = { message: err.DEFAULT, error: true }
+    const toast = { message: 'error', error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })
 
 test("an error renders if the server fails to validate the request's data", async () => {
-  axiosPost.mockRejectedValue({
-    response: { data: { message: err.NAME_MAX, name: 'name' } },
-  })
+  axiosPost
+    .mockRejectedValue({
+      response: { data: { message: err.NAME_MAX, name: 'name' } },
+    })
+    .mockResolvedValueOnce({})
 
   render(<CreateAPost csrfToken={csrfToken} />)
 

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import UserPage from '../../../../pages/users/[id]/[name]'
 
 const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
+const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 
 const user = {
   id: '0',
@@ -34,7 +35,7 @@ it('renders', () => {
   expect(title).toHaveTextContent(user.name)
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', user.image)
+  expect(img).toHaveAttribute('src', awsUrl + user.image)
   expect(img.getAttribute('alt')).toContain(user.name)
 
   const posts = screen.getByRole('status')

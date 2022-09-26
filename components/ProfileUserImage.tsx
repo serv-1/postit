@@ -14,6 +14,7 @@ const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 interface Response {
   url: string
   key: string
+  fields: Record<string, string>
 }
 
 interface ProfileUserImageProps {
@@ -42,16 +43,28 @@ const ProfileUserImage = ({ image: img }: ProfileUserImageProps) => {
     try {
       const csrfToken = await getCsrfToken()
 
-      const { data } = await axios.put<Response>('/api/s3', { csrfToken })
+      const res = await axios.get<Response>('/api/s3?csrfToken=' + csrfToken)
+      const { url, fields, key } = res.data
 
-      await axios.put(data.url, file)
+      const formData = new FormData()
+      Object.entries(fields).forEach(([k, v]) => formData.append(k, v))
+      formData.append('file', file)
 
-      await axios.put('/api/user/', { csrfToken, image: data.key })
+      await axios.post(url, formData)
 
-      setImage(awsUrl + data.key)
+      await axios.put('/api/user', { csrfToken, image: key })
+
+      setImage(awsUrl + key)
       setToast({ message: 'The image has been updated! 🎉' })
     } catch (e) {
-      const { message } = getAxiosError(e)
+      const { message, status } = getAxiosError(e)
+
+      if (status === 400) {
+        return setToast({ message: err.IMAGE_TOO_BIG, error: true })
+      } else if (!message) {
+        return setToast({ message: err.DEFAULT, error: true })
+      }
+
       return setToast({ message, error: true })
     }
   }

@@ -16,10 +16,17 @@ import addPostSchema, { AddPostSchema } from '../schemas/addPostSchema'
 import { joiResolver } from '@hookform/resolvers/joi'
 import axios from 'axios'
 import getAxiosError from '../utils/functions/getAxiosError'
+import err from '../utils/constants/errors'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => ({
   props: { background: 'bg-linear-page', csrfToken: await getCsrfToken(ctx) },
 })
+
+interface Response {
+  url: string
+  key: string
+  fields: Record<string, string>
+}
 
 interface CreateAPostProps {
   csrfToken?: string
@@ -44,11 +51,15 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
       const keys: string[] = []
 
       for (const image of images) {
-        const res = await axios.put('/api/s3', { csrfToken: data.csrfToken })
+        const res = await axios.get<Response>('/api/s3?csrfToken=' + csrfToken)
+        const { url, fields, key } = res.data
 
-        await axios.put(res.data.url, image)
+        const formData = new FormData()
+        Object.entries(fields).forEach(([k, v]) => formData.append(k, v))
+        formData.append('file', image)
+        await axios.post(url, formData)
 
-        keys.push(res.data.key)
+        keys.push(key)
       }
 
       const _data = { ...data, images: keys, latLon }
@@ -56,10 +67,14 @@ const CreateAPost = ({ csrfToken }: CreateAPostProps) => {
 
       router.push(res.headers['location'])
     } catch (e) {
-      const { name, message } = getAxiosError<keyof AddPostSchema>(e)
+      const { name, message, status } = getAxiosError<keyof AddPostSchema>(e)
 
       if (name) {
         return methods.setError(name, { message }, { shouldFocus: true })
+      } else if (status === 400) {
+        return setToast({ message: err.IMAGE_TOO_BIG, error: true })
+      } else if (!message) {
+        return setToast({ message: err.DEFAULT, error: true })
       }
 
       setToast({ message, error: true })

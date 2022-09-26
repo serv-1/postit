@@ -6,6 +6,6 @@ it('returns false if the file is not too big', () => {
 })
 
 it('returns true if the file is too big', () => {
-  const result = isImageTooBig(1_000_001)
+  const result = isImageTooBig(1048577)
   expect(result).toBe(true)
 })

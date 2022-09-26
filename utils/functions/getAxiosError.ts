@@ -3,7 +3,7 @@ import err from '../constants/errors'
 
 interface Response<TName> {
   name?: TName
-  message: string
+  message?: string
 }
 
 /**

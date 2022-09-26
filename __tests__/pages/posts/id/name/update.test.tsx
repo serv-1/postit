@@ -1,28 +1,27 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import server from '../../../../../mocks/server'
 import UpdatePost from '../../../../../pages/posts/[id]/[name]/update'
 import err from '../../../../../utils/constants/errors'
 
+const axiosGet = jest.spyOn(require('axios'), 'get')
 const axiosPut = jest.spyOn(require('axios'), 'put')
+const axiosPost = jest.spyOn(require('axios'), 'post')
 const useToast = jest.spyOn(
   require('../../../../../contexts/toast'),
   'useToast'
 )
 
 const setToast = jest.fn()
-const data = { url: 'presigned url', key: 'keyName' }
+const data = { url: 'signed url', key: 'keyName', fields: {} }
 const csrfToken = 'token'
 const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 
 beforeEach(() => {
   useToast.mockReturnValue({ setToast })
+  axiosGet.mockResolvedValue({ data })
   axiosPut.mockResolvedValue({})
+  axiosPost.mockResolvedValue({})
 })
-
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
 
 const post = {
   id: '0',
@@ -81,13 +80,6 @@ it('renders', async () => {
 })
 
 test('an alert renders if the post is updated', async () => {
-  axiosPut
-    .mockResolvedValue({})
-    .mockResolvedValueOnce({ data })
-    .mockResolvedValueOnce({})
-    .mockResolvedValueOnce({ data })
-    .mockResolvedValueOnce({})
-
   render(<UpdatePost post={post} csrfToken={csrfToken} />)
 
   const nameBtn = screen.getByRole('button', { name: /name/i })
@@ -110,19 +102,23 @@ test('an alert renders if the post is updated', async () => {
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    expect(setToast).toHaveBeenCalledTimes(1)
+    const getCalls = axiosGet.mock.calls
+    const getUrl = '/api/s3?csrfToken=' + csrfToken
+    expect(getCalls[0][0]).toBe(getUrl)
 
-    const calls = axiosPut.mock.calls
+    const postCalls = axiosPost.mock.calls
+    expect(postCalls[0][0]).toBe(data.url)
+    let formData = new FormData()
+    formData.append('file', images[0])
+    expect(postCalls[0][1]).toEqual(formData)
 
-    expect(calls[0][1]).toEqual({ csrfToken })
+    expect(getCalls[1][0]).toBe(getUrl)
 
-    expect(calls[1][0]).toBe(data.url)
-    expect(calls[1][1]).toBe(images[0])
+    expect(postCalls[1][0]).toBe(data.url)
+    formData.set('file', images[1])
+    expect(postCalls[1][1]).toEqual(formData)
 
-    expect(calls[3][1]).toBe(images[1])
-
-    expect(calls[4][0]).toBe('/api/posts/0')
-    expect(calls[4][1]).toEqual({
+    expect(axiosPut).toHaveBeenNthCalledWith(1, '/api/posts/0', {
       csrfToken,
       name: 'Garden gnome',
       images: [data.key, data.key],
@@ -131,7 +127,7 @@ test('an alert renders if the post is updated', async () => {
 })
 
 test('an error renders if the server fails to fetch the presigned url', async () => {
-  axiosPut.mockRejectedValue({ response: { data: { message: 'error' } } })
+  axiosGet.mockRejectedValue({ response: { data: { message: 'error' } } })
 
   render(<UpdatePost post={post} csrfToken={csrfToken} />)
 
@@ -151,10 +147,8 @@ test('an error renders if the server fails to fetch the presigned url', async ()
   })
 })
 
-test('an error renders if the request to the presigned url fails', async () => {
-  axiosPut
-    .mockRejectedValue({ response: { data: { message: 'error' } } })
-    .mockResolvedValueOnce({ data })
+test('an error renders if the request to the presigned url fails because an image is too big', async () => {
+  axiosPost.mockRejectedValue({ response: { status: 400, data: 'xml' } })
 
   render(<UpdatePost post={post} csrfToken={csrfToken} />)
 
@@ -169,7 +163,28 @@ test('an error renders if the request to the presigned url fails', async () => {
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    const toast = { message: 'error', error: true }
+    const toast = { message: err.IMAGE_TOO_BIG, error: true }
+    expect(setToast).toHaveBeenNthCalledWith(1, toast)
+  })
+})
+
+test('an error renders if the request to the presigned url fails', async () => {
+  axiosPost.mockRejectedValue({ response: { status: 403, data: 'xml' } })
+
+  render(<UpdatePost post={post} csrfToken={csrfToken} />)
+
+  const imagesBtn = screen.getByRole('button', { name: /images/i })
+  await userEvent.click(imagesBtn)
+
+  const image = new File(['data'], 'img.jpg', { type: 'image/jpeg' })
+  const imagesInput = screen.getByLabelText(/new images/i)
+  await userEvent.upload(imagesInput, image)
+
+  const submitBtn = screen.getByRole('button', { name: /update/i })
+  await userEvent.click(submitBtn)
+
+  await waitFor(() => {
+    const toast = { message: err.DEFAULT, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })
@@ -244,6 +259,19 @@ test('an error renders if an image is too big', async () => {
 })
 
 test('the form send the latitude/longitude along the address when it is updated', async () => {
+  axiosGet.mockResolvedValue({
+    data: [
+      {
+        lat: 59,
+        lon: 10,
+        type: 'city',
+        display_place: 'Oslo',
+        display_address: 'Norway',
+        address: { name: 'Oslo', country: 'Norway' },
+      },
+    ],
+  })
+
   render(<UpdatePost post={post} csrfToken={csrfToken} />)
 
   const addressBtn = screen.getByRole('button', { name: /address/i })

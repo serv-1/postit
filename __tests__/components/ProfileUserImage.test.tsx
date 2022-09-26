@@ -6,18 +6,19 @@ import server from '../../mocks/server'
 import { mockCsrfToken } from '../../mocks/nextAuth'
 
 const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+const axiosPost = jest.spyOn(require('axios'), 'post')
 const axiosPut = jest.spyOn(require('axios'), 'put')
+const axiosGet = jest.spyOn(require('axios'), 'get')
 
 const setToast = jest.fn()
-const data = { url: 'presigned url', key: 'newImg' }
+const data = { url: 'signed url', key: 'newImg', fields: {} }
 const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 
 beforeEach(() => {
   useToast.mockReturnValue({ setToast })
-  axiosPut
-    .mockResolvedValue({})
-    .mockResolvedValueOnce({ data })
-    .mockResolvedValueOnce({})
+  axiosGet.mockResolvedValue({ data })
+  axiosPut.mockResolvedValue({})
+  axiosPost.mockResolvedValue({})
 })
 
 beforeAll(() => server.listen())
@@ -36,12 +37,15 @@ test('an alert renders if the user image is updated and the new user image rende
   await userEvent.upload(input, file)
 
   await waitFor(() => {
-    const calls = axiosPut.mock.calls
+    const url = '/api/s3?csrfToken=' + mockCsrfToken
+    expect(axiosGet).toHaveBeenNthCalledWith(1, url)
 
-    expect(calls[0][1]).toEqual({ csrfToken: mockCsrfToken })
-    expect(calls[1][0]).toBe(data.url)
-    expect(calls[1][1]).toEqual(file)
-    expect(calls[2][1]).toEqual({ csrfToken: mockCsrfToken, image: data.key })
+    const formData = new FormData()
+    formData.append('file', file)
+    expect(axiosPost).toHaveBeenNthCalledWith(1, data.url, formData)
+
+    const payload = { csrfToken: mockCsrfToken, image: data.key }
+    expect(axiosPut).toHaveBeenNthCalledWith(1, '/api/user', payload)
 
     expect(setToast).toHaveNthReturnedWith(1, undefined)
   })
@@ -88,11 +92,7 @@ test('an error renders if the user image is too big', async () => {
 })
 
 test('an error renders if the server fails to fetch the presigned url', async () => {
-  axiosPut
-    .mockReset()
-    .mockResolvedValue({})
-    .mockRejectedValueOnce({ response: { data: { message: 'error' } } })
-    .mockResolvedValueOnce({})
+  axiosGet.mockRejectedValue({ response: { data: { message: 'error' } } })
 
   render(<ProfileUserImage image="img" />)
 
@@ -101,16 +101,26 @@ test('an error renders if the server fails to fetch the presigned url', async ()
 
   await waitFor(() => {
     const toast = { message: 'error', error: true }
+    expect(setToast).toHaveBeenNthCalledWith(1, toast)
+  })
+})
+
+test('an error renders if the request to the presigned url fails because the image is too big', async () => {
+  axiosPost.mockRejectedValue({ response: { status: 400, data: 'xml' } })
+
+  render(<ProfileUserImage image="img" />)
+
+  const input = screen.getByLabelText(/image/i)
+  await userEvent.upload(input, file)
+
+  await waitFor(() => {
+    const toast = { message: err.IMAGE_TOO_BIG, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })
 
 test('an error renders if the request to the presigned url fails', async () => {
-  axiosPut
-    .mockReset()
-    .mockResolvedValue({})
-    .mockResolvedValueOnce({ data })
-    .mockRejectedValueOnce({ response: { data: { message: 'error' } } })
+  axiosPost.mockRejectedValue({ response: { status: 403, data: 'xml' } })
 
   render(<ProfileUserImage image="img" />)
 
@@ -118,17 +128,15 @@ test('an error renders if the request to the presigned url fails', async () => {
   await userEvent.upload(input, file)
 
   await waitFor(() => {
-    const toast = { message: 'error', error: true }
+    const toast = { message: err.DEFAULT, error: true }
     expect(setToast).toHaveBeenNthCalledWith(1, toast)
   })
 })
 
 test('an error renders if the server fails to update the user image', async () => {
-  axiosPut
-    .mockReset()
-    .mockRejectedValue({ response: { data: { message: err.IMAGE_INVALID } } })
-    .mockResolvedValueOnce({ data })
-    .mockResolvedValueOnce({})
+  axiosPut.mockRejectedValue({
+    response: { data: { message: err.IMAGE_INVALID } },
+  })
 
   render(<ProfileUserImage image="/img" />)
 

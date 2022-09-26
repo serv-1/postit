@@ -5,7 +5,7 @@
  * @returns true if it is too big else false
  */
 const isImageTooBig = (size: number) => {
-  return size > 1_000_000
+  return size > 1048576
 }
 
 export default isImageTooBig
