@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { FormEvent } from 'react'
 import selectEvent from 'react-select-event'
 import HomeSearchPosts from '../../components/HomeSearchPosts'
 
@@ -77,4 +78,37 @@ it("updates the query string's data", async () => {
   })
 
   document.removeEventListener('queryStringChange', onQueryStringChange)
+})
+
+it('resets the form states but keep all values after a valid submittion', async () => {
+  Object.defineProperty(window, 'location', { get: () => ({ search: '' }) })
+  Object.defineProperty(window, 'history', {
+    get: () => ({ pushState: () => null }),
+  })
+
+  const useForm = jest.spyOn(require('react-hook-form'), 'useForm')
+  const useController = jest.spyOn(require('react-hook-form'), 'useController')
+  const reset = jest.fn()
+
+  useForm.mockReturnValue({
+    handleSubmit:
+      (onSubmit: (data: unknown) => void) =>
+      (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        onSubmit(Object.fromEntries(new FormData(e.currentTarget)))
+      },
+    setValue: () => null,
+    formState: { isSubmitted: false, isSubmitSuccessful: true },
+    register: (name: string) => ({ name }),
+    reset,
+  })
+
+  useController.mockReturnValue({
+    field: {},
+    formState: { isSubmitted: false },
+  })
+
+  render(<HomeSearchPosts />)
+
+  await waitFor(() => expect(reset).toHaveBeenCalledTimes(1))
 })

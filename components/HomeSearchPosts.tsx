@@ -21,6 +21,8 @@ const HomeSearchPosts = () => {
     resolver: joiResolver(searchPostSchema),
   })
 
+  const { formState } = methods
+
   const submitHandler: SubmitHandler<SearchPostSchema> = (data) => {
     const { query, minPrice, maxPrice, categories, address } = data
 
@@ -56,6 +58,11 @@ const HomeSearchPosts = () => {
     methods.setValue('maxPrice', queryString.get('maxPrice') || undefined)
     methods.setValue('address', queryString.get('address') || undefined)
   }, [methods])
+
+  useEffect(() => {
+    if (!formState.isSubmitSuccessful) return
+    methods.reset(undefined, { keepValues: true })
+  }, [methods, formState])
 
   return (
     <Form
