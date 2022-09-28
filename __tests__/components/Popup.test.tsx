@@ -28,7 +28,7 @@ it('renders', () => {
   const reference = screen.getByText('open')
   expect(reference).toHaveClass('blue')
 
-  const container = reference.parentElement
+  const container = reference.parentElement?.parentElement
   expect(container).toHaveClass('yellow')
 
   const popup = screen.queryByText('popup')

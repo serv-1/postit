@@ -85,43 +85,44 @@ const Popup = ({
   }, [setIsOpen, popperEl, referenceEl])
 
   return (
-    <div
-      className={containerClassName}
-      onMouseEnter={() => {
-        if (window.innerWidth < 1024) return
-        if (openOnHover && !isOpen) setIsHover(true)
-      }}
-      onMouseLeave={() => {
-        if (window.innerWidth < 1024) return
-        if (openOnHover && !isOpen) setIsHover(false)
-      }}
-    >
-      <button
-        type="button"
-        className={referenceClassName}
-        ref={setReferenceEl}
-        onClick={() => setIsOpen(!isOpen)}
+    <div className={containerClassName}>
+      <span
+        onMouseEnter={() => {
+          if (window.innerWidth < 1024) return
+          if (openOnHover && !isOpen) setIsHover(true)
+        }}
+        onMouseLeave={() => {
+          if (window.innerWidth < 1024) return
+          if (openOnHover && !isOpen) setIsHover(false)
+        }}
       >
-        {referenceContent}
-      </button>
-      {(isOpen || isHover) && (
-        <div
-          id="popup"
-          className={popupClassName}
-          ref={setPopperEl}
-          style={styles.popper}
-          {...attributes.popper}
+        <button
+          type="button"
+          className={referenceClassName}
+          ref={setReferenceEl}
+          onClick={() => setIsOpen(!isOpen)}
         >
-          {popupContent}
+          {referenceContent}
+        </button>
+        {(isOpen || isHover) && (
           <div
-            id="popup-arrow"
-            ref={setArrowEl}
-            className={arrowClassName}
-            style={styles.arrow}
-            {...attributes.arrow}
-          ></div>
-        </div>
-      )}
+            id="popup"
+            className={popupClassName}
+            ref={setPopperEl}
+            style={styles.popper}
+            {...attributes.popper}
+          >
+            {popupContent}
+            <div
+              id="popup-arrow"
+              ref={setArrowEl}
+              className={arrowClassName}
+              style={styles.arrow}
+              {...attributes.arrow}
+            ></div>
+          </div>
+        )}
+      </span>
     </div>
   )
 }

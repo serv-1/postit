@@ -49,10 +49,14 @@ const PostPageFavoriteButton = (props: PostPageFavoriteButtonProps) => {
 
   const heartA11y = (isFavPost ? 'Delete from' : 'Add to') + ' favorite'
 
-  const hiddenOnHover =
-    'w-full h-full transition-opacity duration-200 group-hover:opacity-0'
-  const visibleOnHover =
-    'w-full h-full transition-opacity duration-200 opacity-0 group-hover:opacity-100 group-hover:animate-[heartbeat_1s_linear_infinite] relative -top-full'
+  const heartClass =
+    'w-full h-full p-8 absolute top-0 left-0 transition-opacity duration-200 '
+
+  const heartFillClass =
+    heartClass +
+    (isFavPost
+      ? 'group-hover:opacity-0'
+      : 'opacity-0 group-hover:opacity-100 group-hover:animate-[heartbeat_1s_linear_infinite]')
 
   return (
     <div className="absolute top-8 right-8 group">
@@ -62,17 +66,8 @@ const PostPageFavoriteButton = (props: PostPageFavoriteButtonProps) => {
         title={heartA11y}
         aria-label={heartA11y}
       >
-        {isFavPost ? (
-          <>
-            <HeartFill data-testid="heartFill" className={hiddenOnHover} />
-            <Heart data-testid="heart" className={visibleOnHover} />
-          </>
-        ) : (
-          <>
-            <Heart data-testid="heart" className={hiddenOnHover} />
-            <HeartFill data-testid="heartFill" className={visibleOnHover} />
-          </>
-        )}
+        <HeartFill data-testid="heartFill" className={heartFillClass} />
+        <Heart data-testid="heart" className={heartClass} />
       </DotButton>
     </div>
   )

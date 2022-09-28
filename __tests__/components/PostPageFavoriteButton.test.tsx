@@ -22,21 +22,19 @@ it('renders', () => {
   expect(heartBtn).toHaveAttribute('title', 'Add to favorite')
   expect(heartBtn).toHaveAttribute('aria-label', 'Add to favorite')
 
-  const heartIcons = screen.getAllByTestId(/heart/i)
-  expect(heartIcons[0]).not.toHaveClass('opacity-0')
-  expect(heartIcons[1]).toHaveClass('opacity-0')
+  const heartFillIcon = screen.getByTestId('heartFill')
+  expect(heartFillIcon.className).toContain('animate')
 })
 
 test('the user can add or delete the post to its favorite', async () => {
   render(<PostPageFavoriteButton postId="0" favPostsIds={['0']} />)
 
-  let heartBtn = screen.getByRole('button', { name: /favorite/i })
+  const heartBtn = screen.getByRole('button', { name: /favorite/i })
+  const heartFillIcon = screen.getByTestId('heartFill')
+
   expect(heartBtn).toHaveAttribute('title', 'Delete from favorite')
   expect(heartBtn).toHaveAttribute('aria-label', 'Delete from favorite')
-
-  let heartIcons = screen.getAllByTestId(/heart/i)
-  expect(heartIcons[0]).not.toHaveClass('opacity-0')
-  expect(heartIcons[1]).toHaveClass('opacity-0')
+  expect(heartFillIcon.className).not.toContain('animate')
 
   await userEvent.click(heartBtn)
   await waitFor(() => {
@@ -46,15 +44,9 @@ test('the user can add or delete the post to its favorite', async () => {
     })
   })
 
-  heartBtn = screen.getByRole('button', { name: /favorite/i })
-  await waitFor(() => {
-    expect(heartBtn).toHaveAttribute('title', 'Add to favorite')
-    expect(heartBtn).toHaveAttribute('aria-label', 'Add to favorite')
-  })
-
-  heartIcons = screen.getAllByTestId(/heart/i)
-  expect(heartIcons[0]).not.toHaveClass('opacity-0')
-  expect(heartIcons[1]).toHaveClass('opacity-0')
+  expect(heartBtn).toHaveAttribute('title', 'Add to favorite')
+  expect(heartBtn).toHaveAttribute('aria-label', 'Add to favorite')
+  expect(heartFillIcon.className).toContain('animate')
 
   await userEvent.click(heartBtn)
   await waitFor(() => {
@@ -64,13 +56,9 @@ test('the user can add or delete the post to its favorite', async () => {
     })
   })
 
-  heartBtn = screen.getByRole('button', { name: /favorite/i })
   expect(heartBtn).toHaveAttribute('title', 'Delete from favorite')
   expect(heartBtn).toHaveAttribute('aria-label', 'Delete from favorite')
-
-  heartIcons = screen.getAllByTestId(/heart/i)
-  expect(heartIcons[0]).not.toHaveClass('opacity-0')
-  expect(heartIcons[1]).toHaveClass('opacity-0')
+  expect(heartFillIcon.className).not.toContain('animate')
 })
 
 test('an error renders if the server fails to update the user favorite post list', async () => {
