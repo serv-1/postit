@@ -3,11 +3,17 @@ import userEvent from '@testing-library/user-event'
 import ChatModal from '../../components/ChatModal'
 import server from '../../mocks/server'
 import getClientPusher from '../../utils/functions/getClientPusher'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
 
 jest.mock('../../utils/functions/getClientPusher')
 
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 const axiosGet = jest.spyOn(require('axios'), 'get')
 
 const bind = jest.fn()
@@ -40,7 +46,7 @@ beforeEach(() => {
   Element.prototype.scroll = () => null
 
   useSession.mockReturnValue({ data: { id: '0', channelName: 'test' } })
-  useToast.mockReturnValue({ setToast: () => null })
+  useToastMock.mockReturnValue({ setToast() {}, toast: {} })
   axiosGet.mockResolvedValue({ data: JSONDiscussion })
 
   const subscribe = () => ({ bind, unbind })

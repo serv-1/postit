@@ -5,20 +5,26 @@ import { mockSession } from '../../mocks/nextAuth'
 import userEvent from '@testing-library/user-event'
 import { rest } from 'msw'
 import err from '../../utils/constants/errors'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
+const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
-
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
-const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
 
 const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
 const awsUrl = process.env.NEXT_PUBLIC_AWS_URL
 
 beforeEach(() => {
   useSession.mockReturnValue({ data: mockSession, status: 'authenticated' })
-  useToast.mockReturnValue({})
+  useToastMock.mockReturnValue({ toast: {}, setToast() {} })
 })
 
 test('the default user image renders', () => {
@@ -54,7 +60,7 @@ test('the sign out link signs out the user', async () => {
 
 test('an error renders if the server fails to fetch the user image', async () => {
   const setToast = jest.fn()
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
 
   server.use(
     rest.get('http://localhost/api/users/:id', (req, res, ctx) => {

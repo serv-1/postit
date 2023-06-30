@@ -4,20 +4,26 @@ import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
 import { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
 import server from '../../mocks/server'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
+const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
+const useRouter = jest.spyOn(require('next/router'), 'useRouter')
+const router = { push: jest.fn() }
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
-const useRouter = jest.spyOn(require('next/router'), 'useRouter')
-const router = { push: jest.fn() }
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-
 beforeEach(() => {
   useRouter.mockReturnValue(router)
-  useToast.mockReturnValue({})
+  useToastMock.mockReturnValue({ toast: {}, setToast() {} })
 })
 
 it('signs in the user and redirects him to its profile', async () => {
@@ -42,7 +48,7 @@ it('signs in the user and redirects him to its profile', async () => {
 
 test('an error renders if the server fails to sign in the user', async () => {
   const setToast = jest.fn()
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   signIn.mockResolvedValueOnce({
     error: JSON.stringify({ message: err.DEFAULT }),
   })

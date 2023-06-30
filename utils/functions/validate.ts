@@ -2,7 +2,7 @@ import { Schema } from 'joi'
 
 type ValidateReturn<Value> =
   | {
-      value: NonNullable<Value>
+      value: Value
     }
   | {
       value?: Value

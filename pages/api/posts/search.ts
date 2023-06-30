@@ -25,24 +25,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ message: err.METHOD_NOT_ALLOWED })
   }
 
-  let queryCategories = req.query.categories as
-    | SearchPostSchema['categories']
-    | Categories
-
-  if (queryCategories && !Array.isArray(queryCategories)) {
-    queryCategories = [queryCategories]
-  }
-
-  const reqQuery = {
-    query: req.query.query,
-    page: +req.query.page || undefined,
-    minPrice: +req.query.minPrice || undefined,
-    maxPrice: +req.query.maxPrice || undefined,
-    categories: queryCategories,
-    address: req.query.address,
-  } as SearchPostSchema
-
-  const result = validate(searchPostSchema, reqQuery)
+  const cats = req.query.categories
+  const result = validate(searchPostSchema, {
+    ...req.query,
+    categories: typeof cats === 'string' ? [cats] : cats,
+  })
 
   if ('message' in result) {
     return res.status(422).json({ name: result.name, message: result.message })

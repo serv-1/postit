@@ -2,14 +2,21 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import PostPageMap from '../../components/PostPageMap'
 import server from '../../mocks/server'
+import { useToast } from '../../contexts/toast'
 
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const setToast = jest.fn()
 
 beforeEach(() => {
   window.scrollTo = () => undefined
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
 })
+
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())

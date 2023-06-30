@@ -4,20 +4,26 @@ import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
+const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
+
+const setToast = jest.fn()
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
-
-const setToast = jest.fn()
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-
 beforeEach(() => {
   signIn.mockResolvedValue({ error: '' })
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
 })
 
 test('the form sends a mail to the user to sign in, which redirect him to its profile', async () => {

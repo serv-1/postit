@@ -2,6 +2,11 @@ import { render, screen } from '@testing-library/react'
 import PostPage, { PostPageProps } from '../../../../../pages/posts/[id]/[name]'
 import { LightPost } from '../../../../../types/common'
 import userEvent from '@testing-library/user-event'
+import { useToast } from '../../../../../contexts/toast'
+
+jest.mock('../../../../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
 
 jest.mock('../../../../../components/PostPageFavoriteButton', () => ({
   __esModule: true,
@@ -22,6 +27,8 @@ jest.mock('../../../../../components/PostPageContactModal', () => ({
   __esModule: true,
   default: () => <button>contact</button>,
 }))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
 
 const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 
@@ -50,12 +57,9 @@ const user: PostPageProps['user'] = {
   hasUnseenMessages: false,
 }
 
-const useToast = jest.spyOn(
-  require('../../../../../contexts/toast'),
-  'useToast'
-)
-
-beforeEach(() => useToast.mockReturnValue({ setToast: () => null }))
+beforeEach(() => {
+  useToastMock.mockReturnValue({ setToast: () => null, toast: {} })
+})
 
 it('renders', () => {
   render(<PostPage post={post} />)

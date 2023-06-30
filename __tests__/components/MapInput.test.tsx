@@ -69,7 +69,7 @@ it('renders an error if the query is too long', async () => {
   render(<MapInput setLatLon={() => null} />)
 
   const input = screen.getByRole<HTMLInputElement>('combobox')
-  await userEvent.type(input, new Uint8Array(201).toString())
+  await userEvent.type(input, 'a'.repeat(201))
 
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent(err.ADDRESS_MAX)

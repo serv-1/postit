@@ -3,11 +3,17 @@ import userEvent from '@testing-library/user-event'
 import { act } from 'react-dom/test-utils'
 import HeaderChatListModal from '../../components/HeaderChatListModal'
 import getClientPusher from '../../utils/functions/getClientPusher'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
 
 jest.mock('../../utils/functions/getClientPusher')
 
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const axiosGet = jest.spyOn(require('axios'), 'get')
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
 const getCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 
@@ -42,7 +48,7 @@ beforeEach(() => {
     .mockResolvedValue({ data: discussion })
     .mockResolvedValueOnce({ data: user })
 
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   useSession.mockReturnValue({ data: { id: '0', channelName: 'test' } })
   getCsrfToken.mockResolvedValue('t')
 

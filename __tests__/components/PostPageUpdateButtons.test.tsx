@@ -2,8 +2,14 @@ import PostPageUpdateButtons from '../../components/PostPageUpdateButtons'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
+import { useToast } from '../../contexts/toast'
 
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
 const getCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const axiosDelete = jest.spyOn(require('axios'), 'delete')
@@ -12,7 +18,7 @@ const setToast = jest.fn()
 const push = jest.fn()
 
 beforeEach(() => {
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   useRouter.mockReturnValue({ push })
   getCsrfToken.mockResolvedValue('csrfToken')
 })

@@ -4,17 +4,23 @@ import DeleteAccountModal from '../../components/DeleteAccountModal'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
+const signOut = jest.spyOn(require('next-auth/react'), 'signOut')
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const signOut = jest.spyOn(require('next-auth/react'), 'signOut')
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
-
 beforeEach(() => {
   signOut.mockResolvedValue({ url: '/' })
-  useToast.mockReturnValue({})
+  useToastMock.mockReturnValue({ toast: {}, setToast() {} })
 })
 
 test('the user is signed out and redirected to the home page after being deleted', async () => {
@@ -53,7 +59,7 @@ it('opens/closes', async () => {
 
 test('an error renders if the server fails to delete the user', async () => {
   const setToast = jest.fn()
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
 
   server.use(
     rest.delete('http://localhost/api/user', (req, res, ctx) => {

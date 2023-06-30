@@ -69,7 +69,7 @@ const Select = <FormFields extends FieldValues = FieldValues>({
   })
 
   const onChange = (val: MultiValue<Option>) =>
-    field.onChange(val.map(({ value }) => value))
+    field.onChange(val.map(({ value }) => value) as any)
 
   return (
     <ReactSelect

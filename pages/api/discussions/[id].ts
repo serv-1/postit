@@ -33,7 +33,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const csrfToken = req.query.csrfToken || req.body.csrfToken
   const result = validate<string>(csrfTokenSchema, csrfToken)
-  const csrfTokenCookie = req.cookies[env.CSRF_TOKEN_COOKIE_NAME]
+  const csrfTokenCookie = req.cookies[env.CSRF_TOKEN_COOKIE_NAME] || ''
 
   if (!isCsrfTokenValid(csrfTokenCookie, result.value || '')) {
     return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })

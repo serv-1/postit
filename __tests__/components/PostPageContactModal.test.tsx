@@ -2,16 +2,22 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import PostPageContactModal from '../../components/PostPageContactModal'
 import getClientPusher from '../../utils/functions/getClientPusher'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
 
 jest.mock('../../utils/functions/getClientPusher')
 
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
 
 const setToast = jest.fn()
 
 beforeEach(() => {
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   useSession.mockReturnValue({
     data: { channelName: 'test' },
     status: 'authenticated',

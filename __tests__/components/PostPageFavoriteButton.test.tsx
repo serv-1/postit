@@ -4,13 +4,17 @@ import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
+import { useToast } from '../../contexts/toast'
 
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const setToast = jest.fn()
 
-beforeEach(() => {
-  useToast.mockReturnValue({ setToast })
-})
+beforeEach(() => useToastMock.mockReturnValue({ setToast, toast: {} }))
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
@@ -44,7 +48,10 @@ test('the user can add or delete the post to its favorite', async () => {
     })
   })
 
-  expect(heartBtn).toHaveAttribute('title', 'Add to favorite')
+  await waitFor(() => {
+    expect(heartBtn).toHaveAttribute('title', 'Add to favorite')
+  })
+
   expect(heartBtn).toHaveAttribute('aria-label', 'Add to favorite')
   expect(heartFillIcon.className).toContain('animate')
 
@@ -56,7 +63,10 @@ test('the user can add or delete the post to its favorite', async () => {
     })
   })
 
-  expect(heartBtn).toHaveAttribute('title', 'Delete from favorite')
+  await waitFor(() => {
+    expect(heartBtn).toHaveAttribute('title', 'Delete from favorite')
+  })
+
   expect(heartBtn).toHaveAttribute('aria-label', 'Delete from favorite')
   expect(heartFillIcon.className).not.toContain('animate')
 })

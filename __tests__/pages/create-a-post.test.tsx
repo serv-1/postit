@@ -3,11 +3,17 @@ import userEvent from '@testing-library/user-event'
 import CreateAPost from '../../pages/create-a-post'
 import selectEvent from 'react-select-event'
 import err from '../../utils/constants/errors'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
 
 const axiosGet = jest.spyOn(require('axios'), 'get')
 const axiosPost = jest.spyOn(require('axios'), 'post')
 const useRouter = jest.spyOn(require('next/router'), 'useRouter')
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
 const router = { push: jest.fn() }
 const setToast = jest.fn()
@@ -31,7 +37,7 @@ beforeEach(() => {
   axiosGet.mockResolvedValue({ data }).mockResolvedValueOnce(locationIQRes)
   axiosPost.mockResolvedValue(postRes)
   useRouter.mockReturnValue(router)
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
 })
 
 test('renders the title related to the actually displayed step', async () => {

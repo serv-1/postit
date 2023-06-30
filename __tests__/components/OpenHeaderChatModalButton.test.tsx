@@ -1,6 +1,13 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import OpenHeaderChatModalButton from '../../components/OpenHeaderChatModalButton'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
 
 const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
@@ -25,7 +32,6 @@ const interlocutor = {
   hasUnseenMessages: false,
 }
 
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 const axiosGet = jest.spyOn(require('axios'), 'get')
 const axiosPut = jest.spyOn(require('axios'), 'put')
 const axiosDelete = jest.spyOn(require('axios'), 'delete')
@@ -33,7 +39,7 @@ const axiosDelete = jest.spyOn(require('axios'), 'delete')
 const setToast = jest.fn()
 
 beforeEach(() => {
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   axiosGet.mockResolvedValue({ data: interlocutor })
   axiosPut.mockResolvedValue({})
   axiosDelete.mockResolvedValue({})

@@ -4,19 +4,25 @@ import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { rest } from 'msw'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
+const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
+const useRouter = jest.spyOn(require('next/router'), 'useRouter')
+const router = { push: jest.fn() }
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
-const useRouter = jest.spyOn(require('next/router'), 'useRouter')
-const router = { push: jest.fn() }
-
 beforeEach(() => {
   signIn.mockResolvedValue({ error: '' })
-  useToast.mockReturnValue({})
+  useToastMock.mockReturnValue({ toast: {}, setToast() {} })
   useRouter.mockReturnValue(router)
 })
 
@@ -43,7 +49,7 @@ it('registers the user and signs in him and redirects him to its profile', async
 
 it('an alert renders if the server fails to sign in the user', async () => {
   const setToast = jest.fn()
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   signIn.mockResolvedValue({ error: 'Error' })
 
   render(<AuthenticationRegisterForm />)
@@ -66,7 +72,7 @@ it('an alert renders if the server fails to sign in the user', async () => {
 
 test('an error renders if the server fails to register the user', async () => {
   const setToast = jest.fn()
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
 
   server.use(
     rest.post('http://localhost/api/user', (req, res, ctx) => {

@@ -1,10 +1,16 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import ChatMessageList from '../../components/ChatMessageList'
 import getClientPusher from '../../utils/functions/getClientPusher'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
 
 jest.mock('../../utils/functions/getClientPusher')
 
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
 const axiosGet = jest.spyOn(require('axios'), 'get')
 const axiosPut = jest.spyOn(require('axios'), 'put')
@@ -31,7 +37,7 @@ const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 beforeEach(() => {
   Element.prototype.scroll = jest.fn()
 
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   useSession.mockReturnValue({ data: { id: '0' } })
   axiosGet.mockResolvedValue({ data: JSONDiscussion })
   axiosPut.mockResolvedValue({})

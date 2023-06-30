@@ -2,17 +2,18 @@ import Profile from '../../pages/profile'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import server from '../../mocks/server'
+import { useToast } from '../../contexts/toast'
 
 jest.mock('../../contexts/toast', () => ({
-  __esModule: true,
-  useToast: () => ({}),
+  useToast: jest.fn(),
 }))
 
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const setToast = jest.fn()
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 const signOut = jest.spyOn(require('next-auth/react'), 'signOut')
 
-beforeEach(() => useToast.mockReturnValue({ setToast }))
+beforeEach(() => useToastMock.mockReturnValue({ setToast, toast: {} }))
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
@@ -60,10 +61,14 @@ it('updates the user name if it has been changed', async () => {
   const submitBtn = screen.getAllByRole('button', { name: /change/i })[0]
   await userEvent.click(submitBtn)
 
-  await waitFor(() => expect(setToast).toHaveBeenCalledTimes(1))
+  await waitFor(() => {
+    expect(setToast).toHaveBeenCalledTimes(1)
+  })
 
-  const userName = screen.getByRole('heading', { level: 1 })
-  expect(userName).toHaveTextContent('Bob')
+  await waitFor(() => {
+    const userName = screen.getByRole('heading', { level: 1 })
+    expect(userName).toHaveTextContent('Bob')
+  })
 
   const publicProfileLink = screen.getByRole('link', { name: /public/i })
   expect(publicProfileLink).toHaveAttribute('href', `/users/${user.id}/Bob`)

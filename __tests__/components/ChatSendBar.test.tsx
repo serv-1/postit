@@ -2,15 +2,21 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ChatSendBar from '../../components/ChatSendBar'
 import err from '../../utils/constants/errors'
+import { useToast } from '../../contexts/toast'
 
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const axiosPost = jest.spyOn(require('axios'), 'post')
 const axiosPut = jest.spyOn(require('axios'), 'put')
 
 const setToast = jest.fn()
 
 beforeEach(() => {
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   axiosPost.mockResolvedValue({})
   axiosPut.mockResolvedValue({})
 })

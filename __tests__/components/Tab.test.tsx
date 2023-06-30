@@ -1,10 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import Tab from '../../components/Tab'
 import userEvent from '@testing-library/user-event'
+import { useTabs } from '../../contexts/tabs'
 
-const useTabs = jest.spyOn(require('../../contexts/tabs'), 'useTabs')
+jest.mock('../../contexts/tabs', () => ({
+  useTabs: jest.fn(),
+}))
 
-beforeEach(() => useTabs.mockReturnValue({}))
+const useTabsMock = useTabs as jest.MockedFunction<typeof useTabs>
+
+beforeEach(() => useTabsMock.mockReturnValue({ setActiveTab() {} }))
 
 it('renders', () => {
   render(
@@ -23,7 +28,7 @@ it('renders', () => {
 })
 
 it('renders as an active tab', () => {
-  useTabs.mockReturnValue({ activeTab: 'test' })
+  useTabsMock.mockReturnValue({ activeTab: 'test', setActiveTab() {} })
 
   render(
     <Tab value="test" activeClass="red" inactiveClass="blue" baseClass="black">
@@ -40,7 +45,7 @@ it('renders as an active tab', () => {
 
 it('becomes the active tabs on click', async () => {
   const setActiveTab = jest.fn()
-  useTabs.mockReturnValue({ setActiveTab })
+  useTabsMock.mockReturnValue({ setActiveTab })
 
   render(
     <Tab value="test" activeClass="red">

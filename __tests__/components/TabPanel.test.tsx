@@ -1,10 +1,15 @@
 import TabPanel from '../../components/TabPanel'
 import { render, screen } from '@testing-library/react'
+import { useTabs } from '../../contexts/tabs'
 
-const useTabs = jest.spyOn(require('../../contexts/tabs'), 'useTabs')
+jest.mock('../../contexts/Tabs', () => ({
+  useTabs: jest.fn(),
+}))
+
+const useTabsMock = useTabs as jest.MockedFunction<typeof useTabs>
 
 it('is hidden', () => {
-  useTabs.mockReturnValue({ activeTab: 'no' })
+  useTabsMock.mockReturnValue({ activeTab: 'no', setActiveTab() {} })
 
   render(<TabPanel value="yes">Hidden</TabPanel>)
 
@@ -13,7 +18,7 @@ it('is hidden', () => {
 })
 
 it('is visible', () => {
-  useTabs.mockReturnValue({ activeTab: 'yes' })
+  useTabsMock.mockReturnValue({ activeTab: 'yes', setActiveTab() {} })
 
   render(
     <TabPanel value="yes" className="red">

@@ -4,8 +4,14 @@ import userEvent from '@testing-library/user-event'
 import err from '../../utils/constants/errors'
 import server from '../../mocks/server'
 import { mockCsrfToken } from '../../mocks/nextAuth'
+import { useToast } from '../../contexts/toast'
 
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const axiosPost = jest.spyOn(require('axios'), 'post')
 const axiosPut = jest.spyOn(require('axios'), 'put')
 const axiosGet = jest.spyOn(require('axios'), 'get')
@@ -15,7 +21,7 @@ const data = { url: 'signed url', key: 'newImg', fields: {} }
 const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 
 beforeEach(() => {
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   axiosGet.mockResolvedValue({ data })
   axiosPut.mockResolvedValue({})
   axiosPost.mockResolvedValue({})
@@ -39,14 +45,20 @@ test('an alert renders if the user image is updated and the new user image rende
   await waitFor(() => {
     const url = '/api/s3?csrfToken=' + mockCsrfToken
     expect(axiosGet).toHaveBeenNthCalledWith(1, url)
+  })
 
+  await waitFor(() => {
     const formData = new FormData()
     formData.append('file', file)
     expect(axiosPost).toHaveBeenNthCalledWith(1, data.url, formData)
+  })
 
+  await waitFor(() => {
     const payload = { csrfToken: mockCsrfToken, image: data.key }
     expect(axiosPut).toHaveBeenNthCalledWith(1, '/api/user', payload)
+  })
 
+  await waitFor(() => {
     expect(setToast).toHaveNthReturnedWith(1, undefined)
   })
 

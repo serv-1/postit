@@ -25,8 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(422).json({ message: result.message })
   }
 
-  const csrfTokenCookie = req.cookies[env.CSRF_TOKEN_COOKIE_NAME]
-
+  const csrfTokenCookie = req.cookies[env.CSRF_TOKEN_COOKIE_NAME] || ''
   if (!isCsrfTokenValid(csrfTokenCookie, result.value)) {
     return res.status(422).json({ message: err.CSRF_TOKEN_INVALID })
   }

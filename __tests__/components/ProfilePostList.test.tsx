@@ -8,16 +8,24 @@ import userEvent from '@testing-library/user-event'
 import ProfilePostList from '../../components/ProfilePostList'
 import server from '../../mocks/server'
 import err from '../../utils/constants/errors'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
+const axiosDelete = jest.spyOn(require('axios'), 'delete')
+const setToast = jest.fn()
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const axiosDelete = jest.spyOn(require('axios'), 'delete')
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
-const setToast = jest.fn()
-
-beforeEach(() => useToast.mockReturnValue({ setToast }))
+beforeEach(() => {
+  useToastMock.mockReturnValue({ setToast, toast: {} })
+})
 
 const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 

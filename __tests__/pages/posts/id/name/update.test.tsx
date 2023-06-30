@@ -2,14 +2,17 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import UpdatePost from '../../../../../pages/posts/[id]/[name]/update'
 import err from '../../../../../utils/constants/errors'
+import { useToast } from '../../../../../contexts/toast'
+
+jest.mock('../../../../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
 
 const axiosGet = jest.spyOn(require('axios'), 'get')
 const axiosPut = jest.spyOn(require('axios'), 'put')
 const axiosPost = jest.spyOn(require('axios'), 'post')
-const useToast = jest.spyOn(
-  require('../../../../../contexts/toast'),
-  'useToast'
-)
 
 const setToast = jest.fn()
 const data = { url: 'signed url', key: 'keyName', fields: {} }
@@ -17,7 +20,7 @@ const csrfToken = 'token'
 const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 
 beforeEach(() => {
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   axiosGet.mockResolvedValue({ data })
   axiosPut.mockResolvedValue({})
   axiosPost.mockResolvedValue({})

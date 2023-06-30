@@ -1,14 +1,19 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Toast from '../../components/Toast'
+import { useToast } from '../../contexts/toast'
 
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
 
 const setToast = jest.fn()
 
 beforeEach(() => {
   jest.useFakeTimers()
-  useToast.mockReturnValue({ toast: { message: 'oh' }, setToast })
+  useToastMock.mockReturnValue({ toast: { message: 'oh' }, setToast })
 })
 
 it('renders', async () => {
@@ -31,7 +36,10 @@ it('closes after clicking the close button', async () => {
 })
 
 it('is red if the message is an error', () => {
-  useToast.mockReturnValue({ toast: { message: 'error', error: true } })
+  useToastMock.mockReturnValue({
+    toast: { message: 'error', error: true },
+    setToast() {},
+  })
 
   render(<Toast />)
 
@@ -40,7 +48,7 @@ it('is red if the message is an error', () => {
 })
 
 it('does not render if there is no message to display', () => {
-  useToast.mockReturnValue({ toast: {} })
+  useToastMock.mockReturnValue({ toast: {}, setToast() {} })
 
   render(<Toast />)
 

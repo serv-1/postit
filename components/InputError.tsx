@@ -12,15 +12,16 @@ const InputError = <FormFields extends FieldValues = FieldValues>({
 }: InputErrorProps<FormFields>) => {
   const { formState } = useFormContext<FormFields>()
   const { isSubmitted, errors } = formState
+  const error = errors[inputName]
 
-  return isSubmitted && errors[inputName] ? (
+  return isSubmitted && error ? (
     <div
       {...props}
       id={`${inputName}Feedback`}
       role="alert"
       className="text-rose-600 font-bold"
     >
-      {errors[inputName].message}
+      {error.message as string}
     </div>
   ) : null
 }

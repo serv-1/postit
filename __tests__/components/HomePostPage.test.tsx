@@ -1,7 +1,13 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import HomePostPage from '../../components/HomePostPage'
+import { useToast } from '../../contexts/toast'
 
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
+
 const axiosGet = jest.spyOn(require('axios'), 'get')
 
 const searchData = {
@@ -28,7 +34,7 @@ const searchData = {
 const setToast = jest.fn()
 
 beforeEach(() => {
-  useToast.mockReturnValue({ setToast })
+  useToastMock.mockReturnValue({ setToast, toast: {} })
   axiosGet.mockReturnValue({ data: searchData })
 })
 

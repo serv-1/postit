@@ -4,12 +4,18 @@ import userEvent from '@testing-library/user-event'
 import server from '../../mocks/server'
 import { rest } from 'msw'
 import err from '../../utils/constants/errors'
+import { useToast } from '../../contexts/toast'
+
+jest.mock('../../contexts/toast', () => ({
+  useToast: jest.fn(),
+}))
+
+const useToastMock = useToast as jest.MockedFunction<typeof useToast>
 
 const setName = jest.fn()
 const setToast = jest.fn()
-const useToast = jest.spyOn(require('../../contexts/toast'), 'useToast')
 
-beforeEach(() => useToast.mockReturnValue({ setToast }))
+beforeEach(() => useToastMock.mockReturnValue({ setToast, toast: {} }))
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())

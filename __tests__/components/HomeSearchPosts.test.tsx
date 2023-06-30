@@ -98,7 +98,7 @@ it('resets the form states but keep all values after a valid submittion', async 
         onSubmit(Object.fromEntries(new FormData(e.currentTarget)))
       },
     setValue: () => null,
-    formState: { isSubmitted: false, isSubmitSuccessful: true },
+    formState: { isSubmitted: false, isSubmitSuccessful: true, errors: {} },
     register: (name: string) => ({ name }),
     reset,
   })
