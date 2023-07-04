@@ -7,8 +7,8 @@ interface LinkProps extends ComponentPropsWithoutRef<'a'> {
 
 const Link = ({ href, children, ...rest }: LinkProps) => {
   return (
-    <NextLink href={href}>
-      <a {...rest}>{children}</a>
+    <NextLink href={href} {...rest}>
+      {children}
     </NextLink>
   )
 }

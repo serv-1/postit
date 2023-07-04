@@ -66,9 +66,8 @@ const ProfilePostList = (props: ProfilePostListProps) => {
               <Image
                 src={awsUrl + post.image}
                 alt=""
-                layout="fill"
-                objectFit="cover"
-                className="rounded-l-8"
+                fill
+                className="rounded-l-8 object-cover"
               />
             </div>
             <div className="flex flex-row flex-nowrap min-w-0 w-full p-8 justify-between items-center text-fuchsia-600 md:p-16">

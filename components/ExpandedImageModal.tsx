@@ -25,9 +25,8 @@ const ExpandedImageModal = (props: ExpandedImageModalProps) => {
         <Image
           src={awsUrl + props.src}
           alt=""
-          layout="fill"
-          objectFit="cover"
-          className={props.btnImgClass}
+          fill
+          className={classNames('object-cover', props.btnImgClass)}
         />
       </button>
       {isOpen && (
@@ -47,8 +46,8 @@ const ExpandedImageModal = (props: ExpandedImageModalProps) => {
               <Image
                 src={awsUrl + props.src}
                 alt=""
-                layout="fill"
-                objectFit="contain"
+                fill
+                className="object-contain"
               />
             </div>
           </div>

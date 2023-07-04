@@ -85,25 +85,20 @@ const OpenHeaderChatModalButton = ({
         </div>
       )}
       <button
-        className="relative w-full flex flex-row flex-nowrap items-center gap-x-4 p-4 bg-fuchsia-200 rounded-8 hover:bg-fuchsia-300 transition-colors duration-200 group overflow-hidden"
+        className="relative w-full flex flex-row flex-nowrap items-center gap-x-4 pr-4 bg-fuchsia-200 rounded-8 hover:bg-fuchsia-300 transition-colors duration-200 group overflow-hidden h-56"
         onClick={onClick}
         aria-label="Open discussion"
       >
-        <div className="absolute -top-4 -left-[12px] w-64 h-64">
-          <Image
-            src={
-              interlocutor.image
-                ? awsUrl + interlocutor.image
-                : defaultUserImage
-            }
-            alt={interlocutor.name + "'s profile picture"}
-            objectFit="cover"
-            width={64}
-            height={64}
-            className="rounded-full"
-          />
-        </div>
-        <div className="flex-grow text-left ml-56">
+        <Image
+          src={
+            interlocutor.image ? awsUrl + interlocutor.image : defaultUserImage
+          }
+          alt={interlocutor.name + "'s profile picture"}
+          width={64}
+          height={64}
+          className="rounded-r-full w-[52px] h-64 object-cover"
+        />
+        <div className="flex-grow text-left">
           <span className="block text-fuchsia-600">{interlocutor.name}</span>
           <span className="block font-bold">{postName}</span>
         </div>

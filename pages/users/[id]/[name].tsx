@@ -48,9 +48,8 @@ const UserPage = ({ user }: UserPageProps) => {
             <Image
               src={user.image ? awsUrl + user.image : defaultUserImage}
               alt={`${user.name} profile image`}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-full"
+              fill
+              className="rounded-full object-cover"
             />
           </div>
           <h1 className="text-center break-words">{user.name}</h1>

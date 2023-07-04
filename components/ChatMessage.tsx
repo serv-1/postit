@@ -25,16 +25,13 @@ const ChatMessage = (props: ChatMessageProps) => {
       }
       onClick={() => setShowDate(!showDate)}
     >
-      <div className="w-40 h-40">
-        <Image
-          src={image ? awsUrl + image : defaultUserImage}
-          alt={name + "'s profile picture"}
-          objectFit="cover"
-          width={40}
-          height={40}
-          className="rounded-full"
-        />
-      </div>
+      <Image
+        src={image ? awsUrl + image : defaultUserImage}
+        alt={name + "'s profile picture"}
+        width={40}
+        height={40}
+        className="rounded-full w-40 h-40 object-cover"
+      />
       <div
         className={
           'max-w-[calc(100%-48px)] p-8 rounded-8 break-words ' +

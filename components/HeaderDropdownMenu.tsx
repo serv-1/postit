@@ -43,9 +43,8 @@ const HeaderDropdownMenu = () => {
         <Image
           src={image}
           alt="Your profile image"
-          layout="fill"
-          objectFit="cover"
-          className="rounded-full"
+          fill
+          className="rounded-full object-cover"
         />
       }
       popupClassName="z-10 pt-8"

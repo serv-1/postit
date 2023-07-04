@@ -92,9 +92,8 @@ const CreateAPostStep1 = (props: CreateAPostStep1Props) => {
                   <Image
                     src={imageSources[i]}
                     alt=""
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-8"
+                    fill
+                    className="rounded-8 object-cover"
                   />
                 </div>
               )

@@ -78,8 +78,8 @@ const PostPage = ({ post, user, csrfToken }: PostPageProps) => {
           <Image
             src={awsUrl + post.images[0]}
             alt={post.name}
-            layout="fill"
-            objectFit="cover"
+            fill
+            className="object-cover"
             priority
           />
           <div className="absolute top-8 left-8 md:hidden">

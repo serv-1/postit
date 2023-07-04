@@ -34,10 +34,9 @@ const Post = ({ id, name, price, image, address }: PostProps) => {
       <Image
         src={awsUrl + image}
         alt={name}
-        layout="responsive"
         width="328"
         height="328"
-        className="rounded-8 object-cover z-[-1]"
+        className="rounded-8 z-[-1] aspect-square object-cover"
       />
       <figcaption className="px-8 py-4 text-center">
         <Link

@@ -30,7 +30,7 @@ const PostAddressModal = ({ latLon, setLatLon }: PostAddressModalProps) => {
         <Image
           src="https://maps.locationiq.com/v3/staticmap?key=pk.956a05610e523c7773a4307bbd557cf4&center=37.777,-122.42&zoom=10"
           alt=""
-          layout="fill"
+          fill
           className="rounded-8"
         />
         <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-fuchsia-900/[.65] text-fuchsia-50 text-m-2xl md:text-t-xl font-bold rounded-8 [text-shadow:0_0_16px_#701A75] group-hover:bg-fuchsia-900/[.75] transition-colors duration-200">

@@ -83,11 +83,10 @@ const ProfileUserImage = ({ image: img }: ProfileUserImageProps) => {
       >
         <Image
           src={image}
-          layout="fill"
-          objectFit="cover"
+          fill
           alt="Your profile image"
           title="Click to change your profile image"
-          className="rounded-full group-hover:grayscale transition-[filter] duration-200"
+          className="rounded-full group-hover:grayscale transition-[filter] duration-200 object-cover"
         />
         <Plus className="w-[20px] h-[20px] rounded-full bg-fuchsia-50 text-fuchsia-600 absolute bottom-0 right-0 group-hover:bg-fuchsia-900 group-hover:text-fuchsia-50 transition-colors duration-200 md:w-24 md:h-24" />
       </label>
