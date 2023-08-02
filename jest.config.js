@@ -12,6 +12,7 @@ const customJestConfig = {
   moduleNameMapper: {
     '^.+\\.(svg)$': require.resolve('./__mocks__/fileMock.tsx'),
   },
+  modulePathIgnorePatterns: ['<rootDir>/.*/__mocks__'],
   testEnvironment: 'jest-environment-jsdom',
   testPathIgnorePatterns: ['/cypress/'],
   clearMocks: true,

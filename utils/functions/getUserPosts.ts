@@ -3,10 +3,10 @@ import type { LightPost, Post } from 'types/common'
 import env from 'utils/constants/env'
 
 export default async function getUserPosts(
-  postIDs: string[]
+  postIds: string[]
 ): Promise<LightPost[]> {
-  const userPosts = postIDs.map(async (postID) => {
-    const res = await fetch(env.VERCEL_URL + '/api/posts/' + postID, {
+  const userPosts = postIds.map(async (postId) => {
+    const res = await fetch(env.VERCEL_URL + '/api/posts/' + postId, {
       cache: 'no-store',
     })
 

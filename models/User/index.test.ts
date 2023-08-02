@@ -4,23 +4,20 @@
 
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import User, { UserModel } from '../../models/User'
-import Account, { AccountModel } from '../../models/Account'
-import Post, { PostModel } from '../../models/Post'
-import Discussion from '../../models/Discussion'
-import deleteImage from '../../utils/functions/deleteImage'
+import User, { UserDoc } from '.'
+import Account, { AccountModel } from 'models/Account'
+import Post, { PostModel } from 'models/Post'
+import Discussion from 'models/Discussion'
+// @ts-expect-error
+import { mockDeleteImage } from 'utils/functions/deleteImage'
 
-jest.unmock('nanoid')
-
-jest.mock('../../utils/functions/deleteImage', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}))
+jest
+  .unmock('nanoid')
+  .unmock('models/User')
+  .mock('utils/functions/deleteImage')
+  .mock('utils/functions/hashPassword')
 
 describe('User model', () => {
-  const scryptSync = jest.spyOn(require('crypto'), 'scryptSync')
-  const mockDeleteImage = deleteImage as jest.MockedFunction<typeof deleteImage>
-
   const user = {
     name: 'john',
     email: 'john@test.com',
@@ -31,11 +28,11 @@ describe('User model', () => {
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create()
+
     await mongoose.connect(mongoServer.getUri())
   })
 
   beforeEach(async () => {
-    scryptSync.mockImplementation((pw) => Buffer.from(pw as string, 'utf-8'))
     await new User(user).save()
   })
 
@@ -54,7 +51,7 @@ describe('User model', () => {
   it('defines the default values', async () => {
     const savedUser = (await User.findOne({ email: user.email })
       .lean()
-      .exec()) as UserModel
+      .exec()) as UserDoc
 
     expect(savedUser.channelName).toBeTruthy()
     expect(savedUser.hasUnseenMessages).toBe(false)
@@ -63,23 +60,17 @@ describe('User model', () => {
   it("encrypts the user's the password", async () => {
     const savedUser = (await User.findOne({ email: user.email })
       .lean()
-      .exec()) as UserModel
+      .exec()) as UserDoc
 
-    const [salt, hash] = (savedUser.password as string).split(':')
-
-    expect(salt).toBeTruthy()
-    expect(hash).toBeTruthy()
-
-    expect(hash).not.toBe(user.password)
+    expect(savedUser.password).toBe('hashed' + user.password)
   })
 
   it('generates a different channel name for each user', async () => {
     const user2 = { ...user, email: 'john@testing.com' }
     const savedUser2 = await new User(user2).save()
-
     const savedUser1 = (await User.findOne({ email: user.email })
       .lean()
-      .exec()) as UserModel
+      .exec()) as UserDoc
 
     expect(savedUser1.channelName).not.toBe(savedUser2.channelName)
   })
@@ -90,7 +81,7 @@ describe('User model', () => {
       { image: 'john.jpeg' }
     )
       .lean()
-      .exec()) as UserModel
+      .exec()) as UserDoc
 
     await User.deleteOne({ _id: savedUser._id }).lean().exec()
 
@@ -100,8 +91,7 @@ describe('User model', () => {
   it("deletes the user's account", async () => {
     const savedUser = (await User.findOne({ email: user.email })
       .lean()
-      .exec()) as UserModel
-
+      .exec()) as UserDoc
     const account: Omit<AccountModel, '_id'> = {
       type: 'abc',
       provider: 'abc',
@@ -116,7 +106,6 @@ describe('User model', () => {
     }
 
     await new Account(account).save()
-
     await User.deleteOne({ _id: savedUser._id }).lean().exec()
 
     const savedAccount = await Account.findOne({ userId: savedUser._id })
@@ -129,8 +118,7 @@ describe('User model', () => {
   it("deletes the user's posts", async () => {
     const savedUser = (await User.findOne({ email: user.email })
       .lean()
-      .exec()) as UserModel
-
+      .exec()) as UserDoc
     const posts: Omit<PostModel, '_id'>[] = [
       {
         name: 'table',
@@ -158,7 +146,6 @@ describe('User model', () => {
 
     await new Post(posts[0]).save()
     await new Post(posts[1]).save()
-
     await User.deleteOne({ _id: savedUser._id }).lean().exec()
 
     const savedPosts = await Post.find({ userId: savedUser._id }).lean().exec()
@@ -166,18 +153,18 @@ describe('User model', () => {
     expect(savedPosts).toHaveLength(0)
   })
 
-  describe('When a buyer is deleted', () => {
+  describe('When the buyer has deleted its account', () => {
     it('deletes the discussions where the seller has deleted the discussion', async () => {
       const user2 = { ...user, email: 'jane@test.com' }
+
       await new User(user2).save()
 
       const buyer = (await User.findOne({ email: user.email })
         .lean()
-        .exec()) as UserModel
+        .exec()) as UserDoc
       const seller = (await User.findOne({ email: user2.email })
         .lean()
-        .exec()) as UserModel
-
+        .exec()) as UserDoc
       const discussion1 = await new Discussion({
         messages: [{ message: 'yo', userId: buyer._id }],
         postName: 'table',
@@ -201,7 +188,6 @@ describe('User model', () => {
           },
         }
       )
-
       await User.deleteOne({ _id: buyer._id }).lean().exec()
 
       const savedDiscussion1 = await Discussion.findById(discussion1._id)
@@ -218,8 +204,7 @@ describe('User model', () => {
     it('deletes the discussions where the seller has deleted its account', async () => {
       const buyer = (await User.findOne({ email: user.email })
         .lean()
-        .exec()) as UserModel
-
+        .exec()) as UserDoc
       const discussion1 = await new Discussion({
         messages: [{ message: 'yo', userId: buyer._id }],
         postName: 'table',
@@ -248,15 +233,15 @@ describe('User model', () => {
 
     it('deletes its id in the other discussions in which it was', async () => {
       const user2 = { ...user, email: 'jane@test.com' }
+
       await new User(user2).save()
 
       const buyer = (await User.findOne({ email: user.email })
         .lean()
-        .exec()) as UserModel
+        .exec()) as UserDoc
       const seller = (await User.findOne({ email: user2.email })
         .lean()
-        .exec()) as UserModel
-
+        .exec()) as UserDoc
       const discussion1 = await new Discussion({
         messages: [{ message: 'yo', userId: buyer._id }],
         postName: 'table',
@@ -286,18 +271,18 @@ describe('User model', () => {
     })
   })
 
-  describe('When a seller is deleted', () => {
+  describe('When the seller has deleted its account', () => {
     it('deletes the discussions where the buyer has deleted the discussion', async () => {
       const user2 = { ...user, email: 'jane@test.com' }
+
       await new User(user2).save()
 
       const buyer = (await User.findOne({ email: user.email })
         .lean()
-        .exec()) as UserModel
+        .exec()) as UserDoc
       const seller = (await User.findOne({ email: user2.email })
         .lean()
-        .exec()) as UserModel
-
+        .exec()) as UserDoc
       const discussion1 = await new Discussion({
         messages: [{ message: 'yo', userId: buyer._id }],
         postName: 'table',
@@ -321,7 +306,6 @@ describe('User model', () => {
           },
         }
       )
-
       await User.deleteOne({ _id: seller._id }).lean().exec()
 
       const savedDiscussion1 = await Discussion.findById(discussion1._id)
@@ -338,8 +322,7 @@ describe('User model', () => {
     it('deletes the discussions where the buyer has deleted its account', async () => {
       const seller = (await User.findOne({ email: user.email })
         .lean()
-        .exec()) as UserModel
-
+        .exec()) as UserDoc
       const discussion1 = await new Discussion({
         messages: [{ message: 'yo', userId: new mongoose.Types.ObjectId() }],
         postName: 'table',
@@ -368,15 +351,15 @@ describe('User model', () => {
 
     it('deletes its id in the other discussions in which it was', async () => {
       const user2 = { ...user, email: 'jane@test.com' }
+
       await new User(user2).save()
 
       const buyer = (await User.findOne({ email: user.email })
         .lean()
-        .exec()) as UserModel
+        .exec()) as UserDoc
       const seller = (await User.findOne({ email: user2.email })
         .lean()
-        .exec()) as UserModel
-
+        .exec()) as UserDoc
       const discussion1 = await new Discussion({
         messages: [{ message: 'yo', userId: buyer._id }],
         postName: 'table',

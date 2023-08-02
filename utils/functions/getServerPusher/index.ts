@@ -1,9 +1,6 @@
 import Pusher from 'pusher'
-import env from '../constants/env'
+import env from 'utils/constants/env'
 
-/**
- * Return a new instance of Pusher (for the server) or the one that already exist.
- */
 const getServerPusher = () => {
   let pusher: Pusher | null = null
 

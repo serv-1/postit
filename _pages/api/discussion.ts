@@ -8,7 +8,7 @@ import catchError from '../../utils/functions/catchError'
 import dbConnect from '../../utils/functions/dbConnect'
 import getServerPusher from '../../utils/functions/getServerPusher'
 import getSessionAndUser from '../../utils/functions/getSessionAndUser'
-import isCsrfTokenValid from '../../utils/functions/isCsrfTokenValid'
+import isCsrfTokenValid from '../../utils/functions/verifyCsrfTokens'
 import validate from '../../utils/functions/validate'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

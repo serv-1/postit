@@ -7,7 +7,7 @@ import { nanoid } from 'nanoid'
 import err from '../../utils/constants/errors'
 import getSessionAndUser from '../../utils/functions/getSessionAndUser'
 import validate from '../../utils/functions/validate'
-import isCsrfTokenValid from '../../utils/functions/isCsrfTokenValid'
+import isCsrfTokenValid from '../../utils/functions/verifyCsrfTokens'
 import csrfTokenSchema from '../../schemas/csrfTokenSchema'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

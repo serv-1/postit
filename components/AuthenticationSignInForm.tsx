@@ -1,6 +1,6 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import { getProviders, signIn } from 'next-auth/react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from '../contexts/toast'
 import { UnPromise } from '../types/common'

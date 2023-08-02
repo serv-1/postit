@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Post from '../../models/Post'
-import isCsrfTokenValid from '../../utils/functions/isCsrfTokenValid'
+import isCsrfTokenValid from '../../utils/functions/verifyCsrfTokens'
 import dbConnect from '../../utils/functions/dbConnect'
 import err from '../../utils/constants/errors'
 import validate from '../../utils/functions/validate'

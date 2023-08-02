@@ -6,7 +6,7 @@ import Discussion, {
 } from '../../../models/Discussion'
 import csrfTokenSchema from '../../../schemas/csrfTokenSchema'
 import err from '../../../utils/constants/errors'
-import isCsrfTokenValid from '../../../utils/functions/isCsrfTokenValid'
+import isCsrfTokenValid from '../../../utils/functions/verifyCsrfTokens'
 import validate from '../../../utils/functions/validate'
 import dbConnect from '../../../utils/functions/dbConnect'
 import updateDiscussionApiSchema from '../../../schemas/updateDiscussionApiSchema'
