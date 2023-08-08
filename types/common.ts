@@ -1,10 +1,10 @@
 import categories from '../utils/constants/categories'
-import { DiscussionModel, MessageModel } from '../models/Discussion'
-import { PostModel } from '../models/Post'
-import { UserModel } from '../models/User'
+import { DiscussionDoc, MessageDoc } from '../models/Discussion'
+import { PostDoc } from '../models/Post'
+import { UserDoc } from '../models/User'
 
 export interface Post
-  extends Omit<PostModel, '_id' | 'userId' | 'latLon' | 'discussionsIds'> {
+  extends Omit<PostDoc, '_id' | 'userId' | 'latLon' | 'discussionsIds'> {
   id: string
   discussionsIds: string[]
   latLon: [number, number]
@@ -20,7 +20,7 @@ export type LighterPost = Omit<LightPost, 'price' | 'address'>
 
 export interface User
   extends Pick<
-    UserModel,
+    UserDoc,
     'name' | 'email' | 'image' | 'channelName' | 'hasUnseenMessages'
   > {
   id: string
@@ -29,12 +29,12 @@ export interface User
   favPostsIds: string[]
 }
 
-export interface Message extends Omit<MessageModel, 'userId'> {
+export interface Message extends Omit<MessageDoc, 'userId'> {
   userId: string
 }
 
 export interface Discussion
-  extends Pick<DiscussionModel, 'postName' | 'channelName'> {
+  extends Pick<DiscussionDoc, 'postName' | 'channelName'> {
   id: string
   postId?: string
   buyer: { id?: string; name: string; image?: string }
@@ -46,7 +46,7 @@ export type JSONDiscussion = Omit<Discussion, 'messages'> & {
   messages: (Omit<Message, 'createdAt'> & { createdAt: string })[]
 }
 
-export type Categories = typeof categories[0]
+export type Categories = (typeof categories)[0]
 
 export type Entries<O> = {
   [K in keyof O]-?: [K, O[K]]

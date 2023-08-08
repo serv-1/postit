@@ -1,6 +1,6 @@
 import { models, model, Schema, Model, Types } from 'mongoose'
 
-export interface AccountModel {
+export interface AccountDoc {
   _id: Types.ObjectId
   type: string
   provider: string
@@ -17,7 +17,7 @@ export interface AccountModel {
   session_state: string
 }
 
-const accountSchema = new Schema<AccountModel>({
+const accountSchema = new Schema<AccountDoc>({
   type: String,
   provider: String,
   providerAccountId: String,
@@ -33,5 +33,7 @@ const accountSchema = new Schema<AccountModel>({
   session_state: String,
 })
 
-export default (models.Account as Model<AccountModel>) ||
-  model<AccountModel>('Account', accountSchema)
+const Account =
+  (models.Account as Model<AccountDoc>) || model('Account', accountSchema)
+
+export default Account

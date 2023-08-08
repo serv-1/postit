@@ -3,7 +3,7 @@ import { models, model, Schema, Model, Types, Query } from 'mongoose'
 import { nanoid } from 'nanoid'
 import deleteImage from 'utils/functions/deleteImage'
 import Account from 'models/Account'
-import Discussion, { DiscussionModel } from 'models/Discussion'
+import Discussion, { DiscussionDoc } from 'models/Discussion'
 import Post from 'models/Post'
 import hashPassword from 'utils/functions/hashPassword'
 
@@ -14,9 +14,9 @@ export interface UserDoc {
   image?: string
   password?: string
   emailVerified?: Date
-  postsIds: Types.Array<Types.ObjectId>
-  favPostsIds: Types.Array<Types.ObjectId>
-  discussionsIds: Types.Array<Types.ObjectId>
+  postIds: Types.ObjectId[]
+  favPostIds: Types.ObjectId[]
+  discussionIds: Types.ObjectId[]
   channelName: string
   hasUnseenMessages: boolean
 }
@@ -27,9 +27,9 @@ const userSchema = new Schema<UserDoc>({
   image: { type: String },
   password: String,
   emailVerified: Date,
-  postsIds: [Schema.Types.ObjectId],
-  favPostsIds: [Schema.Types.ObjectId],
-  discussionsIds: [Schema.Types.ObjectId],
+  postIds: [Schema.Types.ObjectId],
+  favPostIds: [Schema.Types.ObjectId],
+  discussionIds: [Schema.Types.ObjectId],
   channelName: { type: String, default: () => nanoid() },
   hasUnseenMessages: { type: Boolean, default: false },
 })
@@ -40,7 +40,7 @@ userSchema.pre('save', function (next) {
 })
 
 userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
-  const userId = this.getFilter()._id.toString() as string
+  const userId = this.getFilter()._id.toString()
 
   await Account.deleteOne({ userId }).lean().exec()
 
@@ -50,28 +50,28 @@ userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
     await deleteImage(user.image)
   }
 
-  const postDeletions = user.postsIds.map((postId) => {
+  const postDeletions = user.postIds.map((postId) => {
     return Post.deleteOne({ _id: postId }).lean().exec()
   })
 
   await Promise.all(postDeletions)
 
-  for (const discussionId of user.discussionsIds) {
+  for (const discussionId of user.discussionIds) {
     const { buyerId, sellerId } = (await Discussion.findById(discussionId)
       .lean()
-      .exec()) as DiscussionModel
+      .exec()) as DiscussionDoc
 
     let hasDiscussionBeenUpdated = false
 
     if (buyerId && sellerId) {
       const isBuyer = buyerId?.toString() === userId
-      const { discussionsIds } = (await User.findById(
+      const { discussionIds } = (await User.findById(
         isBuyer ? sellerId : buyerId
       )
         .lean()
         .exec()) as UserDoc
 
-      for (const id of discussionsIds) {
+      for (const id of discussionIds) {
         if (id.toString() === discussionId.toString()) {
           await Discussion.updateOne(
             { _id: discussionId },
