@@ -112,14 +112,14 @@ export async function PUT(request: NextRequest) {
       } else if ('favPostId' in requestBody) {
         let action = '$push'
 
-        for (const favPostId of user.favPostsIds) {
+        for (const favPostId of user.favPostIds) {
           if (favPostId.toString() === requestBody.favPostId) {
             action = '$pull'
             break
           }
         }
 
-        update[action] = { favPostsIds: requestBody.favPostId }
+        update[action] = { favPostIds: requestBody.favPostId }
       } else if ('discussionId' in requestBody) {
         await getServerPusher().trigger(
           'private-' + session.channelName,
@@ -129,7 +129,7 @@ export async function PUT(request: NextRequest) {
 
         let action = '$push'
 
-        for (const discussionId of user.discussionsIds) {
+        for (const discussionId of user.discussionIds) {
           if (discussionId.toString() === requestBody.discussionId) {
             action = '$pull'
             break
@@ -137,7 +137,7 @@ export async function PUT(request: NextRequest) {
         }
 
         update = {
-          [action]: { discussionsIds: requestBody.discussionId },
+          [action]: { discussionIds: requestBody.discussionId },
           hasUnseenMessages: false,
         }
       }

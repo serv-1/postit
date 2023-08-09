@@ -443,7 +443,7 @@ describe('PUT', () => {
 
   test('204 - add favorite post', async () => {
     const session = { id: 'sessId' }
-    const user = { favPostsIds: [] }
+    const user = { favPostIds: [] }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -464,7 +464,7 @@ describe('PUT', () => {
     expect(mockUpdateOneUser).toHaveBeenNthCalledWith(
       1,
       { _id: session.id },
-      { $push: { favPostsIds: favPostId } }
+      { $push: { favPostIds: favPostId } }
     )
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
@@ -473,7 +473,7 @@ describe('PUT', () => {
   test('204 - delete favorite post', async () => {
     const session = { id: 'sessId' }
     const favPostId = new Types.ObjectId()
-    const user = { favPostsIds: [favPostId] }
+    const user = { favPostIds: [favPostId] }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -495,7 +495,7 @@ describe('PUT', () => {
     expect(mockUpdateOneUser).toHaveBeenNthCalledWith(
       1,
       { _id: session.id },
-      { $pull: { favPostsIds: favPostId.toString() } }
+      { $pull: { favPostIds: favPostId.toString() } }
     )
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
@@ -553,7 +553,7 @@ describe('PUT', () => {
 
   test('204 - add discussion', async () => {
     const session = { id: 'sessId', channelName: 'chanName' }
-    const user = { discussionsIds: [] }
+    const user = { discussionIds: [] }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -576,7 +576,7 @@ describe('PUT', () => {
       1,
       { _id: session.id },
       {
-        $push: { discussionsIds: discussionId },
+        $push: { discussionIds: discussionId },
         hasUnseenMessages: false,
       }
     )
@@ -587,7 +587,7 @@ describe('PUT', () => {
   test('204 - delete discussion', async () => {
     const session = { id: 'sessId', channelName: 'chanName' }
     const discussionId = new Types.ObjectId()
-    const user = { discussionsIds: [discussionId] }
+    const user = { discussionIds: [discussionId] }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -611,7 +611,7 @@ describe('PUT', () => {
       1,
       { _id: session.id },
       {
-        $pull: { discussionsIds: discussionId.toString() },
+        $pull: { discussionIds: discussionId.toString() },
         hasUnseenMessages: false,
       }
     )
