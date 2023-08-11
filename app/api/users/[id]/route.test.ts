@@ -48,6 +48,20 @@ describe('GET', () => {
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
+  it('404 - user not found', async () => {
+    mockDbConnect.mockResolvedValue({})
+    mockFindUserById.mockResolvedValue(null)
+
+    const request = new Request('http://-')
+    const params = { params: { id: new Types.ObjectId().toString() } }
+    const response = await GET(request, params)
+    const data = await response.json()
+
+    expect(mockFindUserById).toHaveBeenNthCalledWith(1, params.params.id)
+    expect(response).toHaveProperty('status', 404)
+    expect(data).toEqual({ message: err.USER_NOT_FOUND })
+  })
+
   it('200 - get the user', async () => {
     const user: UserDoc = {
       _id: new Types.ObjectId(),
@@ -69,6 +83,7 @@ describe('GET', () => {
     const response = await GET(request, params)
     const data = await response.json()
 
+    expect(mockFindUserById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 200)
     expect(data).toEqual({
       id: params.params.id,
@@ -108,6 +123,7 @@ describe('GET', () => {
     const response = await GET(request, params)
     const data = await response.json()
 
+    expect(mockFindUserById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 200)
     expect(data).toEqual({
       id: params.params.id,
