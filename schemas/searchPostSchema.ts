@@ -10,27 +10,28 @@ import querySchema from './querySchema'
 
 export interface SearchPostSchema {
   query: string
-  page?: number
-  minPrice?: string
-  maxPrice?: string
-  categories?: Categories[]
-  address?: string
+  page: string | null
+  minPrice: string | null
+  maxPrice: string | null
+  categories: Categories[]
+  address: string | null
 }
 
 const searchPostSchema = object<SearchPostSchema>({
   query: querySchema.required(),
-  page: pageSchema,
-  minPrice: priceSchema.allow('').default(0),
+  page: pageSchema.required().allow(null),
+  minPrice: priceSchema.required().allow(null).default(0),
   maxPrice: Joi.alternatives().conditional('minPrice', {
-    is: '',
-    then: priceSchema.allow(''),
+    is: null,
+    then: priceSchema.required().allow(null),
     otherwise: priceSchema
-      .allow('')
+      .required()
+      .allow(null)
       .min(Joi.ref('minPrice'))
       .messages({ 'number.min': err.MAX_PRICE_MIN }),
   }),
-  categories: categoriesSchema,
-  address: addressSchema.allow(''),
+  categories: categoriesSchema.required(),
+  address: addressSchema.required().allow(null),
 })
 
 export default searchPostSchema
