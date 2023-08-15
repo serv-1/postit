@@ -3,11 +3,11 @@
  */
 
 import { POST } from './route'
+import err from 'utils/constants/errors'
 // @ts-expect-error
 import { mockDbConnect } from 'utils/functions/dbConnect'
 // @ts-expect-error
 import { mockFindOneUser } from 'models/User'
-import err from 'utils/constants/errors'
 
 jest.mock('models/User').mock('utils/functions/dbConnect')
 

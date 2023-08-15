@@ -3,12 +3,12 @@
  */
 
 import { GET } from './route'
+import { NextRequest } from 'next/server'
+import err from 'utils/constants/errors'
 // @ts-expect-error
 import { mockDbConnect } from 'utils/functions/dbConnect'
 // @ts-expect-error
 import { mockAggregate } from 'models/Post'
-import { NextRequest } from 'next/server'
-import err from 'utils/constants/errors'
 
 jest.mock('models/Post').mock('utils/functions/dbConnect')
 

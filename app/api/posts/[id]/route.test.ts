@@ -4,6 +4,8 @@
 
 import err from 'utils/constants/errors'
 import { GET, PUT, DELETE } from './route'
+import { Types } from 'mongoose'
+import { NextRequest } from 'next/server'
 // prettier-ignore
 // @ts-expect-error
 import { PostDoc, mockFindPostById, mockUpdateOnePost, mockDeleteOnePost } from 'models/Post'
@@ -15,8 +17,6 @@ import { mockDbConnect } from 'utils/functions/dbConnect'
 import { mockDeleteImage } from 'utils/functions/deleteImage'
 // @ts-expect-error
 import { mockVerifyCsrfTokens } from 'utils/functions/verifyCsrfTokens'
-import { Types } from 'mongoose'
-import { NextRequest } from 'next/server'
 
 jest
   .mock('models/Post')
