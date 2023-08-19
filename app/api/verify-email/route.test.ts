@@ -12,7 +12,7 @@ import { mockFindOneUser } from 'models/User'
 jest.mock('models/User').mock('utils/functions/dbConnect')
 
 describe('POST', () => {
-  it('422 - invalid json', async () => {
+  test('422 - invalid json', async () => {
     const request = new Request('http://-', {
       method: 'POST',
     })
@@ -24,7 +24,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.DATA_INVALID })
   })
 
-  it('422 - invalid request body', async () => {
+  test('422 - invalid request body', async () => {
     const request = new Request('http://-', {
       method: 'POST',
       body: JSON.stringify({}),
@@ -37,7 +37,7 @@ describe('POST', () => {
     expect(data).toHaveProperty('message')
   })
 
-  it('500 - database connection failed', async () => {
+  test('500 - database connection failed', async () => {
     mockDbConnect.mockRejectedValue({})
 
     const request = new Request('http://-', {
@@ -52,7 +52,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('500 - find user by email failed', async () => {
+  test('500 - find user by email failed', async () => {
     mockDbConnect.mockResolvedValue({})
     mockFindOneUser.mockRejectedValue({})
 
@@ -68,7 +68,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('422 - email unknown', async () => {
+  test('422 - email unknown', async () => {
     mockDbConnect.mockResolvedValue({})
     mockFindOneUser.mockResolvedValue(null)
 
@@ -84,7 +84,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.EMAIL_UNKNOWN })
   })
 
-  it('204 - valid email', async () => {
+  test('204 - valid email', async () => {
     mockDbConnect.mockResolvedValue({})
     mockFindOneUser.mockResolvedValue({})
 

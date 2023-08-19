@@ -4,6 +4,7 @@ import { AddUserSchema } from 'schemas/addUserSchema'
 export const mockSaveUser = jest.fn()
 export const mockUpdateOneUser = jest.fn()
 export const mockFindUserById = jest.fn()
+export const mockFindUserByIdAndUpdate = jest.fn()
 export const mockDeleteOneUser = jest.fn()
 export const mockFindOneUser = jest.fn()
 
@@ -27,6 +28,14 @@ export default class User {
   static findById(...args: Parameters<(typeof _User)['findById']>) {
     return {
       lean: () => ({ exec: async () => mockFindUserById(...args) }),
+    }
+  }
+
+  static findByIdAndUpdate(
+    ...args: Parameters<(typeof _User)['findByIdAndUpdate']>
+  ) {
+    return {
+      lean: () => ({ exec: async () => mockFindUserByIdAndUpdate(...args) }),
     }
   }
 

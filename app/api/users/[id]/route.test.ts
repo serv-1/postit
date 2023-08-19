@@ -13,7 +13,7 @@ import { UserDoc, mockFindUserById } from 'models/User'
 jest.mock('models/User').mock('utils/functions/dbConnect')
 
 describe('GET', () => {
-  it('422 - invalid id', async () => {
+  test('422 - invalid id', async () => {
     const request = new Request('http://-')
     const params = { params: { id: 'invalid id' } }
     const response = await GET(request, params)
@@ -23,7 +23,7 @@ describe('GET', () => {
     expect(data).toEqual({ message: err.ID_INVALID })
   })
 
-  it('500 - database connection failed', async () => {
+  test('500 - database connection failed', async () => {
     mockDbConnect.mockRejectedValue({})
 
     const request = new Request('http://-')
@@ -35,7 +35,7 @@ describe('GET', () => {
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('500 - find user by id failed', async () => {
+  test('500 - find user by id failed', async () => {
     mockDbConnect.mockResolvedValue({})
     mockFindUserById.mockRejectedValue({})
 
@@ -48,7 +48,7 @@ describe('GET', () => {
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('404 - user not found', async () => {
+  test('404 - user not found', async () => {
     mockDbConnect.mockResolvedValue({})
     mockFindUserById.mockResolvedValue(null)
 
@@ -62,7 +62,7 @@ describe('GET', () => {
     expect(data).toEqual({ message: err.USER_NOT_FOUND })
   })
 
-  it('200 - get the user', async () => {
+  test('200 - get the user', async () => {
     const user: UserDoc = {
       _id: new Types.ObjectId(),
       name: 'john',
@@ -98,7 +98,7 @@ describe('GET', () => {
     })
   })
 
-  it('200 - get the user with some post ids, favorite post ids and discussion ids', async () => {
+  test('200 - get the user with some post ids, favorite post ids and discussion ids', async () => {
     const user: UserDoc = {
       _id: new Types.ObjectId(),
       name: 'john',

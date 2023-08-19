@@ -75,10 +75,10 @@ export async function POST(request: NextRequest) {
     await getServerPusher().trigger(
       ['private-' + session.channelName, 'private-' + seller.channelName],
       'discussion-created',
-      { discussionId: _id.toString(), userId: session.id }
+      { discussionId: _id, userId: session.id }
     )
 
-    return NextResponse.json({ id: _id.toString() }, { status: 201 })
+    return NextResponse.json({ id: _id }, { status: 201 })
   } catch (e) {
     return NextResponse.json(
       { message: err.INTERNAL_SERVER_ERROR },

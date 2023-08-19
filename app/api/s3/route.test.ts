@@ -18,7 +18,7 @@ jest
   .mock('@aws-sdk/s3-presigned-post')
 
 describe('GET', () => {
-  it('401 - unauthorized', async () => {
+  test('401 - unauthorized', async () => {
     mockGetServerSession.mockResolvedValue(null)
 
     const request = new NextRequest('http://-')
@@ -29,7 +29,7 @@ describe('GET', () => {
     expect(data).toEqual({ message: err.UNAUTHORIZED })
   })
 
-  it("422 - invalid search params' csrf token", async () => {
+  test("422 - invalid search params' csrf token", async () => {
     mockGetServerSession.mockResolvedValue({})
 
     const request = new NextRequest('http://-')
@@ -40,7 +40,7 @@ describe('GET', () => {
     expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
   })
 
-  it('422 - invalid csrf token', async () => {
+  test('422 - invalid csrf token', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
@@ -52,7 +52,7 @@ describe('GET', () => {
     expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
   })
 
-  it('500 - create presigned post failed', async () => {
+  test('500 - create presigned post failed', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockCreatePresignedPost.mockRejectedValue({})
@@ -65,7 +65,7 @@ describe('GET', () => {
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('200 - get the needed data to add something to s3 bucket', async () => {
+  test('200 - get the needed data to add something to s3 bucket', async () => {
     const s3Data = { url: 'url', fields: { test: true } }
 
     mockGetServerSession.mockResolvedValue({})

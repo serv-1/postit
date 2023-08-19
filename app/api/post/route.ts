@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }).save()
 
     return NextResponse.json(
-      { id: post._id.toString() },
+      { id: post._id },
       {
         status: 201,
         headers: {

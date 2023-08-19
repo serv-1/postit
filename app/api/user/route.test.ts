@@ -237,7 +237,6 @@ describe('PUT', () => {
     mockUpdateOneUser.mockResolvedValue({})
 
     const name = 'joe'
-
     const request = new NextRequest('http://-', {
       method: 'PUT',
       body: JSON.stringify({ csrfToken: 'token', name }),
@@ -250,6 +249,7 @@ describe('PUT', () => {
       { _id: session.id },
       { name }
     )
+
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
   })
@@ -305,7 +305,6 @@ describe('PUT', () => {
     mockUpdateOneUser.mockResolvedValue({})
 
     const email = 'joe@test.com'
-
     const request = new NextRequest('http://-', {
       method: 'PUT',
       body: JSON.stringify({ csrfToken: 'token', email }),
@@ -318,6 +317,7 @@ describe('PUT', () => {
       { _id: session.id },
       { email }
     )
+
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
   })
@@ -331,7 +331,6 @@ describe('PUT', () => {
     mockUpdateOneUser.mockResolvedValue({})
 
     const password = '0123456789'
-
     const request = new NextRequest('http://-', {
       method: 'PUT',
       body: JSON.stringify({ csrfToken: 'token', password }),
@@ -344,6 +343,7 @@ describe('PUT', () => {
       { _id: session.id },
       { password: 'hashed' + password }
     )
+
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
   })
@@ -380,7 +380,6 @@ describe('PUT', () => {
     mockFindUserById.mockResolvedValue({})
 
     const image = 'new'
-
     const request = new NextRequest('http://-', {
       method: 'PUT',
       body: JSON.stringify({ csrfToken: 'token', image }),
@@ -394,6 +393,7 @@ describe('PUT', () => {
       { _id: session.id },
       { image }
     )
+
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
   })
@@ -452,7 +452,6 @@ describe('PUT', () => {
     mockFindUserById.mockResolvedValue(user)
 
     const favPostId = new Types.ObjectId().toString()
-
     const request = new NextRequest('http://-', {
       method: 'PUT',
       body: JSON.stringify({ csrfToken: 'token', favPostId }),
@@ -466,6 +465,7 @@ describe('PUT', () => {
       { _id: session.id },
       { $push: { favPostIds: favPostId } }
     )
+
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
   })
@@ -497,6 +497,7 @@ describe('PUT', () => {
       { _id: session.id },
       { $pull: { favPostIds: favPostId.toString() } }
     )
+
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
   })
@@ -535,7 +536,6 @@ describe('PUT', () => {
     mockServerPusherTrigger.mockRejectedValue({})
 
     const discussionId = new Types.ObjectId().toString()
-
     const request = new NextRequest('http://-', {
       method: 'PUT',
       body: JSON.stringify({ csrfToken: 'token', discussionId }),
@@ -563,7 +563,6 @@ describe('PUT', () => {
     mockServerPusherTrigger.mockResolvedValue({})
 
     const discussionId = new Types.ObjectId().toString()
-
     const request = new NextRequest('http://-', {
       method: 'PUT',
       body: JSON.stringify({ csrfToken: 'token', discussionId }),
@@ -580,6 +579,7 @@ describe('PUT', () => {
         hasUnseenMessages: false,
       }
     )
+
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
   })
@@ -615,6 +615,7 @@ describe('PUT', () => {
         hasUnseenMessages: false,
       }
     )
+
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
   })

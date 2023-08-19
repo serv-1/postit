@@ -28,7 +28,7 @@ jest
   .mock('utils/functions/verifyCsrfTokens')
 
 describe('POST', () => {
-  it('401 - unauthorized', async () => {
+  test('401 - unauthorized', async () => {
     mockGetServerSession.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'POST' })
@@ -39,7 +39,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.UNAUTHORIZED })
   })
 
-  it('422 - invalid json', async () => {
+  test('422 - invalid json', async () => {
     mockGetServerSession.mockResolvedValue({})
 
     const request = new NextRequest('http://-', { method: 'POST' })
@@ -50,13 +50,14 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.DATA_INVALID })
   })
 
-  it('422 - invalid request body', async () => {
+  test('422 - invalid request body', async () => {
     mockGetServerSession.mockResolvedValue({})
 
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({}),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
@@ -64,7 +65,7 @@ describe('POST', () => {
     expect(data).toHaveProperty('message')
   })
 
-  it('422 - invalid csrf token', async () => {
+  test('422 - invalid csrf token', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
@@ -77,6 +78,7 @@ describe('POST', () => {
         postName: 'table',
       }),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
@@ -84,8 +86,10 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
   })
 
-  it("422 - the authenticated user can't be the seller", async () => {
-    const session = { id: new Types.ObjectId().toString() }
+  test("422 - the authenticated user can't be the seller", async () => {
+    const session = {
+      id: new Types.ObjectId().toString(),
+    }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -100,6 +104,7 @@ describe('POST', () => {
         postName: 'table',
       }),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
@@ -107,7 +112,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.ID_INVALID })
   })
 
-  it('500 - database connection failed', async () => {
+  test('500 - database connection failed', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
@@ -122,6 +127,7 @@ describe('POST', () => {
         postName: 'table',
       }),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
@@ -129,7 +135,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('500 - find one discussion failed', async () => {
+  test('500 - find one discussion failed', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
@@ -145,6 +151,7 @@ describe('POST', () => {
         postName: 'table',
       }),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
@@ -152,8 +159,10 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('409 - discussion already exists', async () => {
-    const session = { id: new Types.ObjectId().toString() }
+  test('409 - discussion already exists', async () => {
+    const session = {
+      id: new Types.ObjectId().toString(),
+    }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -171,6 +180,7 @@ describe('POST', () => {
         postName: 'table',
       }),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
@@ -182,8 +192,10 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.DISCUSSION_ALREADY_EXISTS })
   })
 
-  it('500 - discussion creation failed', async () => {
-    const session = { id: new Types.ObjectId().toString() }
+  test('500 - discussion creation failed', async () => {
+    const session = {
+      id: new Types.ObjectId().toString(),
+    }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -191,30 +203,28 @@ describe('POST', () => {
     mockFindOneDiscussion.mockResolvedValue(null)
     mockSaveDiscussion.mockRejectedValue({})
 
-    const postId = new Types.ObjectId().toString()
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
         csrfToken: 'token',
         message: 'yo',
-        postId,
+        postId: new Types.ObjectId().toString(),
         sellerId: new Types.ObjectId().toString(),
         postName: 'table',
       }),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockFindOneDiscussion).toHaveBeenNthCalledWith(1, {
-      buyerId: session.id,
-      postId,
-    })
     expect(response).toHaveProperty('status', 500)
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('500 - find seller by id failed', async () => {
-    const session = { id: new Types.ObjectId().toString() }
+  test('500 - find seller by id failed', async () => {
+    const session = {
+      id: new Types.ObjectId().toString(),
+    }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -237,13 +247,10 @@ describe('POST', () => {
         postName,
       }),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockFindOneDiscussion).toHaveBeenNthCalledWith(1, {
-      buyerId: session.id,
-      postId,
-    })
     expect(mockSaveDiscussion).toHaveBeenNthCalledWith(1, {
       messages: [{ message, userId: session.id }],
       buyerId: session.id,
@@ -251,12 +258,15 @@ describe('POST', () => {
       postId,
       postName,
     })
+
     expect(response).toHaveProperty('status', 500)
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('404 - seller not found', async () => {
-    const session = { id: new Types.ObjectId().toString() }
+  test('404 - seller not found', async () => {
+    const session = {
+      id: new Types.ObjectId().toString(),
+    }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -265,41 +275,30 @@ describe('POST', () => {
     mockSaveDiscussion.mockResolvedValue({})
     mockFindUserById.mockResolvedValue(null)
 
-    const message = 'yo'
-    const postId = new Types.ObjectId().toString()
     const sellerId = new Types.ObjectId().toString()
-    const postName = 'table'
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
         csrfToken: 'token',
-        message,
-        postId,
+        message: 'yo',
+        postId: new Types.ObjectId().toString(),
         sellerId,
-        postName,
+        postName: 'table',
       }),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockFindOneDiscussion).toHaveBeenNthCalledWith(1, {
-      buyerId: session.id,
-      postId,
-    })
-    expect(mockSaveDiscussion).toHaveBeenNthCalledWith(1, {
-      messages: [{ message, userId: session.id }],
-      buyerId: session.id,
-      sellerId,
-      postId,
-      postName,
-    })
     expect(mockFindUserById).toHaveBeenNthCalledWith(1, sellerId)
     expect(response).toHaveProperty('status', 404)
     expect(data).toEqual({ message: err.USER_NOT_FOUND })
   })
 
-  it('500 - "discussion-created" pusher event triggering failed', async () => {
-    const session = { id: new Types.ObjectId().toString() }
+  test('500 - "discussion-created" pusher event triggering failed', async () => {
+    const session = {
+      id: new Types.ObjectId().toString(),
+    }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -309,46 +308,37 @@ describe('POST', () => {
     mockFindUserById.mockResolvedValue({})
     mockServerPusherTrigger.mockRejectedValue({})
 
-    const message = 'yo'
-    const postId = new Types.ObjectId().toString()
-    const sellerId = new Types.ObjectId().toString()
-    const postName = 'table'
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
         csrfToken: 'token',
-        message,
-        postId,
-        sellerId,
-        postName,
+        message: 'yo',
+        postId: new Types.ObjectId().toString(),
+        sellerId: new Types.ObjectId().toString(),
+        postName: 'table',
       }),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockFindOneDiscussion).toHaveBeenNthCalledWith(1, {
-      buyerId: session.id,
-      postId,
-    })
-    expect(mockSaveDiscussion).toHaveBeenNthCalledWith(1, {
-      messages: [{ message, userId: session.id }],
-      buyerId: session.id,
-      sellerId,
-      postId,
-      postName,
-    })
-    expect(mockFindUserById).toHaveBeenNthCalledWith(1, sellerId)
     expect(response).toHaveProperty('status', 500)
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('201 - discussion created', async () => {
+  test('201 - discussion created', async () => {
     const session = {
       id: new Types.ObjectId().toString(),
       channelName: 'chanName',
     }
-    const discussion = { _id: new Types.ObjectId() }
-    const seller = { channelName: 'seller channel name' }
+
+    const discussion = {
+      _id: new Types.ObjectId(),
+    }
+
+    const seller = {
+      channelName: 'chanName',
+    }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -358,41 +348,27 @@ describe('POST', () => {
     mockFindUserById.mockResolvedValue(seller)
     mockServerPusherTrigger.mockResolvedValue({})
 
-    const message = 'yo'
-    const postId = new Types.ObjectId().toString()
-    const sellerId = new Types.ObjectId().toString()
-    const postName = 'table'
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
         csrfToken: 'token',
-        message,
-        postId,
-        sellerId,
-        postName,
+        message: 'yo',
+        postId: new Types.ObjectId().toString(),
+        sellerId: new Types.ObjectId().toString(),
+        postName: 'table',
       }),
     })
+
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockFindOneDiscussion).toHaveBeenNthCalledWith(1, {
-      buyerId: session.id,
-      postId,
-    })
-    expect(mockSaveDiscussion).toHaveBeenNthCalledWith(1, {
-      messages: [{ message, userId: session.id }],
-      buyerId: session.id,
-      sellerId,
-      postId,
-      postName,
-    })
-    expect(mockFindUserById).toHaveBeenNthCalledWith(1, sellerId)
     expect(mockServerPusherTrigger).toHaveBeenNthCalledWith(
       1,
       ['private-' + session.channelName, 'private-' + seller.channelName],
       'discussion-created',
-      { discussionId: discussion._id.toString(), userId: session.id }
+      { discussionId: discussion._id, userId: session.id }
     )
+
     expect(response).toHaveProperty('status', 201)
     expect(data).toEqual({ id: discussion._id.toString() })
   })

@@ -22,7 +22,7 @@ jest
   .mock('utils/functions/verifyCsrfTokens')
 
 describe('POST', () => {
-  it('401 - Unauthorized', async () => {
+  test('401 - Unauthorized', async () => {
     mockGetServerSession.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', {
@@ -36,7 +36,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.UNAUTHORIZED })
   })
 
-  it('422 - invalid json', async () => {
+  test('422 - invalid json', async () => {
     mockGetServerSession.mockResolvedValue({})
 
     const request = new NextRequest('http://-', {
@@ -50,7 +50,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.DATA_INVALID })
   })
 
-  it('422 - invalid request body', async () => {
+  test('422 - invalid request body', async () => {
     mockGetServerSession.mockResolvedValue({})
 
     const request = new NextRequest('http://-', {
@@ -66,7 +66,7 @@ describe('POST', () => {
     expect(data).toHaveProperty('message')
   })
 
-  it('422 - invalid csrf token', async () => {
+  test('422 - invalid csrf token', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
@@ -91,7 +91,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
   })
 
-  it('500 - database connection failed', async () => {
+  test('500 - database connection failed', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
@@ -117,7 +117,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('500 - post creation failed', async () => {
+  test('500 - post creation failed', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
@@ -144,7 +144,7 @@ describe('POST', () => {
     expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
   })
 
-  it('201 - post creation succeeded', async () => {
+  test('201 - post creation succeeded', async () => {
     const post: PostDoc = {
       _id: new Types.ObjectId(),
       name: 'tâblë',
@@ -158,7 +158,9 @@ describe('POST', () => {
       userId: new Types.ObjectId(),
     }
 
-    const session = { id: post.userId.toString() }
+    const session = {
+      id: post.userId.toString(),
+    }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -192,10 +194,13 @@ describe('POST', () => {
       price: post.price,
       userId: session.id,
     })
+
     expect(response).toHaveProperty('status', 201)
+
     expect(response.headers.get('Location')).toBe(
       `/posts/${post._id.toString()}/table`
     )
+
     expect(data).toEqual({ id: post._id.toString() })
   })
 })

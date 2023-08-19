@@ -4,10 +4,11 @@ import { NextResponse } from 'next/server'
 import err from 'utils/constants/errors'
 import dbConnect from 'utils/functions/dbConnect'
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+interface Params {
+  params: { id: string }
+}
+
+export async function GET(request: Request, { params }: Params) {
   const userId = params.id
 
   if (!isValidObjectId(userId)) {
@@ -23,33 +24,6 @@ export async function GET(
       return NextResponse.json({ message: err.USER_NOT_FOUND }, { status: 404 })
     }
 
-    const postIds: string[] = []
-    const favPostIds: string[] = []
-    const discussionIds: string[] = []
-    const max = Math.max(
-      user.postIds.length,
-      user.favPostIds.length,
-      user.discussionIds.length
-    )
-
-    let i = 0
-
-    while (i < max) {
-      if (user.postIds[i]) {
-        postIds.push(user.postIds[i].toString())
-      }
-
-      if (user.favPostIds[i]) {
-        favPostIds.push(user.favPostIds[i].toString())
-      }
-
-      if (user.discussionIds[i]) {
-        discussionIds.push(user.discussionIds[i].toString())
-      }
-
-      i++
-    }
-
     return NextResponse.json(
       {
         id: userId,
@@ -58,9 +32,9 @@ export async function GET(
         hasUnseenMessages: user.hasUnseenMessages,
         channelName: user.channelName,
         image: user.image,
-        postIds,
-        favPostIds,
-        discussionIds,
+        postIds: user.postIds,
+        favPostIds: user.favPostIds,
+        discussionIds: user.discussionIds,
       },
       { status: 200 }
     )

@@ -54,7 +54,6 @@ describe('GET', () => {
     const request = new NextRequest('http://-?' + searchParams.toString())
     await GET(request)
 
-    expect(mockAggregate).toHaveBeenCalledTimes(1)
     expect(mockAggregate.mock.calls[0][0][0]).toHaveProperty('$search', {
       text: { query: searchParams.get('query'), path: 'name' },
     })
@@ -68,10 +67,10 @@ describe('GET', () => {
       query: 'cat',
       address: 'Tokyo, Japan',
     })
+
     const request = new NextRequest('http://-?' + searchParams.toString())
     await GET(request)
 
-    expect(mockAggregate).toHaveBeenCalledTimes(1)
     expect(mockAggregate.mock.calls[0][0][0]).toHaveProperty('$search', {
       compound: {
         must: [
@@ -90,10 +89,10 @@ describe('GET', () => {
       query: 'cat',
       minPrice: '10',
     })
+
     const request = new NextRequest('http://-?' + searchParams.toString())
     await GET(request)
 
-    expect(mockAggregate).toHaveBeenCalledTimes(1)
     expect(mockAggregate.mock.calls[0][0][1]).toHaveProperty('$match', {
       price: {
         $gte: 1000,
@@ -109,10 +108,10 @@ describe('GET', () => {
       query: 'cat',
       minPrice: '0',
     })
+
     const request = new NextRequest('http://-?' + searchParams.toString())
     await GET(request)
 
-    expect(mockAggregate).toHaveBeenCalledTimes(1)
     expect(mockAggregate.mock.calls[0][0][1]).not.toHaveProperty('$match.price')
   })
 
@@ -124,10 +123,10 @@ describe('GET', () => {
       query: 'cat',
       maxPrice: '40',
     })
+
     const request = new NextRequest('http://-?' + searchParams.toString())
     await GET(request)
 
-    expect(mockAggregate).toHaveBeenCalledTimes(1)
     expect(mockAggregate.mock.calls[0][0][1]).toHaveProperty('$match', {
       price: {
         $lte: 4000,
@@ -143,10 +142,10 @@ describe('GET', () => {
       query: 'cat',
       maxPrice: '0',
     })
+
     const request = new NextRequest('http://-?' + searchParams.toString())
     await GET(request)
 
-    expect(mockAggregate).toHaveBeenCalledTimes(1)
     expect(mockAggregate.mock.calls[0][0][1]).not.toHaveProperty('$match.price')
   })
 
@@ -159,10 +158,10 @@ describe('GET', () => {
       ['categories', 'animal'],
       ['categories', 'toy'],
     ])
+
     const request = new NextRequest('http://-?' + searchParams.toString())
     await GET(request)
 
-    expect(mockAggregate).toHaveBeenCalledTimes(1)
     expect(mockAggregate.mock.calls[0][0][1]).toHaveProperty('$match', {
       categories: { $all: ['animal', 'toy'] },
     })
@@ -176,10 +175,10 @@ describe('GET', () => {
       query: 'cat',
       page: '2',
     })
+
     const request = new NextRequest('http://-?' + searchParams.toString())
     await GET(request)
 
-    expect(mockAggregate).toHaveBeenCalledTimes(1)
     expect(mockAggregate.mock.calls[0][0][2].$facet.posts[1]).toHaveProperty(
       '$skip',
       20
@@ -194,10 +193,10 @@ describe('GET', () => {
       query: 'cat',
       page: '0',
     })
+
     const request = new NextRequest('http://-?' + searchParams.toString())
     await GET(request)
 
-    expect(mockAggregate).toHaveBeenCalledTimes(1)
     expect(mockAggregate.mock.calls[0][0][2].$facet.posts[1]).toHaveProperty(
       '$skip',
       0

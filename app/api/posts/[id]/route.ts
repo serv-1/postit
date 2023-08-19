@@ -10,10 +10,11 @@ import deleteImage from 'utils/functions/deleteImage'
 import validate from 'utils/functions/validate'
 import verifyCsrfTokens from 'utils/functions/verifyCsrfTokens'
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+interface Params {
+  params: { id: string }
+}
+
+export async function GET(request: Request, { params }: Params) {
   const postId = params.id
 
   if (!isValidObjectId(postId)) {
@@ -31,7 +32,7 @@ export async function GET(
 
     return NextResponse.json(
       {
-        id: post._id.toString(),
+        id: post._id,
         name: post.name,
         description: post.description,
         categories: post.categories,
@@ -39,8 +40,8 @@ export async function GET(
         images: post.images,
         address: post.address,
         latLon: post.latLon,
-        discussionIds: post.discussionIds.map((id) => id.toString()),
-        userId: post.userId.toString(),
+        discussionIds: post.discussionIds,
+        userId: post.userId,
       },
       { status: 200 }
     )
@@ -52,10 +53,7 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: Params) {
   const postId = params.id
 
   if (!isValidObjectId(postId)) {
@@ -148,10 +146,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: Params) {
   const postId = params.id
 
   if (!isValidObjectId(postId)) {
