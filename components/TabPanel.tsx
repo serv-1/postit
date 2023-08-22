@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { useTabs } from '../contexts/tabs'
+import { useTabs } from 'contexts/tabs'
 
 type OmittedDivProps = 'role' | 'tabIndex' | 'id' | 'aria-labelledby'
 type DivProps = Omit<React.ComponentPropsWithoutRef<'div'>, OmittedDivProps>

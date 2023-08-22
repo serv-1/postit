@@ -1,8 +1,8 @@
 import Image from 'next/image'
-import addSpacesToNb from '../utils/functions/addSpacesToNb'
-import formatToUrl from '../utils/functions/formatToUrl'
+import addSpacesToNb from 'utils/functions/addSpacesToNb'
+import formatToUrl from 'utils/functions/formatToUrl'
 import Link from './Link'
-import Location from '../public/static/images/location.svg'
+import Location from 'public/static/images/location.svg'
 import Popup from './Popup'
 
 const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'

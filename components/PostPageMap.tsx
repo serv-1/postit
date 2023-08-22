@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import DotButton from './DotButton'
 import Modal from './Modal'
-import X from '../public/static/images/x.svg'
-import ScreenFull from '../public/static/images/screen-full.svg'
+import X from 'public/static/images/x.svg'
+import ScreenFull from 'public/static/images/screen-full.svg'
 import dynamic from 'next/dynamic'
 
 const Map = dynamic(() => import('./Map'), { ssr: false })

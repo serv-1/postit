@@ -61,7 +61,7 @@ export default function PostPage({
           ) : (
             <PostPageFavoriteButton
               postId={post.id}
-              favPostsIds={user?.favPostsIds}
+              favPostIds={user?.favPostIds}
             />
           )}
           <SeeAllPhotosModal sources={post.images} />
@@ -93,8 +93,8 @@ export default function PostPage({
                   sellerId={post.user.id}
                   csrfToken={csrfToken}
                   discussionId={
-                    user?.discussionsIds.filter((id) => {
-                      if (post.discussionsIds.includes(id)) return id
+                    user?.discussionIds.filter((id) => {
+                      if (post.discussionIds.includes(id)) return id
                     })[0]
                   }
                 />

@@ -5,7 +5,7 @@ import ReactSelect, {
 } from 'react-select'
 import { useController, FieldValues, FieldPath } from 'react-hook-form'
 import { StateManagerProps } from 'react-select/dist/declarations/src/useStateManager'
-import { Categories } from '../types/common'
+import { Categories } from 'types/common'
 
 export interface Option {
   label: Categories

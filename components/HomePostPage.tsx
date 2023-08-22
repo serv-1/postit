@@ -1,11 +1,11 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import { useToast } from '../contexts/toast'
-import { LightPost } from '../types/common'
-import getAxiosError from '../utils/functions/getAxiosError'
+import { useToast } from 'contexts/toast'
+import { LightPost } from 'types/common'
+import getAxiosError from 'utils/functions/getAxiosError'
 import PostList from './PostList'
 import Pagination from './Pagination'
-import Blob from '../public/static/images/blob.svg'
+import Blob from 'public/static/images/blob.svg'
 
 interface Response {
   posts: LightPost[]

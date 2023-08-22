@@ -1,31 +1,31 @@
 import axios, { AxiosError } from 'axios'
 import { getCsrfToken } from 'next-auth/react'
 import { useEffect, useState } from 'react'
-import { useToast } from '../contexts/toast'
-import getAxiosError from '../utils/functions/getAxiosError'
+import { useToast } from 'contexts/toast'
+import getAxiosError from 'utils/functions/getAxiosError'
 import DotButton from './DotButton'
-import Heart from '../public/static/images/heart.svg'
-import HeartFill from '../public/static/images/heart-fill.svg'
+import Heart from 'public/static/images/heart.svg'
+import HeartFill from 'public/static/images/heart-fill.svg'
 
 interface PostPageFavoriteButtonProps {
   postId: string
-  favPostsIds?: string[]
+  favPostIds?: string[]
 }
 
 const PostPageFavoriteButton = (props: PostPageFavoriteButtonProps) => {
-  const { postId, favPostsIds } = props
+  const { postId, favPostIds } = props
   const { setToast } = useToast()
   const [isFavPost, setIsFavPost] = useState(false)
 
   useEffect(() => {
-    if (!favPostsIds) return
-    for (const favPostId of favPostsIds) {
+    if (!favPostIds) return
+    for (const favPostId of favPostIds) {
       if (favPostId !== postId) continue
       setIsFavPost(true)
     }
-  }, [postId, favPostsIds])
+  }, [postId, favPostIds])
 
-  const handleFavPost = favPostsIds
+  const handleFavPost = favPostIds
     ? async () => {
         try {
           const csrfToken = await getCsrfToken()

@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { FormEvent, KeyboardEvent, useRef, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
-import err from '../utils/constants/errors'
+import err from 'utils/constants/errors'
 
 const lIQToken = process.env.NEXT_PUBLIC_LOCATION_IQ_TOKEN
 

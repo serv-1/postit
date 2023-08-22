@@ -4,10 +4,9 @@ import { PostDoc } from '../models/Post'
 import { UserDoc } from '../models/User'
 
 export interface Post
-  extends Omit<PostDoc, '_id' | 'userId' | 'latLon' | 'discussionsIds'> {
+  extends Omit<PostDoc, '_id' | 'userId' | 'discussionIds'> {
   id: string
-  discussionsIds: string[]
-  latLon: [number, number]
+  discussionIds: string[]
   userId: string
 }
 
@@ -24,9 +23,9 @@ export interface User
     'name' | 'email' | 'image' | 'channelName' | 'hasUnseenMessages'
   > {
   id: string
-  discussionsIds: string[]
-  postsIds: string[]
-  favPostsIds: string[]
+  discussionIds: string[]
+  postIds: string[]
+  favPostIds: string[]
 }
 
 export interface Message extends Omit<MessageDoc, 'userId'> {

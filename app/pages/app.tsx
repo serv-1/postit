@@ -16,20 +16,8 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <ToastProvider>
-        <div
-          className={
-            'relative mx-16 grid min-h-screen grid-rows-[auto_1fr_auto]'
-          }
-        >
-          <Toast />
-          {children.needAuth ? <AuthGuard>{children}</AuthGuard> : children}
-          <footer className="text-s p-8">
-            <p>
-              Copyright © {new Date().getFullYear()} PostIt. All rights
-              reserved.
-            </p>
-          </footer>
-        </div>
+        <Toast />
+        {children.needAuth ? <AuthGuard>{children}</AuthGuard> : children}
       </ToastProvider>
     </SessionProvider>
   )

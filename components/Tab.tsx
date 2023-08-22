@@ -1,4 +1,4 @@
-import { useTabs } from '../contexts/tabs'
+import { useTabs } from 'contexts/tabs'
 
 interface TabProps {
   value: string

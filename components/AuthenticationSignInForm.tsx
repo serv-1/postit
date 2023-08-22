@@ -2,14 +2,14 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import { getProviders, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { useToast } from '../contexts/toast'
-import { UnPromise } from '../types/common'
+import { useToast } from 'contexts/toast'
+import { UnPromise } from 'types/common'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
 import PasswordInput from './PasswordInput'
 import Button from './Button'
-import signInSchema, { SignInSchema } from '../schemas/signInSchema'
+import signInSchema, { SignInSchema } from 'schemas/signInSchema'
 
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 

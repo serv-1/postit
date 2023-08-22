@@ -3,13 +3,13 @@ import ChatSendBar, {
   WithoutDiscussionId,
 } from './ChatSendBar'
 import Modal from './Modal'
-import X from '../public/static/images/x.svg'
+import X from 'public/static/images/x.svg'
 import { useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import getClientPusher from '../utils/functions/getClientPusher'
+import getClientPusher from 'utils/functions/getClientPusher'
 import ChatMessageList from './ChatMessageList'
 import { Session } from 'next-auth'
-import { DiscussionEventData } from '../types/common'
+import { DiscussionEventData } from 'types/common'
 
 export type ChatModalProps = ChatSendBarProps & {
   isOpen: boolean

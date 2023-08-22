@@ -1,6 +1,6 @@
 import Modal from './Modal'
-import X from '../public/static/images/x.svg'
-import Camera from '../public/static/images/camera.svg'
+import X from 'public/static/images/x.svg'
+import Camera from 'public/static/images/camera.svg'
 import { useState } from 'react'
 import ExpandedImageModal from './ExpandedImageModal'
 import DotButton from './DotButton'

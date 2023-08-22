@@ -2,12 +2,12 @@ import axios from 'axios'
 import { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
-import { useToast } from '../contexts/toast'
-import { Discussion, Message, JSONDiscussion, UnArray } from '../types/common'
-import getAxiosError from '../utils/functions/getAxiosError'
-import getClientPusher from '../utils/functions/getClientPusher'
+import { useToast } from 'contexts/toast'
+import { Discussion, Message, JSONDiscussion, UnArray } from 'types/common'
+import getAxiosError from 'utils/functions/getAxiosError'
+import getClientPusher from 'utils/functions/getClientPusher'
 import ChatMessage from './ChatMessage'
-import styles from '../styles/chatScrollbar.module.css'
+import styles from 'styles/chatScrollbar.module.css'
 
 interface DiscussionDataState {
   channelName: string

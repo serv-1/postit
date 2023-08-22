@@ -1,17 +1,17 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import axios, { AxiosError } from 'axios'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { useToast } from '../contexts/toast'
+import { useToast } from 'contexts/toast'
 import updateUserEmailSchema, {
   UpdateUserEmailSchema,
-} from '../schemas/updateUserEmailSchema'
+} from 'schemas/updateUserEmailSchema'
 import updateUserNameSchema, {
   UpdateUserNameSchema,
-} from '../schemas/updateUserNameSchema'
+} from 'schemas/updateUserNameSchema'
 import updateUserPwSchema, {
   UpdateUserPwSchema,
-} from '../schemas/updateUserPwSchema'
-import getAxiosError from '../utils/functions/getAxiosError'
+} from 'schemas/updateUserPwSchema'
+import getAxiosError from 'utils/functions/getAxiosError'
 import Button from './Button'
 import Form from './Form'
 import Input from './Input'

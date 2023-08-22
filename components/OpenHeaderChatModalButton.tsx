@@ -1,11 +1,11 @@
 import axios from 'axios'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { useToast } from '../contexts/toast'
-import ChevronRight from '../public/static/images/chevron-right.svg'
-import X from '../public/static/images/x.svg'
-import { User } from '../types/common'
-import getAxiosError from '../utils/functions/getAxiosError'
+import { useToast } from 'contexts/toast'
+import ChevronRight from 'public/static/images/chevron-right.svg'
+import X from 'public/static/images/x.svg'
+import { User } from 'types/common'
+import getAxiosError from 'utils/functions/getAxiosError'
 
 const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
 const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE as string
@@ -44,7 +44,7 @@ const OpenHeaderChatModalButton = ({
           const url = '/api/users/' + interlocutor.id
           const { data } = await axios.get<User>(url)
 
-          if (!data.discussionsIds.includes(discussionId)) {
+          if (!data.discussionIds.includes(discussionId)) {
             hasToDelete = true
           }
         }

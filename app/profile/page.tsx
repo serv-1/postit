@@ -18,8 +18,8 @@ export default async function Page() {
   }
 
   const user = await getUser(session.id)
-  const posts = await getPosts(user.postsIds)
-  const favPosts = await getUserFavoritePosts(user.favPostsIds)
+  const posts = await getPosts(user.postIds)
+  const favPosts = await getUserFavoritePosts(user.favPostIds)
   const csrfToken = await getCsrfToken()
 
   return <Profile user={{ ...user, posts, favPosts }} csrfToken={csrfToken} />

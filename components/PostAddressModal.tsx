@@ -2,7 +2,7 @@ import Image from 'next/image'
 import MapInput from './MapInput'
 import Modal from './Modal'
 import DotButton from './DotButton'
-import X from '../public/static/images/x.svg'
+import X from 'public/static/images/x.svg'
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
 

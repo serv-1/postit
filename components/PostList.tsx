@@ -1,4 +1,4 @@
-import { LightPost } from '../types/common'
+import { LightPost } from 'types/common'
 import Post from './Post'
 
 interface PostListProps {

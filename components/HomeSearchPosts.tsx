@@ -1,14 +1,14 @@
 import Form from './Form'
 import Input from './Input'
 import Select from './Select'
-import categories from '../utils/constants/categories'
+import categories from 'utils/constants/categories'
 import InputError from './InputError'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { useEffect } from 'react'
-import { Categories } from '../types/common'
+import { Categories } from 'types/common'
 import Button from './Button'
-import searchPostSchema, { SearchPostSchema } from '../schemas/searchPostSchema'
+import searchPostSchema, { SearchPostSchema } from 'schemas/searchPostSchema'
 import Popup from './Popup'
 
 const options = categories.map((category) => ({
@@ -54,9 +54,9 @@ const HomeSearchPosts = () => {
 
     if (query) methods.setValue('query', query)
     methods.setValue('categories', categories)
-    methods.setValue('minPrice', queryString.get('minPrice') || undefined)
-    methods.setValue('maxPrice', queryString.get('maxPrice') || undefined)
-    methods.setValue('address', queryString.get('address') || undefined)
+    methods.setValue('minPrice', queryString.get('minPrice'))
+    methods.setValue('maxPrice', queryString.get('maxPrice'))
+    methods.setValue('address', queryString.get('address'))
   }, [methods])
 
   useEffect(() => {

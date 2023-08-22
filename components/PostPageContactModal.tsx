@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useToast } from '../contexts/toast'
+import { useToast } from 'contexts/toast'
 import Button from './Button'
-import ChatFill from '../public/static/images/chat-fill.svg'
+import ChatFill from 'public/static/images/chat-fill.svg'
 import { useSession } from 'next-auth/react'
 import dynamic from 'next/dynamic'
 

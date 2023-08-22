@@ -1,9 +1,9 @@
 import axios, { AxiosError } from 'axios'
 import { getCsrfToken, signOut } from 'next-auth/react'
-import { useToast } from '../contexts/toast'
-import getAxiosError from '../utils/functions/getAxiosError'
+import { useToast } from 'contexts/toast'
+import getAxiosError from 'utils/functions/getAxiosError'
 import Modal from './Modal'
-import X from '../public/static/images/x.svg'
+import X from 'public/static/images/x.svg'
 import { useState } from 'react'
 import Button from './Button'
 

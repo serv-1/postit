@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Modal from './Modal'
-import X from '../public/static/images/x.svg'
+import X from 'public/static/images/x.svg'
 import { useState } from 'react'
 import classNames from 'classnames'
 

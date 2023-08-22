@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from 'react'
 import { FieldPath } from 'react-hook-form'
-import Eye from '../public/static/images/eye-fill.svg'
-import EyeSlash from '../public/static/images/eye-slash-fill.svg'
+import Eye from 'public/static/images/eye-fill.svg'
+import EyeSlash from 'public/static/images/eye-slash-fill.svg'
 import Input from './Input'
 
 interface PasswordInputProps {

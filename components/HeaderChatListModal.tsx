@@ -2,15 +2,15 @@ import axios from 'axios'
 import { Session } from 'next-auth'
 import { getCsrfToken, useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
-import { useToast } from '../contexts/toast'
-import CommentDiscussion from '../public/static/images/comment-discussion.svg'
-import X from '../public/static/images/x.svg'
-import { DiscussionEventData, User } from '../types/common'
-import getAxiosError from '../utils/functions/getAxiosError'
+import { useToast } from 'contexts/toast'
+import CommentDiscussion from 'public/static/images/comment-discussion.svg'
+import X from 'public/static/images/x.svg'
+import { DiscussionEventData, User } from 'types/common'
+import getAxiosError from 'utils/functions/getAxiosError'
 import Modal from './Modal'
 import HeaderChatModal from './HeaderChatModal'
-import getClientPusher from '../utils/functions/getClientPusher'
-import styles from '../styles/chatScrollbar.module.css'
+import getClientPusher from 'utils/functions/getClientPusher'
+import styles from 'styles/chatScrollbar.module.css'
 
 const HeaderChatListModal = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -28,7 +28,7 @@ const HeaderChatListModal = () => {
       try {
         const { data } = await axios.get<User>('/api/users/' + session.id)
 
-        setDiscussionsIds(data.discussionsIds)
+        setDiscussionsIds(data.discussionIds)
         setHasUnseenMessages(data.hasUnseenMessages)
         setCsrfToken(await getCsrfToken())
       } catch (e) {

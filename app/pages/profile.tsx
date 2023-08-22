@@ -20,7 +20,7 @@ export default function Profile({
   user,
   csrfToken,
 }: {
-  user: Omit<User, 'postsIds' | 'favPostsIds'> & {
+  user: Omit<User, 'postIds' | 'favPostIds'> & {
     posts: Post[]
     favPosts: Omit<LightPost, 'price' | 'address'>[]
   }

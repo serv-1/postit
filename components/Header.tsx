@@ -1,7 +1,7 @@
 import { signIn, useSession } from 'next-auth/react'
 import HeaderDropdownMenu from './HeaderDropdownMenu'
 import Link from './Link'
-import PlusCircle from '../public/static/images/plus-circle.svg'
+import PlusCircle from 'public/static/images/plus-circle.svg'
 import dynamic from 'next/dynamic'
 
 const HeaderChatListModal = dynamic(() => import('./HeaderChatListModal'), {

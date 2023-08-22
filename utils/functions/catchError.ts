@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import err from '../constants/errors'
+import err from 'utils/constants/errors'
 
 const catchError = (
   handler: (

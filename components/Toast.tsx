@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { useEffect } from 'react'
-import { useToast } from '../contexts/toast'
-import X from '../public/static/images/x.svg'
+import { useToast } from 'contexts/toast'
+import X from 'public/static/images/x.svg'
 
 const Toast = () => {
   const { toast, setToast } = useToast()

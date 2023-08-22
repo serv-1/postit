@@ -1,6 +1,6 @@
 import { NextApiRequest } from 'next'
 import { getSession } from 'next-auth/react'
-import User from '../../models/User'
+import User from 'models/User'
 
 /**
  * Return the session and the signed in user or nothing if one is undefined.

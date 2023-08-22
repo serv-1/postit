@@ -12,7 +12,7 @@ const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE as string
 export default function PublicProfile({
   user,
 }: {
-  user: Omit<User, 'postsIds'> & { posts: Post[] }
+  user: Omit<User, 'postIds'> & { posts: Post[] }
 }) {
   return (
     <>

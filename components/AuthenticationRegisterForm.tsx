@@ -3,15 +3,15 @@ import axios, { AxiosError } from 'axios'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { useToast } from '../contexts/toast'
-import getAxiosError from '../utils/functions/getAxiosError'
+import { useToast } from 'contexts/toast'
+import getAxiosError from 'utils/functions/getAxiosError'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
 import PasswordStrength from './PasswordStrength'
 import PasswordInput from './PasswordInput'
 import Button from './Button'
-import addUserSchema, { AddUserSchema } from '../schemas/addUserSchema'
+import addUserSchema, { AddUserSchema } from 'schemas/addUserSchema'
 
 const AuthenticationRegisterForm = () => {
   const methods = useForm<AddUserSchema>({

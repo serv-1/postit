@@ -18,7 +18,19 @@ export default async function RootLayout({
   return (
     <html lang="en" className={quicksand.className}>
       <body>
-        <App session={session}>{children}</App>
+        <div
+          className={
+            'relative mx-16 grid min-h-screen grid-rows-[auto_1fr_auto]'
+          }
+        >
+          <App session={session}>{children}</App>
+          <footer className="text-s p-8">
+            <p>
+              Copyright © {new Date().getFullYear()} PostIt. All rights
+              reserved.
+            </p>
+          </footer>
+        </div>
       </body>
     </html>
   )

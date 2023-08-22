@@ -2,13 +2,13 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import axios, { AxiosError } from 'axios'
 import { signIn } from 'next-auth/react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import getAxiosError from '../utils/functions/getAxiosError'
+import getAxiosError from 'utils/functions/getAxiosError'
 import Form from './Form'
 import Input from './Input'
 import InputError from './InputError'
-import { useToast } from '../contexts/toast'
+import { useToast } from 'contexts/toast'
 import Button from './Button'
-import forgotPwSchema, { ForgotPwSchema } from '../schemas/forgotPwSchema'
+import forgotPwSchema, { ForgotPwSchema } from 'schemas/forgotPwSchema'
 
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 

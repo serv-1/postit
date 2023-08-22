@@ -1,5 +1,5 @@
 import Button from './Button'
-import '../node_modules/leaflet/dist/leaflet.css'
+import 'node_modules/leaflet/dist/leaflet.css'
 import PostAddressModal from './PostAddressModal'
 import { useWatch } from 'react-hook-form'
 

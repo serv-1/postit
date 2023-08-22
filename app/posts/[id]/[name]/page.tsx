@@ -26,7 +26,7 @@ export default async function Page({ params }: { params: Params }) {
   const post = await getPost(params.id)
   const postUser = await getUser(post.userId)
   const posts = await getUserPosts(
-    postUser.postsIds.filter((postID) => postID !== params.id)
+    postUser.postIds.filter((postId) => postId !== params.id)
   )
   const session = await getSession()
   const user = session ? await getUser(session.id) : undefined

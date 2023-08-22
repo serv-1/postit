@@ -1,10 +1,10 @@
 import Image from 'next/image'
 import { useState } from 'react'
 import { ChangeHandler } from 'react-hook-form'
-import PlusCircle from '../public/static/images/plus-circle.svg'
-import err from '../utils/constants/errors'
-import isImage from '../utils/functions/isImage'
-import isImageTooBig from '../utils/functions/isImageTooBig'
+import PlusCircle from 'public/static/images/plus-circle.svg'
+import err from 'utils/constants/errors'
+import isImage from 'utils/functions/isImage'
+import isImageTooBig from 'utils/functions/isImageTooBig'
 import Button from './Button'
 
 interface CreateAPostStep1Props {

@@ -1,6 +1,6 @@
 // This approach is taken from https://github.com/vercel/next.js/tree/canary/examples/with-mongodb
 import { MongoClient } from 'mongodb'
-import env from '../utils/constants/env'
+import env from 'utils/constants/env'
 
 let client: MongoClient
 let clientPromise: Promise<MongoClient>

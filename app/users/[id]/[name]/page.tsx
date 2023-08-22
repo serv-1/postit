@@ -22,7 +22,7 @@ export async function generateMetadata({
 
 export default async function Page({ params }: { params: Params }) {
   const user = await getUser(params.id)
-  const posts = await getPosts(user.postsIds)
+  const posts = await getPosts(user.postIds)
 
   return <PublicProfile user={{ ...user, posts }} />
 }

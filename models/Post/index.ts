@@ -22,7 +22,7 @@ export interface PostDoc {
   images: string[]
   userId: Types.ObjectId
   address: string
-  latLon: number[]
+  latLon: [number, number]
   discussionIds: Types.ObjectId[]
 }
 

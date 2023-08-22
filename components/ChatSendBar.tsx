@@ -1,13 +1,13 @@
 import Form from './Form'
-import PaperAirPlane from '../public/static/images/paper-airplane.svg'
+import PaperAirPlane from 'public/static/images/paper-airplane.svg'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import updateDiscussionSchema, {
   UpdateDiscussionSchema,
-} from '../schemas/updateDiscussionSchema'
+} from 'schemas/updateDiscussionSchema'
 import { useEffect } from 'react'
-import { useToast } from '../contexts/toast'
-import getAxiosError from '../utils/functions/getAxiosError'
+import { useToast } from 'contexts/toast'
+import getAxiosError from 'utils/functions/getAxiosError'
 import axios from 'axios'
 
 interface WithDiscussionId {
