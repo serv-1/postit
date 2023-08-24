@@ -1,0 +1,101 @@
+import { Discussion, JSONDiscussion } from 'types/common'
+import { useEffect, useRef, useState } from 'react'
+import getAxiosError from 'utils/functions/getAxiosError'
+import { useToast } from 'contexts/toast'
+import axios from 'axios'
+import { useSession } from 'next-auth/react'
+import { Session } from 'next-auth'
+import getClientPusher from 'utils/functions/getClientPusher'
+import OpenHeaderChatModalButton from 'components/OpenHeaderChatModalButton'
+import ChatModal from 'components/ChatModal'
+
+interface DiscussionDataState {
+  buyer: Discussion['buyer']
+  seller: Discussion['seller']
+  postName: string
+  channelName: string
+}
+
+interface HeaderChatModalProps {
+  csrfToken?: string
+  discussionId: string
+}
+
+export default function HeaderChatModal({
+  csrfToken,
+  discussionId,
+}: HeaderChatModalProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [discussionData, setDiscussionData] = useState<DiscussionDataState>()
+  const [hasUnseenMessages, setHasUnseenMessages] = useState(false)
+
+  const { setToast } = useToast()
+  const { data } = useSession() as { data: Session }
+  const userId = data.id
+
+  const pusher = useRef(getClientPusher())
+
+  useEffect(() => {
+    const getDiscussion = async () => {
+      try {
+        const url = `/api/discussions/${discussionId}?csrfToken=${csrfToken}`
+        const { data } = await axios.get<JSONDiscussion>(url)
+
+        const { messages, channelName, buyer, seller, postName } = data
+        const lastMsg = messages[messages.length - 1]
+
+        setDiscussionData({ buyer, seller, postName, channelName })
+        setHasUnseenMessages(userId !== lastMsg.userId && !lastMsg.seen)
+      } catch (e) {
+        const { message } = getAxiosError(e)
+        setToast({ message, error: true })
+      }
+    }
+    getDiscussion()
+  }, [csrfToken, discussionId, setToast, userId])
+
+  useEffect(() => {
+    if (!discussionData?.channelName) return
+
+    const newMessageHandler = () => {
+      if (isOpen) return
+      setHasUnseenMessages(true)
+    }
+
+    const p = pusher.current
+    const channelName = 'private-encrypted-' + discussionData.channelName
+    const channel = p.subscribe(channelName)
+
+    channel.bind('new-message', newMessageHandler)
+
+    return () => {
+      channel.unbind('new-message', newMessageHandler)
+    }
+  }, [isOpen, discussionData?.channelName])
+
+  if (!discussionData) return null
+
+  const { buyer, seller, postName } = discussionData
+
+  return (
+    <div className="mb-8 last:mb-0">
+      <OpenHeaderChatModalButton
+        hasUnseenMessages={hasUnseenMessages}
+        interlocutor={userId === buyer.id ? seller : buyer}
+        postName={postName}
+        csrfToken={csrfToken}
+        discussionId={discussionId}
+        onClick={() => {
+          setIsOpen(true)
+          setHasUnseenMessages(false)
+        }}
+      />
+      <ChatModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        csrfToken={csrfToken}
+        discussionId={discussionId}
+      />
+    </div>
+  )
+}
