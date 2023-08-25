@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import addSpacesToNb from 'utils/functions/addSpacesToNb'
+import addSpacesToNum from 'utils/functions/addSpacesToNum'
 import formatToUrl from 'utils/functions/formatToUrl'
 import Link from 'next/link'
 import Location from 'public/static/images/location.svg'
@@ -45,7 +45,7 @@ export default function Post({ id, name, price, image, address }: PostProps) {
         >
           <span className="truncate">{name}</span>
           <span>&nbsp;-&nbsp;</span>
-          <span>{addSpacesToNb(price)}€</span>
+          <span>{addSpacesToNum(price)}€</span>
         </Link>
       </figcaption>
     </figure>

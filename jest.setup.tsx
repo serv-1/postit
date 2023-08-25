@@ -7,10 +7,6 @@ jest
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
   }))
-  .mock('utils/functions/hashPassword', () => ({
-    __esModule: true,
-    default: (password: string) => 'hashed' + password,
-  }))
 
 export default async function _loadEnvConfig() {
   loadEnvConfig(process.cwd())

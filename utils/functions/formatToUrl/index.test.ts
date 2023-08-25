@@ -1,7 +1,5 @@
-import formatToUrl from 'utils/functions/formatToUrl'
+import formatToUrl from '.'
 
 it('returns the string formatted', () => {
-  const result = formatToUrl('yès, of çôursë!')
-
-  expect(result).toBe('yes-of-course')
+  expect(formatToUrl('yès, of çôursë!')).toBe('yes-of-course')
 })

@@ -1,5 +1,5 @@
-import err from '../../utils/constants/errors'
-import getAxiosError from '../../utils/functions/getAxiosError'
+import err from 'utils/constants/errors'
+import getAxiosError from '.'
 
 it('returns the NO_RESPONSE error message if there is no response', () => {
   const e = {
@@ -10,9 +10,7 @@ it('returns the NO_RESPONSE error message if there is no response', () => {
     message: 'error message',
   }
 
-  const result = getAxiosError(e)
-
-  expect(result).toEqual({ message: err.NO_RESPONSE })
+  expect(getAxiosError(e)).toEqual({ message: err.NO_RESPONSE })
 })
 
 it("returns the error's name and message with the response status code", () => {
@@ -31,9 +29,7 @@ it("returns the error's name and message with the response status code", () => {
     },
   }
 
-  const result = getAxiosError(e)
-
-  expect(result).toEqual({
+  expect(getAxiosError(e)).toEqual({
     name: 'name',
     message: err.NAME_INVALID,
     status: 422,
@@ -56,7 +52,5 @@ it("only returns the error's message and the response status code", () => {
     },
   }
 
-  const result = getAxiosError(e)
-
-  expect(result).toEqual({ message: err.USER_NOT_FOUND, status: 404 })
+  expect(getAxiosError(e)).toEqual({ message: err.USER_NOT_FOUND, status: 404 })
 })

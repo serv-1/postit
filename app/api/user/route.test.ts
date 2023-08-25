@@ -28,6 +28,7 @@ jest
   .mock('utils/functions/verifyCsrfTokens')
   .mock('utils/functions/deleteImage')
   .mock('utils/functions/getServerPusher')
+  .mock('utils/functions/hashPassword')
 
 describe('POST', () => {
   test('422 - invalid json', async () => {

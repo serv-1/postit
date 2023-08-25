@@ -1,13 +1,11 @@
 import Joi from 'joi'
-import validate from '../../utils/functions/validate'
+import validate from '.'
 
 it('only returns the validated value if there is no error', () => {
   const schema = Joi.object({ a: Joi.string() })
   const value = { a: 'a' }
 
-  const result = validate(schema, value)
-
-  expect(result).toEqual({ value })
+  expect(validate(schema, value)).toEqual({ value })
 })
 
 it('returns the validated value with the error name and message', () => {
