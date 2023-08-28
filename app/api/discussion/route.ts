@@ -31,9 +31,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: result.message }, { status: 422 })
   }
 
-  const { csrfToken, sellerId, postId, message, postName } = result.value
+  const { sellerId, postId, message, postName } = result.value
 
-  if (!verifyCsrfTokens(request.cookies, csrfToken)) {
+  if (!verifyCsrfTokens(request)) {
     return NextResponse.json(
       { message: err.CSRF_TOKEN_INVALID },
       { status: 422 }

@@ -8,7 +8,6 @@ const VALUE = {
   categories: ['furniture'],
   price: 20,
   address: 'Oslo, Norway',
-  csrfToken: 'csrfToken',
 }
 
 it('passes', () => {

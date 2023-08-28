@@ -87,9 +87,7 @@ describe('POST', () => {
   })
 
   test("422 - the authenticated user can't be the seller", async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -97,7 +95,6 @@ describe('POST', () => {
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
-        csrfToken: 'token',
         message: 'yo',
         postId: new Types.ObjectId().toString(),
         sellerId: session.id,
@@ -120,7 +117,6 @@ describe('POST', () => {
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
-        csrfToken: 'token',
         message: 'yo',
         postId: new Types.ObjectId().toString(),
         sellerId: new Types.ObjectId().toString(),
@@ -144,7 +140,6 @@ describe('POST', () => {
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
-        csrfToken: 'token',
         message: 'yo',
         postId: new Types.ObjectId().toString(),
         sellerId: new Types.ObjectId().toString(),
@@ -160,9 +155,7 @@ describe('POST', () => {
   })
 
   test('409 - discussion already exists', async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -173,7 +166,6 @@ describe('POST', () => {
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
-        csrfToken: 'token',
         message: 'yo',
         postId,
         sellerId: new Types.ObjectId().toString(),
@@ -188,14 +180,13 @@ describe('POST', () => {
       buyerId: session.id,
       postId,
     })
+
     expect(response).toHaveProperty('status', 409)
     expect(data).toEqual({ message: err.DISCUSSION_ALREADY_EXISTS })
   })
 
   test('500 - discussion creation failed', async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -206,7 +197,6 @@ describe('POST', () => {
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
-        csrfToken: 'token',
         message: 'yo',
         postId: new Types.ObjectId().toString(),
         sellerId: new Types.ObjectId().toString(),
@@ -222,9 +212,7 @@ describe('POST', () => {
   })
 
   test('500 - find seller by id failed', async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -239,13 +227,7 @@ describe('POST', () => {
     const postName = 'table'
     const request = new NextRequest('http://-', {
       method: 'POST',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        message,
-        postId,
-        sellerId,
-        postName,
-      }),
+      body: JSON.stringify({ message, postId, sellerId, postName }),
     })
 
     const response = await POST(request)
@@ -264,9 +246,7 @@ describe('POST', () => {
   })
 
   test('404 - seller not found', async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -279,7 +259,6 @@ describe('POST', () => {
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
-        csrfToken: 'token',
         message: 'yo',
         postId: new Types.ObjectId().toString(),
         sellerId,
@@ -296,9 +275,7 @@ describe('POST', () => {
   })
 
   test('500 - "discussion-created" pusher event triggering failed', async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -311,7 +288,6 @@ describe('POST', () => {
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
-        csrfToken: 'token',
         message: 'yo',
         postId: new Types.ObjectId().toString(),
         sellerId: new Types.ObjectId().toString(),
@@ -332,13 +308,8 @@ describe('POST', () => {
       channelName: 'chanName',
     }
 
-    const discussion = {
-      _id: new Types.ObjectId(),
-    }
-
-    const seller = {
-      channelName: 'chanName',
-    }
+    const discussion = { _id: new Types.ObjectId() }
+    const seller = { channelName: 'chanName' }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -351,7 +322,6 @@ describe('POST', () => {
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
-        csrfToken: 'token',
         message: 'yo',
         postId: new Types.ObjectId().toString(),
         sellerId: new Types.ObjectId().toString(),

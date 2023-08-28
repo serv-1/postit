@@ -66,6 +66,13 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
   }
 
+  if (!verifyCsrfTokens(request)) {
+    return NextResponse.json(
+      { message: err.CSRF_TOKEN_INVALID },
+      { status: 422 }
+    )
+  }
+
   let data = null
 
   try {
@@ -80,64 +87,57 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: result.message }, { status: 422 })
   }
 
-  const { csrfToken, ...requestBody } = result.value
-
-  if (!verifyCsrfTokens(request.cookies, csrfToken)) {
-    return NextResponse.json(
-      { message: err.CSRF_TOKEN_INVALID },
-      { status: 422 }
-    )
-  }
-
   let update: UpdateQuery<UserDoc> = {}
 
   try {
     await dbConnect()
 
-    if ('name' in requestBody) {
-      update.name = requestBody.name
-    } else if ('email' in requestBody) {
-      update.email = requestBody.email
-    } else if ('password' in requestBody) {
-      update.password = hashPassword(requestBody.password)
+    data = result.value
+
+    if ('name' in data) {
+      update.name = data.name
+    } else if ('email' in data) {
+      update.email = data.email
+    } else if ('password' in data) {
+      update.password = hashPassword(data.password)
     } else {
       const user = (await User.findById(session.id).lean().exec()) as UserDoc
 
-      if ('image' in requestBody) {
+      if ('image' in data) {
         if (user.image) {
           await deleteImage(user.image)
         }
 
-        update.image = requestBody.image
-      } else if ('favPostId' in requestBody) {
+        update.image = data.image
+      } else if ('favPostId' in data) {
         let action = '$push'
 
         for (const favPostId of user.favPostIds) {
-          if (favPostId.toString() === requestBody.favPostId) {
+          if (favPostId.toString() === data.favPostId) {
             action = '$pull'
             break
           }
         }
 
-        update[action] = { favPostIds: requestBody.favPostId }
-      } else if ('discussionId' in requestBody) {
+        update[action] = { favPostIds: data.favPostId }
+      } else if ('discussionId' in data) {
         await getServerPusher().trigger(
           'private-' + session.channelName,
           'discussion-deleted',
-          requestBody.discussionId
+          data.discussionId
         )
 
         let action = '$push'
 
         for (const discussionId of user.discussionIds) {
-          if (discussionId.toString() === requestBody.discussionId) {
+          if (discussionId.toString() === data.discussionId) {
             action = '$pull'
             break
           }
         }
 
         update = {
-          [action]: { discussionIds: requestBody.discussionId },
+          [action]: { discussionIds: data.discussionId },
           hasUnseenMessages: false,
         }
       }
@@ -165,15 +165,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
   }
 
-  let data: { csrfToken?: string } | null = null
-
-  try {
-    data = await request.json()
-  } catch (e) {
-    return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
-  }
-
-  if (!data?.csrfToken || !verifyCsrfTokens(request.cookies, data.csrfToken)) {
+  if (!verifyCsrfTokens(request)) {
     return NextResponse.json(
       { message: err.CSRF_TOKEN_INVALID },
       { status: 422 }

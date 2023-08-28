@@ -1,5 +1,4 @@
 import categoriesSchema from './categoriesSchema'
-import csrfTokenSchema from './csrfTokenSchema'
 import descriptionSchema from './descriptionSchema'
 import addressSchema from './addressSchema'
 import nameSchema from './nameSchema'
@@ -11,7 +10,6 @@ export const addPost = {
   categories: categoriesSchema.required().min(1),
   price: priceSchema.required().min(1),
   address: addressSchema.required(),
-  csrfToken: csrfTokenSchema,
 }
 
 export const updatePost = {
@@ -20,5 +18,4 @@ export const updatePost = {
   categories: categoriesSchema,
   price: priceSchema.allow('').min(1),
   address: addressSchema.allow(''),
-  csrfToken: csrfTokenSchema,
 }

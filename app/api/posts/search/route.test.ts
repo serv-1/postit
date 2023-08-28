@@ -94,9 +94,7 @@ describe('GET', () => {
     await GET(request)
 
     expect(mockAggregate.mock.calls[0][0][1]).toHaveProperty('$match', {
-      price: {
-        $gte: 1000,
-      },
+      price: { $gte: 1000 },
     })
   })
 
@@ -128,9 +126,7 @@ describe('GET', () => {
     await GET(request)
 
     expect(mockAggregate.mock.calls[0][0][1]).toHaveProperty('$match', {
-      price: {
-        $lte: 4000,
-      },
+      price: { $lte: 4000 },
     })
   })
 

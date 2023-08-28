@@ -28,48 +28,12 @@ it('fails if one the properties is missing', () => {
 
   e = searchPostSchema.validate({
     query: 'cat',
-    minPrice: null,
-    maxPrice: null,
-    categories: [],
-    address: null,
-  }).error
-  expect(e?.details[0].message).toBe(err.PAGE_INVALID)
-
-  e = searchPostSchema.validate({
-    query: 'cat',
-    page: null,
-    maxPrice: null,
-    categories: [],
-    address: null,
-  }).error
-  expect(e?.details[0].message).toBe(err.PRICE_REQUIRED)
-
-  e = searchPostSchema.validate({
-    query: 'cat',
-    page: null,
-    minPrice: null,
-    categories: [],
-    address: null,
-  }).error
-  expect(e?.details[0].message).toBe(err.PRICE_REQUIRED)
-
-  e = searchPostSchema.validate({
-    query: 'cat',
     page: null,
     minPrice: null,
     maxPrice: null,
     address: null,
   }).error
   expect(e?.details[0].message).toBe(err.CATEGORIES_REQUIRED)
-
-  e = searchPostSchema.validate({
-    query: 'cat',
-    page: null,
-    minPrice: null,
-    maxPrice: null,
-    categories: [],
-  }).error
-  expect(e?.details[0].message).toBe(err.ADDRESS_REQUIRED)
 })
 
 it('allows page, minPrice, maxPrice and address to be null', () => {

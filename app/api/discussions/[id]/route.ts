@@ -28,9 +28,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
   }
 
-  const csrfToken = request.nextUrl.searchParams.get('csrfToken')
-
-  if (!csrfToken || !verifyCsrfTokens(request.cookies, csrfToken)) {
+  if (!verifyCsrfTokens(request)) {
     return NextResponse.json(
       { message: err.CSRF_TOKEN_INVALID },
       { status: 422 }
@@ -153,28 +151,28 @@ export async function PUT(request: NextRequest, { params }: Params) {
       )
     }
 
-    let data = null
-
-    try {
-      data = await request.json()
-    } catch (e) {
-      return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
-    }
-
-    const result = validate(updateDiscussionApiSchema, data)
-
-    if ('message' in result) {
-      return NextResponse.json({ message: result.message }, { status: 422 })
-    }
-
-    if (!verifyCsrfTokens(request.cookies, result.value.csrfToken)) {
+    if (!verifyCsrfTokens(request)) {
       return NextResponse.json(
         { message: err.CSRF_TOKEN_INVALID },
         { status: 422 }
       )
     }
 
-    if ('message' in result.value) {
+    if (request.body) {
+      let data = null
+
+      try {
+        data = await request.json()
+      } catch (e) {
+        return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
+      }
+
+      const result = validate(updateDiscussionApiSchema, data)
+
+      if ('message' in result) {
+        return NextResponse.json({ message: result.message }, { status: 422 })
+      }
+
       const userId =
         session.id === buyer._id.toString()
           ? seller._id.toString()
@@ -281,9 +279,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
   }
 
-  const csrfToken = request.nextUrl.searchParams.get('csrfToken')
-
-  if (!csrfToken || !verifyCsrfTokens(request.cookies, csrfToken)) {
+  if (!verifyCsrfTokens(request)) {
     return NextResponse.json(
       { message: err.CSRF_TOKEN_INVALID },
       { status: 422 }

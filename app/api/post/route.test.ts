@@ -25,10 +25,7 @@ describe('POST', () => {
   test('401 - Unauthorized', async () => {
     mockGetServerSession.mockResolvedValue(null)
 
-    const request = new NextRequest('http://-', {
-      method: 'POST',
-    })
-
+    const request = new NextRequest('http://-', { method: 'POST' })
     const response = await POST(request)
     const data = await response.json()
 
@@ -39,10 +36,7 @@ describe('POST', () => {
   test('422 - invalid json', async () => {
     mockGetServerSession.mockResolvedValue({})
 
-    const request = new NextRequest('http://-', {
-      method: 'POST',
-    })
-
+    const request = new NextRequest('http://-', { method: 'POST' })
     const response = await POST(request)
     const data = await response.json()
 
@@ -80,7 +74,6 @@ describe('POST', () => {
         images: ['image'],
         address: 'Oslo, Norway',
         latLon: [42, 58],
-        csrfToken: 'token',
       }),
     })
 
@@ -106,7 +99,6 @@ describe('POST', () => {
         images: ['image'],
         address: 'Oslo, Norway',
         latLon: [42, 58],
-        csrfToken: 'token',
       }),
     })
 
@@ -133,7 +125,6 @@ describe('POST', () => {
         images: ['image'],
         address: 'Oslo, Norway',
         latLon: [42, 58],
-        csrfToken: 'token',
       }),
     })
 
@@ -158,9 +149,7 @@ describe('POST', () => {
       userId: new Types.ObjectId(),
     }
 
-    const session = {
-      id: post.userId.toString(),
-    }
+    const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -177,7 +166,6 @@ describe('POST', () => {
         images: post.images,
         address: post.address,
         latLon: post.latLon,
-        csrfToken: 'token',
       }),
     })
 
@@ -196,7 +184,6 @@ describe('POST', () => {
     })
 
     expect(response).toHaveProperty('status', 201)
-
     expect(response.headers.get('Location')).toBe(
       `/posts/${post._id.toString()}/table`
     )

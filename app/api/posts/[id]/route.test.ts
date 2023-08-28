@@ -136,8 +136,26 @@ describe('PUT', () => {
     expect(data).toEqual({ message: err.UNAUTHORIZED })
   })
 
+  test('422 - invalid csrf token', async () => {
+    mockGetServerSession.mockResolvedValue({})
+    mockVerifyCsrfTokens.mockReturnValue(false)
+
+    const request = new NextRequest('http://-', {
+      method: 'PUT',
+      body: JSON.stringify({ name: 'blue table' }),
+    })
+
+    const params = { params: { id: new Types.ObjectId().toString() } }
+    const response = await PUT(request, params)
+    const data = await response.json()
+
+    expect(response).toHaveProperty('status', 422)
+    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+  })
+
   test('422 - invalid json', async () => {
     mockGetServerSession.mockResolvedValue({})
+    mockVerifyCsrfTokens.mockReturnValue(true)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -150,6 +168,7 @@ describe('PUT', () => {
 
   test('422 - invalid request body', async () => {
     mockGetServerSession.mockResolvedValue({})
+    mockVerifyCsrfTokens.mockReturnValue(true)
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
@@ -164,26 +183,6 @@ describe('PUT', () => {
     expect(data).toHaveProperty('message')
   })
 
-  test('422 - invalid csrf token', async () => {
-    mockGetServerSession.mockResolvedValue({})
-    mockVerifyCsrfTokens.mockReturnValue(false)
-
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        name: 'blue table',
-      }),
-    })
-
-    const params = { params: { id: new Types.ObjectId().toString() } }
-    const response = await PUT(request, params)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
-  })
-
   test('500 - database connection failed', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -191,10 +190,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        name: 'blue table',
-      }),
+      body: JSON.stringify({ name: 'blue table' }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -213,10 +209,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        name: 'blue table',
-      }),
+      body: JSON.stringify({ name: 'blue table' }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -235,10 +228,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        name: 'blue table',
-      }),
+      body: JSON.stringify({ name: 'blue table' }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -251,22 +241,8 @@ describe('PUT', () => {
   })
 
   test('403 - forbidden', async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
-
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
-      images: ['image'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
-      userId: new Types.ObjectId(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
+    const post = { userId: new Types.ObjectId() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -275,10 +251,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        name: 'blue table',
-      }),
+      body: JSON.stringify({ name: 'blue table' }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -290,22 +263,8 @@ describe('PUT', () => {
   })
 
   test('500 - deleting old images failed', async () => {
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
-      images: ['image1', 'image2'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
-      userId: new Types.ObjectId(),
-    }
-
-    const session = {
-      id: post.userId.toString(),
-    }
+    const post = { userId: new Types.ObjectId() }
+    const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -315,10 +274,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        images: ['newImage1', 'newImage2'],
-      }),
+      body: JSON.stringify({ images: ['newImage1', 'newImage2'] }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -330,22 +286,12 @@ describe('PUT', () => {
   })
 
   test('204 - images updated', async () => {
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
+    const post = {
       images: ['image1', 'image2'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
       userId: new Types.ObjectId(),
     }
 
-    const session = {
-      id: post.userId.toString(),
-    }
+    const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -356,7 +302,7 @@ describe('PUT', () => {
     const newImages = ['newImage1', 'newImage2']
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', images: newImages }),
+      body: JSON.stringify({ images: newImages }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -375,22 +321,8 @@ describe('PUT', () => {
   })
 
   test('204 - price updated', async () => {
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
-      images: ['image'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
-      userId: new Types.ObjectId(),
-    }
-
-    const session = {
-      id: post.userId.toString(),
-    }
+    const post = { userId: new Types.ObjectId() }
+    const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -401,7 +333,7 @@ describe('PUT', () => {
     const newPrice = 80
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', price: newPrice }),
+      body: JSON.stringify({ price: newPrice }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -418,22 +350,8 @@ describe('PUT', () => {
   })
 
   test('204 - name updated', async () => {
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
-      images: ['image'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
-      userId: new Types.ObjectId(),
-    }
-
-    const session = {
-      id: post.userId.toString(),
-    }
+    const post = { userId: new Types.ObjectId() }
+    const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -444,7 +362,7 @@ describe('PUT', () => {
     const newName = 'blue table'
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', name: newName }),
+      body: JSON.stringify({ name: newName }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -461,22 +379,8 @@ describe('PUT', () => {
   })
 
   test('204 - description updated', async () => {
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
-      images: ['image'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
-      userId: new Types.ObjectId(),
-    }
-
-    const session = {
-      id: post.userId.toString(),
-    }
+    const post = { userId: new Types.ObjectId() }
+    const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -487,7 +391,7 @@ describe('PUT', () => {
     const newDescription = 'awesome table'
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', description: newDescription }),
+      body: JSON.stringify({ description: newDescription }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -504,22 +408,8 @@ describe('PUT', () => {
   })
 
   test('204 - categories updated', async () => {
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
-      images: ['image'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
-      userId: new Types.ObjectId(),
-    }
-
-    const session = {
-      id: post.userId.toString(),
-    }
+    const post = { userId: new Types.ObjectId() }
+    const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -530,7 +420,7 @@ describe('PUT', () => {
     const newCategories = ['decoration', 'Do-It-Yourself']
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', categories: newCategories }),
+      body: JSON.stringify({ categories: newCategories }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -547,22 +437,8 @@ describe('PUT', () => {
   })
 
   test('204 - address updated', async () => {
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
-      images: ['image'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
-      userId: new Types.ObjectId(),
-    }
-
-    const session = {
-      id: post.userId.toString(),
-    }
+    const post = { userId: new Types.ObjectId() }
+    const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -574,11 +450,7 @@ describe('PUT', () => {
     const newLatLon = [11, 22]
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        address: newAddress,
-        latLon: newLatLon,
-      }),
+      body: JSON.stringify({ address: newAddress, latLon: newLatLon }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -618,27 +490,11 @@ describe('DELETE', () => {
     expect(data).toEqual({ message: err.UNAUTHORIZED })
   })
 
-  test('422 - invalid json', async () => {
-    mockGetServerSession.mockResolvedValue({})
-
-    const request = new NextRequest('http://-', { method: 'DELETE' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
-    const response = await DELETE(request, params)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.DATA_INVALID })
-  })
-
   test('422 - invalid csrf token', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({}),
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -652,11 +508,7 @@ describe('DELETE', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({ csrfToken: 'token' }),
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -671,11 +523,7 @@ describe('DELETE', () => {
     mockDbConnect.mockResolvedValue({})
     mockFindPostById.mockRejectedValue({})
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({ csrfToken: 'token' }),
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -690,11 +538,7 @@ describe('DELETE', () => {
     mockDbConnect.mockResolvedValue({})
     mockFindPostById.mockResolvedValue(null)
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({ csrfToken: 'token' }),
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -705,33 +549,15 @@ describe('DELETE', () => {
   })
 
   test('403 - forbidden', async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
-
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
-      images: ['image1', 'image2'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
-      userId: new Types.ObjectId(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
+    const post = { userId: new Types.ObjectId() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockFindPostById.mockResolvedValue(post)
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({ csrfToken: 'token' }),
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -741,33 +567,15 @@ describe('DELETE', () => {
   })
 
   test('204 - post deleted', async () => {
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
-      images: ['image1', 'image2'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
-      userId: new Types.ObjectId(),
-    }
-
-    const session = {
-      id: post.userId.toString(),
-    }
+    const post = { userId: new Types.ObjectId() }
+    const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockFindPostById.mockResolvedValue(post)
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({ csrfToken: 'token' }),
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
 

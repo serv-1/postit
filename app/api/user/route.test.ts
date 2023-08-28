@@ -32,10 +32,7 @@ jest
 
 describe('POST', () => {
   test('422 - invalid json', async () => {
-    const request = new Request('http://-', {
-      method: 'POST',
-    })
-
+    const request = new Request('http://-', { method: 'POST' })
     const response = await POST(request)
     const data = await response.json()
 
@@ -150,10 +147,7 @@ describe('PUT', () => {
   test('401 - unauthenticated', async () => {
     mockGetServerSession.mockResolvedValue(null)
 
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-    })
-
+    const request = new NextRequest('http://-', { method: 'PUT' })
     const response = await PUT(request)
     const data = await response.json()
 
@@ -161,13 +155,23 @@ describe('PUT', () => {
     expect(data).toEqual({ message: err.UNAUTHORIZED })
   })
 
+  test('422 - invalid csrf token', async () => {
+    mockGetServerSession.mockResolvedValue({})
+    mockVerifyCsrfTokens.mockReturnValue(false)
+
+    const request = new NextRequest('http://-', { method: 'PUT' })
+    const response = await PUT(request)
+    const data = await response.json()
+
+    expect(response).toHaveProperty('status', 422)
+    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+  })
+
   test('422 - invalid json', async () => {
     mockGetServerSession.mockResolvedValue({})
+    mockVerifyCsrfTokens.mockReturnValue(true)
 
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-    })
-
+    const request = new NextRequest('http://-', { method: 'PUT' })
     const response = await PUT(request)
     const data = await response.json()
 
@@ -177,6 +181,7 @@ describe('PUT', () => {
 
   test('422 - invalid request body', async () => {
     mockGetServerSession.mockResolvedValue({})
+    mockVerifyCsrfTokens.mockReturnValue(true)
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
@@ -190,25 +195,6 @@ describe('PUT', () => {
     expect(data).toHaveProperty('message')
   })
 
-  test('422 - invalid csrf token', async () => {
-    mockGetServerSession.mockResolvedValue({})
-    mockVerifyCsrfTokens.mockReturnValue(false)
-
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        name: 'joe',
-      }),
-    })
-
-    const response = await PUT(request)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
-  })
-
   test('500 - database connection failed', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -216,10 +202,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        name: 'joe',
-      }),
+      body: JSON.stringify({ name: 'joe' }),
     })
 
     const response = await PUT(request)
@@ -240,7 +223,7 @@ describe('PUT', () => {
     const name = 'joe'
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', name }),
+      body: JSON.stringify({ name }),
     })
 
     const response = await PUT(request)
@@ -263,10 +246,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        name: 'joe',
-      }),
+      body: JSON.stringify({ name: 'joe' }),
     })
 
     const response = await PUT(request)
@@ -284,10 +264,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        email: 'joe@test.com',
-      }),
+      body: JSON.stringify({ email: 'joe@test.com' }),
     })
 
     const response = await PUT(request)
@@ -308,7 +285,7 @@ describe('PUT', () => {
     const email = 'joe@test.com'
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', email }),
+      body: JSON.stringify({ email }),
     })
 
     const response = await PUT(request)
@@ -334,7 +311,7 @@ describe('PUT', () => {
     const password = '0123456789'
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', password }),
+      body: JSON.stringify({ password }),
     })
 
     const response = await PUT(request)
@@ -360,7 +337,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', image: 'key' }),
+      body: JSON.stringify({ image: 'key' }),
     })
 
     const response = await PUT(request)
@@ -383,7 +360,7 @@ describe('PUT', () => {
     const image = 'new'
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', image }),
+      body: JSON.stringify({ image }),
     })
 
     const response = await PUT(request)
@@ -411,10 +388,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        image: 'new',
-      }),
+      body: JSON.stringify({ image: 'new' }),
     })
 
     await PUT(request)
@@ -432,7 +406,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', image: 'new' }),
+      body: JSON.stringify({ image: 'new' }),
     })
 
     const response = await PUT(request)
@@ -455,7 +429,7 @@ describe('PUT', () => {
     const favPostId = new Types.ObjectId().toString()
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', favPostId }),
+      body: JSON.stringify({ favPostId }),
     })
 
     const response = await PUT(request)
@@ -484,10 +458,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        favPostId: favPostId.toString(),
-      }),
+      body: JSON.stringify({ favPostId: favPostId.toString() }),
     })
 
     const response = await PUT(request)
@@ -513,10 +484,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        discussionId: new Types.ObjectId().toString(),
-      }),
+      body: JSON.stringify({ discussionId: new Types.ObjectId().toString() }),
     })
 
     const response = await PUT(request)
@@ -539,7 +507,7 @@ describe('PUT', () => {
     const discussionId = new Types.ObjectId().toString()
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', discussionId }),
+      body: JSON.stringify({ discussionId }),
     })
 
     await PUT(request)
@@ -566,7 +534,7 @@ describe('PUT', () => {
     const discussionId = new Types.ObjectId().toString()
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token', discussionId }),
+      body: JSON.stringify({ discussionId }),
     })
 
     const response = await PUT(request)
@@ -599,10 +567,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({
-        csrfToken: 'token',
-        discussionId: discussionId.toString(),
-      }),
+      body: JSON.stringify({ discussionId: discussionId.toString() }),
     })
 
     const response = await PUT(request)
@@ -626,10 +591,7 @@ describe('DELETE', () => {
   test('401 - unauthenticated', async () => {
     mockGetServerSession.mockResolvedValue(null)
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const response = await DELETE(request)
     const data = await response.json()
 
@@ -637,44 +599,11 @@ describe('DELETE', () => {
     expect(data).toEqual({ message: err.UNAUTHORIZED })
   })
 
-  test('422 - invalid json', async () => {
-    mockGetServerSession.mockResolvedValue({})
-
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-    })
-
-    const response = await DELETE(request)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.DATA_INVALID })
-  })
-
-  test('422 - csrf token undefined', async () => {
-    mockGetServerSession.mockResolvedValue({})
-
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({}),
-    })
-
-    const response = await DELETE(request)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
-  })
-
   test('422 - invalid csrf token', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({ csrfToken: 'token' }),
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const response = await DELETE(request)
     const data = await response.json()
 
@@ -687,11 +616,7 @@ describe('DELETE', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({ csrfToken: 'token' }),
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const response = await DELETE(request)
     const data = await response.json()
 
@@ -705,11 +630,7 @@ describe('DELETE', () => {
     mockDbConnect.mockResolvedValue({})
     mockDeleteOneUser.mockRejectedValue({})
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({ csrfToken: 'token' }),
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const response = await DELETE(request)
     const data = await response.json()
 
@@ -725,11 +646,7 @@ describe('DELETE', () => {
     mockDbConnect.mockResolvedValue({})
     mockDeleteOneUser.mockResolvedValue({})
 
-    const request = new NextRequest('http://-', {
-      method: 'DELETE',
-      body: JSON.stringify({ csrfToken: 'token' }),
-    })
-
+    const request = new NextRequest('http://-', { method: 'DELETE' })
     const response = await DELETE(request)
 
     expect(mockDeleteOneUser).toHaveBeenNthCalledWith(1, { _id: session.id })

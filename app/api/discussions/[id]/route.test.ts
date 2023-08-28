@@ -81,7 +81,7 @@ describe('GET', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await GET(request, params)
     const data = await response.json()
@@ -96,7 +96,7 @@ describe('GET', () => {
     mockDbConnect.mockResolvedValue({})
     mockFindDiscussionById.mockRejectedValue({})
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await GET(request, params)
     const data = await response.json()
@@ -111,7 +111,7 @@ describe('GET', () => {
     mockDbConnect.mockResolvedValue({})
     mockFindDiscussionById.mockResolvedValue(null)
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await GET(request, params)
     const data = await response.json()
@@ -122,9 +122,7 @@ describe('GET', () => {
   })
 
   test('403 - forbidden', async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
 
     const discussion = {
       buyerId: new Types.ObjectId(),
@@ -136,7 +134,7 @@ describe('GET', () => {
     mockDbConnect.mockResolvedValue({})
     mockFindDiscussionById.mockResolvedValue(discussion)
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await GET(request, params)
     const data = await response.json()
@@ -151,9 +149,7 @@ describe('GET', () => {
       sellerId: new Types.ObjectId(),
     }
 
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
+    const session = { id: discussion.buyerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -161,7 +157,7 @@ describe('GET', () => {
     mockFindDiscussionById.mockResolvedValue(discussion)
     mockFindUserById.mockRejectedValue({})
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await GET(request, params)
     const data = await response.json()
@@ -176,9 +172,7 @@ describe('GET', () => {
       sellerId: new Types.ObjectId(),
     }
 
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
+    const session = { id: discussion.buyerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -186,7 +180,7 @@ describe('GET', () => {
     mockFindDiscussionById.mockResolvedValue(discussion)
     mockFindUserById.mockRejectedValue({}).mockResolvedValueOnce({})
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await GET(request, params)
     const data = await response.json()
@@ -219,9 +213,7 @@ describe('GET', () => {
       messages: [],
     }
 
-    const session = {
-      id: buyer._id.toString(),
-    }
+    const session = { id: buyer._id.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -229,7 +221,7 @@ describe('GET', () => {
     mockFindDiscussionById.mockResolvedValue(discussion)
     mockFindUserById.mockResolvedValue(seller).mockResolvedValueOnce(buyer)
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await GET(request, params)
     const data = await response.json()
@@ -271,9 +263,7 @@ describe('GET', () => {
       messages: [],
     }
 
-    const session = {
-      id: seller._id.toString(),
-    }
+    const session = { id: seller._id.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -281,7 +271,7 @@ describe('GET', () => {
     mockFindDiscussionById.mockResolvedValue(discussion)
     mockFindUserById.mockResolvedValue(seller).mockResolvedValueOnce(null)
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await GET(request, params)
     const data = await response.json()
@@ -310,9 +300,7 @@ describe('GET', () => {
       messages: [],
     }
 
-    const session = {
-      id: buyer._id.toString(),
-    }
+    const session = { id: buyer._id.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -320,7 +308,7 @@ describe('GET', () => {
     mockFindDiscussionById.mockResolvedValue(discussion)
     mockFindUserById.mockResolvedValue(null).mockResolvedValueOnce(buyer)
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await GET(request, params)
     const data = await response.json()
@@ -400,9 +388,7 @@ describe('PUT', () => {
   })
 
   test('403 - forbidden', async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
 
     const discussion = {
       buyerId: new Types.ObjectId(),
@@ -429,9 +415,7 @@ describe('PUT', () => {
       sellerId: new Types.ObjectId(),
     }
 
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
+    const session = { id: discussion.buyerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue({})
@@ -453,9 +437,7 @@ describe('PUT', () => {
       sellerId: new Types.ObjectId(),
     }
 
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
+    const session = { id: discussion.buyerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue({})
@@ -473,13 +455,8 @@ describe('PUT', () => {
   })
 
   test("409 - can't send a message if the buyer is null", async () => {
-    const discussion = {
-      sellerId: new Types.ObjectId(),
-    }
-
-    const session = {
-      id: discussion.sellerId.toString(),
-    }
+    const discussion = { sellerId: new Types.ObjectId() }
+    const session = { id: discussion.sellerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue({})
@@ -497,13 +474,8 @@ describe('PUT', () => {
   })
 
   test("409 - can't send a message if the seller is null", async () => {
-    const discussion = {
-      buyerId: new Types.ObjectId(),
-    }
-
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
+    const discussion = { buyerId: new Types.ObjectId() }
+    const session = { id: discussion.buyerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue({})
@@ -526,17 +498,9 @@ describe('PUT', () => {
       sellerId: new Types.ObjectId(),
     }
 
-    const buyer = {
-      discussionIds: [],
-    }
-
-    const seller = {
-      discussionIds: [discussion._id],
-    }
-
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
+    const buyer = { discussionIds: [] }
+    const seller = { discussionIds: [discussion._id] }
+    const session = { id: discussion.buyerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue({})
@@ -559,17 +523,9 @@ describe('PUT', () => {
       sellerId: new Types.ObjectId(),
     }
 
-    const buyer = {
-      discussionIds: [discussion._id],
-    }
-
-    const seller = {
-      discussionIds: [],
-    }
-
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
+    const buyer = { discussionIds: [discussion._id] }
+    const seller = { discussionIds: [] }
+    const session = { id: discussion.buyerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue({})
@@ -585,76 +541,6 @@ describe('PUT', () => {
     expect(data).toEqual({ message: err.CANNOT_SEND_MSG })
   })
 
-  test('422 - invalid json', async () => {
-    const discussion = {
-      _id: new Types.ObjectId(),
-      buyerId: new Types.ObjectId(),
-      sellerId: new Types.ObjectId(),
-    }
-
-    const buyer = {
-      discussionIds: [discussion._id],
-    }
-
-    const seller = {
-      discussionIds: [discussion._id],
-    }
-
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
-
-    mockGetServerSession.mockResolvedValue(session)
-    mockDbConnect.mockResolvedValue({})
-    mockFindDiscussionById.mockResolvedValue(discussion)
-    mockFindUserById.mockResolvedValue(seller).mockResolvedValueOnce(buyer)
-
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await PUT(request, params)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.DATA_INVALID })
-  })
-
-  test('422 - invalid request body', async () => {
-    const discussion = {
-      _id: new Types.ObjectId(),
-      buyerId: new Types.ObjectId(),
-      sellerId: new Types.ObjectId(),
-    }
-
-    const buyer = {
-      discussionIds: [discussion._id],
-    }
-
-    const seller = {
-      discussionIds: [discussion._id],
-    }
-
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
-
-    mockGetServerSession.mockResolvedValue(session)
-    mockDbConnect.mockResolvedValue({})
-    mockFindDiscussionById.mockResolvedValue(discussion)
-    mockFindUserById.mockResolvedValue(seller).mockResolvedValueOnce(buyer)
-
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-      body: JSON.stringify({}),
-    })
-
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await PUT(request, params)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toHaveProperty('message')
-  })
-
   test('422 - invalid csrf token', async () => {
     const discussion = {
       _id: new Types.ObjectId(),
@@ -662,17 +548,9 @@ describe('PUT', () => {
       sellerId: new Types.ObjectId(),
     }
 
-    const buyer = {
-      discussionIds: [discussion._id],
-    }
-
-    const seller = {
-      discussionIds: [discussion._id],
-    }
-
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
+    const buyer = { discussionIds: [discussion._id] }
+    const seller = { discussionIds: [discussion._id] }
+    const session = { id: discussion.buyerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue({})
@@ -680,11 +558,7 @@ describe('PUT', () => {
     mockFindUserById.mockResolvedValue(seller).mockResolvedValueOnce(buyer)
     mockVerifyCsrfTokens.mockReturnValue(false)
 
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-      body: JSON.stringify({ csrfToken: 'token' }),
-    })
-
+    const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: discussion._id.toString() } }
     const response = await PUT(request, params)
     const data = await response.json()
@@ -694,6 +568,62 @@ describe('PUT', () => {
   })
 
   describe('add a new message', () => {
+    test('422 - invalid json', async () => {
+      const discussion = {
+        _id: new Types.ObjectId(),
+        buyerId: new Types.ObjectId(),
+        sellerId: new Types.ObjectId(),
+      }
+
+      const buyer = { discussionIds: [discussion._id] }
+      const seller = { discussionIds: [discussion._id] }
+      const session = { id: discussion.buyerId.toString() }
+
+      mockGetServerSession.mockResolvedValue(session)
+      mockDbConnect.mockResolvedValue({})
+      mockFindDiscussionById.mockResolvedValue(discussion)
+      mockFindUserById.mockResolvedValue(seller).mockResolvedValueOnce(buyer)
+      mockVerifyCsrfTokens.mockReturnValue(true)
+
+      const request = new NextRequest('http://-', { method: 'PUT', body: '' })
+      const params = { params: { id: discussion._id.toString() } }
+      const response = await PUT(request, params)
+      const data = await response.json()
+
+      expect(response).toHaveProperty('status', 422)
+      expect(data).toEqual({ message: err.DATA_INVALID })
+    })
+
+    test('422 - invalid request body', async () => {
+      const discussion = {
+        _id: new Types.ObjectId(),
+        buyerId: new Types.ObjectId(),
+        sellerId: new Types.ObjectId(),
+      }
+
+      const buyer = { discussionIds: [discussion._id] }
+      const seller = { discussionIds: [discussion._id] }
+      const session = { id: discussion.buyerId.toString() }
+
+      mockGetServerSession.mockResolvedValue(session)
+      mockDbConnect.mockResolvedValue({})
+      mockFindDiscussionById.mockResolvedValue(discussion)
+      mockFindUserById.mockResolvedValue(seller).mockResolvedValueOnce(buyer)
+      mockVerifyCsrfTokens.mockReturnValue(true)
+
+      const request = new NextRequest('http://-', {
+        method: 'PUT',
+        body: JSON.stringify({}),
+      })
+
+      const params = { params: { id: discussion._id.toString() } }
+      const response = await PUT(request, params)
+      const data = await response.json()
+
+      expect(response).toHaveProperty('status', 422)
+      expect(data).toHaveProperty('message')
+    })
+
     test('500 - find discussion by id and update failed', async () => {
       const discussion = {
         _id: new Types.ObjectId(),
@@ -701,17 +631,9 @@ describe('PUT', () => {
         sellerId: new Types.ObjectId(),
       }
 
-      const buyer = {
-        discussionIds: [discussion._id],
-      }
-
-      const seller = {
-        discussionIds: [discussion._id],
-      }
-
-      const session = {
-        id: discussion.buyerId.toString(),
-      }
+      const buyer = { discussionIds: [discussion._id] }
+      const seller = { discussionIds: [discussion._id] }
+      const session = { id: discussion.buyerId.toString() }
 
       mockGetServerSession.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue({})
@@ -722,7 +644,7 @@ describe('PUT', () => {
 
       const request = new NextRequest('http://-', {
         method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token', message: 'yo' }),
+        body: JSON.stringify({ message: 'yo' }),
       })
 
       const params = { params: { id: discussion._id.toString() } }
@@ -750,9 +672,7 @@ describe('PUT', () => {
         discussionIds: [discussion._id],
       }
 
-      const session = {
-        id: buyer._id.toString(),
-      }
+      const session = { id: buyer._id.toString() }
 
       mockGetServerSession.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue({})
@@ -765,7 +685,7 @@ describe('PUT', () => {
       const message = 'yo'
       const request = new NextRequest('http://-', {
         method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token', message }),
+        body: JSON.stringify({ message }),
       })
 
       const params = { params: { id: discussion._id.toString() } }
@@ -799,9 +719,7 @@ describe('PUT', () => {
         discussionIds: [discussion._id],
       }
 
-      const session = {
-        id: buyer._id.toString(),
-      }
+      const session = { id: buyer._id.toString() }
 
       mockGetServerSession.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue({})
@@ -817,7 +735,7 @@ describe('PUT', () => {
       const message = 'yo'
       const request = new NextRequest('http://-', {
         method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token', message }),
+        body: JSON.stringify({ message }),
       })
 
       const params = { params: { id: discussion._id.toString() } }
@@ -851,9 +769,7 @@ describe('PUT', () => {
         discussionIds: [discussion._id],
       }
 
-      const session = {
-        id: buyer._id.toString(),
-      }
+      const session = { id: buyer._id.toString() }
 
       mockGetServerSession.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue({})
@@ -870,7 +786,7 @@ describe('PUT', () => {
       const message = 'yo'
       const request = new NextRequest('http://-', {
         method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token', message }),
+        body: JSON.stringify({ message }),
       })
 
       const params = { params: { id: discussion._id.toString() } }
@@ -906,9 +822,7 @@ describe('PUT', () => {
         channelName: 'chanName',
       }
 
-      const session = {
-        id: buyer._id.toString(),
-      }
+      const session = { id: buyer._id.toString() }
 
       mockGetServerSession.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue({})
@@ -925,7 +839,7 @@ describe('PUT', () => {
       const message = 'yo'
       const request = new NextRequest('http://-', {
         method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token', message }),
+        body: JSON.stringify({ message }),
       })
 
       const params = { params: { id: discussion._id.toString() } }
@@ -974,9 +888,7 @@ describe('PUT', () => {
         discussionIds: [discussion._id],
       }
 
-      const session = {
-        id: seller._id.toString(),
-      }
+      const session = { id: seller._id.toString() }
 
       mockGetServerSession.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue({})
@@ -993,7 +905,7 @@ describe('PUT', () => {
       const message = 'yo'
       const request = new NextRequest('http://-', {
         method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token', message }),
+        body: JSON.stringify({ message }),
       })
 
       const params = { params: { id: discussion._id.toString() } }
@@ -1042,9 +954,7 @@ describe('PUT', () => {
         discussionIds: [discussion._id],
       }
 
-      const session = {
-        id: buyer._id.toString(),
-      }
+      const session = { id: buyer._id.toString() }
 
       mockGetServerSession.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue({})
@@ -1053,11 +963,7 @@ describe('PUT', () => {
       mockVerifyCsrfTokens.mockReturnValue(true)
       mockFindDiscussionByIdAndUpdate.mockRejectedValue({})
 
-      const request = new NextRequest('http://-', {
-        method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token' }),
-      })
-
+      const request = new NextRequest('http://-', { method: 'PUT' })
       const params = { params: { id: discussion._id.toString() } }
       const response = await PUT(request, params)
       const data = await response.json()
@@ -1090,9 +996,7 @@ describe('PUT', () => {
         ],
       }
 
-      const session = {
-        id: buyer._id.toString(),
-      }
+      const session = { id: buyer._id.toString() }
 
       mockGetServerSession.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue({})
@@ -1105,11 +1009,7 @@ describe('PUT', () => {
       mockVerifyCsrfTokens.mockReturnValue(true)
       mockFindDiscussionByIdAndUpdate.mockResolvedValue({})
 
-      const request = new NextRequest('http://-', {
-        method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token' }),
-      })
-
+      const request = new NextRequest('http://-', { method: 'PUT' })
       const params = { params: { id: discussion._id.toString() } }
       const response = await PUT(request, params)
       const data = await response.json()
@@ -1152,9 +1052,7 @@ describe('PUT', () => {
         messages: [{ userId: seller._id, seen: false }],
       }
 
-      const session = {
-        id: buyer._id.toString(),
-      }
+      const session = { id: buyer._id.toString() }
 
       mockGetServerSession.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue({})
@@ -1168,11 +1066,7 @@ describe('PUT', () => {
       mockFindDiscussionByIdAndUpdate.mockResolvedValue({})
       mockFindDiscussion.mockRejectedValue({})
 
-      const request = new NextRequest('http://-', {
-        method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token' }),
-      })
-
+      const request = new NextRequest('http://-', { method: 'PUT' })
       const params = { params: { id: discussion._id.toString() } }
       const response = await PUT(request, params)
       const data = await response.json()
@@ -1202,9 +1096,7 @@ describe('PUT', () => {
         messages: [{ userId: seller._id, seen: false }],
       }
 
-      const session = {
-        id: buyer._id.toString(),
-      }
+      const session = { id: buyer._id.toString() }
 
       mockGetServerSession.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue({})
@@ -1219,11 +1111,7 @@ describe('PUT', () => {
       mockFindDiscussion.mockResolvedValue([])
       mockFindUserByIdAndUpdate.mockRejectedValue({})
 
-      const request = new NextRequest('http://-', {
-        method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token' }),
-      })
-
+      const request = new NextRequest('http://-', { method: 'PUT' })
       const params = { params: { id: discussion._id.toString() } }
       const response = await PUT(request, params)
       const data = await response.json()
@@ -1256,9 +1144,7 @@ describe('PUT', () => {
         messages: [{ userId: seller._id, seen: false }],
       }
 
-      const session = {
-        id: buyer._id.toString(),
-      }
+      const session = { id: buyer._id.toString() }
 
       const discussions = [
         { messages: [{ userId: buyer._id, seen: false }] },
@@ -1277,11 +1163,7 @@ describe('PUT', () => {
       mockFindDiscussionByIdAndUpdate.mockResolvedValue({})
       mockFindDiscussion.mockResolvedValue(discussions)
 
-      const request = new NextRequest('http://-', {
-        method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token' }),
-      })
-
+      const request = new NextRequest('http://-', { method: 'PUT' })
       const params = { params: { id: discussion._id.toString() } }
       const response = await PUT(request, params)
 
@@ -1310,9 +1192,7 @@ describe('PUT', () => {
         messages: [{ userId: seller._id, seen: false }],
       }
 
-      const session = {
-        id: buyer._id.toString(),
-      }
+      const session = { id: buyer._id.toString() }
 
       const discussions = [
         { messages: [{ userId: buyer._id, seen: true }] },
@@ -1332,11 +1212,7 @@ describe('PUT', () => {
       mockFindDiscussion.mockResolvedValue(discussions)
       mockFindUserByIdAndUpdate.mockResolvedValue({})
 
-      const request = new NextRequest('http://-', {
-        method: 'PUT',
-        body: JSON.stringify({ csrfToken: 'token' }),
-      })
-
+      const request = new NextRequest('http://-', { method: 'PUT' })
       const params = { params: { id: discussion._id.toString() } }
       const response = await PUT(request, params)
 
@@ -1373,26 +1249,11 @@ describe('DELETE', () => {
     expect(data).toEqual({ message: err.UNAUTHORIZED })
   })
 
-  test("422 - invalid search params' csrf token", async () => {
-    mockGetServerSession.mockResolvedValue({})
-
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
-    const response = await DELETE(request, params)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
-  })
-
   test('422 - invalid csrf token', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
-    const request = new NextRequest('http://-?csrfToken=token', {
-      method: 'PUT',
-    })
-
+    const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -1406,10 +1267,7 @@ describe('DELETE', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
 
-    const request = new NextRequest('http://-?csrfToken=token', {
-      method: 'PUT',
-    })
-
+    const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -1424,10 +1282,7 @@ describe('DELETE', () => {
     mockDbConnect.mockResolvedValue({})
     mockFindDiscussionById.mockRejectedValue({})
 
-    const request = new NextRequest('http://-?csrfToken=token', {
-      method: 'PUT',
-    })
-
+    const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -1442,10 +1297,7 @@ describe('DELETE', () => {
     mockDbConnect.mockResolvedValue({})
     mockFindDiscussionById.mockResolvedValue(null)
 
-    const request = new NextRequest('http://-?csrfToken=token', {
-      method: 'PUT',
-    })
-
+    const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -1461,19 +1313,14 @@ describe('DELETE', () => {
       sellerId: new Types.ObjectId(),
     }
 
-    const session = {
-      id: new Types.ObjectId().toString(),
-    }
+    const session = { id: new Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockFindDiscussionById.mockResolvedValue(discussion)
 
-    const request = new NextRequest('http://-?csrfToken=token', {
-      method: 'PUT',
-    })
-
+    const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -1488,9 +1335,7 @@ describe('DELETE', () => {
       sellerId: new Types.ObjectId(),
     }
 
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
+    const session = { id: discussion.buyerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -1498,10 +1343,7 @@ describe('DELETE', () => {
     mockFindDiscussionById.mockResolvedValue(discussion)
     mockDeleteOneDiscussion.mockRejectedValue({})
 
-    const request = new NextRequest('http://-?csrfToken=token', {
-      method: 'PUT',
-    })
-
+    const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
@@ -1516,9 +1358,7 @@ describe('DELETE', () => {
       sellerId: new Types.ObjectId(),
     }
 
-    const session = {
-      id: discussion.buyerId.toString(),
-    }
+    const session = { id: discussion.buyerId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -1526,10 +1366,7 @@ describe('DELETE', () => {
     mockFindDiscussionById.mockResolvedValue(discussion)
     mockDeleteOneDiscussion.mockResolvedValue({})
 
-    const request = new NextRequest('http://-?csrfToken=token', {
-      method: 'PUT',
-    })
-
+    const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: new Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
 

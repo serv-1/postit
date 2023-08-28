@@ -6,7 +6,6 @@ const DISCUSSION = {
   postId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
   sellerId: 'f0f0f0f0f0f0f0f0f0f0f0f0',
   postName: 'Table',
-  csrfToken: 'csrfToken',
 }
 
 it('passes', () => {

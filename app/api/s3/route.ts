@@ -15,9 +15,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
   }
 
-  const csrfToken = request.nextUrl.searchParams.get('csrfToken')
-
-  if (!csrfToken || !verifyCsrfTokens(request.cookies, csrfToken)) {
+  if (!verifyCsrfTokens(request)) {
     return NextResponse.json(
       { message: err.CSRF_TOKEN_INVALID },
       { status: 422 }

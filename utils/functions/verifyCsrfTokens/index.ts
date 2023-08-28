@@ -1,18 +1,16 @@
 import { createHash } from 'crypto'
-import { RequestCookies } from 'next/dist/compiled/@edge-runtime/cookies'
+import { NextRequest } from 'next/server'
 import env from 'utils/constants/env'
 
-export default function verifyCsrfTokens(
-  cookies: RequestCookies,
-  csrfToken: string
-) {
-  const csrfCookieValue = cookies.get(env.CSRF_COOKIE_NAME)?.value
+export default function verifyCsrfTokens(request: NextRequest) {
+  const csrfCookie = request.cookies.get(env.CSRF_COOKIE_NAME)
+  const headerCsrfToken = request.headers.get('x-csrf-token')
 
-  if (!csrfCookieValue) return false
+  if (!csrfCookie || !headerCsrfToken) return false
 
-  const hash = csrfCookieValue.split('|')[1]
+  const hash = csrfCookie.value.split('|')[1]
   const expectedHash = createHash('sha256')
-    .update(csrfToken + env.SECRET)
+    .update(headerCsrfToken + env.SECRET)
     .digest('hex')
 
   return expectedHash === hash

@@ -66,6 +66,13 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
   }
 
+  if (!verifyCsrfTokens(request)) {
+    return NextResponse.json(
+      { message: err.CSRF_TOKEN_INVALID },
+      { status: 422 }
+    )
+  }
+
   let data = null
 
   try {
@@ -78,15 +85,6 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
   if ('message' in result) {
     return NextResponse.json({ message: result.message }, { status: 422 })
-  }
-
-  data = result.value
-
-  if (!verifyCsrfTokens(request.cookies, data.csrfToken)) {
-    return NextResponse.json(
-      { message: err.CSRF_TOKEN_INVALID },
-      { status: 422 }
-    )
   }
 
   try {
@@ -103,6 +101,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
     }
 
     const update: UpdateQuery<PostDoc> = {}
+
+    data = result.value
 
     if (data.images) {
       await Promise.all(
@@ -159,15 +159,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
   }
 
-  let data = null
-
-  try {
-    data = await request.json()
-  } catch (e) {
-    return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
-  }
-
-  if (!verifyCsrfTokens(request.cookies, data.csrfToken)) {
+  if (!verifyCsrfTokens(request)) {
     return NextResponse.json(
       { message: err.CSRF_TOKEN_INVALID },
       { status: 422 }

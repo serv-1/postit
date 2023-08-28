@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (!verifyCsrfTokens(request.cookies, result.value.csrfToken)) {
+  if (!verifyCsrfTokens(request)) {
     return NextResponse.json(
       { message: err.CSRF_TOKEN_INVALID },
       { status: 422 }

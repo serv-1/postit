@@ -5,7 +5,6 @@ import object from './object'
 import { addPost } from './partials'
 
 export interface AddPostApiSchema {
-  csrfToken: string
   name: string
   description: string
   categories: Categories[]

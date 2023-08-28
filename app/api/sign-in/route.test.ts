@@ -18,9 +18,7 @@ jest
 
 describe('POST', () => {
   test('422 - invalid json', async () => {
-    const request = new Request('http://-', {
-      method: 'POST',
-    })
+    const request = new Request('http://-', { method: 'POST' })
 
     const response = await POST(request)
     const data = await response.json()
@@ -48,10 +46,7 @@ describe('POST', () => {
 
     const request = new Request('http://-', {
       method: 'POST',
-      body: JSON.stringify({
-        email: 'a@a.a',
-        password: '0123456789',
-      }),
+      body: JSON.stringify({ email: 'a@a.a', password: '0123456789' }),
     })
 
     const response = await POST(request)
@@ -67,10 +62,7 @@ describe('POST', () => {
 
     const request = new Request('http://-', {
       method: 'POST',
-      body: JSON.stringify({
-        email: 'a@a.a',
-        password: '0123456789',
-      }),
+      body: JSON.stringify({ email: 'a@a.a', password: '0123456789' }),
     })
 
     const response = await POST(request)
@@ -96,10 +88,7 @@ describe('POST', () => {
 
     expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({
-      name: 'email',
-      message: err.EMAIL_UNKNOWN,
-    })
+    expect(data).toEqual({ name: 'email', message: err.EMAIL_UNKNOWN })
   })
 
   test('422 - password undefined', async () => {
@@ -118,10 +107,7 @@ describe('POST', () => {
 
     expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({
-      name: 'password',
-      message: err.PASSWORD_REQUIRED,
-    })
+    expect(data).toEqual({ name: 'password', message: err.PASSWORD_REQUIRED })
   })
 
   test('422 - invalid password', async () => {
@@ -131,7 +117,6 @@ describe('POST', () => {
     mockFindOneUser.mockResolvedValue(user)
 
     const email = 'bob@test.com'
-
     const request = new Request('http://-', {
       method: 'POST',
       body: JSON.stringify({ email, password: '0123456789' }),
@@ -142,10 +127,7 @@ describe('POST', () => {
 
     expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({
-      name: 'password',
-      message: err.PASSWORD_INVALID,
-    })
+    expect(data).toEqual({ name: 'password', message: err.PASSWORD_INVALID })
   })
 
   test('200 - user ready to sign in', async () => {
@@ -171,10 +153,6 @@ describe('POST', () => {
 
     expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 200)
-    expect(data).toEqual({
-      id: user._id.toString(),
-      name: user.name,
-      email,
-    })
+    expect(data).toEqual({ id: user._id.toString(), name: user.name, email })
   })
 })

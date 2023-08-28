@@ -29,22 +29,11 @@ describe('GET', () => {
     expect(data).toEqual({ message: err.UNAUTHORIZED })
   })
 
-  test("422 - invalid search params' csrf token", async () => {
-    mockGetServerSession.mockResolvedValue({})
-
-    const request = new NextRequest('http://-')
-    const response = await GET(request)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
-  })
-
   test('422 - invalid csrf token', async () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const response = await GET(request)
     const data = await response.json()
 
@@ -57,7 +46,7 @@ describe('GET', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockCreatePresignedPost.mockRejectedValue({})
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const response = await GET(request)
     const data = await response.json()
 
@@ -72,7 +61,7 @@ describe('GET', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockCreatePresignedPost.mockResolvedValue(s3Data)
 
-    const request = new NextRequest('http://-?csrfToken=token')
+    const request = new NextRequest('http://-')
     const response = await GET(request)
     const data = await response.json()
 

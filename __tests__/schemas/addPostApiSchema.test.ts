@@ -2,7 +2,6 @@ import addPostApiSchema from '../../schemas/addPostApiSchema'
 import err from '../../utils/constants/errors'
 
 const VALUE = {
-  csrfToken: 'csrfToken',
   name: 'table',
   description: 'magnificent table',
   categories: ['furniture'],

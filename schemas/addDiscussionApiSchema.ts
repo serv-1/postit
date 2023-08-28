@@ -1,4 +1,3 @@
-import csrfTokenSchema from './csrfTokenSchema'
 import idSchema from './idSchema'
 import messageSchema from './messageSchema'
 import nameSchema from './nameSchema'
@@ -9,7 +8,6 @@ export interface AddDiscussionApiSchema {
   postId: string
   sellerId: string
   postName: string
-  csrfToken: string
 }
 
 const addDiscussionApiSchema = object<AddDiscussionApiSchema>({
@@ -17,7 +15,6 @@ const addDiscussionApiSchema = object<AddDiscussionApiSchema>({
   postId: idSchema.required(),
   sellerId: idSchema.required(),
   postName: nameSchema.required(),
-  csrfToken: csrfTokenSchema,
 })
 
 export default addDiscussionApiSchema

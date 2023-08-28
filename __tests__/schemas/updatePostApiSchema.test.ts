@@ -2,19 +2,21 @@ import updatePostApiSchema from '../../schemas/updatePostApiSchema'
 import err from '../../utils/constants/errors'
 
 it('passes', () => {
-  const value = { csrfToken: 'token', address: 'Paris', latLon: [17, 58] }
-  const result = updatePostApiSchema.validate(value)
+  const result = updatePostApiSchema.validate({
+    address: 'Paris',
+    latLon: [17, 58],
+  })
+
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
 })
 
 it('fails if latLon is missing with address', () => {
-  const value = { csrfToken: 'token', address: 'Paris' }
-  const { error: e } = updatePostApiSchema.validate(value)
+  const { error: e } = updatePostApiSchema.validate({ address: 'Paris' })
   expect(e?.details[0].message).toBe(err.ADDRESS_INVALID)
 })
 
 it('fails if a property is missing', () => {
-  const { error: e } = updatePostApiSchema.validate({ csrfToken: 'token' })
+  const { error: e } = updatePostApiSchema.validate({})
   expect(e?.details[0].message).toBe(err.DATA_INVALID)
 })
