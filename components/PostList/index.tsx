@@ -1,8 +1,8 @@
-import { LightPost } from 'types/common'
+import type { SearchedPost, UserPost } from 'types'
 import Post from 'components/Post'
 
 interface PostListProps {
-  posts: LightPost[]
+  posts: (SearchedPost | UserPost)[]
 }
 
 export default function PostList({ posts }: PostListProps) {

@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation'
-import type { User } from 'types/common'
-import env from 'utils/constants/env'
+import type { User } from 'types'
+import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 
 export default async function getUser(userId: string): Promise<User> {
-  const res = await fetch(env.VERCEL_URL + '/api/users/' + userId, {
+  const res = await fetch(NEXT_PUBLIC_VERCEL_URL + '/api/users/' + userId, {
     cache: 'no-store',
   })
 

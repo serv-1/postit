@@ -1,17 +1,17 @@
 import { joiResolver } from '@hookform/resolvers/joi'
-import axios, { AxiosError } from 'axios'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from 'contexts/toast'
-import getAxiosError from 'utils/functions/getAxiosError'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
 import PasswordStrength from 'components/PasswordStrength'
 import PasswordInput from 'components/PasswordInput'
 import Button from 'components/Button'
-import addUserSchema, { AddUserSchema } from 'schemas/addUserSchema'
+import addUserSchema, { type AddUserSchema } from 'schemas/addUserSchema'
+import ajax from 'libs/ajax'
+import type { UserPostError } from 'app/api/user/types'
 
 export default function AuthenticationRegisterForm() {
   const methods = useForm<AddUserSchema>({
@@ -22,33 +22,38 @@ export default function AuthenticationRegisterForm() {
   const router = useRouter()
 
   const submitHandler: SubmitHandler<AddUserSchema> = async (data) => {
-    try {
-      const axiosRes = await axios.post('/api/user', data)
+    const response = await ajax.post('/user', data)
 
-      const res = await signIn<'credentials'>('credentials', {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      })
-
-      if (res && res.error) {
-        return setToast({
-          message:
-            'Your account has been successfully created. You can now sign in!',
-        })
-      }
-
-      router.push(axiosRes.headers['location'])
-    } catch (e) {
-      type FieldsNames = keyof AddUserSchema
-      const { name, message } = getAxiosError<FieldsNames>(e as AxiosError)
+    if (!response.ok) {
+      const { name, message }: UserPostError = await response.json()
 
       if (name) {
-        return methods.setError(name, { message }, { shouldFocus: true })
+        methods.setError(name, { message }, { shouldFocus: true })
+
+        return
       }
 
       setToast({ message, error: true })
+
+      return
     }
+
+    const signInResponse = await signIn<'credentials'>('credentials', {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    })
+
+    if (signInResponse && signInResponse.error) {
+      setToast({
+        message:
+          'Your account has been successfully created. You can now sign in!',
+      })
+
+      return
+    }
+
+    router.push(response.headers.get('location') as string)
   }
 
   return (

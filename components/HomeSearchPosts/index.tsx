@@ -3,12 +3,14 @@ import Input from 'components/Input'
 import Select from 'components/Select'
 import categories from 'utils/constants/categories'
 import InputError from 'components/InputError'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { useEffect } from 'react'
-import { Categories } from 'types/common'
+import type { Categories } from 'types'
 import Button from 'components/Button'
-import searchPostSchema, { SearchPostSchema } from 'schemas/searchPostSchema'
+import searchPostSchema, {
+  type SearchPostSchema,
+} from 'schemas/searchPostSchema'
 import Popup from 'components/Popup'
 
 const options = categories.map((category) => ({

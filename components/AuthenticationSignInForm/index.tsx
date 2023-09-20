@@ -1,18 +1,17 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import { getProviders, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from 'contexts/toast'
-import { UnPromise } from 'types/common'
+import type { UnPromise } from 'types'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
 import PasswordInput from 'components/PasswordInput'
 import Button from 'components/Button'
-import signInSchema, { SignInSchema } from 'schemas/signInSchema'
+import signInSchema, { type SignInSchema } from 'schemas/signInSchema'
 import err from 'utils/constants/errors'
-
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 
 interface AuthenticationSignInFormProps {
   providers: UnPromise<ReturnType<typeof getProviders>>
@@ -98,7 +97,9 @@ export default function AuthenticationSignInForm({
                 color="primary"
                 fullWidth
                 onClick={() =>
-                  signIn(id, { callbackUrl: baseUrl + '/profile' })
+                  signIn(id, {
+                    callbackUrl: NEXT_PUBLIC_VERCEL_URL + '/profile',
+                  })
                 }
               >
                 Sign in with {name}

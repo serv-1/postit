@@ -10,13 +10,11 @@ interface PostPageContactModalProps {
   postId: string
   sellerId: string
   postName: string
-  csrfToken?: string
 }
 
 const ChatModal = dynamic(() => import('components/ChatModal'), { ssr: false })
 
 export default function PostPageContactModal({
-  csrfToken,
   discussionId,
   postId,
   postName,
@@ -53,7 +51,6 @@ export default function PostPageContactModal({
         <ChatModal
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          csrfToken={csrfToken}
           {...(discussionId
             ? { discussionId }
             : { postId, postName, sellerId })}

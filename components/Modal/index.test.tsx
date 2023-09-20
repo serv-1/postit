@@ -3,15 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import Modal from '.'
 
-const nanoid = jest.spyOn(require('nanoid'), 'nanoid')
-
-beforeEach(() => {
-  nanoid
-    .mockReturnValue('nanoidMock0')
-    .mockReturnValueOnce('nanoidMock1')
-    .mockReturnValueOnce('nanoidMock2')
-})
-
 it('renders', async () => {
   const setIsOpen = jest.fn()
 

@@ -29,6 +29,9 @@ jest
   .mock('utils/functions/deleteImage')
   .mock('utils/functions/getServerPusher')
   .mock('utils/functions/hashPassword')
+  .mock('app/api/auth/[...nextauth]/route', () => ({
+    nextAuthOptions: {},
+  }))
 
 describe('POST', () => {
   test('422 - invalid json', async () => {

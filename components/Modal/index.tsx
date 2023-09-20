@@ -1,9 +1,9 @@
 import { nanoid } from 'nanoid'
 import {
-  ComponentPropsWithoutRef,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
+  type ComponentPropsWithoutRef,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
   useEffect,
   useRef,
   useState,

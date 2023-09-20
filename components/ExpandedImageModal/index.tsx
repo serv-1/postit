@@ -3,8 +3,7 @@ import Modal from 'components/Modal'
 import X from 'public/static/images/x.svg'
 import { useState } from 'react'
 import classNames from 'classnames'
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+import { NEXT_PUBLIC_AWS_URL } from 'env/public'
 
 interface ExpandedImageModalProps {
   src: string
@@ -28,7 +27,7 @@ export default function ExpandedImageModal({
         className={classNames('relative', btnClass)}
       >
         <Image
-          src={awsUrl + src}
+          src={NEXT_PUBLIC_AWS_URL + '/' + src}
           alt=""
           fill
           className={classNames('object-cover', btnImgClass)}
@@ -49,7 +48,7 @@ export default function ExpandedImageModal({
             </button>
             <div className="h-full relative">
               <Image
-                src={awsUrl + src}
+                src={NEXT_PUBLIC_AWS_URL + '/' + src}
                 alt=""
                 fill
                 className="object-contain"

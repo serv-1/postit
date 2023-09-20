@@ -1,13 +1,23 @@
-import NextAuth, { AuthOptions } from 'next-auth'
+import NextAuth, { type AuthOptions } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/email'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from 'libs/mongodb'
-import User, { UserDoc } from 'models/User'
+import User, { type UserDoc } from 'models/User'
 import dbConnect from 'utils/functions/dbConnect'
-import env from 'utils/constants/env'
+import {
+  EMAIL_FROM,
+  EMAIL_HOST,
+  EMAIL_PASS,
+  EMAIL_PORT,
+  EMAIL_USER,
+  GOOGLE_ID,
+  GOOGLE_SECRET,
+  SECRET,
+} from 'env'
 import { nanoid } from 'nanoid'
+import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 
 export const nextAuthOptions: AuthOptions = {
   providers: [
@@ -17,7 +27,7 @@ export const nextAuthOptions: AuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials, req) {
-        const res = await fetch(env.VERCEL_URL + '/api/sign-in', {
+        const res = await fetch(NEXT_PUBLIC_VERCEL_URL + '/api/sign-in', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -32,19 +42,19 @@ export const nextAuthOptions: AuthOptions = {
       },
     }),
     GoogleProvider({
-      clientId: env.GOOGLE_ID,
-      clientSecret: env.GOOGLE_SECRET,
+      clientId: GOOGLE_ID,
+      clientSecret: GOOGLE_SECRET,
     }),
     EmailProvider({
       server: {
-        host: env.EMAIL_HOST,
-        port: Number(env.EMAIL_PORT),
+        host: EMAIL_HOST,
+        port: Number(EMAIL_PORT),
         auth: {
-          user: env.EMAIL_USER,
-          pass: env.EMAIL_PASS,
+          user: EMAIL_USER,
+          pass: EMAIL_PASS,
         },
       },
-      from: env.EMAIL_FROM,
+      from: EMAIL_FROM,
       maxAge: 3600,
     }),
   ],
@@ -94,7 +104,7 @@ export const nextAuthOptions: AuthOptions = {
     },
   },
   session: { strategy: 'jwt' },
-  secret: env.SECRET,
+  secret: SECRET,
   adapter: MongoDBAdapter(clientPromise),
 }
 

@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { nextAuthOptions } from '../auth/[...nextauth]/route'
+import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import err from 'utils/constants/errors'
 import validate from 'utils/functions/validate'
 import addPostApiSchema from 'schemas/addPostApiSchema'

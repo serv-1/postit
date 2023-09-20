@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
-import Select, { Option } from '.'
-import { Categories } from 'types/common'
-import ReactSelect, { ControlProps, OptionProps } from 'react-select'
+import Select, { type Option } from '.'
+import type { Categories } from 'types'
+import ReactSelect, { type ControlProps, type OptionProps } from 'react-select'
 import userEvent from '@testing-library/user-event'
 
 jest.mock('react-select', () => ({

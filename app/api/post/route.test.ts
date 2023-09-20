@@ -7,7 +7,7 @@ import { NextRequest } from 'next/server'
 import err from 'utils/constants/errors'
 import { Types } from 'mongoose'
 // @ts-expect-error
-import { PostDoc, mockSavePost } from 'models/Post'
+import { type PostDoc, mockSavePost } from 'models/Post'
 // @ts-expect-error
 import { mockDbConnect } from 'utils/functions/dbConnect'
 // @ts-expect-error
@@ -20,6 +20,9 @@ jest
   .mock('utils/functions/dbConnect')
   .mock('next-auth')
   .mock('utils/functions/verifyCsrfTokens')
+  .mock('app/api/auth/[...nextauth]/route', () => ({
+    nextAuthOptions: {},
+  }))
 
 describe('POST', () => {
   test('401 - Unauthorized', async () => {

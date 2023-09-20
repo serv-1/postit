@@ -1,7 +1,7 @@
 import Post from 'models/Post'
 import { NextRequest, NextResponse } from 'next/server'
 import searchPostSchema from 'schemas/searchPostSchema'
-import { Categories } from 'types/common'
+import type { Categories } from 'types'
 import err from 'utils/constants/errors'
 import dbConnect from 'utils/functions/dbConnect'
 import validate from 'utils/functions/validate'
@@ -35,10 +35,7 @@ export async function GET(request: NextRequest) {
   })
 
   if ('message' in result) {
-    return NextResponse.json(
-      { name: result.name, message: result.message },
-      { status: 422 }
-    )
+    return NextResponse.json({ message: result.message }, { status: 422 })
   }
 
   const { query, page, minPrice, maxPrice, categories, address } = result.value

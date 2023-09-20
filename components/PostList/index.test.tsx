@@ -1,21 +1,22 @@
 import { render, screen } from '@testing-library/react'
 import PostList from '.'
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
-
-const defaultPosts = [
-  {
-    id: '0',
-    name: 'Cat',
-    price: 40,
-    image: 'keyName',
-    address: 'Oslo, Norway',
-  },
-]
+import { NEXT_PUBLIC_AWS_URL } from 'env/public'
 
 it('renders', () => {
-  render(<PostList posts={defaultPosts} />)
+  render(
+    <PostList
+      posts={[
+        {
+          id: '0',
+          name: 'Cat',
+          price: 40,
+          image: 'key',
+          address: 'Oslo, Norway',
+        },
+      ]}
+    />
+  )
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', awsUrl + defaultPosts[0].image)
+  expect(img).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/key')
 })

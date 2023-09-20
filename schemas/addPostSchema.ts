@@ -1,9 +1,8 @@
-import { Categories } from '../types/common'
+import type { Categories } from '../types'
 import object from './object'
 import { addPost } from './partials'
 
 export interface AddPostSchema {
-  csrfToken: string
   name: string
   description: string
   categories: Categories[]

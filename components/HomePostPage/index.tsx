@@ -1,20 +1,17 @@
-import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useToast } from 'contexts/toast'
-import { LightPost } from 'types/common'
-import getAxiosError from 'utils/functions/getAxiosError'
+import type { SearchedPost } from 'types'
 import PostList from 'components/PostList'
 import Pagination from 'components/Pagination'
 import Blob from 'public/static/images/blob.svg'
-
-interface Response {
-  posts: LightPost[]
-  totalPages: number
-  totalPosts: number
-}
+import ajax from 'libs/ajax'
+import type {
+  PostsSearchGetData,
+  PostsSearchGetError,
+} from 'app/api/posts/search/types'
 
 export default function HomePostPage() {
-  const [posts, setPosts] = useState<LightPost[]>()
+  const [posts, setPosts] = useState<SearchedPost[]>()
   const [totalPosts, setTotalPosts] = useState<number>(0)
   const [totalPages, setTotalPages] = useState<number>(0)
 
@@ -22,17 +19,21 @@ export default function HomePostPage() {
 
   useEffect(() => {
     const onQueryStringChange = async () => {
-      try {
-        const url = '/api/posts/search' + window.location.search
-        const { data } = await axios.get<Response>(url)
+      const response = await ajax.get('/posts/search' + window.location.search)
 
-        setPosts(data.posts)
-        setTotalPosts(data.totalPosts)
-        setTotalPages(data.totalPages)
-      } catch (e) {
-        const { message } = getAxiosError(e)
+      if (!response.ok) {
+        const { message }: PostsSearchGetError = await response.json()
+
         setToast({ message, error: true })
+
+        return
       }
+
+      const data: PostsSearchGetData = await response.json()
+
+      setPosts(data.posts)
+      setTotalPosts(data.totalPosts)
+      setTotalPages(data.totalPages)
     }
 
     document.addEventListener('queryStringChange', onQueryStringChange)

@@ -1,4 +1,4 @@
-import _Post, { PostDoc } from 'models/Post'
+import _Post, { type PostDoc } from 'models/Post'
 
 export const mockSavePost = jest.fn()
 export const mockFindPostById = jest.fn()

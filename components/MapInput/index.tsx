@@ -1,9 +1,8 @@
-import axios, { AxiosError } from 'axios'
-import { FormEvent, KeyboardEvent, useRef, useState } from 'react'
+import { type FormEvent, type KeyboardEvent, useRef, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import err from 'utils/constants/errors'
-
-const lIQToken = process.env.NEXT_PUBLIC_LOCATION_IQ_TOKEN
+import { NEXT_PUBLIC_LOCATION_IQ_TOKEN } from 'env/public'
+import type { LocationIQAutocompleteGetData } from 'app/api/locationIQ/autocomplete/types'
 
 interface Prediction {
   lat: number
@@ -12,21 +11,6 @@ interface Prediction {
   address: string
   postAddress: string
 }
-
-type AutoCompleteResponse = {
-  lat: string
-  lon: string
-  display_place: string
-  display_address: string
-  address: {
-    name?: string
-    city?: string
-    county?: string
-    state?: string
-    postcode?: string
-    country?: string
-  }
-}[]
 
 interface MapInputProps {
   setLatLon: React.Dispatch<React.SetStateAction<[number, number] | undefined>>
@@ -40,64 +24,65 @@ export default function MapInput({ setLatLon }: MapInputProps) {
 
   const inputRef = useRef<HTMLInputElement>(null)
   const count = useRef(0)
-
   const { register, setValue } = useFormContext()
 
   const onInput = async (e: FormEvent<HTMLInputElement>) => {
     const value = (e.target as HTMLInputElement).value
+
     count.current++
 
     if (value.length > 200) {
-      return setError(err.ADDRESS_MAX)
+      setError(err.ADDRESS_MAX)
+
+      return
     } else if (count.current !== 2) {
       return
     } else if (count.current === 2 && !value.trim()) {
       count.current = 0
+
       return
     }
 
-    try {
-      const res = await axios.get<AutoCompleteResponse>(
-        `https://api.locationiq.com/v1/autocomplete.php?key=${lIQToken}&dedupe=1&tag=place:city,town,village,hamlet&q=${value}`
-      )
+    count.current = 0
 
-      const predictions: Prediction[] = []
+    const response = await fetch(
+      `https://api.locationiq.com/v1/autocomplete?key=${NEXT_PUBLIC_LOCATION_IQ_TOKEN}&dedupe=1&tag=place:city,town,village,hamlet&q=${value}`
+    )
 
-      for (const item of res.data) {
-        const { lat, lon, address, display_address, display_place } = item
-        const { name, postcode, county, state, country } = address
+    if (!response.ok) {
+      const { error }: { error: string } = await response.json()
 
-        const values: string[] = []
+      setError(error)
 
-        if (name) values.push(name)
-        if (postcode) values.push(postcode.split(';')[0])
-        if (county) values.push(county)
-        if (state) values.push(state)
-        if (country) values.push(country)
-
-        predictions.push({
-          lat: +lat,
-          lon: +lon,
-          place: display_place,
-          address: display_address,
-          postAddress: values.join(', '),
-        })
-      }
-
-      setPredictions(predictions)
-      setIsOpen(true)
-      setError(undefined)
-    } catch (e) {
-      const res = (e as AxiosError<{ error: string }>).response
-
-      if (!res) {
-        return setError(err.NO_RESPONSE)
-      }
-
-      setError(res.data.error)
-    } finally {
-      count.current = 0
+      return
     }
+
+    const predictions: Prediction[] = []
+    const data: LocationIQAutocompleteGetData = await response.json()
+
+    for (const item of data) {
+      const { lat, lon, address, display_address, display_place } = item
+      const { name, postcode, county, state, country } = address
+      const values: string[] = []
+
+      if (name) values.push(name)
+      if (postcode) values.push(postcode.split(';')[0])
+      if (county) values.push(county)
+      if (state) values.push(state)
+      if (country) values.push(country)
+
+      predictions.push({
+        lat: +lat,
+        lon: +lon,
+        place: display_place,
+        address: display_address,
+        postAddress: values.join(', '),
+      })
+    }
+
+    setPredictions(predictions)
+    setIsOpen(true)
+    setError(undefined)
   }
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -109,22 +94,29 @@ export default function MapInput({ setLatLon }: MapInputProps) {
     switch (e.key) {
       case 'ArrowDown': {
         const nb = idNb + 1
+
         setActivePredictionId('prediction-' + (nb === nbOfPredictions ? 0 : nb))
+
         break
       }
       case 'ArrowUp': {
         const nb = idNb - 1
         const id = 'prediction-' + (nb === -1 ? nbOfPredictions - 1 : nb)
+
         setActivePredictionId(id)
+
         break
       }
       case 'Tab':
       case 'Enter': {
         ;(e.target as HTMLInputElement).value = predictions[idNb].place
+
         setIsOpen(false)
         setLatLon([predictions[idNb].lat, predictions[idNb].lon])
         setValue('address', predictions[idNb].postAddress)
+
         e.preventDefault()
+
         break
       }
     }
@@ -172,6 +164,7 @@ export default function MapInput({ setLatLon }: MapInputProps) {
                   activePredictionId === id
                     ? 'bg-fuchsia-200'
                     : 'bg-fuchsia-100'
+
                 return (
                   <li
                     id={id}
@@ -179,10 +172,13 @@ export default function MapInput({ setLatLon }: MapInputProps) {
                     className={className + ' py-4 px-4 pb-2 cursor-pointer'}
                     onMouseDown={(e) => {
                       if (!inputRef.current) return
+
                       inputRef.current.value = prediction.place
+
                       setLatLon([prediction.lat, prediction.lon])
                       setValue('address', prediction.postAddress)
                       setIsOpen(false)
+
                       e.preventDefault()
                     }}
                     role="option"

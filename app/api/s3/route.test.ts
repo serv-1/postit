@@ -16,6 +16,12 @@ jest
   .mock('next-auth')
   .mock('utils/functions/verifyCsrfTokens')
   .mock('@aws-sdk/s3-presigned-post')
+  .mock('app/api/auth/[...nextauth]/route', () => ({
+    nextAuthOptions: {},
+  }))
+  .mock('nanoid', () => ({
+    nanoid: () => 'id',
+  }))
 
 describe('GET', () => {
   test('401 - unauthorized', async () => {
@@ -69,7 +75,7 @@ describe('GET', () => {
     expect(data).toEqual({
       url: s3Data.url,
       fields: s3Data.fields,
-      key: '_nanoid_mock',
+      key: 'id',
     })
   })
 })

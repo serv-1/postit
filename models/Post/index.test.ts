@@ -5,7 +5,7 @@
 import Post from '.'
 import mongoose, { Types } from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import User, { UserDoc } from 'models/User'
+import User, { type UserDoc } from 'models/User'
 import Discussion from 'models/Discussion'
 // @ts-expect-error
 import { mockDeleteImage } from 'utils/functions/deleteImage'

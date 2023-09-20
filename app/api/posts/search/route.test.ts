@@ -19,8 +19,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toHaveProperty('name')
-    expect(data).toHaveProperty('message')
+    expect(data).toEqual({ message: err.QUERY_INVALID })
   })
 
   test('500 - database connection failed', async () => {

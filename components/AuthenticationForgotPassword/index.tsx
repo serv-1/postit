@@ -1,16 +1,15 @@
 import { joiResolver } from '@hookform/resolvers/joi'
-import axios, { AxiosError } from 'axios'
 import { signIn } from 'next-auth/react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import getAxiosError from 'utils/functions/getAxiosError'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
 import { useToast } from 'contexts/toast'
 import Button from 'components/Button'
-import forgotPwSchema, { ForgotPwSchema } from 'schemas/forgotPwSchema'
-
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+import forgotPwSchema, { type ForgotPwSchema } from 'schemas/forgotPwSchema'
+import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
+import ajax from 'libs/ajax'
+import type { VerifyEmailPostError } from 'app/api/verify-email/types'
 
 interface AuthenticationFPProps {
   setForgotPassword: React.Dispatch<React.SetStateAction<boolean>>
@@ -26,21 +25,26 @@ export default function AuthenticationForgotPassword({
   const { setToast } = useToast()
 
   const submitHandler: SubmitHandler<ForgotPwSchema> = async (data) => {
-    try {
-      await axios.post('/api/verifyEmail', data)
-      await signIn('email', {
-        email: data.email,
-        callbackUrl: baseUrl + '/profile',
-      })
-    } catch (e) {
-      const { message, status } = getAxiosError(e as AxiosError)
+    const response = await ajax.post('/verify-email', data)
 
-      if (status !== 422) {
-        return setToast({ message, error: true })
+    if (!response.ok) {
+      const { message }: VerifyEmailPostError = await response.json()
+
+      if (response.status !== 422) {
+        setToast({ message, error: true })
+
+        return
       }
 
       methods.setError('email', { message }, { shouldFocus: true })
+
+      return
     }
+
+    await signIn('email', {
+      email: data.email,
+      callbackUrl: NEXT_PUBLIC_VERCEL_URL + '/profile',
+    })
   }
 
   return (

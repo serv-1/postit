@@ -1,5 +1,9 @@
-import { ComponentPropsWithoutRef } from 'react'
-import { FieldPath, FieldValues, useFormContext } from 'react-hook-form'
+import type { ComponentPropsWithoutRef } from 'react'
+import {
+  type FieldPath,
+  type FieldValues,
+  useFormContext,
+} from 'react-hook-form'
 
 interface InputErrorProps<FormFields extends FieldValues = FieldValues>
   extends ComponentPropsWithoutRef<'div'> {

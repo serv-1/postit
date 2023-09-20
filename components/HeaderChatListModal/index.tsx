@@ -1,20 +1,19 @@
-import axios from 'axios'
-import { Session } from 'next-auth'
-import { getCsrfToken, useSession } from 'next-auth/react'
+import type { Session } from 'next-auth'
+import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
 import { useToast } from 'contexts/toast'
 import CommentDiscussion from 'public/static/images/comment-discussion.svg'
 import X from 'public/static/images/x.svg'
-import { DiscussionEventData, User } from 'types/common'
-import getAxiosError from 'utils/functions/getAxiosError'
+import type { DiscussionEventData } from 'types'
 import Modal from 'components/Modal'
 import HeaderChatModal from 'components/HeaderChatModal'
 import getClientPusher from 'utils/functions/getClientPusher'
 import styles from 'styles/chatScrollbar.module.css'
+import ajax from 'libs/ajax'
+import type { UsersIdGetData, UsersIdGetError } from 'app/api/users/[id]/types'
 
 export default function HeaderChatListModal() {
   const [isOpen, setIsOpen] = useState(false)
-  const [csrfToken, setCsrfToken] = useState<string>()
   const [discussionIds, setDiscussionIds] = useState<string[]>([])
   const [hasUnseenMessages, setHasUnseenMessages] = useState(false)
 
@@ -24,18 +23,23 @@ export default function HeaderChatListModal() {
   const { data: session } = useSession() as { data: Session }
 
   useEffect(() => {
-    const getDiscussionsIds = async () => {
-      try {
-        const { data } = await axios.get<User>('/api/users/' + session.id)
+    async function getDiscussionsIds() {
+      const response = await ajax.get('/users/' + session.id)
 
-        setDiscussionIds(data.discussionIds)
-        setHasUnseenMessages(data.hasUnseenMessages)
-        setCsrfToken(await getCsrfToken())
-      } catch (e) {
-        const { message } = getAxiosError(e)
+      if (!response.ok) {
+        const { message }: UsersIdGetError = await response.json()
+
         setToast({ message, error: true })
+
+        return
       }
+
+      const user: UsersIdGetData = await response.json()
+
+      setDiscussionIds(user.discussionIds)
+      setHasUnseenMessages(user.hasUnseenMessages)
     }
+
     getDiscussionsIds()
   }, [setToast, session.id])
 
@@ -122,11 +126,7 @@ export default function HeaderChatListModal() {
                 }
               >
                 {discussionIds.map((id) => (
-                  <HeaderChatModal
-                    key={id}
-                    csrfToken={csrfToken}
-                    discussionId={id}
-                  />
+                  <HeaderChatModal key={id} discussionId={id} />
                 ))}
               </div>
             )}

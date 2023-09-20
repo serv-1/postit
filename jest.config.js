@@ -9,12 +9,9 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.tsx'],
   // if using TypeScript with a baseUrl set to the root directory then you need the below for alias' to work
   moduleDirectories: ['node_modules', '<rootDir>/'],
-  moduleNameMapper: {
-    '^.+\\.(svg)$': require.resolve('./__mocks__/fileMock.tsx'),
-  },
+  moduleNameMapper: { '^.+\\.(svg)$': require.resolve('./__mocks__/svg.tsx') },
   modulePathIgnorePatterns: ['<rootDir>/.*/__mocks__'],
   testEnvironment: 'jest-environment-jsdom',
-  testPathIgnorePatterns: ['/cypress/'],
   clearMocks: true,
   resetMocks: true,
 }

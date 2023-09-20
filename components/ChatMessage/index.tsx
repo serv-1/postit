@@ -1,8 +1,6 @@
+import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 import Image from 'next/image'
 import { useState } from 'react'
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
-const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE as string
 
 interface ChatMessageProps {
   message: string
@@ -30,7 +28,11 @@ export default function ChatMessage({
       onClick={() => setShowDate(!showDate)}
     >
       <Image
-        src={image ? awsUrl + image : defaultUserImage}
+        src={
+          image
+            ? NEXT_PUBLIC_AWS_URL + '/' + image
+            : NEXT_PUBLIC_DEFAULT_USER_IMAGE
+        }
         alt={name + "'s profile picture"}
         width={40}
         height={40}

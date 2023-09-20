@@ -1,4 +1,4 @@
-import Popup, { PopupProps } from '../../components/Popup'
+import Popup, { type PopupProps } from 'components/Popup'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { usePopper } from 'react-popper'

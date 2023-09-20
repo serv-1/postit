@@ -1,9 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ChatMessage from '.'
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
-const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
+import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 
 it('renders', () => {
   const date = new Date()
@@ -19,7 +17,7 @@ it('renders', () => {
   )
 
   const image = screen.getByRole('img')
-  expect(image).toHaveAttribute('src', awsUrl + 'keyName')
+  expect(image).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/keyName')
   expect(image.getAttribute('alt')).toContain('john')
 
   const msgContainer = container.firstElementChild
@@ -44,7 +42,7 @@ it('renders the default image', () => {
   )
 
   const image = screen.getByRole('img')
-  expect(image).toHaveAttribute('src', defaultUserImage)
+  expect(image).toHaveAttribute('src', NEXT_PUBLIC_DEFAULT_USER_IMAGE)
 })
 
 it('renders/unmounts the creation date on click', async () => {

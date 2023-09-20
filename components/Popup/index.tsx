@@ -1,12 +1,12 @@
-import { Options as OffsetOptions } from '@popperjs/core/lib/modifiers/offset'
-import { Options as ArrowOptions } from '@popperjs/core/lib/modifiers/arrow'
-import { PreventOverflowModifier } from '@popperjs/core/lib/modifiers/preventOverflow'
-import { ComputeStylesModifier } from '@popperjs/core/lib/modifiers/computeStyles'
-import { FlipModifier } from '@popperjs/core/lib/modifiers/flip'
+import type { Options as OffsetOptions } from '@popperjs/core/lib/modifiers/offset'
+import type { Options as ArrowOptions } from '@popperjs/core/lib/modifiers/arrow'
+import type { PreventOverflowModifier } from '@popperjs/core/lib/modifiers/preventOverflow'
+import type { ComputeStylesModifier } from '@popperjs/core/lib/modifiers/computeStyles'
+import type { FlipModifier } from '@popperjs/core/lib/modifiers/flip'
 import { useEffect, useState } from 'react'
 import { usePopper } from 'react-popper'
-import { EventListenersModifier } from '@popperjs/core/lib/modifiers/eventListeners'
-import { Placement, PositioningStrategy, State } from '@popperjs/core'
+import type { EventListenersModifier } from '@popperjs/core/lib/modifiers/eventListeners'
+import type { Placement, PositioningStrategy, State } from '@popperjs/core'
 
 type Reference = HTMLButtonElement | null
 type Arrow = HTMLDivElement | null

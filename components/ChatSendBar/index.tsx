@@ -1,14 +1,15 @@
 import Form from 'components/Form'
 import PaperAirPlane from 'public/static/images/paper-airplane.svg'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import updateDiscussionSchema, {
-  UpdateDiscussionSchema,
+  type UpdateDiscussionSchema,
 } from 'schemas/updateDiscussionSchema'
 import { useEffect } from 'react'
 import { useToast } from 'contexts/toast'
-import getAxiosError from 'utils/functions/getAxiosError'
-import axios from 'axios'
+import ajax from 'libs/ajax'
+import type { DiscussionsIdPutError } from 'app/api/discussions/[id]/types'
+import type { DiscussionPostError } from 'app/api/discussion/types'
 
 interface WithDiscussionId {
   discussionId: string
@@ -24,12 +25,9 @@ export interface WithoutDiscussionId {
   sellerId: string
 }
 
-export type ChatSendBarProps = (WithDiscussionId | WithoutDiscussionId) & {
-  csrfToken?: string
-}
+export type ChatSendBarProps = WithDiscussionId | WithoutDiscussionId
 
 export default function ChatSendBar({
-  csrfToken,
   discussionId,
   postId,
   postName,
@@ -44,18 +42,22 @@ export default function ChatSendBar({
   const { errors, isSubmitSuccessful } = formState
 
   const submitHandler: SubmitHandler<UpdateDiscussionSchema> = async (data) => {
-    try {
-      const message = data.message
+    const response = !discussionId
+      ? await ajax.post(
+          '/discussion',
+          { message: data.message, postId, sellerId, postName },
+          { csrf: true }
+        )
+      : await ajax.put(
+          '/discussions/' + discussionId,
+          { message: data.message },
+          { csrf: true }
+        )
 
-      if (!discussionId) {
-        const payload = { message, postId, sellerId, postName, csrfToken }
-        await axios.post('/api/discussion', payload)
-      } else {
-        const url = '/api/discussions/' + discussionId
-        await axios.put(url, { message, csrfToken })
-      }
-    } catch (e) {
-      const { message } = getAxiosError(e)
+    if (!response.ok) {
+      const { message }: DiscussionPostError | DiscussionsIdPutError =
+        await response.json()
+
       setToast({ message, error: true })
     }
   }
@@ -75,7 +77,6 @@ export default function ChatSendBar({
       method="post"
       methods={methods}
       submitHandler={submitHandler}
-      csrfToken={csrfToken}
       className="flex flex-row flex-nowrap m-8 md:m-16"
     >
       <textarea

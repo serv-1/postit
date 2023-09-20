@@ -1,145 +1,187 @@
-import {
-  render,
-  screen,
-  waitForElementToBeRemoved,
-  waitFor,
-} from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProfilePostList from '.'
-import server from 'mocks/server'
-import err from 'utils/constants/errors'
+import { setupServer } from 'msw/node'
+import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
+import { rest } from 'msw'
+import 'cross-fetch/polyfill'
 
+const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const mockSetToast = jest.fn()
+const server = setupServer()
 
 jest.mock('contexts/toast', () => ({
   useToast: () => ({ setToast: mockSetToast, toast: {} }),
 }))
 
-const axiosDelete = jest.spyOn(require('axios'), 'delete')
+beforeEach(() => {
+  mockGetCsrfToken.mockResolvedValue('token')
+})
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
-
-const posts = [
-  { id: '0', name: 'table', image: 'keyName' },
-  { id: '1', name: 'chair', image: 'keyName' },
-]
-
-const favPosts = [
-  { id: '0', name: 'table', image: 'keyName' },
-  { id: '1', name: 'chair', image: 'keyName' },
-]
-
 it('renders without posts', () => {
   render(<ProfilePostList posts={[]} altText="no posts" />)
 
   const altText = screen.getByText('no posts')
+
   expect(altText).toBeInTheDocument()
 })
 
-it('renders with posts', () => {
+it('renders with some posts', () => {
+  const posts = [
+    { id: '0', name: 'table', image: 'table.jpeg' },
+    { id: '1', name: 'chair', image: 'chair.jpeg' },
+  ]
+
   render(<ProfilePostList posts={posts} altText="no posts" />)
 
-  const links = screen.getAllByRole('link')
-  for (let i = 0; i < links.length; i++) {
-    expect(links[i]).toHaveAttribute('href', `/posts/${i}/${posts[i].name}`)
-  }
+  const tableName = screen.getByText(/table/i)
 
-  const deleteBtns = screen.getAllByRole('button')
-  for (let i = 0; i < deleteBtns.length; i++) {
-    expect(deleteBtns[i]).toHaveAccessibleName('Delete ' + posts[i].name)
-    expect(deleteBtns[i]).toHaveAttribute('title', 'Delete ' + posts[i].name)
-  }
+  expect(tableName).toBeInTheDocument()
 
-  const images = screen.getAllByRole('img')
-  for (let i = 0; i < images.length; i++) {
-    expect(images[i]).toHaveAttribute('src', awsUrl + posts[i].image)
-  }
+  const chairName = screen.getByText(/chair/i)
 
-  const postName1 = screen.getByText(/table/i)
-  expect(postName1).toBeInTheDocument()
+  expect(chairName).toBeInTheDocument()
 
-  const postName2 = screen.getByText(/chair/i)
-  expect(postName2).toBeInTheDocument()
+  const tableLink = screen.getByRole('link', { name: /table/i })
+
+  expect(tableLink).toHaveAttribute('href', '/posts/0/table')
+
+  const chairLink = screen.getByRole('link', { name: /chair/i })
+
+  expect(chairLink).toHaveAttribute('href', '/posts/1/chair')
+
+  const deleteTableBtn = screen.getByRole('button', { name: /table/i })
+
+  expect(deleteTableBtn).toHaveAccessibleName('Delete table')
+  expect(deleteTableBtn).toHaveAttribute('title', 'Delete table')
+
+  const deleteChairBtn = screen.getByRole('button', { name: /chair/i })
+
+  expect(deleteChairBtn).toHaveAccessibleName('Delete chair')
+  expect(deleteChairBtn).toHaveAttribute('title', 'Delete chair')
+
+  const tableImage = screen.getByAltText('table')
+
+  expect(tableImage).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/table.jpeg')
+
+  const chairImage = screen.getByAltText('chair')
+
+  expect(chairImage).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/chair.jpeg')
 })
 
-it('renders with favorite posts', () => {
-  render(<ProfilePostList isFavPost posts={favPosts} altText="no posts" />)
+it('deletes one post', async () => {
+  server.use(
+    rest.delete('http://localhost/api/posts/:id', (req, res, ctx) => {
+      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(req.params.id).toBe('0')
 
-  const links = screen.getAllByRole('link')
-  for (let i = 0; i < links.length; i++) {
-    expect(links[i]).toHaveAttribute('href', `/posts/${i}/${favPosts[i].name}`)
-  }
-
-  const deleteBtns = screen.getAllByRole('button')
-  for (let i = 0; i < deleteBtns.length; i++) {
-    expect(deleteBtns[i]).toHaveAccessibleName('Delete ' + posts[i].name)
-    expect(deleteBtns[i]).toHaveAttribute('title', 'Delete ' + posts[i].name)
-  }
-
-  const images = screen.getAllByRole('img')
-  for (let i = 0; i < images.length; i++) {
-    expect(images[i]).toHaveAttribute('src', awsUrl + favPosts[i].image)
-  }
-
-  const postName1 = screen.getByText(/table/i)
-  expect(postName1).toBeInTheDocument()
-
-  const postName2 = screen.getByText(/chair/i)
-  expect(postName2).toBeInTheDocument()
-})
-
-test('the delete button deletes the post', async () => {
-  render(<ProfilePostList posts={posts} altText="no posts" />)
-
-  const deleteBtns = screen.getAllByRole('button')
-  for (let i = 0; i < deleteBtns.length; i++) {
-    await userEvent.click(deleteBtns[i])
-
-    await waitForElementToBeRemoved(() => {
-      return screen.getByRole('button', { name: 'Delete ' + posts[i].name })
+      return res(ctx.status(204))
     })
-    expect(mockSetToast).toHaveBeenCalledTimes(i + 1)
-  }
+  )
 
-  const altText = screen.getByText('no posts')
-  expect(altText).toBeInTheDocument()
-})
-
-test('the delete button deletes the favorite post', async () => {
-  render(<ProfilePostList isFavPost posts={favPosts} altText="no posts" />)
-
-  const deleteBtns = screen.getAllByRole('button')
-  for (let i = 0; i < deleteBtns.length; i++) {
-    await userEvent.click(deleteBtns[i])
-
-    await waitForElementToBeRemoved(() => {
-      return screen.getByRole('button', { name: 'Delete ' + favPosts[i].name })
-    })
-    expect(mockSetToast).toHaveBeenCalledTimes(i + 1)
-  }
-
-  const altText = screen.getByText('no posts')
-  expect(altText).toBeInTheDocument()
-})
-
-test('an error renders if the server fails to delete the post', async () => {
-  axiosDelete.mockRejectedValue({
-    response: { data: { message: err.DEFAULT } },
-  })
+  const posts = [
+    { id: '0', name: 'table', image: 'img' },
+    { id: '1', name: 'chair', image: 'img' },
+  ]
 
   render(<ProfilePostList posts={posts} altText="no posts" />)
 
-  const deleteBtns = screen.getAllByRole('button')
-  await userEvent.click(deleteBtns[0])
+  const deleteBtn = screen.getByRole('button', { name: /table/i })
+
+  await userEvent.click(deleteBtn)
+
+  expect(deleteBtn).not.toBeInTheDocument()
+
+  const chair = screen.getByText('chair')
+
+  expect(chair).toBeInTheDocument()
+})
+
+it('deletes one favorite post', async () => {
+  server.use(
+    rest.put('http://localhost/api/user', async (req, res, ctx) => {
+      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(await req.json()).toEqual({ favPostId: '0' })
+
+      return res(ctx.status(204))
+    })
+  )
+
+  const posts = [
+    { id: '0', name: 'table', image: 'img' },
+    { id: '1', name: 'chair', image: 'img' },
+  ]
+
+  render(<ProfilePostList isFavPost posts={posts} altText="no posts" />)
+
+  const deleteBtn = screen.getByRole('button', { name: /table/i })
+
+  await userEvent.click(deleteBtn)
+
+  expect(deleteBtn).not.toBeInTheDocument()
+
+  const chair = screen.getByText('chair')
+
+  expect(chair).toBeInTheDocument()
+})
+
+it('renders an error if the server fails to delete one post', async () => {
+  server.use(
+    rest.delete('http://localhost/api/posts/:id', (req, res, ctx) => {
+      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    })
+  )
+
+  render(
+    <ProfilePostList
+      posts={[{ id: '0', name: 'table', image: 'img' }]}
+      altText="no posts"
+    />
+  )
+
+  const deleteBtn = screen.getByRole('button', { name: /table/i })
+
+  await userEvent.click(deleteBtn)
 
   await waitFor(() => {
     expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: err.DEFAULT,
+      message: 'error',
       error: true,
     })
   })
+
+  expect(deleteBtn).toBeInTheDocument()
+})
+
+it('renders an error if the server fails to delete one favorite post', async () => {
+  server.use(
+    rest.put('http://localhost/api/user', (req, res, ctx) => {
+      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    })
+  )
+
+  render(
+    <ProfilePostList
+      isFavPost
+      posts={[{ id: '0', name: 'table', image: 'img' }]}
+      altText="no posts"
+    />
+  )
+
+  const deleteBtn = screen.getByRole('button', { name: /table/i })
+
+  await userEvent.click(deleteBtn)
+
+  await waitFor(() => {
+    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
+      message: 'error',
+      error: true,
+    })
+  })
+
+  expect(deleteBtn).toBeInTheDocument()
 })

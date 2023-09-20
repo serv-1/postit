@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { RegisterOptions } from 'react-hook-form'
+import type { RegisterOptions } from 'react-hook-form'
 import TextArea from '.'
 
 const setFocus = jest.fn()

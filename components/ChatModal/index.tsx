@@ -1,6 +1,6 @@
 import ChatSendBar, {
-  ChatSendBarProps,
-  WithoutDiscussionId,
+  type ChatSendBarProps,
+  type WithoutDiscussionId,
 } from 'components/ChatSendBar'
 import Modal from 'components/Modal'
 import X from 'public/static/images/x.svg'
@@ -8,8 +8,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import getClientPusher from 'utils/functions/getClientPusher'
 import ChatMessageList from 'components/ChatMessageList'
-import { Session } from 'next-auth'
-import { DiscussionEventData } from 'types/common'
+import type { Session } from 'next-auth'
+import type { DiscussionEventData } from 'types'
 
 export type ChatModalProps = ChatSendBarProps & {
   isOpen: boolean
@@ -19,7 +19,6 @@ export type ChatModalProps = ChatSendBarProps & {
 export default function ChatModal({
   isOpen,
   setIsOpen,
-  csrfToken,
   postName,
   postId,
   sellerId,
@@ -67,8 +66,8 @@ export default function ChatModal({
         >
           <X className="w-full h-full" />
         </button>
-        <ChatMessageList csrfToken={csrfToken} discussionId={discussionId} />
-        <ChatSendBar csrfToken={csrfToken} {...chatSendBarProps} />
+        <ChatMessageList discussionId={discussionId} />
+        <ChatSendBar {...chatSendBarProps} />
       </div>
     </Modal>
   ) : null

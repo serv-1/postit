@@ -1,14 +1,14 @@
-import { DeleteResult } from 'mongodb'
+import type { DeleteResult } from 'mongodb'
 import {
   models,
   model,
   Schema,
-  Model,
+  type Model,
   Types,
   Query,
-  UpdateWriteOpResult,
+  type UpdateWriteOpResult,
 } from 'mongoose'
-import { Categories } from 'types/common'
+import type { Categories } from 'types'
 import deleteImage from 'utils/functions/deleteImage'
 import Discussion from 'models/Discussion'
 import User from 'models/User'

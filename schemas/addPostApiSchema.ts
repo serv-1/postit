@@ -1,4 +1,4 @@
-import { Categories } from '../types/common'
+import type { Categories } from '../types'
 import imagesSchema from './imagesSchema'
 import latLonSchema from './latLonSchema'
 import object from './object'

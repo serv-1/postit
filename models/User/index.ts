@@ -1,9 +1,9 @@
-import { DeleteResult } from 'mongodb'
-import { models, model, Schema, Model, Types, Query } from 'mongoose'
+import { type DeleteResult } from 'mongodb'
+import { models, model, Schema, type Model, Types, Query } from 'mongoose'
 import { nanoid } from 'nanoid'
 import deleteImage from 'utils/functions/deleteImage'
 import Account from 'models/Account'
-import Discussion, { DiscussionDoc } from 'models/Discussion'
+import Discussion, { type DiscussionDoc } from 'models/Discussion'
 import Post from 'models/Post'
 import hashPassword from 'utils/functions/hashPassword'
 

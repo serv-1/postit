@@ -1,11 +1,15 @@
 import ReactSelect, {
-  StylesConfig,
-  MultiValue,
-  CSSObjectWithLabel,
+  type StylesConfig,
+  type MultiValue,
+  type CSSObjectWithLabel,
 } from 'react-select'
-import { useController, FieldValues, FieldPath } from 'react-hook-form'
-import { StateManagerProps } from 'react-select/dist/declarations/src/useStateManager'
-import { Categories } from 'types/common'
+import {
+  useController,
+  type FieldValues,
+  type FieldPath,
+} from 'react-hook-form'
+import type { StateManagerProps } from 'react-select/dist/declarations/src/useStateManager'
+import type { Categories } from 'types'
 
 export interface Option {
   label: Categories

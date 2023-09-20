@@ -1,4 +1,4 @@
-import type { Post } from 'types/common'
+import type { Post } from 'types'
 import getPost from 'utils/functions/getPost'
 
 export default async function getPosts(postIds: string[]): Promise<Post[]> {

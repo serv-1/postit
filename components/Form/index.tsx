@@ -1,45 +1,37 @@
-import { ComponentPropsWithoutRef } from 'react'
-import * as RHF from 'react-hook-form'
+import type { ComponentPropsWithoutRef } from 'react'
+import {
+  FormProvider,
+  type FieldValues,
+  type UseFormReturn,
+  type SubmitHandler,
+  type SubmitErrorHandler,
+} from 'react-hook-form'
 
-type FormProps<FormFields extends RHF.FieldValues = RHF.FieldValues> =
+type FormProps<FormFields extends FieldValues = FieldValues> =
   ComponentPropsWithoutRef<'form'> & {
-    methods: RHF.UseFormReturn<FormFields>
-    submitHandler: RHF.SubmitHandler<FormFields>
-    submitErrorHandler?: RHF.SubmitErrorHandler<FormFields>
-  } & (FormFields extends { csrfToken: string }
-      ? { csrfToken?: string }
-      : { csrfToken?: never })
+    methods: UseFormReturn<FormFields>
+    submitHandler: SubmitHandler<FormFields>
+    submitErrorHandler?: SubmitErrorHandler<FormFields>
+  }
 
-export default function Form<
-  FormFields extends RHF.FieldValues = RHF.FieldValues
->({
+export default function Form<FormFields extends FieldValues = FieldValues>({
   methods,
   submitHandler,
   submitErrorHandler,
-  csrfToken,
   children,
   ...props
 }: FormProps<FormFields>) {
-  const { handleSubmit, register } = methods
-
   return (
-    <RHF.FormProvider {...methods}>
+    <FormProvider {...methods}>
       <form
         {...props}
         id={props.name}
         action=""
         noValidate
-        onSubmit={handleSubmit(submitHandler, submitErrorHandler)}
+        onSubmit={methods.handleSubmit(submitHandler, submitErrorHandler)}
       >
-        {csrfToken && (
-          <input
-            {...register('csrfToken' as any)}
-            type="hidden"
-            value={csrfToken}
-          />
-        )}
         {children}
       </form>
-    </RHF.FormProvider>
+    </FormProvider>
   )
 }

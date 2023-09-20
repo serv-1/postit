@@ -1,9 +1,9 @@
 import classNames from 'classnames'
 import { useEffect } from 'react'
 import {
-  FieldPath,
-  FieldValues,
-  RegisterOptions,
+  type FieldPath,
+  type FieldValues,
+  type RegisterOptions,
   useFormContext,
 } from 'react-hook-form'
 import { BORDER, RED_BORDER } from 'components/Input'

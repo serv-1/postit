@@ -1,10 +1,9 @@
-import { Categories } from '../types/common'
+import type { Categories } from '../types'
 import imagesFileListSchema from './imagesFileListSchema'
 import object from './object'
 import { updatePost } from './partials'
 
 export interface UpdatePostSchema {
-  csrfToken: string
   name?: string
   description?: string
   categories?: Categories[]

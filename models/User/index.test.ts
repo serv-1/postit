@@ -4,7 +4,7 @@
 
 import mongoose, { Types } from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import User, { UserDoc } from '.'
+import User, { type UserDoc } from '.'
 import Account from 'models/Account'
 import Post from 'models/Post'
 import Discussion from 'models/Discussion'

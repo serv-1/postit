@@ -1,4 +1,4 @@
-import { Schema } from 'joi'
+import type { Schema } from 'joi'
 
 type ValidateReturn<Value> =
   | {

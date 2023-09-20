@@ -1,95 +1,109 @@
 import AuthenticationForgotPassword from '.'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import err from 'utils/constants/errors'
-import server from 'mocks/server'
 import { rest } from 'msw'
-import { useToast } from 'contexts/toast'
+import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
+import { setupServer } from 'msw/node'
+import 'cross-fetch/polyfill'
+
+const mockSetToast = jest.fn()
+const mockSignIn = jest.spyOn(require('next-auth/react'), 'signIn')
+const server = setupServer()
 
 jest.mock('contexts/toast', () => ({
-  useToast: jest.fn(),
+  useToast: () => ({ setToast: mockSetToast, toast: {} }),
 }))
 
-const useToastMock = useToast as jest.MockedFunction<typeof useToast>
-
-const signIn = jest.spyOn(require('next-auth/react'), 'signIn')
-
-const setToast = jest.fn()
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+beforeEach(() => {
+  mockSignIn.mockResolvedValue({ error: '' })
+})
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-beforeEach(() => {
-  signIn.mockResolvedValue({ error: '' })
-  useToastMock.mockReturnValue({ setToast, toast: {} })
-})
-
-test('the form sends a mail to the user to sign in, which redirect him to its profile', async () => {
-  render(<AuthenticationForgotPassword setForgotPassword={() => null} />)
-
-  const input = screen.getByRole('textbox')
-  await userEvent.type(input, 'johndoe@test.com')
-
-  const submitBtn = screen.getByRole('button', { name: /send/i })
-  await userEvent.click(submitBtn)
-
-  await waitFor(() => {
-    expect(signIn).toHaveBeenNthCalledWith(1, 'email', {
-      email: 'johndoe@test.com',
-      callbackUrl: baseUrl + '/profile',
-    })
-  })
-})
-
-test('an error renders if the server fails to verify the user email', async () => {
+it('sends a mail to sign the user in', async () => {
   server.use(
-    rest.post('http://localhost/api/verifyEmail', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: err.DEFAULT }))
+    rest.post('http://localhost/api/verify-email', async (req, res, ctx) => {
+      expect(await req.json()).toEqual({ email: 'john@test.com' })
+
+      return res(ctx.status(204))
     })
   )
 
   render(<AuthenticationForgotPassword setForgotPassword={() => null} />)
 
   const input = screen.getByRole('textbox')
-  await userEvent.type(input, 'johndoe@test.com')
+
+  await userEvent.type(input, 'john@test.com')
 
   const submitBtn = screen.getByRole('button', { name: /send/i })
+
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    const toast = { message: err.DEFAULT, error: true }
-    expect(setToast).toHaveBeenNthCalledWith(1, toast)
+    expect(mockSignIn).toHaveBeenNthCalledWith(1, 'email', {
+      email: 'john@test.com',
+      callbackUrl: NEXT_PUBLIC_VERCEL_URL + '/profile',
+    })
   })
 })
 
-test('an error renders if the server fails to validate the request data', async () => {
+it('renders an error if the server fails to verify the user email', async () => {
   server.use(
-    rest.post('http://localhost/api/verifyEmail', (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ message: err.EMAIL_INVALID }))
+    rest.post('http://localhost/api/verify-email', (req, res, ctx) => {
+      return res(ctx.status(500), ctx.json({ message: 'error' }))
     })
   )
 
   render(<AuthenticationForgotPassword setForgotPassword={() => null} />)
 
   const input = screen.getByRole('textbox')
-  await userEvent.type(input, 'johndoe@test.com')
+
+  await userEvent.type(input, 'john@test.com')
 
   const submitBtn = screen.getByRole('button', { name: /send/i })
+
+  await userEvent.click(submitBtn)
+
+  await waitFor(() => {
+    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
+      message: 'error',
+      error: true,
+    })
+  })
+})
+
+it('renders an error if the server fails to validate the request data', async () => {
+  server.use(
+    rest.post('http://localhost/api/verify-email', (req, res, ctx) => {
+      return res(ctx.status(422), ctx.json({ message: 'error' }))
+    })
+  )
+
+  render(<AuthenticationForgotPassword setForgotPassword={() => null} />)
+
+  const input = screen.getByRole('textbox')
+
+  await userEvent.type(input, 'john@test.com')
+
+  const submitBtn = screen.getByRole('button', { name: /send/i })
+
   await userEvent.click(submitBtn)
 
   const alert = await screen.findByRole('alert')
-  expect(alert).toHaveTextContent(err.EMAIL_INVALID)
 
+  expect(alert).toHaveTextContent('error')
   expect(input).toHaveFocus()
 })
 
-test('the "Back to Auth." button returns the user to the sign in form', async () => {
+it('returns the user to the sign in form', async () => {
   const setForgotPassword = jest.fn()
+
   render(<AuthenticationForgotPassword setForgotPassword={setForgotPassword} />)
 
   const backToAuthBtn = screen.getByRole('button', { name: /back/i })
+
   await userEvent.click(backToAuthBtn)
 
   expect(setForgotPassword).toHaveBeenNthCalledWith(1, false)

@@ -1,26 +1,28 @@
-import axios, { AxiosError } from 'axios'
-import { getCsrfToken, signOut } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
 import { useToast } from 'contexts/toast'
-import getAxiosError from 'utils/functions/getAxiosError'
 import Modal from 'components/Modal'
 import X from 'public/static/images/x.svg'
 import { useState } from 'react'
 import Button from 'components/Button'
+import ajax from 'libs/ajax'
+import type { UserDeleteError } from 'app/api/user/types'
 
 export default function DeleteAccountModal() {
   const [isOpen, setIsOpen] = useState(false)
   const { setToast } = useToast()
 
-  const deleteUser = async () => {
-    try {
-      const data = { csrfToken: await getCsrfToken() }
-      await axios.delete('/api/user', { data })
+  async function deleteUser() {
+    const response = await ajax.delete('/user', { csrf: true })
 
-      await signOut({ callbackUrl: '/' })
-    } catch (e) {
-      const { message } = getAxiosError(e as AxiosError)
+    if (!response.ok) {
+      const { message }: UserDeleteError = await response.json()
+
       setToast({ message, error: true })
+
+      return
     }
+
+    await signOut({ callbackUrl: '/' })
   }
 
   return (

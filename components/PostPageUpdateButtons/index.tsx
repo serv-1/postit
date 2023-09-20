@@ -3,11 +3,10 @@ import Pencil from 'public/static/images/pencil.svg'
 import X from 'public/static/images/x.svg'
 import Link from 'next/link'
 import { useToast } from 'contexts/toast'
-import getAxiosError from 'utils/functions/getAxiosError'
-import axios, { AxiosError } from 'axios'
-import { getCsrfToken } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Button from 'components/Button'
+import ajax from 'libs/ajax'
+import type { PostsIdDeleteError } from 'app/api/posts/[id]/types'
 
 interface PostPageUpdateButtonsProps {
   id: string
@@ -24,14 +23,17 @@ export default function PostPageUpdateButtons({
   const router = useRouter()
 
   const deletePost = async () => {
-    try {
-      const csrfToken = await getCsrfToken()
-      await axios.delete('/api/posts/' + id, { data: { csrfToken } })
-      router.push('/profile')
-    } catch (e) {
-      const { message } = getAxiosError(e as AxiosError)
+    const response = await ajax.delete('/posts/' + id, { csrf: true })
+
+    if (!response.ok) {
+      const { message }: PostsIdDeleteError = await response.json()
+
       setToast({ message, error: true })
+
+      return
     }
+
+    router.push('/profile')
   }
 
   return (

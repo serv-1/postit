@@ -1,5 +1,5 @@
 import _User from 'models/User'
-import { AddUserSchema } from 'schemas/addUserSchema'
+import type { AddUserSchema } from 'schemas/addUserSchema'
 
 export const mockSaveUser = jest.fn()
 export const mockUpdateOneUser = jest.fn()

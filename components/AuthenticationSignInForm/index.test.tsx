@@ -2,12 +2,12 @@ import AuthenticationSignInForm from '.'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import err from 'utils/constants/errors'
-import { ClientSafeProvider, LiteralUnion, signIn } from 'next-auth/react'
-import server from 'mocks/server'
+import type { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
+import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 
 const mockSetToast = jest.fn()
 const mockRouterPush = jest.fn()
-const mockSignIn = jest.fn()
+const mockSignIn = jest.spyOn(require('next-auth/react'), 'signIn')
 
 jest
   .mock('contexts/toast', () => ({
@@ -16,15 +16,6 @@ jest
   .mock('next/navigation', () => ({
     useRouter: () => ({ push: mockRouterPush }),
   }))
-  .mock('next-auth/react', () => ({
-    signIn: (...args: Parameters<typeof signIn>) => mockSignIn(...args),
-  }))
-
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
 
 it('signs in the user and redirects him to its profile', async () => {
   render(
@@ -100,7 +91,7 @@ test('the providers render', async () => {
 
   await userEvent.click(googleBtn)
   expect(mockSignIn).toHaveBeenNthCalledWith(1, 'google', {
-    callbackUrl: baseUrl + '/profile',
+    callbackUrl: NEXT_PUBLIC_VERCEL_URL + '/profile',
   })
 
   const emailBtn = screen.queryByRole('button', { name: /email/i })

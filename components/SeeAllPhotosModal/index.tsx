@@ -11,6 +11,7 @@ interface SeeAllPhotosModalProps {
 
 export default function SeeAllPhotosModal({ sources }: SeeAllPhotosModalProps) {
   const [isOpen, setIsOpen] = useState(false)
+
   return (
     <>
       <div className="absolute bottom-8 right-8">

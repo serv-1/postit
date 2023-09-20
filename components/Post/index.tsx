@@ -4,8 +4,7 @@ import formatToUrl from 'utils/functions/formatToUrl'
 import Link from 'next/link'
 import Location from 'public/static/images/location.svg'
 import Popup from 'components/Popup'
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+import { NEXT_PUBLIC_AWS_URL } from 'env/public'
 
 interface PostProps {
   id: string
@@ -32,7 +31,7 @@ export default function Post({ id, name, price, image, address }: PostProps) {
         }
       />
       <Image
-        src={awsUrl + image}
+        src={NEXT_PUBLIC_AWS_URL + '/' + image}
         alt={name}
         width="328"
         height="328"

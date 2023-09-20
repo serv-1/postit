@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Index from 'app/pages'
+import Index from 'app/pages/root'
 
 export const metadata: Metadata = {
   title: 'Home - PostIt',

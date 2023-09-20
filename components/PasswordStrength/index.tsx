@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactNode, useState } from 'react'
+import { type ChangeEvent, type ReactNode, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import zxcvbn from 'zxcvbn'
 

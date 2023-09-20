@@ -1,9 +1,9 @@
 import classNames from 'classnames'
-import { ComponentPropsWithoutRef, ReactNode, useEffect } from 'react'
+import { type ComponentPropsWithoutRef, type ReactNode, useEffect } from 'react'
 import {
-  FieldPath,
-  FieldValues,
-  RegisterOptions,
+  type FieldPath,
+  type FieldValues,
+  type RegisterOptions,
   useFormContext,
 } from 'react-hook-form'
 

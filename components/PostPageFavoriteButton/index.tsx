@@ -1,11 +1,10 @@
-import axios, { AxiosError } from 'axios'
-import { getCsrfToken } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { useToast } from 'contexts/toast'
-import getAxiosError from 'utils/functions/getAxiosError'
 import DotButton from 'components/DotButton'
 import Heart from 'public/static/images/heart.svg'
 import HeartFill from 'public/static/images/heart-fill.svg'
+import ajax from 'libs/ajax'
+import type { UserPutError } from 'app/api/user/types'
 
 interface PostPageFavoriteButtonProps {
   postId: string
@@ -30,22 +29,28 @@ export default function PostPageFavoriteButton({
 
   const handleFavPost = favPostIds
     ? async () => {
-        try {
-          const csrfToken = await getCsrfToken()
-          await axios.put('/api/user', { csrfToken, favPostId: postId })
+        const response = await ajax.put(
+          '/user',
+          { favPostId: postId },
+          { csrf: true }
+        )
 
-          setToast({
-            message: `This post has been successfully ${
-              isFavPost ? 'deleted from' : 'added to'
-            } your favorite list! 🎉`,
-          })
-
-          setIsFavPost(!isFavPost)
-        } catch (e) {
-          const { message } = getAxiosError(e as AxiosError)
+        if (!response.ok) {
+          const { message }: UserPutError = await response.json()
 
           setToast({ message, error: true })
+
+          return
         }
+
+        setToast({
+          message:
+            'This post has been successfully ' +
+            (isFavPost ? 'deleted from' : 'added to') +
+            ' your favorite list! 🎉',
+        })
+
+        setIsFavPost(!isFavPost)
       }
     : () =>
         setToast({

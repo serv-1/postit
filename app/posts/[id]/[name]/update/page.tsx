@@ -1,6 +1,5 @@
 import UpdatePost from 'app/pages/postUpdate'
 import type { Metadata } from 'next'
-import { getCsrfToken } from 'next-auth/react'
 import getPost from 'utils/functions/getPost'
 
 interface Params {
@@ -22,7 +21,6 @@ export async function generateMetadata({
 
 export default async function Page({ params }: { params: Params }) {
   const post = await getPost(params.id)
-  const csrfToken = await getCsrfToken()
 
-  return <UpdatePost post={post} csrfToken={csrfToken} />
+  return <UpdatePost post={post} />
 }

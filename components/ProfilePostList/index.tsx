@@ -4,18 +4,16 @@ import ChevronRight from 'public/static/images/chevron-right.svg'
 import X from 'public/static/images/x.svg'
 import Link from 'next/link'
 import DotButton from 'components/DotButton'
-import getAxiosError from 'utils/functions/getAxiosError'
-import axios, { AxiosError } from 'axios'
 import { useToast } from 'contexts/toast'
-import { getCsrfToken } from 'next-auth/react'
 import { useState } from 'react'
-import { LighterPost } from 'types/common'
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+import { NEXT_PUBLIC_AWS_URL } from 'env/public'
+import ajax from 'libs/ajax'
+import type { UserPutError } from 'app/api/user/types'
+import type { PostsIdDeleteError } from 'app/api/posts/[id]/types'
 
 interface ProfilePostListProps {
   isFavPost?: boolean
-  posts: LighterPost[]
+  posts: { id: string; name: string; image: string }[]
   altText: string
 }
 
@@ -28,21 +26,25 @@ export default function ProfilePostList({
   const { setToast } = useToast()
 
   const deletePost = async (id: string) => {
-    try {
-      const csrfToken = await getCsrfToken()
+    let response: Response | null = null
 
-      if (isFavPost) {
-        await axios.put('/api/user', { csrfToken, favPostId: id })
-      } else {
-        await axios.delete('/api/posts/' + id, { data: { csrfToken } })
-      }
-
-      setToast({ message: 'The post has been successfully deleted! 🎉' })
-      setPosts(posts.filter((post) => post.id !== id))
-    } catch (e) {
-      const { message } = getAxiosError(e as AxiosError)
-      setToast({ message, error: true })
+    if (isFavPost) {
+      response = await ajax.put('/user', { favPostId: id }, { csrf: true })
+    } else {
+      response = await ajax.delete('/posts/' + id, { csrf: true })
     }
+
+    if (!response.ok) {
+      const { message }: UserPutError | PostsIdDeleteError =
+        await response.json()
+
+      setToast({ message, error: true })
+
+      return
+    }
+
+    setToast({ message: 'The post has been successfully deleted! 🎉' })
+    setPosts(posts.filter((post) => post.id !== id))
   }
 
   return posts.length > 0 ? (
@@ -68,8 +70,8 @@ export default function ProfilePostList({
           >
             <div className="relative flex-shrink-0 w-[100px] h-[100px] md:w-[150px] md:h-[150px]">
               <Image
-                src={awsUrl + post.image}
-                alt=""
+                src={NEXT_PUBLIC_AWS_URL + '/' + post.image}
+                alt={post.name}
                 fill
                 className="rounded-l-8 object-cover"
               />

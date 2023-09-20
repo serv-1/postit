@@ -3,34 +3,38 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { signOut, useSession } from 'next-auth/react'
 import { useToast } from 'contexts/toast'
-import getAxiosError from 'utils/functions/getAxiosError'
-import axios, { AxiosError } from 'axios'
 import Popup from 'components/Popup'
-import { Session } from 'next-auth'
-import { User } from 'types/common'
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
-const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
+import type { Session } from 'next-auth'
+import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
+import ajax from 'libs/ajax'
+import type { UsersIdGetData, UsersIdGetError } from 'app/api/users/[id]/types'
 
 export default function HeaderDropdownMenu() {
-  const [image, setImage] = useState<string>(defaultUserImage as string)
+  const [image, setImage] = useState<string>(NEXT_PUBLIC_DEFAULT_USER_IMAGE)
 
   const { setToast } = useToast()
-  const { data } = useSession() as { data: Session }
-  const { id } = data
+  const session = useSession() as { data: Session }
 
   useEffect(() => {
-    const getImage = async () => {
-      try {
-        const { data } = await axios.get<User>('/api/users/' + id)
-        if (data.image) setImage(awsUrl + data.image)
-      } catch (e) {
-        const { message } = getAxiosError(e as AxiosError)
+    async function getImage() {
+      const response = await ajax.get('/users/' + session.data.id)
+
+      if (!response.ok) {
+        const { message }: UsersIdGetError = await response.json()
+
         setToast({ message, error: true })
+
+        return
+      }
+
+      const data: UsersIdGetData = await response.json()
+
+      if (data.image) {
+        setImage(NEXT_PUBLIC_AWS_URL + '/' + data.image)
       }
     }
     getImage()
-  }, [id, setToast])
+  }, [session.data.id, setToast])
 
   return (
     <Popup

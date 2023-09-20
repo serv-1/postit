@@ -27,6 +27,9 @@ jest
   .mock('utils/functions/dbConnect')
   .mock('utils/functions/getServerPusher')
   .mock('utils/functions/verifyCsrfTokens')
+  .mock('app/api/auth/[...nextauth]/route', () => ({
+    nextAuthOptions: {},
+  }))
 
 describe('GET', () => {
   test('422 - invalid id', async () => {

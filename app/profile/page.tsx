@@ -1,26 +1,26 @@
 import Profile from 'app/pages/profile'
 import type { Metadata } from 'next'
-import { getCsrfToken, getSession } from 'next-auth/react'
 import { redirect } from 'next/navigation'
 import getUser from 'utils/functions/getUser'
 import getPosts from 'utils/functions/getPosts'
 import getUserFavoritePosts from 'utils/functions/getUserFavoritePosts'
+import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import { getServerSession } from 'next-auth'
 
 export const metadata: Metadata = {
   title: 'Profile - PostIt',
 }
 
 export default async function Page() {
-  const session = await getSession()
+  const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
-    redirect('/auth/sign-in')
+    redirect('/authentication')
   }
 
   const user = await getUser(session.id)
   const posts = await getPosts(user.postIds)
   const favPosts = await getUserFavoritePosts(user.favPostIds)
-  const csrfToken = await getCsrfToken()
 
-  return <Profile user={{ ...user, posts, favPosts }} csrfToken={csrfToken} />
+  return <Profile user={{ ...user, posts, favPosts }} />
 }

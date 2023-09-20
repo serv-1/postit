@@ -5,8 +5,8 @@
 import Discussion from '.'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import User, { UserDoc } from 'models/User'
-import Post, { PostDoc } from 'models/Post'
+import User, { type UserDoc } from 'models/User'
+import Post, { type PostDoc } from 'models/Post'
 
 jest.unmock('nanoid')
 

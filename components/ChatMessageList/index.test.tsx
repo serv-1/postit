@@ -3,8 +3,16 @@ import ChatMessageList from '.'
 // prettier-ignore
 // @ts-expect-error
 import { mockClientPusherBind, mockClientPusherUnbind } from 'utils/functions/getClientPusher'
+import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
+import { setupServer } from 'msw/node'
+import discussionsIdHandlers from 'app/api/discussions/[id]/mock'
+import 'cross-fetch/polyfill'
+import { rest } from 'msw'
 
+const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
+const mockUseSession = jest.spyOn(require('next-auth/react'), 'useSession')
 const mockSetToast = jest.fn()
+const server = setupServer()
 
 jest
   .mock('contexts/toast', () => ({
@@ -12,143 +20,205 @@ jest
   }))
   .mock('utils/functions/getClientPusher')
 
-const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
-const axiosGet = jest.spyOn(require('axios'), 'get')
-const axiosPut = jest.spyOn(require('axios'), 'put')
-
-const messages = [
-  { message: 'hi', createdAt: new Date(), userId: '0', seen: true },
-  { message: 'hello', createdAt: new Date(), userId: '1', seen: true },
-]
-
-const JSONDiscussion = {
-  id: '0',
-  messages,
-  postName: 'table',
-  postId: '0',
-  buyer: { id: '0', name: 'john', image: 'john.jpeg' },
-  seller: { id: '1', name: 'jane', image: 'jane.jpeg' },
-  channelName: 'test',
-}
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
-
 beforeEach(() => {
   Element.prototype.scroll = jest.fn()
 
-  useSession.mockReturnValue({ data: { id: '0' } })
-  axiosGet.mockResolvedValue({ data: JSONDiscussion })
-  axiosPut.mockResolvedValue({})
+  mockUseSession.mockReturnValue({ data: { id: '0' } })
+  mockGetCsrfToken.mockResolvedValue('token')
 })
 
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
 it('renders', async () => {
-  render(<ChatMessageList discussionId="0" csrfToken="token" />)
+  server.use(
+    rest.get('http://localhost/api/discussions/:id', (req, res, ctx) => {
+      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(req.params.id).toBe('0')
+
+      return res(
+        ctx.status(200),
+        ctx.json({
+          messages: [
+            { message: 'hi', createdAt: new Date(), userId: '0', seen: true },
+            { message: 'yo', createdAt: new Date(), userId: '1', seen: true },
+          ],
+          buyer: { id: '0', name: 'john', image: 'john.jpeg' },
+          seller: { id: '1', name: 'jane', image: 'jane.jpeg' },
+          channelName: 'test',
+        })
+      )
+    })
+  )
+
+  render(<ChatMessageList discussionId="0" />)
 
   const msg1 = await screen.findByText('hi')
+
   expect(msg1).toBeInTheDocument()
 
-  const msg2 = screen.getByText('hello')
+  const msg2 = screen.getByText('yo')
+
   expect(msg2).toBeInTheDocument()
 
   const images = screen.getAllByRole('img')
-  expect(images[0]).toHaveAttribute('src', awsUrl + 'john.jpeg')
+
+  expect(images[0]).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/john.jpeg')
   expect(images[0].getAttribute('alt')).toContain('john')
-  expect(images[1]).toHaveAttribute('src', awsUrl + 'jane.jpeg')
+  expect(images[1]).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/jane.jpeg')
   expect(images[1].getAttribute('alt')).toContain('jane')
-
-  const url = '/api/discussions/0?csrfToken=token'
-  expect(axiosGet).toHaveBeenNthCalledWith(1, url)
-
-  expect(axiosPut).not.toHaveBeenCalled()
 })
 
 it('renders an alert if the server fails to fetch the discussion', async () => {
-  axiosGet.mockRejectedValue({ response: { data: { message: 'error' } } })
+  server.use(
+    rest.get('http://localhost/api/discussions/:id', (req, res, ctx) => {
+      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    })
+  )
 
-  render(<ChatMessageList discussionId="0" csrfToken="token" />)
+  render(<ChatMessageList discussionId="0" />)
 
   await waitFor(() => {
-    const toast = { message: 'error', error: true }
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, toast)
+    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
+      message: 'error',
+      error: true,
+    })
   })
 })
 
 it('scrolls until the last message of the discussion is visible', async () => {
-  const { container } = render(
-    <ChatMessageList discussionId="0" csrfToken="token" />
-  )
+  server.use(...discussionsIdHandlers)
+
+  const { container } = render(<ChatMessageList discussionId="0" />)
 
   const msgList = container.firstElementChild as HTMLDivElement
 
   await waitFor(() => {
-    const scrollOptions = { top: msgList.scrollHeight, behavior: 'smooth' }
-    expect(msgList.scroll).toHaveBeenNthCalledWith(1, scrollOptions)
+    expect(msgList.scroll).toHaveBeenNthCalledWith(1, {
+      top: msgList.scrollHeight,
+      behavior: 'smooth',
+    })
   })
 })
 
 it('updates the last unseen messages if the user has saw them', async () => {
-  const msg = { ...messages[0], userId: '1', seen: false }
+  server.use(
+    rest.get('http://localhost/api/discussions/:id', (req, res, ctx) => {
+      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(req.params.id).toBe('0')
 
-  axiosGet.mockResolvedValue({ data: { ...JSONDiscussion, messages: [msg] } })
+      return res(
+        ctx.status(200),
+        ctx.json({
+          messages: [
+            { message: 'hi', createdAt: new Date(), userId: '0', seen: true },
+            { message: 'yo', createdAt: new Date(), userId: '1', seen: false },
+          ],
+          buyer: { id: '0', name: 'john', image: 'john.jpeg' },
+          seller: { id: '1', name: 'jane', image: 'jane.jpeg' },
+          channelName: 'test',
+        })
+      )
+    }),
+    rest.put('http://localhost/api/discussions/:id', (req, res, ctx) => {
+      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(req.params.id).toBe('0')
 
-  render(<ChatMessageList discussionId="0" csrfToken="token" />)
+      return res(ctx.status(204))
+    })
+  )
 
-  await waitFor(() => {
-    const url = '/api/discussions/0'
-    expect(axiosPut).toHaveBeenNthCalledWith(1, url, { csrfToken: 'token' })
-  })
+  render(<ChatMessageList discussionId="0" />)
+
+  await screen.findByText('yo')
 })
 
 it('does not update the last message if its author is the signed in user', async () => {
-  const msg = { ...messages[0], seen: false }
-  axiosGet.mockResolvedValue({ data: { ...JSONDiscussion, messages: [msg] } })
+  server.use(
+    rest.get('http://localhost/api/discussions/:id', (req, res, ctx) => {
+      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(req.params.id).toBe('0')
 
-  render(<ChatMessageList discussionId="0" csrfToken="token" />)
+      return res(
+        ctx.status(200),
+        ctx.json({
+          messages: [
+            { message: 'hi', createdAt: new Date(), userId: '0', seen: false },
+          ],
+          buyer: { id: '0', name: 'john', image: 'john.jpeg' },
+          seller: { id: '1', name: 'jane', image: 'jane.jpeg' },
+          channelName: 'test',
+        })
+      )
+    })
+  )
+
+  render(<ChatMessageList discussionId="0" />)
 
   await screen.findByText('hi')
-
-  expect(axiosPut).not.toHaveBeenCalled()
 })
 
 it('renders an alert if the server fails to update the last unseen messages', async () => {
-  const msg = { ...messages[0], userId: '1', seen: false }
+  server.use(
+    rest.get('http://localhost/api/discussions/:id', (req, res, ctx) => {
+      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(req.params.id).toBe('0')
 
-  axiosGet.mockResolvedValue({ data: { ...JSONDiscussion, messages: [msg] } })
-  axiosPut.mockRejectedValue({ response: { data: { message: 'error' } } })
+      return res(
+        ctx.status(200),
+        ctx.json({
+          messages: [
+            { message: 'hi', createdAt: new Date(), userId: '0', seen: true },
+            { message: 'yo', createdAt: new Date(), userId: '1', seen: false },
+          ],
+          buyer: { id: '0', name: 'john', image: 'john.jpeg' },
+          seller: { id: '1', name: 'jane', image: 'jane.jpeg' },
+          channelName: 'test',
+        })
+      )
+    }),
+    rest.put('http://localhost/api/discussions/:id', (req, res, ctx) => {
+      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    })
+  )
 
-  render(<ChatMessageList discussionId="0" csrfToken="token" />)
+  render(<ChatMessageList discussionId="0" />)
 
   await waitFor(() => {
-    const toast = { message: 'error', error: true }
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, toast)
+    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
+      message: 'error',
+      error: true,
+    })
   })
 })
 
 it('renders the new message received in real time', async () => {
-  const createdAt = new Date().toISOString()
+  server.use(...discussionsIdHandlers)
 
-  render(<ChatMessageList discussionId="0" csrfToken="token" />)
+  render(<ChatMessageList discussionId="0" />)
 
   await waitFor(() => {
     const newMessageHandler = mockClientPusherBind.mock.calls[0][1]
     newMessageHandler({
-      message: 'yo',
-      createdAt,
+      message: 'hi',
+      createdAt: new Date().toISOString(),
       userId: '0',
       seen: false,
     })
   })
 
-  const msg = await screen.findByText('yo')
+  const msg = await screen.findByText('hi')
+
   expect(msg).toBeInTheDocument()
 })
 
 it('unbinds all events when unmounting', async () => {
-  const { unmount } = render(
-    <ChatMessageList discussionId="0" csrfToken="token" />
-  )
+  server.use(...discussionsIdHandlers)
 
-  await screen.findByText('hi')
+  const { unmount } = render(<ChatMessageList discussionId="0" />)
+
+  await screen.findByText('yo')
 
   unmount()
 

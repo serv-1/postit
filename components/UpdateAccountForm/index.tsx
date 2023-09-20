@@ -1,28 +1,27 @@
 import { joiResolver } from '@hookform/resolvers/joi'
-import axios, { AxiosError } from 'axios'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from 'contexts/toast'
 import updateUserEmailSchema, {
-  UpdateUserEmailSchema,
+  type UpdateUserEmailSchema,
 } from 'schemas/updateUserEmailSchema'
 import updateUserNameSchema, {
-  UpdateUserNameSchema,
+  type UpdateUserNameSchema,
 } from 'schemas/updateUserNameSchema'
 import updateUserPwSchema, {
-  UpdateUserPwSchema,
+  type UpdateUserPwSchema,
 } from 'schemas/updateUserPwSchema'
-import getAxiosError from 'utils/functions/getAxiosError'
 import Button from 'components/Button'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
 import PasswordInput from 'components/PasswordInput'
 import PasswordStrength from 'components/PasswordStrength'
+import ajax from 'libs/ajax'
+import type { UserPutError } from 'app/api/user/types'
 
 interface UpdateAccountFormProps {
   value: 'name' | 'email' | 'password'
   setName?: React.Dispatch<React.SetStateAction<string>>
-  csrfToken?: string
 }
 
 type Schemas =
@@ -35,8 +34,10 @@ type TSchemas =
   | UpdateUserEmailSchema
   | UpdateUserPwSchema
 
-export default function UpdateAccountForm(props: UpdateAccountFormProps) {
-  const { value, setName, csrfToken } = props
+export default function UpdateAccountForm({
+  value,
+  setName,
+}: UpdateAccountFormProps) {
   let schema: Schemas = updateUserNameSchema
 
   if (value === 'email') {
@@ -49,18 +50,25 @@ export default function UpdateAccountForm(props: UpdateAccountFormProps) {
   const { setToast } = useToast()
 
   const submitHandler: SubmitHandler<TSchemas> = async (data) => {
-    try {
-      await axios.put('/api/user', data)
-      setToast({ message: `Your ${value} has been updated! 🎉` })
-      if (setName) setName(data[value] as string)
-    } catch (e) {
-      const { message } = getAxiosError(e as AxiosError)
-      methods.setError(value, { message }, { shouldFocus: true })
+    const response = await ajax.put('/user', data, { csrf: true })
+
+    if (!response.ok) {
+      const data: UserPutError = await response.json()
+
+      methods.setError(value, data, { shouldFocus: true })
+
+      return
+    }
+
+    setToast({ message: `Your ${value} has been updated! 🎉` })
+
+    if (setName) {
+      setName(data[value] as string)
     }
   }
 
   return (
-    <Form methods={methods} submitHandler={submitHandler} csrfToken={csrfToken}>
+    <Form methods={methods} submitHandler={submitHandler}>
       {value === 'password' ? (
         <div className="mb-16">
           <div className="flex flex-row flex-nowrap items-end md:mb-32">

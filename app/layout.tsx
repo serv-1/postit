@@ -1,7 +1,8 @@
 import './global.css'
 import { Quicksand } from 'next/font/google'
 import App from 'app/pages/app'
-import { getSession } from 'next-auth/react'
+import { getServerSession } from 'next-auth'
+import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 
 const quicksand = Quicksand({
   subsets: ['latin'],
@@ -13,7 +14,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode & { needAuth?: true | undefined }
 }) {
-  const session = await getSession()
+  const session = await getServerSession(nextAuthOptions)
 
   return (
     <html lang="en" className={quicksand.className}>

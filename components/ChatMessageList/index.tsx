@@ -1,28 +1,27 @@
-import axios from 'axios'
-import { Session } from 'next-auth'
+import type { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
 import { useToast } from 'contexts/toast'
-import { Discussion, Message, JSONDiscussion, UnArray } from 'types/common'
-import getAxiosError from 'utils/functions/getAxiosError'
+import type { Discussion, NewDiscussionMessage } from 'types'
 import getClientPusher from 'utils/functions/getClientPusher'
 import ChatMessage from 'components/ChatMessage'
 import styles from 'styles/chatScrollbar.module.css'
+import ajax from 'libs/ajax'
+import type {
+  DiscussionsIdGetData,
+  DiscussionsIdGetError,
+} from 'app/api/discussions/[id]/types'
 
-interface DiscussionDataState {
-  channelName: string
-  messages: Message[]
-  buyer: Discussion['buyer']
-  seller: Discussion['seller']
-}
+type DiscussionDataState = Pick<
+  Discussion,
+  'channelName' | 'messages' | 'buyer' | 'seller'
+>
 
 interface ChatMessageListProps {
-  csrfToken?: string
   discussionId?: string
 }
 
 export default function ChatMessageList({
-  csrfToken,
   discussionId,
 }: ChatMessageListProps) {
   const [discussionData, setDiscussionData] = useState<DiscussionDataState>()
@@ -36,22 +35,33 @@ export default function ChatMessageList({
   useEffect(() => {
     if (!discussionId) return
 
-    const getDiscussion = async () => {
-      try {
-        const url = `/api/discussions/${discussionId}?csrfToken=${csrfToken}`
-        const { data } = await axios.get<JSONDiscussion>(url)
-        const { messages: m, channelName, buyer, seller } = data
+    async function getDiscussion() {
+      const response = await ajax.get('/discussions/' + discussionId, {
+        csrf: true,
+      })
 
-        const _m = m.map((m) => ({ ...m, createdAt: new Date(m.createdAt) }))
-        setDiscussionData({ messages: _m, channelName, buyer, seller })
-      } catch (e) {
-        const { message } = getAxiosError(e)
+      if (!response.ok) {
+        const { message }: DiscussionsIdGetError = await response.json()
+
         setToast({ message, error: true })
+
+        return
       }
+
+      const discussion: DiscussionsIdGetData = await response.json()
+
+      setDiscussionData({
+        messages: discussion.messages.map((message) => {
+          return { ...message, createdAt: new Date(message.createdAt) }
+        }),
+        channelName: discussion.channelName,
+        buyer: discussion.buyer,
+        seller: discussion.seller,
+      })
     }
 
     getDiscussion()
-  }, [discussionId, csrfToken, setToast])
+  }, [discussionId, setToast])
 
   useEffect(() => {
     const messages = discussionData?.messages
@@ -67,16 +77,20 @@ export default function ChatMessageList({
 
     if (session.id !== lastMsg.userId && !lastMsg.seen) {
       const updateUnseenMessages = async () => {
-        try {
-          await axios.put('/api/discussions/' + discussionId, { csrfToken })
-        } catch (e) {
-          const { message } = getAxiosError(e)
+        const response = await ajax.put('/discussions/' + discussionId, null, {
+          csrf: true,
+        })
+
+        if (!response.ok) {
+          const { message }: DiscussionsIdGetError = await response.json()
+
           setToast({ message, error: true })
         }
       }
+
       updateUnseenMessages()
     }
-  }, [session.id, setToast, csrfToken, discussionId, discussionData?.messages])
+  }, [session.id, setToast, discussionId, discussionData?.messages])
 
   useEffect(() => {
     const channelName = discussionData?.channelName
@@ -86,11 +100,18 @@ export default function ChatMessageList({
     const p = pusher.current
     const channel = p.subscribe('private-encrypted-' + channelName)
 
-    const newMessageHandler = (msg: UnArray<JSONDiscussion['messages']>) => {
-      const m = { ...msg, createdAt: new Date(msg.createdAt) }
-      setDiscussionData((prev) =>
-        prev ? { ...prev, messages: [...prev.messages, m] } : prev
-      )
+    const newMessageHandler = (msg: NewDiscussionMessage) => {
+      setDiscussionData((prev) => {
+        if (prev) {
+          return {
+            ...prev,
+            messages: [
+              ...prev.messages,
+              { ...msg, createdAt: new Date(msg.createdAt) },
+            ],
+          }
+        }
+      })
     }
 
     channel.bind('new-message', newMessageHandler)

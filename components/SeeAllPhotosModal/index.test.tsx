@@ -1,11 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import SeeAllPhotosModal from '.'
 import userEvent from '@testing-library/user-event'
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
+import { NEXT_PUBLIC_AWS_URL } from 'env/public'
 
 it('renders', async () => {
-  render(<SeeAllPhotosModal sources={['keyName']} />)
+  render(<SeeAllPhotosModal sources={['key']} />)
 
   const photosBtn = screen.getByRole('button', { name: /photos/i })
   await userEvent.click(photosBtn)
@@ -14,17 +13,17 @@ it('renders', async () => {
   expect(closeBtn).toHaveFocus()
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', awsUrl + 'keyName')
+  expect(img).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/key')
 
   const expandBtn = screen.getByRole('button', { name: /expand/i })
   await userEvent.click(expandBtn)
 
   const expandedImage = screen.getAllByRole('img')[1]
-  expect(expandedImage).toHaveAttribute('src', awsUrl + 'keyName')
+  expect(expandedImage).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/key')
 })
 
 it('closes', async () => {
-  render(<SeeAllPhotosModal sources={['keyName']} />)
+  render(<SeeAllPhotosModal sources={['key']} />)
 
   const photosBtn = screen.getByRole('button', { name: /photos/i })
   await userEvent.click(photosBtn)

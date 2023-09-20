@@ -1,12 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { RegisterOptions } from 'react-hook-form'
+import type { RegisterOptions } from 'react-hook-form'
 import Input from '.'
 
 const setFocus = jest.fn()
-
 const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
-
 const setFormContext = (isSubmitted: boolean, message?: string) => ({
   formState: { isSubmitted, errors: message ? { test: { message } } : {} },
   register: jest.fn((name: string, opt: RegisterOptions) => ({

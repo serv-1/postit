@@ -1,21 +1,19 @@
-import axios from 'axios'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useToast } from 'contexts/toast'
 import ChevronRight from 'public/static/images/chevron-right.svg'
 import X from 'public/static/images/x.svg'
-import { User } from 'types/common'
-import getAxiosError from 'utils/functions/getAxiosError'
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
-const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE as string
+import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
+import ajax from 'libs/ajax'
+import type { UserPutError } from 'app/api/user/types'
+import type { UsersIdGetData, UsersIdGetError } from 'app/api/users/[id]/types'
+import type { DiscussionsIdDeleteError } from 'app/api/discussions/[id]/types'
 
 interface OpenHeaderChatModalButtonProps {
   onClick: () => void
   hasUnseenMessages: boolean
   interlocutor: { id?: string; name: string; image?: string }
   postName: string
-  csrfToken?: string
   discussionId: string
 }
 
@@ -24,7 +22,6 @@ export default function OpenHeaderChatModalButton({
   hasUnseenMessages,
   interlocutor,
   postName,
-  csrfToken,
   discussionId,
 }: OpenHeaderChatModalButtonProps) {
   const [isDeleted, setIsDeleted] = useState(false)
@@ -35,34 +32,51 @@ export default function OpenHeaderChatModalButton({
     if (!isDeleted) return
 
     const deleteDiscussion = async () => {
-      try {
-        let hasToDelete = false
+      let response: Response | undefined = undefined
 
-        if (!interlocutor.id) {
-          hasToDelete = true
-        } else {
-          const url = '/api/users/' + interlocutor.id
-          const { data } = await axios.get<User>(url)
+      if (!interlocutor.id) {
+        response = await ajax.delete('/discussions/' + discussionId, {
+          csrf: true,
+        })
+      } else {
+        response = await ajax.get('/users/' + interlocutor.id)
 
-          if (!data.discussionIds.includes(discussionId)) {
-            hasToDelete = true
-          }
+        if (!response.ok) {
+          const { message }: UsersIdGetError = await response.json()
+
+          setToast({ message, error: true })
+
+          return
         }
 
-        await axios.put('/api/user/', { discussionId, csrfToken })
+        const { discussionIds }: UsersIdGetData = await response.json()
 
-        if (hasToDelete) {
-          const url = `/api/discussions/${discussionId}?csrfToken=${csrfToken}`
-          await axios.delete(url)
+        if (!discussionIds.includes(discussionId)) {
+          response = await ajax.delete('/discussions/' + discussionId, {
+            csrf: true,
+          })
         }
-      } catch (e) {
-        const { message } = getAxiosError(e)
+      }
+
+      if (!response.ok) {
+        const { message }: DiscussionsIdDeleteError = await response.json()
+
+        setToast({ message, error: true })
+
+        return
+      }
+
+      response = await ajax.put('/user', { discussionId }, { csrf: true })
+
+      if (!response.ok) {
+        const { message }: UserPutError = await response.json()
+
         setToast({ message, error: true })
       }
     }
 
     deleteDiscussion()
-  }, [isDeleted, interlocutor.id, setToast, discussionId, csrfToken])
+  }, [isDeleted, interlocutor.id, setToast, discussionId])
 
   return !isDeleted ? (
     <div className="relative w-full">
@@ -91,7 +105,9 @@ export default function OpenHeaderChatModalButton({
       >
         <Image
           src={
-            interlocutor.image ? awsUrl + interlocutor.image : defaultUserImage
+            interlocutor.image
+              ? NEXT_PUBLIC_AWS_URL + '/' + interlocutor.image
+              : NEXT_PUBLIC_DEFAULT_USER_IMAGE
           }
           alt={interlocutor.name + "'s profile picture"}
           width={64}

@@ -1,8 +1,8 @@
-import User, { UserDoc } from 'models/User'
+import User, { type UserDoc } from 'models/User'
 import { MongoServerError } from 'mongodb'
-import { UpdateQuery } from 'mongoose'
+import type { UpdateQuery } from 'mongoose'
 import { getServerSession } from 'next-auth'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import addUserSchema from 'schemas/addUserSchema'
 import updateUserApiSchema from 'schemas/updateUserApiSchema'
 import err from 'utils/constants/errors'
@@ -12,7 +12,7 @@ import getServerPusher from 'utils/functions/getServerPusher'
 import hashPassword from 'utils/functions/hashPassword'
 import verifyCsrfTokens from 'utils/functions/verifyCsrfTokens'
 import validate from 'utils/functions/validate'
-import { nextAuthOptions } from '../auth/[...nextauth]/route'
+import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 
 export async function POST(request: Request) {
   let data = null

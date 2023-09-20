@@ -4,7 +4,7 @@
 
 import verifyCsrfTokens from '.'
 import { createHash } from 'crypto'
-import env from 'utils/constants/env'
+import { CSRF_COOKIE_NAME, SECRET } from 'env'
 import { NextRequest } from 'next/server'
 
 describe('verifyCsrfTokens()', () => {
@@ -19,7 +19,7 @@ describe('verifyCsrfTokens()', () => {
   it('returns false if there is no csrf header', () => {
     const request = new NextRequest('http://-')
 
-    request.cookies.set(env.CSRF_COOKIE_NAME, 'token')
+    request.cookies.set(CSRF_COOKIE_NAME, 'token')
 
     expect(verifyCsrfTokens(request)).toBe(false)
   })
@@ -30,10 +30,10 @@ describe('verifyCsrfTokens()', () => {
     })
 
     const csrfTokenHash = createHash('sha256')
-      .update('token' + env.SECRET)
+      .update('token' + SECRET)
       .digest('hex')
 
-    request.cookies.set(env.CSRF_COOKIE_NAME, csrfTokenHash)
+    request.cookies.set(CSRF_COOKIE_NAME, csrfTokenHash)
 
     expect(verifyCsrfTokens(request)).toBe(false)
   })
@@ -44,10 +44,10 @@ describe('verifyCsrfTokens()', () => {
     })
 
     const csrfTokenHash = createHash('sha256')
-      .update('token' + env.SECRET)
+      .update('token' + SECRET)
       .digest('hex')
 
-    request.cookies.set(env.CSRF_COOKIE_NAME, '|' + csrfTokenHash)
+    request.cookies.set(CSRF_COOKIE_NAME, '|' + csrfTokenHash)
 
     expect(verifyCsrfTokens(request)).toBe(true)
   })

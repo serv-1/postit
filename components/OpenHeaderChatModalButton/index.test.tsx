@@ -1,183 +1,320 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import OpenHeaderChatModalButton from '.'
+import { setupServer } from 'msw/node'
+import userHandlers from 'app/api/user/mock'
+import {
+  NEXT_PUBLIC_AWS_URL,
+  NEXT_PUBLIC_CSRF_HEADER_NAME,
+  NEXT_PUBLIC_DEFAULT_USER_IMAGE,
+} from 'env/public'
+import { rest } from 'msw'
+import 'cross-fetch/polyfill'
 
+const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const mockSetToast = jest.fn()
+const server = setupServer()
 
 jest.mock('contexts/toast', () => ({
   useToast: () => ({ setToast: mockSetToast, toast: {} }),
 }))
 
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
-const defaultUserImage = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE
-
-const props = {
-  onClick: () => null,
-  hasUnseenMessages: false,
-  interlocutor: { name: 'jane', image: 'keyName', id: '1' },
-  postName: 'table',
-  csrfToken: 'token',
-  discussionId: '0',
-}
-const interlocutor = {
-  id: '1',
-  name: 'jane',
-  email: 'jane@ja.ne',
-  image: 'keyName',
-  discussionIds: ['0'],
-  posts: ['0'],
-  favPosts: [],
-  channelName: 'test',
-  hasUnseenMessages: false,
-}
-
-const axiosGet = jest.spyOn(require('axios'), 'get')
-const axiosPut = jest.spyOn(require('axios'), 'put')
-const axiosDelete = jest.spyOn(require('axios'), 'delete')
-
 beforeEach(() => {
-  axiosGet.mockResolvedValue({ data: interlocutor })
-  axiosPut.mockResolvedValue({})
-  axiosDelete.mockResolvedValue({})
+  mockGetCsrfToken.mockResolvedValue('token')
 })
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 it('renders', async () => {
   const onClick = jest.fn()
 
-  render(<OpenHeaderChatModalButton {...{ ...props, onClick }} />)
+  render(
+    <OpenHeaderChatModalButton
+      onClick={onClick}
+      postName="table"
+      discussionId="0"
+      hasUnseenMessages={false}
+      interlocutor={{ name: 'john', image: 'john.jpeg', id: '0' }}
+    />
+  )
 
   const notifBadge = screen.queryByRole('status')
+
   expect(notifBadge).not.toBeInTheDocument()
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', awsUrl + 'keyName')
-  expect(img).toHaveAttribute('alt', "jane's profile picture")
 
-  const interlocutorName = screen.getByText('jane')
+  expect(img).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/' + 'john.jpeg')
+  expect(img).toHaveAttribute('alt', "john's profile picture")
+
+  const interlocutorName = screen.getByText('john')
+
   expect(interlocutorName).toBeInTheDocument()
 
   const postName = screen.getByText('table')
+
   expect(postName).toBeInTheDocument()
 
   const openBtn = screen.getByRole('button', { name: /open/i })
+
   await userEvent.click(openBtn)
 
   expect(onClick).toHaveBeenCalledTimes(1)
 })
 
 it('renders the default user image', () => {
-  const p = { ...props, interlocutor: { name: 'jane', id: '1' } }
-  render(<OpenHeaderChatModalButton {...p} />)
+  render(
+    <OpenHeaderChatModalButton
+      onClick={() => null}
+      postName="table"
+      discussionId="0"
+      hasUnseenMessages={false}
+      interlocutor={{ name: 'john', id: '0' }}
+    />
+  )
 
   const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', defaultUserImage)
+
+  expect(img).toHaveAttribute('src', NEXT_PUBLIC_DEFAULT_USER_IMAGE)
 })
 
-it('renders a notification badge if there is a new message', async () => {
+it('renders the notification badge if there is a new message', async () => {
   render(
-    <OpenHeaderChatModalButton {...{ ...props, hasUnseenMessages: true }} />
+    <OpenHeaderChatModalButton
+      onClick={() => null}
+      postName="table"
+      discussionId="0"
+      hasUnseenMessages
+      interlocutor={{ name: 'john', image: 'john.jpeg', id: '0' }}
+    />
   )
 
   const notifBadge = screen.getByRole('status')
-  expect(notifBadge).toHaveAttribute('aria-label', 'jane has responded')
+
+  expect(notifBadge).toHaveAttribute('aria-label', 'john has responded')
 })
 
-it("removes the discussion from the user's discussionIds after a click on the remove button", async () => {
-  render(<OpenHeaderChatModalButton {...props} />)
+it("removes the discussion from the user's discussion list", async () => {
+  server.use(
+    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+      expect(req.params.id).toBe('0')
+
+      return res(ctx.status(200), ctx.json({ discussionIds: ['0'] }))
+    }),
+    rest.put('http://localhost/api/user', async (req, res, ctx) => {
+      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(await req.json()).toEqual({ discussionId: '0' })
+
+      return res(ctx.status(204))
+    })
+  )
+
+  render(
+    <OpenHeaderChatModalButton
+      onClick={() => null}
+      postName="table"
+      discussionId="0"
+      hasUnseenMessages={false}
+      interlocutor={{ name: 'john', image: 'john.jpeg', id: '0' }}
+    />
+  )
 
   const removeBtn = screen.getByRole('button', { name: /remove/i })
+
   await userEvent.click(removeBtn)
-
-  await waitFor(() => {
-    expect(axiosGet).toHaveBeenNthCalledWith(1, '/api/users/1')
-
-    expect(axiosPut).toHaveBeenCalledTimes(1)
-    const payload = { discussionId: '0', csrfToken: 'token' }
-    expect(axiosPut.mock.calls[0][1]).toEqual(payload)
-  })
 
   expect(removeBtn).not.toBeInTheDocument()
 })
 
-it('deletes the discussion if the interlocutor has deleted its account after a click on the remove button', async () => {
-  const interlocutor = { name: '[DELETED]', image: 'default.jpeg' }
+it('deletes the discussion if the interlocutor has deleted its account', async () => {
+  server.use(
+    ...userHandlers,
+    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+      expect(req.params.id).toBe('0')
 
-  render(<OpenHeaderChatModalButton {...{ ...props, interlocutor }} />)
+      return res(ctx.status(200), ctx.json({ discussionIds: ['0'] }))
+    }),
+    rest.delete('http://localhost/api/discussions/:id', (req, res, ctx) => {
+      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(req.params.id).toBe('0')
+
+      return res(ctx.status(204))
+    })
+  )
+
+  render(
+    <OpenHeaderChatModalButton
+      onClick={() => null}
+      postName="table"
+      discussionId="0"
+      hasUnseenMessages={false}
+      interlocutor={{ name: '[DELETED]' }}
+    />
+  )
 
   const removeBtn = screen.getByRole('button', { name: /remove/i })
+
   await userEvent.click(removeBtn)
 
-  await waitFor(() => {
-    expect(axiosPut).toHaveBeenCalledTimes(1)
-    const payload = { discussionId: '0', csrfToken: 'token' }
-    expect(axiosPut.mock.calls[0][1]).toEqual(payload)
-
-    const url = '/api/discussions/0?csrfToken=token'
-    expect(axiosDelete).toHaveBeenNthCalledWith(1, url)
-  })
-
-  expect(axiosGet).not.toHaveBeenCalled()
+  expect(removeBtn).not.toBeInTheDocument()
 })
 
-it('deletes the discussion if the interlocutor has not the discussion id after a click on the remove button', async () => {
-  axiosGet.mockResolvedValue({ data: { ...interlocutor, discussionIds: [] } })
+it('deletes the discussion if the interlocutor has removed it from its discussion list', async () => {
+  server.use(
+    ...userHandlers,
+    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+      expect(req.params.id).toBe('0')
 
-  render(<OpenHeaderChatModalButton {...props} />)
+      return res(ctx.status(200), ctx.json({ discussionIds: [] }))
+    }),
+    rest.delete('http://localhost/api/discussions/:id', (req, res, ctx) => {
+      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(req.params.id).toBe('0')
+
+      return res(ctx.status(204))
+    })
+  )
+
+  render(
+    <OpenHeaderChatModalButton
+      onClick={() => null}
+      postName="table"
+      discussionId="0"
+      hasUnseenMessages={false}
+      interlocutor={{ name: 'john', image: 'john.jpeg', id: '0' }}
+    />
+  )
 
   const removeBtn = screen.getByRole('button', { name: /remove/i })
+
   await userEvent.click(removeBtn)
 
-  await waitFor(() => {
-    expect(axiosGet).toHaveBeenNthCalledWith(1, '/api/users/1')
-
-    expect(axiosPut).toHaveBeenCalledTimes(1)
-    const payload = { discussionId: '0', csrfToken: 'token' }
-    expect(axiosPut.mock.calls[0][1]).toEqual(payload)
-
-    const url = '/api/discussions/0?csrfToken=token'
-    expect(axiosDelete).toHaveBeenNthCalledWith(1, url)
-  })
+  expect(removeBtn).not.toBeInTheDocument()
 })
 
-it('renders an alert if the server fails to fetch the interlocutor', async () => {
-  axiosGet.mockRejectedValue({ response: { data: { message: 'error' } } })
+describe('renders an alert if the server fails to', () => {
+  test('fetch the interlocutor', async () => {
+    server.use(
+      rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+        return res(ctx.status(500), ctx.json({ message: 'error' }))
+      })
+    )
 
-  render(<OpenHeaderChatModalButton {...props} />)
+    render(
+      <OpenHeaderChatModalButton
+        onClick={() => null}
+        postName="table"
+        discussionId="0"
+        hasUnseenMessages
+        interlocutor={{ name: 'john', image: 'john.jpeg', id: '0' }}
+      />
+    )
 
-  const removeBtn = screen.getByRole('button', { name: /remove/i })
-  await userEvent.click(removeBtn)
+    const removeBtn = screen.getByRole('button', { name: /remove/i })
 
-  await waitFor(() => {
-    const toast = { message: 'error', error: true }
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, toast)
+    await userEvent.click(removeBtn)
+
+    await waitFor(() => {
+      expect(mockSetToast).toHaveBeenNthCalledWith(1, {
+        message: 'error',
+        error: true,
+      })
+    })
   })
-})
 
-it('renders an alert if the server fails to update the interlocutor', async () => {
-  axiosPut.mockRejectedValue({ response: { data: { message: 'error' } } })
+  test('update the interlocutor', async () => {
+    server.use(
+      rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+        return res(ctx.status(200), ctx.json({ discussionIds: ['0'] }))
+      }),
+      rest.put('http://localhost/api/user', (req, res, ctx) => {
+        return res(ctx.status(500), ctx.json({ message: 'error' }))
+      })
+    )
 
-  render(<OpenHeaderChatModalButton {...props} />)
+    render(
+      <OpenHeaderChatModalButton
+        onClick={() => null}
+        postName="table"
+        discussionId="0"
+        hasUnseenMessages
+        interlocutor={{ name: 'john', image: 'john.jpeg', id: '0' }}
+      />
+    )
 
-  const removeBtn = screen.getByRole('button', { name: /remove/i })
-  await userEvent.click(removeBtn)
+    const removeBtn = screen.getByRole('button', { name: /remove/i })
 
-  await waitFor(() => {
-    const toast = { message: 'error', error: true }
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, toast)
+    await userEvent.click(removeBtn)
+
+    await waitFor(() => {
+      expect(mockSetToast).toHaveBeenNthCalledWith(1, {
+        message: 'error',
+        error: true,
+      })
+    })
   })
-})
 
-it('renders an alert if the server fails to delete the discussion', async () => {
-  axiosGet.mockResolvedValue({ data: { ...interlocutor, discussionIds: [] } })
-  axiosDelete.mockRejectedValue({ response: { data: { message: 'error' } } })
+  test('delete the discussion when the interlocutor has deleted its account', async () => {
+    server.use(
+      rest.delete('http://localhost/api/discussions/:id', (req, res, ctx) => {
+        return res(ctx.status(500), ctx.json({ message: 'error' }))
+      })
+    )
 
-  render(<OpenHeaderChatModalButton {...props} />)
+    render(
+      <OpenHeaderChatModalButton
+        onClick={() => null}
+        postName="table"
+        discussionId="0"
+        hasUnseenMessages
+        interlocutor={{ name: '[DELETED]' }}
+      />
+    )
 
-  const removeBtn = screen.getByRole('button', { name: /remove/i })
-  await userEvent.click(removeBtn)
+    const removeBtn = screen.getByRole('button', { name: /remove/i })
 
-  await waitFor(() => {
-    const toast = { message: 'error', error: true }
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, toast)
+    await userEvent.click(removeBtn)
+
+    await waitFor(() => {
+      expect(mockSetToast).toHaveBeenNthCalledWith(1, {
+        message: 'error',
+        error: true,
+      })
+    })
+  })
+
+  test('delete the discussion when the interlocutor has removed it from its discussion list', async () => {
+    server.use(
+      ...userHandlers,
+      rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+        return res(ctx.status(200), ctx.json({ discussionIds: [] }))
+      }),
+      rest.delete('http://localhost/api/discussions/:id', (req, res, ctx) => {
+        return res(ctx.status(500), ctx.json({ message: 'error' }))
+      })
+    )
+
+    render(
+      <OpenHeaderChatModalButton
+        onClick={() => null}
+        postName="table"
+        discussionId="0"
+        hasUnseenMessages
+        interlocutor={{ name: 'john', image: 'john.jpeg', id: '0' }}
+      />
+    )
+
+    const removeBtn = screen.getByRole('button', { name: /remove/i })
+
+    await userEvent.click(removeBtn)
+
+    await waitFor(() => {
+      expect(mockSetToast).toHaveBeenNthCalledWith(1, {
+        message: 'error',
+        error: true,
+      })
+    })
   })
 })

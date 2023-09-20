@@ -1,4 +1,4 @@
-import { Categories } from '../types/common'
+import type { Categories } from '../types'
 import err from '../utils/constants/errors'
 import imagesSchema from './imagesSchema'
 import latLonSchema from './latLonSchema'

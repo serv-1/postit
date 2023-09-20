@@ -8,7 +8,7 @@ import { Types } from 'mongoose'
 import { NextRequest } from 'next/server'
 // prettier-ignore
 // @ts-expect-error
-import { PostDoc, mockFindPostById, mockUpdateOnePost, mockDeleteOnePost } from 'models/Post'
+import { type PostDoc, mockFindPostById, mockUpdateOnePost, mockDeleteOnePost } from 'models/Post'
 // @ts-expect-error
 import { mockGetServerSession } from 'next-auth'
 // @ts-expect-error
@@ -24,6 +24,9 @@ jest
   .mock('utils/functions/dbConnect')
   .mock('utils/functions/deleteImage')
   .mock('utils/functions/verifyCsrfTokens')
+  .mock('app/api/auth/[...nextauth]/route', () => ({
+    nextAuthOptions: {},
+  }))
 
 describe('GET', () => {
   test('422 - invalid id', async () => {
@@ -172,7 +175,7 @@ describe('PUT', () => {
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({}),
+      body: JSON.stringify({ name: 1 }),
     })
 
     const params = { params: { id: new Types.ObjectId().toString() } }
@@ -180,6 +183,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
+    expect(data).toHaveProperty('name')
     expect(data).toHaveProperty('message')
   })
 

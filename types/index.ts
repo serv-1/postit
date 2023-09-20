@@ -1,0 +1,58 @@
+import categories from 'utils/constants/categories'
+import type { PostsIdGetData } from 'app/api/posts/[id]/types'
+import type { UsersIdGetData } from 'app/api/users/[id]/types'
+import type { DiscussionsIdGetData } from 'app/api/discussions/[id]/types'
+import type { PostsSearchGetData } from 'app/api/posts/search/types'
+
+export type Post = PostsIdGetData
+
+export type SearchedPost = UnArray<PostsSearchGetData['posts']>
+
+export type User = UsersIdGetData
+
+export interface UserPost {
+  id: string
+  name: string
+  price: number
+  address: string
+  image: string
+}
+
+export interface UserFavoritePost {
+  id: string
+  name: string
+  image: string
+}
+
+export type Discussion = Omit<DiscussionsIdGetData, 'messages'> & {
+  messages: (Omit<UnArray<DiscussionsIdGetData['messages']>, 'createdAt'> & {
+    createdAt: Date
+  })[]
+}
+
+export interface NewDiscussionMessage {
+  message: string
+  createdAt: string
+  userId: string
+  seen: boolean
+}
+
+export type Categories = (typeof categories)[0]
+
+export type Entries<O> = {
+  [K in keyof O]-?: [K, O[K]]
+}[keyof O][]
+
+export type UnPromise<T> = T extends Promise<infer U> ? U : T
+
+export type UnArray<T> = T extends Array<infer U> ? U : T
+
+export interface DeferredPromise<T extends unknown> {
+  resolve: (value: T) => void
+  reject: (reason?: any) => void
+}
+
+export interface DiscussionEventData {
+  discussionId: string
+  userId: string
+}

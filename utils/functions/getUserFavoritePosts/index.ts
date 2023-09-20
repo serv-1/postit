@@ -1,9 +1,9 @@
-import type { LightPost } from 'types/common'
+import type { UserFavoritePost } from 'types'
 import getPost from 'utils/functions/getPost'
 
 export default async function getUserFavoritePosts(
   postIds: string[]
-): Promise<Omit<LightPost, 'price' | 'address'>[]> {
+): Promise<UserFavoritePost[]> {
   const favoritePosts = postIds.map(async (postId) => {
     const post = await getPost(postId)
 

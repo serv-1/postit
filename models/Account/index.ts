@@ -1,4 +1,4 @@
-import { models, model, Schema, Model, Types } from 'mongoose'
+import { models, model, Schema, type Model, Types } from 'mongoose'
 
 export interface AccountDoc {
   _id: Types.ObjectId

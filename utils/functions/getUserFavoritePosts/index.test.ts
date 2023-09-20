@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-import { Post } from 'types/common'
+import type { Post } from 'types'
 import getUserFavoritePosts from '.'
 import getPost from 'utils/functions/getPost'
 

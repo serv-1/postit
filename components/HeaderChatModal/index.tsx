@@ -1,13 +1,16 @@
-import { Discussion, JSONDiscussion } from 'types/common'
+import type { Discussion } from 'types'
 import { useEffect, useRef, useState } from 'react'
-import getAxiosError from 'utils/functions/getAxiosError'
 import { useToast } from 'contexts/toast'
-import axios from 'axios'
 import { useSession } from 'next-auth/react'
-import { Session } from 'next-auth'
+import type { Session } from 'next-auth'
 import getClientPusher from 'utils/functions/getClientPusher'
 import OpenHeaderChatModalButton from 'components/OpenHeaderChatModalButton'
 import ChatModal from 'components/ChatModal'
+import ajax from 'libs/ajax'
+import type {
+  DiscussionsIdGetData,
+  DiscussionsIdGetError,
+} from 'app/api/discussions/[id]/types'
 
 interface DiscussionDataState {
   buyer: Discussion['buyer']
@@ -17,12 +20,10 @@ interface DiscussionDataState {
 }
 
 interface HeaderChatModalProps {
-  csrfToken?: string
   discussionId: string
 }
 
 export default function HeaderChatModal({
-  csrfToken,
   discussionId,
 }: HeaderChatModalProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -30,29 +31,39 @@ export default function HeaderChatModal({
   const [hasUnseenMessages, setHasUnseenMessages] = useState(false)
 
   const { setToast } = useToast()
-  const { data } = useSession() as { data: Session }
-  const userId = data.id
+  const session = useSession() as { data: Session }
+  const userId = session.data.id
 
   const pusher = useRef(getClientPusher())
 
   useEffect(() => {
-    const getDiscussion = async () => {
-      try {
-        const url = `/api/discussions/${discussionId}?csrfToken=${csrfToken}`
-        const { data } = await axios.get<JSONDiscussion>(url)
+    async function getDiscussion() {
+      const response = await ajax.get('/discussions/' + discussionId, {
+        csrf: true,
+      })
 
-        const { messages, channelName, buyer, seller, postName } = data
-        const lastMsg = messages[messages.length - 1]
+      if (!response.ok) {
+        const { message }: DiscussionsIdGetError = await response.json()
 
-        setDiscussionData({ buyer, seller, postName, channelName })
-        setHasUnseenMessages(userId !== lastMsg.userId && !lastMsg.seen)
-      } catch (e) {
-        const { message } = getAxiosError(e)
         setToast({ message, error: true })
+
+        return
       }
+
+      const discussion: DiscussionsIdGetData = await response.json()
+      const lastMsg = discussion.messages[discussion.messages.length - 1]
+
+      setHasUnseenMessages(userId !== lastMsg.userId && !lastMsg.seen)
+      setDiscussionData({
+        buyer: discussion.buyer,
+        seller: discussion.seller,
+        postName: discussion.postName,
+        channelName: discussion.channelName,
+      })
     }
+
     getDiscussion()
-  }, [csrfToken, discussionId, setToast, userId])
+  }, [discussionId, setToast, userId])
 
   useEffect(() => {
     if (!discussionData?.channelName) return
@@ -83,7 +94,6 @@ export default function HeaderChatModal({
         hasUnseenMessages={hasUnseenMessages}
         interlocutor={userId === buyer.id ? seller : buyer}
         postName={postName}
-        csrfToken={csrfToken}
         discussionId={discussionId}
         onClick={() => {
           setIsOpen(true)
@@ -93,7 +103,6 @@ export default function HeaderChatModal({
       <ChatModal
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        csrfToken={csrfToken}
         discussionId={discussionId}
       />
     </div>

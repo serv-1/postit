@@ -1,6 +1,6 @@
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
-import Post, { PostDoc } from 'models/Post'
-import { UpdateQuery, isValidObjectId } from 'mongoose'
+import Post, { type PostDoc } from 'models/Post'
+import { type UpdateQuery, isValidObjectId } from 'mongoose'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import updatePostApiSchema from 'schemas/updatePostApiSchema'
@@ -84,7 +84,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
   const result = validate(updatePostApiSchema, data)
 
   if ('message' in result) {
-    return NextResponse.json({ message: result.message }, { status: 422 })
+    return NextResponse.json(
+      { name: result.name, message: result.message },
+      { status: 422 }
+    )
   }
 
   try {

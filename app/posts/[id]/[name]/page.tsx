@@ -1,9 +1,10 @@
 import PostPage from 'app/pages/post'
 import type { Metadata } from 'next'
-import { getCsrfToken, getSession } from 'next-auth/react'
 import getPost from 'utils/functions/getPost'
 import getUserPosts from 'utils/functions/getUserPosts'
 import getUser from 'utils/functions/getUser'
+import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import { getServerSession } from 'next-auth'
 
 interface Params {
   id: string
@@ -28,15 +29,13 @@ export default async function Page({ params }: { params: Params }) {
   const posts = await getUserPosts(
     postUser.postIds.filter((postId) => postId !== params.id)
   )
-  const session = await getSession()
+  const session = await getServerSession(nextAuthOptions)
   const user = session ? await getUser(session.id) : undefined
-  const csrfToken = await getCsrfToken()
 
   return (
     <PostPage
       post={{ ...post, user: { id: postUser.id, name: postUser.name, posts } }}
       user={user}
-      csrfToken={csrfToken}
     />
   )
 }

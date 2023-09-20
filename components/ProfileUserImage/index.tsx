@@ -1,21 +1,14 @@
-import axios from 'axios'
-import { ChangeEvent, useRef, useState } from 'react'
+import { type ChangeEvent, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useToast } from 'contexts/toast'
-import getAxiosError from 'utils/functions/getAxiosError'
-import { getCsrfToken } from 'next-auth/react'
 import Plus from 'public/static/images/plus.svg'
 import err from 'utils/constants/errors'
 import isImage from 'utils/functions/isImage'
 import isImageTooBig from 'utils/functions/isImageTooBig'
-
-const awsUrl = process.env.NEXT_PUBLIC_AWS_URL + '/'
-
-interface Response {
-  url: string
-  key: string
-  fields: Record<string, string>
-}
+import ajax from 'libs/ajax'
+import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
+import type { S3GetData, S3GetError } from 'app/api/s3/types'
+import type { UserPutError } from 'app/api/user/types'
 
 interface ProfileUserImageProps {
   image?: string
@@ -24,15 +17,18 @@ interface ProfileUserImageProps {
 export default function ProfileUserImage({
   image: img,
 }: ProfileUserImageProps) {
-  const defaultImage = img ? awsUrl + img : '/static/images/default.jpg'
-
-  const [image, setImage] = useState(defaultImage)
+  const [image, setImage] = useState(
+    img ? NEXT_PUBLIC_AWS_URL + '/' + img : NEXT_PUBLIC_DEFAULT_USER_IMAGE
+  )
   const { setToast } = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
 
   const updateImage = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0]
-    if (!file) return
+
+    if (!file) {
+      return
+    }
 
     if (!isImage(file.type)) {
       return setToast({ message: err.IMAGE_INVALID, error: true })
@@ -42,33 +38,42 @@ export default function ProfileUserImage({
       return setToast({ message: err.IMAGE_TOO_BIG, error: true })
     }
 
-    try {
-      const csrfToken = await getCsrfToken()
+    let response = await ajax.get('/s3', { csrf: true })
 
-      const res = await axios.get<Response>('/api/s3?csrfToken=' + csrfToken)
-      const { url, fields, key } = res.data
+    if (!response.ok) {
+      const { message }: S3GetError = await response.json()
 
-      const formData = new FormData()
-      Object.entries(fields).forEach(([k, v]) => formData.append(k, v))
-      formData.append('file', file)
+      setToast({ message, error: true })
 
-      await axios.post(url, formData)
-
-      await axios.put('/api/user', { csrfToken, image: key })
-
-      setImage(awsUrl + key)
-      setToast({ message: 'The image has been updated! 🎉' })
-    } catch (e) {
-      const { message, status } = getAxiosError(e)
-
-      if (status === 400) {
-        return setToast({ message: err.IMAGE_TOO_BIG, error: true })
-      } else if (!message) {
-        return setToast({ message: err.DEFAULT, error: true })
-      }
-
-      return setToast({ message, error: true })
+      return
     }
+
+    const { url, fields, key }: S3GetData = await response.json()
+    const formData = new FormData()
+
+    Object.entries(fields).forEach(([k, v]) => formData.append(k, v))
+    formData.append('file', file)
+
+    response = await fetch(url, { method: 'POST', body: formData })
+
+    if (!response.ok) {
+      setToast({ message: err.DEFAULT, error: true })
+
+      return
+    }
+
+    response = await ajax.put('/user', { image: key }, { csrf: true })
+
+    if (!response.ok) {
+      const { message }: UserPutError = await response.json()
+
+      setToast({ message, error: true })
+
+      return
+    }
+
+    setImage(NEXT_PUBLIC_AWS_URL + '/' + key)
+    setToast({ message: 'The image has been updated! 🎉' })
   }
 
   return (

@@ -1,10 +1,5 @@
 import Joi from 'joi'
-import err from '../utils/constants/errors'
-
-interface keySchema {
-  csrfToken: string
-  oldImageKey: string
-}
+import err from 'utils/constants/errors'
 
 const keySchema = Joi.string().max(1024, 'utf8').messages({
   'string.base': err.KEY_INVALID,

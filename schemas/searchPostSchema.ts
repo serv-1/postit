@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { Categories } from '../types/common'
+import type { Categories } from '../types'
 import err from '../utils/constants/errors'
 import categoriesSchema from './categoriesSchema'
 import addressSchema from './addressSchema'

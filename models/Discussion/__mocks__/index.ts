@@ -1,5 +1,5 @@
 import _Discussion from 'models/Discussion'
-import { DiscussionDoc } from '..'
+import type { DiscussionDoc } from '..'
 
 export const mockSaveDiscussion = jest.fn()
 export const mockFindOneDiscussion = jest.fn()

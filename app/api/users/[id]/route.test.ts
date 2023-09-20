@@ -8,7 +8,7 @@ import { Types } from 'mongoose'
 // @ts-expect-error
 import { mockDbConnect } from 'utils/functions/dbConnect'
 // @ts-expect-error
-import { UserDoc, mockFindUserById } from 'models/User'
+import { type UserDoc, mockFindUserById } from 'models/User'
 
 jest.mock('models/User').mock('utils/functions/dbConnect')
 

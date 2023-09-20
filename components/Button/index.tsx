@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { ComponentPropsWithoutRef, ReactNode } from 'react'
+import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 
 const BUTTON_BASE =
   'rounded px-16 py-8 transition-colors duration-200 font-bold'

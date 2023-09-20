@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ChangeEvent } from 'react'
+import type { ChangeEvent } from 'react'
 import PasswordInput from '.'
 
 const setFocus = jest.fn()

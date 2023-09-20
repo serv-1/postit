@@ -1,8 +1,8 @@
-import { DeleteResult } from 'mongodb'
-import { models, model, Schema, Model, Types, Query } from 'mongoose'
+import type { DeleteResult } from 'mongodb'
+import { models, model, Schema, type Model, Types, Query } from 'mongoose'
 import { nanoid } from 'nanoid'
 import Post from 'models/Post'
-import User, { UserDoc } from 'models/User'
+import User, { type UserDoc } from 'models/User'
 
 export interface MessageDoc {
   message: string

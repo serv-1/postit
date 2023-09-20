@@ -1,6 +1,6 @@
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
-import Discussion, { DiscussionDoc } from 'models/Discussion'
-import User, { UserDoc } from 'models/User'
+import Discussion, { type DiscussionDoc } from 'models/Discussion'
+import User, { type UserDoc } from 'models/User'
 import { isValidObjectId } from 'mongoose'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
