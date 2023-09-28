@@ -1,7 +1,7 @@
 import { scryptSync, timingSafeEqual } from 'crypto'
 import User from 'models/User'
 import { NextResponse } from 'next/server'
-import signInSchema from 'schemas/signInSchema'
+import signIn from 'schemas/signIn'
 import err from 'utils/constants/errors'
 import dbConnect from 'utils/functions/dbConnect'
 import validate from 'utils/functions/validate'
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
   }
 
-  const result = validate(signInSchema, data)
+  const result = validate(signIn, data)
 
   if ('message' in result) {
     return NextResponse.json(

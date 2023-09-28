@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import CreateAPostStep1 from '.'
 import userEvent from '@testing-library/user-event'
 import err from 'utils/constants/errors'
+import { MAX_IMAGE_SIZE } from 'utils/constants'
 
 it('has the "hidden" class if the given step is not its step', () => {
   render(
@@ -163,11 +164,16 @@ test('an error renders if an image is too big', async () => {
   )
 
   const input = screen.getByLabelText(/images/i)
-  const data = new Uint8Array(1_000_001).toString()
-  const files = [new File([data], 'image.jpeg', { type: 'image/jpeg' })]
-  await userEvent.upload(input, files)
+
+  await userEvent.upload(
+    input,
+    new File([new Uint8Array(MAX_IMAGE_SIZE + 1).toString()], 'image.jpeg', {
+      type: 'image/jpeg',
+    })
+  )
 
   const alert = await screen.findByRole('alert')
+
   expect(alert).toHaveTextContent(err.IMAGE_TOO_BIG)
   expect(input.nextElementSibling).toHaveFocus()
 })

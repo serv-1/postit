@@ -3,7 +3,7 @@ import Post, { type PostDoc } from 'models/Post'
 import { type UpdateQuery, isValidObjectId } from 'mongoose'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
-import updatePostApiSchema from 'schemas/updatePostApiSchema'
+import updatePost from 'schemas/server/updatePost'
 import err from 'utils/constants/errors'
 import dbConnect from 'utils/functions/dbConnect'
 import deleteImage from 'utils/functions/deleteImage'
@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
   }
 
-  const result = validate(updatePostApiSchema, data)
+  const result = validate(updatePost, data)
 
   if ('message' in result) {
     return NextResponse.json(

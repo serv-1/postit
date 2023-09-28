@@ -1,6 +1,6 @@
 import User from 'models/User'
 import { NextResponse } from 'next/server'
-import forgotPwSchema from 'schemas/forgotPwSchema'
+import forgotPassword from 'schemas/forgotPassword'
 import err from 'utils/constants/errors'
 import dbConnect from 'utils/functions/dbConnect'
 import validate from 'utils/functions/validate'
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
   }
 
-  const result = validate(forgotPwSchema, data)
+  const result = validate(forgotPassword, data)
 
   if ('message' in result) {
     return NextResponse.json({ message: result.message }, { status: 422 })

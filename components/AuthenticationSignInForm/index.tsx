@@ -9,7 +9,7 @@ import Input from 'components/Input'
 import InputError from 'components/InputError'
 import PasswordInput from 'components/PasswordInput'
 import Button from 'components/Button'
-import signInSchema, { type SignInSchema } from 'schemas/signInSchema'
+import signInSchema, { type SignIn } from 'schemas/signIn'
 import err from 'utils/constants/errors'
 import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 
@@ -22,14 +22,14 @@ export default function AuthenticationSignInForm({
   providers,
   setForgotPassword,
 }: AuthenticationSignInFormProps) {
-  const methods = useForm<SignInSchema>({
+  const methods = useForm<SignIn>({
     resolver: joiResolver(signInSchema),
   })
 
   const { setToast } = useToast()
   const router = useRouter()
 
-  const submitHandler: SubmitHandler<SignInSchema> = async (data) => {
+  const submitHandler: SubmitHandler<SignIn> = async (data) => {
     const res = await signIn<'credentials'>('credentials', {
       ...data,
       redirect: false,
@@ -52,14 +52,14 @@ export default function AuthenticationSignInForm({
       >
         <div className="mb-16">
           <label htmlFor="signInEmail">Email</label>
-          <Input<SignInSchema>
+          <Input<SignIn>
             id="signInEmail"
             type="email"
             name="email"
             needFocus
             bgColor="md:bg-fuchsia-100"
           />
-          <InputError<SignInSchema> inputName="email" />
+          <InputError<SignIn> inputName="email" />
         </div>
 
         <div className="mb-16">
@@ -73,11 +73,11 @@ export default function AuthenticationSignInForm({
           >
             Forgot password?
           </button>
-          <PasswordInput<SignInSchema>
+          <PasswordInput<SignIn>
             id="signInPassword"
             bgColor="bg-fuchsia-50 md:bg-fuchsia-100"
           />
-          <InputError<SignInSchema> inputName="password" />
+          <InputError<SignIn> inputName="password" />
         </div>
 
         <div className="flex justify-end">

@@ -3,8 +3,8 @@ import { MongoServerError } from 'mongodb'
 import type { UpdateQuery } from 'mongoose'
 import { getServerSession } from 'next-auth'
 import { type NextRequest, NextResponse } from 'next/server'
-import addUserSchema from 'schemas/addUserSchema'
-import updateUserApiSchema from 'schemas/updateUserApiSchema'
+import createUser from 'schemas/createUser'
+import updateUser from 'schemas/server/updateUser'
 import err from 'utils/constants/errors'
 import dbConnect from 'utils/functions/dbConnect'
 import deleteImage from 'utils/functions/deleteImage'
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
   }
 
-  const result = validate(addUserSchema, data)
+  const result = validate(createUser, data)
 
   if ('message' in result) {
     return NextResponse.json(
@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
   }
 
-  const result = validate(updateUserApiSchema, data)
+  const result = validate(updateUser, data)
 
   if ('message' in result) {
     return NextResponse.json({ message: result.message }, { status: 422 })

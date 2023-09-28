@@ -4,11 +4,11 @@ import { useToast } from 'contexts/toast'
 import Plus from 'public/static/images/plus.svg'
 import err from 'utils/constants/errors'
 import isImage from 'utils/functions/isImage'
-import isImageTooBig from 'utils/functions/isImageTooBig'
 import ajax from 'libs/ajax'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 import type { S3GetData, S3GetError } from 'app/api/s3/types'
 import type { UserPutError } from 'app/api/user/types'
+import { MAX_IMAGE_SIZE } from 'utils/constants'
 
 interface ProfileUserImageProps {
   image?: string
@@ -30,11 +30,11 @@ export default function ProfileUserImage({
       return
     }
 
-    if (!isImage(file.type)) {
+    if (!isImage(file)) {
       return setToast({ message: err.IMAGE_INVALID, error: true })
     }
 
-    if (isImageTooBig(file.size)) {
+    if (file.size > MAX_IMAGE_SIZE) {
       return setToast({ message: err.IMAGE_TOO_BIG, error: true })
     }
 

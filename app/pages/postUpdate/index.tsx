@@ -20,22 +20,18 @@ import useLinearBackgroundGradient from 'hooks/useLinearBackgroundGradient'
 import ajax from 'libs/ajax'
 import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
-import updatePostSchema, {
-  type UpdatePostSchema,
-} from 'schemas/updatePostSchema'
+import updatePost, { type UpdatePost } from 'schemas/client/updatePost'
 import type { Entries, Post } from 'types'
 import categories from 'utils/constants/categories'
 import err from 'utils/constants/errors'
 import addSpacesToNum from 'utils/functions/addSpacesToNum'
-import isImage from 'utils/functions/isImage'
-import isImageTooBig from 'utils/functions/isImageTooBig'
 
 const options = categories.map((category) => ({
   label: category,
   value: category,
 }))
 
-type FilteredData = Omit<UpdatePostSchema, 'images'> & {
+type FilteredData = Omit<UpdatePost, 'images'> & {
   images?: string[]
   latLon?: [number, number]
 }
@@ -43,15 +39,13 @@ type FilteredData = Omit<UpdatePostSchema, 'images'> & {
 export default function UpdatePost({ post }: { post: Post }) {
   const [latLon, setLatLon] = useState<[number, number]>()
 
-  const methods = useForm<UpdatePostSchema>({
-    resolver: joiResolver(updatePostSchema),
-  })
+  const methods = useForm<UpdatePost>({ resolver: joiResolver(updatePost) })
 
   useLinearBackgroundGradient()
 
   const { setToast } = useToast()
 
-  const submitHandler: SubmitHandler<UpdatePostSchema> = async (data) => {
+  const submitHandler: SubmitHandler<UpdatePost> = async (data) => {
     const { images, ...dataRest } = data
     const filteredData: FilteredData = dataRest
 
@@ -62,23 +56,7 @@ export default function UpdatePost({ post }: { post: Post }) {
     }
 
     if (images) {
-      for (let i = 0; i < images.length; i++) {
-        if (!isImage(images[i].type)) {
-          return methods.setError(
-            'images',
-            { message: err.IMAGE_INVALID },
-            { shouldFocus: true }
-          )
-        }
-
-        if (isImageTooBig(images[i].size)) {
-          return methods.setError(
-            'images',
-            { message: err.IMAGE_TOO_BIG },
-            { shouldFocus: true }
-          )
-        }
-
+      for (const image of images) {
         let response = await ajax.get('/s3', { csrf: true })
 
         if (!response.ok) {
@@ -93,7 +71,7 @@ export default function UpdatePost({ post }: { post: Post }) {
         const formData = new FormData()
 
         Object.entries(fields).forEach(([k, v]) => formData.append(k, v))
-        formData.append('file', images[i])
+        formData.append('file', image)
 
         response = await fetch(url, { method: 'POST', body: formData })
 
@@ -123,7 +101,7 @@ export default function UpdatePost({ post }: { post: Post }) {
 
       if (name) {
         methods.setError(
-          name as keyof UpdatePostSchema,
+          name as keyof UpdatePost,
           { message },
           { shouldFocus: true }
         )

@@ -12,7 +12,7 @@ import Form from 'components/Form'
 import { useToast } from 'contexts/toast'
 import { useRouter } from 'next/navigation'
 import { type SubmitHandler, useForm } from 'react-hook-form'
-import addPostSchema, { type AddPostSchema } from 'schemas/addPostSchema'
+import createPost, { type CreatePost } from 'schemas/client/createPost'
 import { joiResolver } from '@hookform/resolvers/joi'
 import err from 'utils/constants/errors'
 import useLinearBackgroundGradient from 'hooks/useLinearBackgroundGradient'
@@ -31,12 +31,9 @@ export default function Page() {
 
   const { setToast } = useToast()
   const router = useRouter()
+  const methods = useForm<CreatePost>({ resolver: joiResolver(createPost) })
 
-  const methods = useForm<AddPostSchema>({
-    resolver: joiResolver(addPostSchema),
-  })
-
-  const submitHandler: SubmitHandler<AddPostSchema> = async (data) => {
+  const submitHandler: SubmitHandler<CreatePost> = async (data) => {
     const keys: string[] = []
 
     for (const image of images) {
@@ -81,7 +78,7 @@ export default function Page() {
 
       if (name) {
         methods.setError(
-          name as keyof AddPostSchema,
+          name as keyof CreatePost,
           { message },
           { shouldFocus: true }
         )

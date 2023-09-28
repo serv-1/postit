@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import err from 'utils/constants/errors'
 import validate from 'utils/functions/validate'
-import addDiscussionApiSchema from 'schemas/addDiscussionApiSchema'
+import createDiscussion from 'schemas/server/createDiscussion'
 import verifyCsrfTokens from 'utils/functions/verifyCsrfTokens'
 import Discussion from 'models/Discussion'
 import dbConnect from 'utils/functions/dbConnect'
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
   }
 
-  const result = validate(addDiscussionApiSchema, data)
+  const result = validate(createDiscussion, data)
 
   if ('message' in result) {
     return NextResponse.json({ message: result.message }, { status: 422 })

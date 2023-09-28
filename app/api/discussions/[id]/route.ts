@@ -4,7 +4,7 @@ import User, { type UserDoc } from 'models/User'
 import { isValidObjectId } from 'mongoose'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
-import updateDiscussionApiSchema from 'schemas/updateDiscussionApiSchema'
+import updateDiscussion from 'schemas/updateDiscussion'
 import err from 'utils/constants/errors'
 import dbConnect from 'utils/functions/dbConnect'
 import getServerPusher from 'utils/functions/getServerPusher'
@@ -167,7 +167,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
         return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
       }
 
-      const result = validate(updateDiscussionApiSchema, data)
+      const result = validate(updateDiscussion, data)
 
       if ('message' in result) {
         return NextResponse.json({ message: result.message }, { status: 422 })

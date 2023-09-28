@@ -9,19 +9,19 @@ import InputError from 'components/InputError'
 import PasswordStrength from 'components/PasswordStrength'
 import PasswordInput from 'components/PasswordInput'
 import Button from 'components/Button'
-import addUserSchema, { type AddUserSchema } from 'schemas/addUserSchema'
+import createUser, { type CreateUser } from 'schemas/createUser'
 import ajax from 'libs/ajax'
 import type { UserPostError } from 'app/api/user/types'
 
 export default function AuthenticationRegisterForm() {
-  const methods = useForm<AddUserSchema>({
-    resolver: joiResolver(addUserSchema),
+  const methods = useForm<CreateUser>({
+    resolver: joiResolver(createUser),
   })
 
   const { setToast } = useToast()
   const router = useRouter()
 
-  const submitHandler: SubmitHandler<AddUserSchema> = async (data) => {
+  const submitHandler: SubmitHandler<CreateUser> = async (data) => {
     const response = await ajax.post('/user', data)
 
     if (!response.ok) {
@@ -65,23 +65,23 @@ export default function AuthenticationRegisterForm() {
     >
       <div className="mb-16">
         <label htmlFor="name">Name</label>
-        <Input<AddUserSchema>
+        <Input<CreateUser>
           type="text"
           name="name"
           needFocus
           bgColor="md:bg-fuchsia-100"
         />
-        <InputError<AddUserSchema> inputName="name" />
+        <InputError<CreateUser> inputName="name" />
       </div>
 
       <div className="mb-16">
         <label htmlFor="email">Email</label>
-        <Input<AddUserSchema>
+        <Input<CreateUser>
           type="email"
           name="email"
           bgColor="md:bg-fuchsia-100"
         />
-        <InputError<AddUserSchema> inputName="email" />
+        <InputError<CreateUser> inputName="email" />
       </div>
 
       <div className="mb-16">
@@ -90,13 +90,13 @@ export default function AuthenticationRegisterForm() {
         </label>
         <PasswordStrength className="inline-block w-1/2 text-right">
           {(onChange) => (
-            <PasswordInput<AddUserSchema>
+            <PasswordInput<CreateUser>
               onChange={onChange}
               bgColor="bg-fuchsia-50 md:bg-fuchsia-100"
             />
           )}
         </PasswordStrength>
-        <InputError<AddUserSchema> inputName="password" />
+        <InputError<CreateUser> inputName="password" />
       </div>
 
       <div className="flex justify-end">

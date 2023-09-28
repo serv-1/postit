@@ -8,9 +8,7 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import { useEffect } from 'react'
 import type { Categories } from 'types'
 import Button from 'components/Button'
-import searchPostSchema, {
-  type SearchPostSchema,
-} from 'schemas/searchPostSchema'
+import searchPost, { type SearchPost } from 'schemas/searchPost'
 import Popup from 'components/Popup'
 
 const options = categories.map((category) => ({
@@ -19,13 +17,11 @@ const options = categories.map((category) => ({
 }))
 
 export default function HomeSearchPosts() {
-  const methods = useForm<SearchPostSchema>({
-    resolver: joiResolver(searchPostSchema),
-  })
+  const methods = useForm<SearchPost>({ resolver: joiResolver(searchPost) })
 
   const { formState } = methods
 
-  const submitHandler: SubmitHandler<SearchPostSchema> = (data) => {
+  const submitHandler: SubmitHandler<SearchPost> = (data) => {
     const { query, minPrice, maxPrice, categories, address } = data
 
     const url = new URLSearchParams({ query })
@@ -79,21 +75,21 @@ export default function HomeSearchPosts() {
       className="relative"
     >
       <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] md:align-top lg:block lg:w-auto md:mr-8 lg:mr-0">
-        <Select<SearchPostSchema>
+        <Select<SearchPost>
           name="categories"
           options={options}
           aria-label="Categories"
           placeholder="Categories"
         />
-        <InputError<SearchPostSchema> inputName="categories" />
+        <InputError<SearchPost> inputName="categories" />
       </div>
       <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] md:align-top lg:block lg:w-auto">
-        <Input<SearchPostSchema>
+        <Input<SearchPost>
           name="query"
           type="search"
           placeholder="Umbrella, sofa, ..."
         />
-        <InputError<SearchPostSchema> inputName="query" />
+        <InputError<SearchPost> inputName="query" />
       </div>
       <Popup
         placement="bottom-start"
@@ -108,7 +104,7 @@ export default function HomeSearchPosts() {
             <div className="flex flex-row flex-nowrap">
               <div className="mr-8">
                 <label htmlFor="minPrice">Minimum</label>
-                <Input<SearchPostSchema>
+                <Input<SearchPost>
                   id="minPrice"
                   name="minPrice"
                   type="number"
@@ -119,7 +115,7 @@ export default function HomeSearchPosts() {
               </div>
               <div>
                 <label htmlFor="maxPrice">Maximum</label>
-                <Input<SearchPostSchema>
+                <Input<SearchPost>
                   id="maxPrice"
                   name="maxPrice"
                   type="number"
@@ -128,8 +124,8 @@ export default function HomeSearchPosts() {
                 />
               </div>
             </div>
-            <InputError<SearchPostSchema> inputName="minPrice" />
-            <InputError<SearchPostSchema> inputName="maxPrice" />
+            <InputError<SearchPost> inputName="minPrice" />
+            <InputError<SearchPost> inputName="maxPrice" />
           </>
         }
       />
@@ -146,13 +142,13 @@ export default function HomeSearchPosts() {
             <label htmlFor="address">
               A city, county, state, country or a postal code is expected.
             </label>
-            <Input<SearchPostSchema>
+            <Input<SearchPost>
               id="address"
               name="address"
               type="text"
               needFocus
             />
-            <InputError<SearchPostSchema> inputName="address" />
+            <InputError<SearchPost> inputName="address" />
           </>
         }
       />

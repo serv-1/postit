@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import err from 'utils/constants/errors'
 import validate from 'utils/functions/validate'
-import addPostApiSchema from 'schemas/addPostApiSchema'
+import createPost from 'schemas/server/createPost'
 import verifyCsrfTokens from 'utils/functions/verifyCsrfTokens'
 import dbConnect from 'utils/functions/dbConnect'
 import Post from 'models/Post'
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
   }
 
-  const result = validate(addPostApiSchema, data)
+  const result = validate(createPost, data)
 
   if ('message' in result) {
     return NextResponse.json(

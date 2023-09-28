@@ -2,9 +2,9 @@ import Form from 'components/Form'
 import PaperAirPlane from 'public/static/images/paper-airplane.svg'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
-import updateDiscussionSchema, {
-  type UpdateDiscussionSchema,
-} from 'schemas/updateDiscussionSchema'
+import updateDiscussion, {
+  type UpdateDiscussion,
+} from 'schemas/updateDiscussion'
 import { useEffect } from 'react'
 import { useToast } from 'contexts/toast'
 import ajax from 'libs/ajax'
@@ -33,15 +33,15 @@ export default function ChatSendBar({
   postName,
   sellerId,
 }: ChatSendBarProps) {
-  const methods = useForm<UpdateDiscussionSchema>({
-    resolver: joiResolver(updateDiscussionSchema),
+  const methods = useForm<UpdateDiscussion>({
+    resolver: joiResolver(updateDiscussion),
   })
 
   const { setToast } = useToast()
   const { formState } = methods
   const { errors, isSubmitSuccessful } = formState
 
-  const submitHandler: SubmitHandler<UpdateDiscussionSchema> = async (data) => {
+  const submitHandler: SubmitHandler<UpdateDiscussion> = async (data) => {
     const response = !discussionId
       ? await ajax.post(
           '/discussion',
@@ -73,7 +73,7 @@ export default function ChatSendBar({
   }, [methods, isSubmitSuccessful])
 
   return (
-    <Form<UpdateDiscussionSchema>
+    <Form<UpdateDiscussion>
       method="post"
       methods={methods}
       submitHandler={submitHandler}

@@ -1,15 +1,11 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { useToast } from 'contexts/toast'
-import updateUserEmailSchema, {
-  type UpdateUserEmailSchema,
-} from 'schemas/updateUserEmailSchema'
-import updateUserNameSchema, {
-  type UpdateUserNameSchema,
-} from 'schemas/updateUserNameSchema'
-import updateUserPwSchema, {
-  type UpdateUserPwSchema,
-} from 'schemas/updateUserPwSchema'
+import updateUserEmail, { type UpdateUserEmail } from 'schemas/updateUserEmail'
+import updateUserName, { type UpdateUserName } from 'schemas/updateUserName'
+import updateUserPassword, {
+  type UpdateUserPassword,
+} from 'schemas/updateUserPassword'
 import Button from 'components/Button'
 import Form from 'components/Form'
 import Input from 'components/Input'
@@ -25,25 +21,22 @@ interface UpdateAccountFormProps {
 }
 
 type Schemas =
-  | typeof updateUserNameSchema
-  | typeof updateUserEmailSchema
-  | typeof updateUserPwSchema
+  | typeof updateUserName
+  | typeof updateUserEmail
+  | typeof updateUserPassword
 
-type TSchemas =
-  | UpdateUserNameSchema
-  | UpdateUserEmailSchema
-  | UpdateUserPwSchema
+type TSchemas = UpdateUserName | UpdateUserEmail | UpdateUserPassword
 
 export default function UpdateAccountForm({
   value,
   setName,
 }: UpdateAccountFormProps) {
-  let schema: Schemas = updateUserNameSchema
+  let schema: Schemas = updateUserName
 
   if (value === 'email') {
-    schema = updateUserEmailSchema
+    schema = updateUserEmail
   } else if (value === 'password') {
-    schema = updateUserPwSchema
+    schema = updateUserPassword
   }
 
   const methods = useForm<TSchemas>({ resolver: joiResolver(schema) })
@@ -78,7 +71,7 @@ export default function UpdateAccountForm({
               </label>
               <PasswordStrength className="w-1/2 text-right">
                 {(onChange) => (
-                  <PasswordInput<UpdateUserPwSchema>
+                  <PasswordInput<UpdateUserPassword>
                     onChange={onChange}
                     noRightRadius
                     bgColor="bg-fuchsia-100"
@@ -90,7 +83,7 @@ export default function UpdateAccountForm({
               Change
             </Button>
           </div>
-          <InputError<UpdateUserPwSchema> inputName="password" />
+          <InputError<UpdateUserPassword> inputName="password" />
         </div>
       ) : (
         <div className="mb-16 md:mb-32">
@@ -98,15 +91,13 @@ export default function UpdateAccountForm({
             {value[0].toUpperCase() + value.slice(1)}
           </label>
           <div className="flex flex-row flex-nowrap">
-            <Input<UpdateUserEmailSchema | UpdateUserNameSchema>
+            <Input<UpdateUserEmail | UpdateUserName>
               type={value === 'name' ? 'text' : value}
               name={value}
               noRightRadius
               bgColor="bg-fuchsia-100"
             />
-            <InputError<UpdateUserEmailSchema | UpdateUserNameSchema>
-              inputName={value}
-            />
+            <InputError<UpdateUserEmail | UpdateUserName> inputName={value} />
             <Button color="primary" noRadius="left">
               Change
             </Button>

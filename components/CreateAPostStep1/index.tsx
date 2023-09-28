@@ -4,8 +4,8 @@ import type { ChangeHandler } from 'react-hook-form'
 import PlusCircle from 'public/static/images/plus-circle.svg'
 import err from 'utils/constants/errors'
 import isImage from 'utils/functions/isImage'
-import isImageTooBig from 'utils/functions/isImageTooBig'
 import Button from 'components/Button'
+import { MAX_IMAGE_SIZE } from 'utils/constants'
 
 interface CreateAPostStep1Props {
   step: 0 | 1 | 2
@@ -21,8 +21,8 @@ export default function CreateAPostStep1({
   const [imageSources, setImageSources] = useState<string[]>()
   const [error, setError] = useState<string>()
 
-  const onChange: ChangeHandler = async (e) => {
-    const files = e.target.files
+  const onChange: ChangeHandler = async (e: Parameters<ChangeHandler>[0]) => {
+    const files: File[] = Array.from(e.target.files)
 
     if (files.length === 0) {
       setError(err.IMAGES_REQUIRED)
@@ -36,12 +36,12 @@ export default function CreateAPostStep1({
     const images: File[] = []
 
     for (const file of files) {
-      if (!isImage(file.type)) {
+      if (!isImage(file)) {
         setError(err.IMAGE_INVALID)
         return setImageSources(undefined)
       }
 
-      if (isImageTooBig(file.size)) {
+      if (file.size > MAX_IMAGE_SIZE) {
         setError(err.IMAGE_TOO_BIG)
         return setImageSources(undefined)
       }

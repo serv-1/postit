@@ -1,4 +1,4 @@
-import type { AddUserSchema } from 'schemas/addUserSchema'
+import type { CreateUser } from 'schemas/createUser'
 
 export interface UserPostData {
   id: string
@@ -6,7 +6,7 @@ export interface UserPostData {
 
 export interface UserPostError {
   message: string
-  name?: keyof AddUserSchema
+  name?: keyof CreateUser
 }
 
 export type UserPutData = null

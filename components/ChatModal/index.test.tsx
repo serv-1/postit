@@ -121,5 +121,8 @@ it('unbinds all events when unmounting', async () => {
 
   unmount()
 
-  expect(mockClientPusherUnbind).toHaveBeenCalledTimes(2)
+  const { calls } = mockClientPusherUnbind.mock
+
+  expect(calls[0][0]).toBe('discussion-created')
+  expect(calls[1][0]).toBe('discussion-deleted')
 })

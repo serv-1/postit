@@ -1,6 +1,6 @@
 import Post from 'models/Post'
 import { NextRequest, NextResponse } from 'next/server'
-import searchPostSchema from 'schemas/searchPostSchema'
+import searchPost from 'schemas/searchPost'
 import type { Categories } from 'types'
 import err from 'utils/constants/errors'
 import dbConnect from 'utils/functions/dbConnect'
@@ -25,7 +25,7 @@ interface SearchResult {
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
 
-  const result = validate(searchPostSchema, {
+  const result = validate(searchPost, {
     query: searchParams.get('query'),
     page: searchParams.get('page'),
     minPrice: searchParams.get('minPrice'),

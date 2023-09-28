@@ -6,7 +6,7 @@ import Input from 'components/Input'
 import InputError from 'components/InputError'
 import { useToast } from 'contexts/toast'
 import Button from 'components/Button'
-import forgotPwSchema, { type ForgotPwSchema } from 'schemas/forgotPwSchema'
+import forgotPassword, { type ForgotPassword } from 'schemas/forgotPassword'
 import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 import ajax from 'libs/ajax'
 import type { VerifyEmailPostError } from 'app/api/verify-email/types'
@@ -18,13 +18,13 @@ interface AuthenticationFPProps {
 export default function AuthenticationForgotPassword({
   setForgotPassword,
 }: AuthenticationFPProps) {
-  const methods = useForm<ForgotPwSchema>({
-    resolver: joiResolver(forgotPwSchema),
+  const methods = useForm<ForgotPassword>({
+    resolver: joiResolver(forgotPassword),
   })
 
   const { setToast } = useToast()
 
-  const submitHandler: SubmitHandler<ForgotPwSchema> = async (data) => {
+  const submitHandler: SubmitHandler<ForgotPassword> = async (data) => {
     const response = await ajax.post('/verify-email', data)
 
     if (!response.ok) {
@@ -62,13 +62,13 @@ export default function AuthenticationForgotPassword({
       >
         <div className="mb-16">
           <label htmlFor="email">Email</label>
-          <Input<ForgotPwSchema>
+          <Input<ForgotPassword>
             type="email"
             name="email"
             needFocus
             bgColor="md:bg-fuchsia-100"
           />
-          <InputError<ForgotPwSchema> inputName="email" />
+          <InputError<ForgotPassword> inputName="email" />
         </div>
         <div className="flex justify-end">
           <Button color="primary">Send</Button>
