@@ -4,13 +4,13 @@
 
 import { GET } from './route'
 import { NextRequest } from 'next/server'
-import err from 'utils/constants/errors'
 // @ts-expect-error
-import { mockDbConnect } from 'utils/functions/dbConnect'
+import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
 import { mockAggregate } from 'models/Post'
+import { QUERY_INVALID, INTERNAL_SERVER_ERROR } from 'constants/errors'
 
-jest.mock('models/Post').mock('utils/functions/dbConnect')
+jest.mock('models/Post').mock('functions/dbConnect')
 
 describe('GET', () => {
   test('422 - invalid search params', async () => {
@@ -19,7 +19,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.QUERY_INVALID })
+    expect(data).toEqual({ message: QUERY_INVALID })
   })
 
   test('500 - database connection failed', async () => {
@@ -30,7 +30,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - post aggregation failed', async () => {
@@ -42,7 +42,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('posts searched by query', async () => {

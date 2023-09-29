@@ -2,10 +2,10 @@ import Input from 'components/Input'
 import InputError from 'components/InputError'
 import Select from 'components/Select'
 import TextArea from 'components/TextArea'
-import categories from 'utils/constants/categories'
 import Button from 'components/Button'
+import { CATEGORIES } from 'constants/index'
 
-const options = categories.map((category) => ({
+const options = CATEGORIES.map((category) => ({
   label: category,
   value: category,
 }))

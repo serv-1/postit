@@ -9,13 +9,13 @@ import Account from 'models/Account'
 import Post from 'models/Post'
 import Discussion from 'models/Discussion'
 // @ts-expect-error
-import { mockDeleteImage } from 'utils/functions/deleteImage'
+import { mockDeleteImage } from 'functions/deleteImage'
 
 jest
   .unmock('nanoid')
   .unmock('models/User')
-  .mock('utils/functions/deleteImage')
-  .mock('utils/functions/hashPassword')
+  .mock('functions/deleteImage')
+  .mock('functions/hashPassword')
 
 describe('User model', () => {
   let johnId: Types.ObjectId

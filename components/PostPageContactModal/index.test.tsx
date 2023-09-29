@@ -8,7 +8,7 @@ jest
   .mock('contexts/toast', () => ({
     useToast: () => ({ setToast: mockSetToast, toast: {} }),
   }))
-  .mock('utils/functions/getClientPusher')
+  .mock('functions/getClientPusher')
 
 const useSession = jest.spyOn(require('next-auth/react'), 'useSession')
 

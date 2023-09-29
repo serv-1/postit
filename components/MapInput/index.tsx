@@ -1,8 +1,8 @@
 import { type FormEvent, type KeyboardEvent, useRef, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
-import err from 'utils/constants/errors'
 import { NEXT_PUBLIC_LOCATION_IQ_TOKEN } from 'env/public'
 import type { LocationIQAutocompleteGetData } from 'app/api/locationIQ/autocomplete/types'
+import { ADDRESS_MAX } from 'constants/errors'
 
 interface Prediction {
   lat: number
@@ -32,7 +32,7 @@ export default function MapInput({ setLatLon }: MapInputProps) {
     count.current++
 
     if (value.length > 200) {
-      setError(err.ADDRESS_MAX)
+      setError(ADDRESS_MAX)
 
       return
     } else if (count.current !== 2) {

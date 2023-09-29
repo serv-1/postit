@@ -5,7 +5,7 @@ import { act } from 'react-dom/test-utils'
 import type { ChatModalProps } from 'components/ChatModal'
 // prettier-ignore
 // @ts-expect-error
-import { mockClientPusherBind, mockClientPusherUnbind } from 'utils/functions/getClientPusher'
+import { mockClientPusherBind, mockClientPusherUnbind } from 'functions/getClientPusher'
 import { setupServer } from 'msw/node'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import discussionsIdHandlers from 'app/api/discussions/[id]/mock'
@@ -21,7 +21,7 @@ jest
   .mock('contexts/toast', () => ({
     useToast: () => ({ setToast: mockSetToast, toast: {} }),
   }))
-  .mock('utils/functions/getClientPusher')
+  .mock('functions/getClientPusher')
   .mock('components/ChatModal', () => ({
     __esModule: true,
     default: ({ setIsOpen, isOpen }: ChatModalProps) =>

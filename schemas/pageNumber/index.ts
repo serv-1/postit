@@ -1,10 +1,10 @@
+import { PAGE_INVALID } from 'constants/errors'
 import Joi from 'joi'
-import err from 'utils/constants/errors'
 
 const pageNumber = Joi.number().greater(-1).messages({
-  'number.base': err.PAGE_INVALID,
-  'number.infinity': err.PAGE_INVALID,
-  'number.greater': err.PAGE_INVALID,
+  'number.base': PAGE_INVALID,
+  'number.infinity': PAGE_INVALID,
+  'number.greater': PAGE_INVALID,
 })
 
 export default pageNumber

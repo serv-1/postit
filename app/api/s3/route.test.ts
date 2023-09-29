@@ -4,17 +4,21 @@
 
 import { NextRequest } from 'next/server'
 import { GET } from './route'
-import err from 'utils/constants/errors'
 // @ts-expect-error
 import { mockGetServerSession } from 'next-auth'
 // @ts-expect-error
-import { mockVerifyCsrfTokens } from 'utils/functions/verifyCsrfTokens'
+import { mockVerifyCsrfTokens } from 'functions/verifyCsrfTokens'
 // @ts-expect-error
 import { mockCreatePresignedPost } from '@aws-sdk/s3-presigned-post'
+import {
+  UNAUTHORIZED,
+  CSRF_TOKEN_INVALID,
+  INTERNAL_SERVER_ERROR,
+} from 'constants/errors'
 
 jest
   .mock('next-auth')
-  .mock('utils/functions/verifyCsrfTokens')
+  .mock('functions/verifyCsrfTokens')
   .mock('@aws-sdk/s3-presigned-post')
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
@@ -32,7 +36,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
-    expect(data).toEqual({ message: err.UNAUTHORIZED })
+    expect(data).toEqual({ message: UNAUTHORIZED })
   })
 
   test('422 - invalid csrf token', async () => {
@@ -44,7 +48,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
   })
 
   test('500 - create presigned post failed', async () => {
@@ -57,7 +61,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('200 - get the needed data to add something to s3 bucket', async () => {

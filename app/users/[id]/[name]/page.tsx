@@ -1,7 +1,7 @@
 import PublicProfile from 'app/pages/publicProfile'
 import type { Metadata } from 'next'
-import getPosts from 'utils/functions/getPosts'
-import getUser from 'utils/functions/getUser'
+import getPosts from 'functions/getPosts'
+import getUser from 'functions/getUser'
 
 interface Params {
   id: string

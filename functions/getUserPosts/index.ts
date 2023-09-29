@@ -1,5 +1,5 @@
 import type { UserPost } from 'types'
-import getPost from 'utils/functions/getPost'
+import getPost from 'functions/getPost'
 
 export default async function getUserPosts(
   postIds: string[]

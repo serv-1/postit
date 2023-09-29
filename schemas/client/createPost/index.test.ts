@@ -1,5 +1,12 @@
+import {
+  NAME_REQUIRED,
+  DESCRIPTION_REQUIRED,
+  CATEGORIES_REQUIRED,
+  PRICE_REQUIRED,
+  ADDRESS_REQUIRED,
+  PRICE_INVALID,
+} from 'constants/errors'
 import createPost from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = createPost.validate({
@@ -22,7 +29,7 @@ it('fails if the name is undefined', () => {
     address: 'Oslo, Norway',
   })
 
-  expect(error?.details[0].message).toBe(err.NAME_REQUIRED)
+  expect(error?.details[0].message).toBe(NAME_REQUIRED)
 })
 
 it('fails if the descrition is undefined', () => {
@@ -33,7 +40,7 @@ it('fails if the descrition is undefined', () => {
     address: 'Oslo, Norway',
   })
 
-  expect(error?.details[0].message).toBe(err.DESCRIPTION_REQUIRED)
+  expect(error?.details[0].message).toBe(DESCRIPTION_REQUIRED)
 })
 
 it('fails if the categories are undefined', () => {
@@ -44,7 +51,7 @@ it('fails if the categories are undefined', () => {
     address: 'Oslo, Norway',
   })
 
-  expect(error?.details[0].message).toBe(err.CATEGORIES_REQUIRED)
+  expect(error?.details[0].message).toBe(CATEGORIES_REQUIRED)
 })
 
 it('fails if the price is undefined', () => {
@@ -55,7 +62,7 @@ it('fails if the price is undefined', () => {
     address: 'Oslo, Norway',
   })
 
-  expect(error?.details[0].message).toBe(err.PRICE_REQUIRED)
+  expect(error?.details[0].message).toBe(PRICE_REQUIRED)
 })
 
 it('fails if the address is undefined', () => {
@@ -66,7 +73,7 @@ it('fails if the address is undefined', () => {
     price: 20,
   })
 
-  expect(error?.details[0].message).toBe(err.ADDRESS_REQUIRED)
+  expect(error?.details[0].message).toBe(ADDRESS_REQUIRED)
 })
 
 it('fails if there are no categories', () => {
@@ -78,7 +85,7 @@ it('fails if there are no categories', () => {
     address: 'Oslo, Norway',
   })
 
-  expect(error?.details[0].message).toBe(err.CATEGORIES_REQUIRED)
+  expect(error?.details[0].message).toBe(CATEGORIES_REQUIRED)
 })
 
 it('fails if the price is less than 1', () => {
@@ -90,5 +97,5 @@ it('fails if the price is less than 1', () => {
     address: 'Oslo, Norway',
   })
 
-  expect(error?.details[0].message).toBe(err.PRICE_INVALID)
+  expect(error?.details[0].message).toBe(PRICE_INVALID)
 })

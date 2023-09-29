@@ -1,6 +1,11 @@
-import { MAX_IMAGE_SIZE } from 'utils/constants'
+import { MAX_IMAGE_SIZE } from 'constants/index'
 import imageList from '.'
-import err from 'utils/constants/errors'
+import {
+  IMAGES_INVALID,
+  IMAGES_MAX,
+  IMAGE_INVALID,
+  IMAGE_TOO_BIG,
+} from 'constants/errors'
 
 it('passes', () => {
   const result = imageList.validate({
@@ -28,7 +33,7 @@ it('returns an array of images', () => {
 it('fails if the value is not an object', () => {
   const { error } = imageList.validate('oh no')
 
-  expect(error?.details[0].message).toBe(err.IMAGES_INVALID)
+  expect(error?.details[0].message).toBe(IMAGES_INVALID)
 })
 
 it('fails if there are more than 5 images', () => {
@@ -42,7 +47,7 @@ it('fails if there are more than 5 images', () => {
     length: 6,
   })
 
-  expect(error?.details[0].message).toBe(err.IMAGES_MAX)
+  expect(error?.details[0].message).toBe(IMAGES_MAX)
 })
 
 it('fails if an image is invalid', () => {
@@ -52,7 +57,7 @@ it('fails if an image is invalid', () => {
     length: 2,
   })
 
-  expect(error?.details[0].message).toBe(err.IMAGE_INVALID)
+  expect(error?.details[0].message).toBe(IMAGE_INVALID)
 })
 
 it('fails if an image is too big', () => {
@@ -64,5 +69,5 @@ it('fails if an image is too big', () => {
     length: 2,
   })
 
-  expect(error?.details[0].message).toBe(err.IMAGE_TOO_BIG)
+  expect(error?.details[0].message).toBe(IMAGE_TOO_BIG)
 })

@@ -2,13 +2,13 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CreateAPost from '.'
 import selectEvent from 'react-select-event'
-import err from 'utils/constants/errors'
 import { setupServer } from 'msw/node'
 import 'cross-fetch/polyfill'
 import locationIQAutocompleteHandlers from 'app/api/locationIQ/autocomplete/mock'
 import { rest } from 'msw'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import s3Handlers from 'app/api/s3/mock'
+import { IMAGE_TOO_BIG, DEFAULT } from 'constants/errors'
 
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const mockSetToast = jest.fn()
@@ -315,7 +315,7 @@ it('renders an error if the request to the presigned url fails because an image 
 
   await waitFor(() => {
     expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: err.IMAGE_TOO_BIG,
+      message: IMAGE_TOO_BIG,
       error: true,
     })
   })
@@ -374,7 +374,7 @@ it('renders an error if the request to the presigned url fails', async () => {
 
   await waitFor(() => {
     expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: err.DEFAULT,
+      message: DEFAULT,
       error: true,
     })
   })

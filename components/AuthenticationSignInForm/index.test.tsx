@@ -1,9 +1,9 @@
 import AuthenticationSignInForm from '.'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import err from 'utils/constants/errors'
 import type { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
 import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
+import { DATA_INVALID } from 'constants/errors'
 
 const mockSetToast = jest.fn()
 const mockRouterPush = jest.fn()
@@ -54,7 +54,7 @@ test('an error renders if the server fails to sign in the user', async () => {
   await userEvent.click(submitBtn)
 
   await waitFor(() => {
-    const toast = { message: err.DATA_INVALID, error: true }
+    const toast = { message: DATA_INVALID, error: true }
     expect(mockSetToast).toHaveBeenNthCalledWith(1, toast)
   })
 })

@@ -1,5 +1,5 @@
+import { PRICE_INVALID } from 'constants/errors'
 import updatePost from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = updatePost.validate({
@@ -49,5 +49,5 @@ it('allows the address to be an empty string', () => {
 it('fails if the price is less than 1', () => {
   const { error } = updatePost.validate({ price: 0 })
 
-  expect(error?.details[0].message).toBe(err.PRICE_INVALID)
+  expect(error?.details[0].message).toBe(PRICE_INVALID)
 })

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import getServerPusher from 'utils/functions/getServerPusher'
+import getServerPusher from 'functions/getServerPusher'
 
 export async function POST(request: Request) {
   const data = new URLSearchParams(await request.text())

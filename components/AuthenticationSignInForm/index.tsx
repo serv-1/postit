@@ -10,8 +10,8 @@ import InputError from 'components/InputError'
 import PasswordInput from 'components/PasswordInput'
 import Button from 'components/Button'
 import signInSchema, { type SignIn } from 'schemas/signIn'
-import err from 'utils/constants/errors'
 import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
+import { DATA_INVALID } from 'constants/errors'
 
 interface AuthenticationSignInFormProps {
   providers: UnPromise<ReturnType<typeof getProviders>>
@@ -36,7 +36,7 @@ export default function AuthenticationSignInForm({
     })
 
     if (res && res.error) {
-      return setToast({ message: err.DATA_INVALID, error: true })
+      return setToast({ message: DATA_INVALID, error: true })
     }
 
     router.push('/profile')

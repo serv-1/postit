@@ -1,11 +1,11 @@
 import { type DeleteResult } from 'mongodb'
 import { models, model, Schema, type Model, Types, Query } from 'mongoose'
 import { nanoid } from 'nanoid'
-import deleteImage from 'utils/functions/deleteImage'
+import deleteImage from 'functions/deleteImage'
 import Account from 'models/Account'
 import Discussion, { type DiscussionDoc } from 'models/Discussion'
 import Post from 'models/Post'
-import hashPassword from 'utils/functions/hashPassword'
+import hashPassword from 'functions/hashPassword'
 
 export interface UserDoc {
   _id: Types.ObjectId

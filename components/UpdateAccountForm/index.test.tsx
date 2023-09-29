@@ -3,8 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-import err from 'utils/constants/errors'
 import 'cross-fetch/polyfill'
+import { NAME_INVALID, EMAIL_INVALID, PASSWORD_INVALID } from 'constants/errors'
 
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const mockSetToast = jest.fn()
@@ -130,7 +130,7 @@ it('renders an alert if the user password is updated', async () => {
 it('renders an error if the server fails to update the user name', async () => {
   server.use(
     rest.put('http://localhost/api/user', (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ message: err.NAME_INVALID }))
+      return res(ctx.status(422), ctx.json({ message: NAME_INVALID }))
     })
   )
 
@@ -146,14 +146,14 @@ it('renders an error if the server fails to update the user name', async () => {
 
   const alert = await screen.findByRole('alert')
 
-  expect(alert).toHaveTextContent(err.NAME_INVALID)
+  expect(alert).toHaveTextContent(NAME_INVALID)
   expect(input).toHaveFocus()
 })
 
 it('renders an error if the server fails to update the user email', async () => {
   server.use(
     rest.put('http://localhost/api/user', (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ message: err.EMAIL_INVALID }))
+      return res(ctx.status(422), ctx.json({ message: EMAIL_INVALID }))
     })
   )
 
@@ -169,14 +169,14 @@ it('renders an error if the server fails to update the user email', async () => 
 
   const alert = await screen.findByRole('alert')
 
-  expect(alert).toHaveTextContent(err.EMAIL_INVALID)
+  expect(alert).toHaveTextContent(EMAIL_INVALID)
   expect(input).toHaveFocus()
 })
 
 it('renders an error if the server fails to update the user password', async () => {
   server.use(
     rest.put('http://localhost/api/user', (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ message: err.PASSWORD_INVALID }))
+      return res(ctx.status(422), ctx.json({ message: PASSWORD_INVALID }))
     })
   )
 
@@ -192,6 +192,6 @@ it('renders an error if the server fails to update the user password', async () 
 
   const alert = await screen.findByRole('alert')
 
-  expect(alert).toHaveTextContent(err.PASSWORD_INVALID)
+  expect(alert).toHaveTextContent(PASSWORD_INVALID)
   expect(input).toHaveFocus()
 })

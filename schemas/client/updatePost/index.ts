@@ -5,8 +5,8 @@ import postDescription from 'schemas/postDescription'
 import postCategories from 'schemas/postCategories'
 import postPrice from 'schemas/postPrice'
 import postAddress from 'schemas/postAddress'
-import err from 'utils/constants/errors'
-import createObjectSchema from 'utils/functions/createObjectSchema'
+import createObjectSchema from 'functions/createObjectSchema'
+import { PRICE_INVALID } from 'constants/errors'
 
 export interface UpdatePost {
   name?: string
@@ -21,10 +21,7 @@ const updatePost = createObjectSchema<UpdatePost>({
   name: name.allow(''),
   description: postDescription.allow(''),
   categories: postCategories,
-  price: postPrice
-    .allow('')
-    .min(1)
-    .messages({ 'number.min': err.PRICE_INVALID }),
+  price: postPrice.allow('').min(1).messages({ 'number.min': PRICE_INVALID }),
   address: postAddress.allow(''),
   images: imageList,
 })

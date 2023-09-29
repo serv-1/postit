@@ -1,19 +1,24 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
-import err from 'utils/constants/errors'
-import validate from 'utils/functions/validate'
+import validate from 'functions/validate'
 import createPost from 'schemas/server/createPost'
-import verifyCsrfTokens from 'utils/functions/verifyCsrfTokens'
-import dbConnect from 'utils/functions/dbConnect'
+import verifyCsrfTokens from 'functions/verifyCsrfTokens'
+import dbConnect from 'functions/dbConnect'
 import Post from 'models/Post'
-import formatToUrl from 'utils/functions/formatToUrl'
+import formatToUrl from 'functions/formatToUrl'
+import {
+  UNAUTHORIZED,
+  DATA_INVALID,
+  CSRF_TOKEN_INVALID,
+  INTERNAL_SERVER_ERROR,
+} from 'constants/errors'
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
-    return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
+    return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
   }
 
   let data = null
@@ -21,7 +26,7 @@ export async function POST(request: NextRequest) {
   try {
     data = await request.json()
   } catch (e) {
-    return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
+    return NextResponse.json({ message: DATA_INVALID }, { status: 422 })
   }
 
   const result = validate(createPost, data)
@@ -34,10 +39,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (!verifyCsrfTokens(request)) {
-    return NextResponse.json(
-      { message: err.CSRF_TOKEN_INVALID },
-      { status: 422 }
-    )
+    return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
   }
 
   try {
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
     )
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }

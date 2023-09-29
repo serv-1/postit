@@ -4,7 +4,7 @@
 
 import { Types } from 'mongoose'
 import createDiscussion from '.'
-import err from 'utils/constants/errors'
+import { MESSAGE_REQUIRED, ID_INVALID, NAME_REQUIRED } from 'constants/errors'
 
 it('passes', () => {
   const result = createDiscussion.validate({
@@ -25,7 +25,7 @@ it('fails if the message is undefined', () => {
     postName: 'Table',
   })
 
-  expect(error?.details[0].message).toBe(err.MESSAGE_REQUIRED)
+  expect(error?.details[0].message).toBe(MESSAGE_REQUIRED)
 })
 
 it("fails if the seller's id is undefined", () => {
@@ -35,7 +35,7 @@ it("fails if the seller's id is undefined", () => {
     postName: 'Table',
   })
 
-  expect(error?.details[0].message).toBe(err.ID_INVALID)
+  expect(error?.details[0].message).toBe(ID_INVALID)
 })
 
 it("fails if the post's id is undefined", () => {
@@ -45,7 +45,7 @@ it("fails if the post's id is undefined", () => {
     postName: 'Table',
   })
 
-  expect(error?.details[0].message).toBe(err.ID_INVALID)
+  expect(error?.details[0].message).toBe(ID_INVALID)
 })
 
 it("fails if the post's name is undefined", () => {
@@ -55,5 +55,5 @@ it("fails if the post's name is undefined", () => {
     sellerId: new Types.ObjectId(),
   })
 
-  expect(error?.details[0].message).toBe(err.NAME_REQUIRED)
+  expect(error?.details[0].message).toBe(NAME_REQUIRED)
 })

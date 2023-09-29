@@ -6,8 +6,17 @@ import postPrice from 'schemas/postPrice'
 import postAddress from 'schemas/postAddress'
 import postImages from 'schemas/postImages'
 import postLatLon from 'schemas/postLatLon'
-import err from 'utils/constants/errors'
-import createObjectSchema from 'utils/functions/createObjectSchema'
+import createObjectSchema from 'functions/createObjectSchema'
+import {
+  NAME_REQUIRED,
+  DESCRIPTION_REQUIRED,
+  CATEGORIES_REQUIRED,
+  PRICE_REQUIRED,
+  PRICE_INVALID,
+  ADDRESS_REQUIRED,
+  IMAGES_REQUIRED,
+  LATLON_REQUIRED,
+} from 'constants/errors'
 
 export interface CreatePost {
   name: string
@@ -21,28 +30,28 @@ export interface CreatePost {
 
 const createPost = createObjectSchema<CreatePost>({
   name: name.required().messages({
-    'any.required': err.NAME_REQUIRED,
+    'any.required': NAME_REQUIRED,
   }),
   description: postDescription.required().messages({
-    'any.required': err.DESCRIPTION_REQUIRED,
+    'any.required': DESCRIPTION_REQUIRED,
   }),
   categories: postCategories.required().min(1).messages({
-    'any.required': err.CATEGORIES_REQUIRED,
-    'array.min': err.CATEGORIES_REQUIRED,
+    'any.required': CATEGORIES_REQUIRED,
+    'array.min': CATEGORIES_REQUIRED,
   }),
   price: postPrice.required().min(1).messages({
-    'any.required': err.PRICE_REQUIRED,
-    'number.min': err.PRICE_INVALID,
+    'any.required': PRICE_REQUIRED,
+    'number.min': PRICE_INVALID,
   }),
-  address: postAddress.required().messages({
-    'any.required': err.ADDRESS_REQUIRED,
-  }),
+  address: postAddress
+    .required()
+    .messages({ 'any.required': ADDRESS_REQUIRED }),
   images: postImages.required().min(1).messages({
-    'any.required': err.IMAGES_REQUIRED,
-    'array.min': err.IMAGES_REQUIRED,
+    'any.required': IMAGES_REQUIRED,
+    'array.min': IMAGES_REQUIRED,
   }),
   latLon: postLatLon.required().messages({
-    'any.required': err.LATLON_REQUIRED,
+    'any.required': LATLON_REQUIRED,
   }),
 })
 

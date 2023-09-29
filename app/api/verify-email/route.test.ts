@@ -2,14 +2,18 @@
  * @jest-environment node
  */
 
+import {
+  DATA_INVALID,
+  INTERNAL_SERVER_ERROR,
+  EMAIL_UNKNOWN,
+} from 'constants/errors'
 import { POST } from './route'
-import err from 'utils/constants/errors'
 // @ts-expect-error
-import { mockDbConnect } from 'utils/functions/dbConnect'
+import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
 import { mockFindOneUser } from 'models/User'
 
-jest.mock('models/User').mock('utils/functions/dbConnect')
+jest.mock('models/User').mock('functions/dbConnect')
 
 describe('POST', () => {
   test('422 - invalid json', async () => {
@@ -21,7 +25,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.DATA_INVALID })
+    expect(data).toEqual({ message: DATA_INVALID })
   })
 
   test('422 - invalid request body', async () => {
@@ -49,7 +53,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find user by email failed', async () => {
@@ -65,7 +69,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('422 - email unknown', async () => {
@@ -81,7 +85,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.EMAIL_UNKNOWN })
+    expect(data).toEqual({ message: EMAIL_UNKNOWN })
   })
 
   test('204 - valid email', async () => {

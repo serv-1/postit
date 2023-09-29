@@ -1,5 +1,5 @@
+import { PRICE_INVALID } from 'constants/errors'
 import postPrice from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = postPrice.validate(12)
@@ -17,17 +17,17 @@ it('rounds the value to 2 decimals places', () => {
 it('fails if the value is infinity', () => {
   const { error } = postPrice.validate(Infinity)
 
-  expect(error?.details[0].message).toBe(err.PRICE_INVALID)
+  expect(error?.details[0].message).toBe(PRICE_INVALID)
 })
 
 it('fails if the value is not a number', () => {
   const { error } = postPrice.validate('no')
 
-  expect(error?.details[0].message).toBe(err.PRICE_INVALID)
+  expect(error?.details[0].message).toBe(PRICE_INVALID)
 })
 
 it('fails if the value is negative', () => {
   const { error } = postPrice.validate(-1)
 
-  expect(error?.details[0].message).toBe(err.PRICE_INVALID)
+  expect(error?.details[0].message).toBe(PRICE_INVALID)
 })

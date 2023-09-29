@@ -1,5 +1,5 @@
 import type { UserFavoritePost } from 'types'
-import getPost from 'utils/functions/getPost'
+import getPost from 'functions/getPost'
 
 export default async function getUserFavoritePosts(
   postIds: string[]

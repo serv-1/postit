@@ -1,16 +1,16 @@
 import Joi from 'joi'
-import categories from 'utils/constants/categories'
-import err from 'utils/constants/errors'
+import { CATEGORIES } from 'constants/index'
+import { CATEGORIES_INVALID, CATEGORIES_MAX } from 'constants/errors'
 
 const postCategories = Joi.array()
-  .items(Joi.string().valid(...categories))
+  .items(Joi.string().valid(...CATEGORIES))
   .max(3)
   .unique()
   .messages({
-    'array.base': err.CATEGORIES_INVALID,
-    'any.only': err.CATEGORIES_INVALID,
-    'array.max': err.CATEGORIES_MAX,
-    'array.unique': err.CATEGORIES_INVALID,
+    'array.base': CATEGORIES_INVALID,
+    'any.only': CATEGORIES_INVALID,
+    'array.max': CATEGORIES_MAX,
+    'array.unique': CATEGORIES_INVALID,
   })
 
 export default postCategories

@@ -4,28 +4,36 @@
 
 import { POST } from './route'
 import { NextRequest } from 'next/server'
-import err from 'utils/constants/errors'
 import { Types } from 'mongoose'
 // @ts-expect-error
-import { mockDbConnect } from 'utils/functions/dbConnect'
+import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
 import { mockGetServerSession } from 'next-auth'
 // @ts-expect-error
-import { mockServerPusherTrigger } from 'utils/functions/getServerPusher'
+import { mockServerPusherTrigger } from 'functions/getServerPusher'
 // @ts-expect-error
-import { mockVerifyCsrfTokens } from 'utils/functions/verifyCsrfTokens'
+import { mockVerifyCsrfTokens } from 'functions/verifyCsrfTokens'
 // @ts-expect-error
 import { mockFindOneDiscussion, mockSaveDiscussion } from 'models/Discussion'
 // @ts-expect-error
 import { mockFindUserById } from 'models/User'
+import {
+  CSRF_TOKEN_INVALID,
+  DATA_INVALID,
+  DISCUSSION_ALREADY_EXISTS,
+  ID_INVALID,
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
+  USER_NOT_FOUND,
+} from 'constants/errors'
 
 jest
   .mock('next-auth')
   .mock('models/Discussion')
   .mock('models/User')
-  .mock('utils/functions/dbConnect')
-  .mock('utils/functions/getServerPusher')
-  .mock('utils/functions/verifyCsrfTokens')
+  .mock('functions/dbConnect')
+  .mock('functions/getServerPusher')
+  .mock('functions/verifyCsrfTokens')
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
   }))
@@ -39,7 +47,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
-    expect(data).toEqual({ message: err.UNAUTHORIZED })
+    expect(data).toEqual({ message: UNAUTHORIZED })
   })
 
   test('422 - invalid json', async () => {
@@ -50,7 +58,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.DATA_INVALID })
+    expect(data).toEqual({ message: DATA_INVALID })
   })
 
   test('422 - invalid request body', async () => {
@@ -86,7 +94,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
   })
 
   test("422 - the authenticated user can't be the seller", async () => {
@@ -109,7 +117,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.ID_INVALID })
+    expect(data).toEqual({ message: ID_INVALID })
   })
 
   test('500 - database connection failed', async () => {
@@ -131,7 +139,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find one discussion failed', async () => {
@@ -154,7 +162,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('409 - discussion already exists', async () => {
@@ -185,7 +193,7 @@ describe('POST', () => {
     })
 
     expect(response).toHaveProperty('status', 409)
-    expect(data).toEqual({ message: err.DISCUSSION_ALREADY_EXISTS })
+    expect(data).toEqual({ message: DISCUSSION_ALREADY_EXISTS })
   })
 
   test('500 - discussion creation failed', async () => {
@@ -211,7 +219,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find seller by id failed', async () => {
@@ -245,7 +253,7 @@ describe('POST', () => {
     })
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('404 - seller not found', async () => {
@@ -274,7 +282,7 @@ describe('POST', () => {
 
     expect(mockFindUserById).toHaveBeenNthCalledWith(1, sellerId)
     expect(response).toHaveProperty('status', 404)
-    expect(data).toEqual({ message: err.USER_NOT_FOUND })
+    expect(data).toEqual({ message: USER_NOT_FOUND })
   })
 
   test('500 - "discussion-created" pusher event triggering failed', async () => {
@@ -302,7 +310,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('201 - discussion created', async () => {

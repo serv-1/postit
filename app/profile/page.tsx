@@ -1,9 +1,9 @@
 import Profile from 'app/pages/profile'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import getUser from 'utils/functions/getUser'
-import getPosts from 'utils/functions/getPosts'
-import getUserFavoritePosts from 'utils/functions/getUserFavoritePosts'
+import getUser from 'functions/getUser'
+import getPosts from 'functions/getPosts'
+import getUserFavoritePosts from 'functions/getUserFavoritePosts'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import { getServerSession } from 'next-auth'
 

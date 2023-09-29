@@ -1,8 +1,13 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import CreateAPostStep1 from '.'
 import userEvent from '@testing-library/user-event'
-import err from 'utils/constants/errors'
-import { MAX_IMAGE_SIZE } from 'utils/constants'
+import { MAX_IMAGE_SIZE } from 'constants/index'
+import {
+  IMAGES_REQUIRED,
+  IMAGES_MAX,
+  IMAGE_INVALID,
+  IMAGE_TOO_BIG,
+} from 'constants/errors'
 
 it('has the "hidden" class if the given step is not its step', () => {
   render(
@@ -115,7 +120,7 @@ test('uploaded images are unmounted and an error renders if the user cancels the
   expect(img).not.toBeInTheDocument()
 
   const alert = screen.getByRole('alert')
-  expect(alert).toHaveTextContent(err.IMAGES_REQUIRED)
+  expect(alert).toHaveTextContent(IMAGES_REQUIRED)
   expect(input.nextElementSibling).toHaveFocus()
 })
 
@@ -141,7 +146,7 @@ test('uploaded images are unmounted and an error renders if there is too many im
   expect(img).not.toBeInTheDocument()
 
   const alert = screen.getByRole('alert')
-  expect(alert).toHaveTextContent(err.IMAGES_MAX)
+  expect(alert).toHaveTextContent(IMAGES_MAX)
   expect(input.nextElementSibling).toHaveFocus()
 })
 
@@ -154,7 +159,7 @@ test('an error renders if an image is invalid', async () => {
   await userEvent.upload(input, [new File(['text'], 'text.txt')])
 
   const alert = await screen.findByRole('alert')
-  expect(alert).toHaveTextContent(err.IMAGE_INVALID)
+  expect(alert).toHaveTextContent(IMAGE_INVALID)
   expect(input.nextElementSibling).toHaveFocus()
 })
 
@@ -164,7 +169,6 @@ test('an error renders if an image is too big', async () => {
   )
 
   const input = screen.getByLabelText(/images/i)
-
   await userEvent.upload(
     input,
     new File([new Uint8Array(MAX_IMAGE_SIZE + 1).toString()], 'image.jpeg', {
@@ -173,8 +177,7 @@ test('an error renders if an image is too big', async () => {
   )
 
   const alert = await screen.findByRole('alert')
-
-  expect(alert).toHaveTextContent(err.IMAGE_TOO_BIG)
+  expect(alert).toHaveTextContent(IMAGE_TOO_BIG)
   expect(input.nextElementSibling).toHaveFocus()
 })
 

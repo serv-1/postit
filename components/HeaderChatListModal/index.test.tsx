@@ -4,7 +4,7 @@ import { act } from 'react-dom/test-utils'
 import HeaderChatListModal from '.'
 // prettier-ignore
 // @ts-expect-error
-import { mockClientPusherBind, mockClientPusherUnbind } from 'utils/functions/getClientPusher'
+import { mockClientPusherBind, mockClientPusherUnbind } from 'functions/getClientPusher'
 import { setupServer } from 'msw/node'
 import { rest } from 'msw'
 import 'cross-fetch/polyfill'
@@ -20,7 +20,7 @@ jest
   .mock('contexts/toast', () => ({
     useToast: () => ({ setToast: mockSetToast, toast: {} }),
   }))
-  .mock('utils/functions/getClientPusher')
+  .mock('functions/getClientPusher')
 
 beforeEach(() => {
   mockUseSession.mockReturnValue({ data: { id: '0', channelName: 'test' } })

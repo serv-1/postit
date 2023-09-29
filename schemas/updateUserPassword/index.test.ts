@@ -1,5 +1,5 @@
+import { PASSWORD_REQUIRED } from 'constants/errors'
 import updateUserPassword from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = updateUserPassword.validate({ password: 'super password' })
@@ -11,5 +11,5 @@ it('passes', () => {
 it('fails if the password is undefined', () => {
   const { error } = updateUserPassword.validate({})
 
-  expect(error?.details[0].message).toBe(err.PASSWORD_REQUIRED)
+  expect(error?.details[0].message).toBe(PASSWORD_REQUIRED)
 })

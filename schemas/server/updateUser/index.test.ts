@@ -4,7 +4,7 @@
 
 import { Types } from 'mongoose'
 import updateUser from '.'
-import err from 'utils/constants/errors'
+import { DATA_INVALID } from 'constants/errors'
 
 it('passes with the name', () => {
   const result = updateUser.validate({ name: 'john' })
@@ -55,7 +55,7 @@ it('passes with the discussion id', () => {
 it('fails if there is nothing to update', () => {
   const { error } = updateUser.validate({})
 
-  expect(error?.details[0].message).toBe(err.DATA_INVALID)
+  expect(error?.details[0].message).toBe(DATA_INVALID)
 })
 
 it('fails if there is more than 1 thing to update', () => {
@@ -64,5 +64,5 @@ it('fails if there is more than 1 thing to update', () => {
     email: 'john@test.com',
   })
 
-  expect(error?.details[0].message).toBe(err.DATA_INVALID)
+  expect(error?.details[0].message).toBe(DATA_INVALID)
 })

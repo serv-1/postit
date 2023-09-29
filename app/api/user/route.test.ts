@@ -2,7 +2,6 @@
  * @jest-environment node
  */
 
-import err from 'utils/constants/errors'
 import { POST, PUT, DELETE } from './route'
 import { MongoServerError } from 'mongodb'
 import { Types } from 'mongoose'
@@ -11,24 +10,31 @@ import { NextRequest } from 'next/server'
 // @ts-expect-error
 import { mockDeleteOneUser, mockFindUserById, mockSaveUser, mockUpdateOneUser } from 'models/User'
 // @ts-expect-error
-import { mockDbConnect } from 'utils/functions/dbConnect'
+import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
 import { mockGetServerSession } from 'next-auth'
 // @ts-expect-error
-import { mockVerifyCsrfTokens } from 'utils/functions/verifyCsrfTokens'
+import { mockVerifyCsrfTokens } from 'functions/verifyCsrfTokens'
 // @ts-expect-error
-import { mockDeleteImage } from 'utils/functions/deleteImage'
+import { mockDeleteImage } from 'functions/deleteImage'
 // @ts-expect-error
-import { mockServerPusherTrigger } from 'utils/functions/getServerPusher'
+import { mockServerPusherTrigger } from 'functions/getServerPusher'
+import {
+  DATA_INVALID,
+  INTERNAL_SERVER_ERROR,
+  EMAIL_USED,
+  UNAUTHORIZED,
+  CSRF_TOKEN_INVALID,
+} from 'constants/errors'
 
 jest
   .mock('models/User')
-  .mock('utils/functions/dbConnect')
+  .mock('functions/dbConnect')
   .mock('next-auth')
-  .mock('utils/functions/verifyCsrfTokens')
-  .mock('utils/functions/deleteImage')
-  .mock('utils/functions/getServerPusher')
-  .mock('utils/functions/hashPassword')
+  .mock('functions/verifyCsrfTokens')
+  .mock('functions/deleteImage')
+  .mock('functions/getServerPusher')
+  .mock('functions/hashPassword')
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
   }))
@@ -40,7 +46,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.DATA_INVALID })
+    expect(data).toEqual({ message: DATA_INVALID })
   })
 
   test('422 - invalid request body', async () => {
@@ -73,7 +79,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - user creation failed', async () => {
@@ -93,7 +99,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('422 - email taken', async () => {
@@ -115,7 +121,7 @@ describe('POST', () => {
     expect(response).toHaveProperty('status', 422)
     expect(data).toEqual({
       name: 'email',
-      message: err.EMAIL_USED,
+      message: EMAIL_USED,
     })
   })
 
@@ -155,7 +161,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
-    expect(data).toEqual({ message: err.UNAUTHORIZED })
+    expect(data).toEqual({ message: UNAUTHORIZED })
   })
 
   test('422 - invalid csrf token', async () => {
@@ -167,7 +173,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
   })
 
   test('422 - invalid json', async () => {
@@ -179,7 +185,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.DATA_INVALID })
+    expect(data).toEqual({ message: DATA_INVALID })
   })
 
   test('422 - invalid request body', async () => {
@@ -212,7 +218,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('204 - name updated', async () => {
@@ -256,7 +262,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('422 - email taken', async () => {
@@ -274,7 +280,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.EMAIL_USED })
+    expect(data).toEqual({ message: EMAIL_USED })
   })
 
   test('204 - email updated', async () => {
@@ -348,7 +354,7 @@ describe('PUT', () => {
 
     expect(mockFindUserById).toHaveBeenNthCalledWith(1, session.id)
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('204 - image updated', async () => {
@@ -416,7 +422,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('204 - add favorite post', async () => {
@@ -494,7 +500,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   it("triggers a 'discussion-deleted' pusher event", async () => {
@@ -599,7 +605,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
-    expect(data).toEqual({ message: err.UNAUTHORIZED })
+    expect(data).toEqual({ message: UNAUTHORIZED })
   })
 
   test('422 - invalid csrf token', async () => {
@@ -611,7 +617,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
   })
 
   test('500 - database connection failed', async () => {
@@ -624,7 +630,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - delete one user failed', async () => {
@@ -638,7 +644,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('204 - user deletion succeeded', async () => {

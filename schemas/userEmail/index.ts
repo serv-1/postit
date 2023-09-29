@@ -1,13 +1,13 @@
+import { EMAIL_INVALID, EMAIL_REQUIRED } from 'constants/errors'
 import Joi from 'joi'
-import err from 'utils/constants/errors'
 
 const userEmail = Joi.string()
   .email({ tlds: { allow: false } })
   .trim()
   .messages({
-    'string.base': err.EMAIL_INVALID,
-    'string.empty': err.EMAIL_REQUIRED,
-    'string.email': err.EMAIL_INVALID,
+    'string.base': EMAIL_INVALID,
+    'string.empty': EMAIL_REQUIRED,
+    'string.email': EMAIL_INVALID,
   })
 
 export default userEmail

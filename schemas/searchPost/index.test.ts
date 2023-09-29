@@ -1,5 +1,9 @@
+import {
+  QUERY_REQUIRED,
+  CATEGORIES_REQUIRED,
+  MAX_PRICE_MIN,
+} from 'constants/errors'
 import searchPost from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = searchPost.validate({
@@ -18,13 +22,13 @@ it('passes', () => {
 it('fails if the query is undefined', () => {
   const { error } = searchPost.validate({ categories: ['furniture'] })
 
-  expect(error?.details[0].message).toBe(err.QUERY_REQUIRED)
+  expect(error?.details[0].message).toBe(QUERY_REQUIRED)
 })
 
 it('fails if the categories are undefined', () => {
   const { error } = searchPost.validate({ query: 'table' })
 
-  expect(error?.details[0].message).toBe(err.CATEGORIES_REQUIRED)
+  expect(error?.details[0].message).toBe(CATEGORIES_REQUIRED)
 })
 
 it('allows the page number to be null', () => {
@@ -79,5 +83,5 @@ it('fails if the maximum price is less than the minimum price', () => {
     maxPrice: 10,
   })
 
-  expect(error?.details[0].message).toBe(err.MAX_PRICE_MIN)
+  expect(error?.details[0].message).toBe(MAX_PRICE_MIN)
 })

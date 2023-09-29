@@ -1,5 +1,5 @@
+import { EMAIL_REQUIRED } from 'constants/errors'
 import updateUserEmail from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = updateUserEmail.validate({ email: 'a@a.a' })
@@ -11,5 +11,5 @@ it('passes', () => {
 it('fails if the email is undefined', () => {
   const { error } = updateUserEmail.validate({})
 
-  expect(error?.details[0].message).toBe(err.EMAIL_REQUIRED)
+  expect(error?.details[0].message).toBe(EMAIL_REQUIRED)
 })

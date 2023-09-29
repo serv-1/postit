@@ -1,12 +1,16 @@
 import Joi from 'joi'
 import type { Categories } from 'types'
-import err from 'utils/constants/errors'
 import postCategories from 'schemas/postCategories'
 import postAddress from 'schemas/postAddress'
 import pageNumber from 'schemas/pageNumber'
 import postPrice from 'schemas/postPrice'
 import searchPostQuery from 'schemas/searchPostQuery'
-import createObjectSchema from 'utils/functions/createObjectSchema'
+import createObjectSchema from 'functions/createObjectSchema'
+import {
+  QUERY_REQUIRED,
+  MAX_PRICE_MIN,
+  CATEGORIES_REQUIRED,
+} from 'constants/errors'
 
 export interface SearchPost {
   query: string
@@ -20,7 +24,7 @@ export interface SearchPost {
 const searchPost = createObjectSchema<SearchPost>({
   query: searchPostQuery
     .required()
-    .messages({ 'any.required': err.QUERY_REQUIRED }),
+    .messages({ 'any.required': QUERY_REQUIRED }),
   page: pageNumber.allow(null),
   minPrice: postPrice.allow(null),
   maxPrice: Joi.alternatives().conditional('minPrice', {
@@ -29,11 +33,11 @@ const searchPost = createObjectSchema<SearchPost>({
     otherwise: postPrice
       .allow(null)
       .min(Joi.ref('minPrice'))
-      .messages({ 'number.min': err.MAX_PRICE_MIN }),
+      .messages({ 'number.min': MAX_PRICE_MIN }),
   }),
   categories: postCategories
     .required()
-    .messages({ 'any.required': err.CATEGORIES_REQUIRED }),
+    .messages({ 'any.required': CATEGORIES_REQUIRED }),
   address: postAddress.allow(null),
 })
 

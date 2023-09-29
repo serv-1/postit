@@ -4,11 +4,19 @@ import { type UpdateQuery, isValidObjectId } from 'mongoose'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import updatePost from 'schemas/server/updatePost'
-import err from 'utils/constants/errors'
-import dbConnect from 'utils/functions/dbConnect'
-import deleteImage from 'utils/functions/deleteImage'
-import validate from 'utils/functions/validate'
-import verifyCsrfTokens from 'utils/functions/verifyCsrfTokens'
+import dbConnect from 'functions/dbConnect'
+import deleteImage from 'functions/deleteImage'
+import validate from 'functions/validate'
+import verifyCsrfTokens from 'functions/verifyCsrfTokens'
+import {
+  PARAMS_INVALID,
+  POST_NOT_FOUND,
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
+  CSRF_TOKEN_INVALID,
+  DATA_INVALID,
+  FORBIDDEN,
+} from 'constants/errors'
 
 interface Params {
   params: { id: string }
@@ -18,7 +26,7 @@ export async function GET(request: Request, { params }: Params) {
   const postId = params.id
 
   if (!isValidObjectId(postId)) {
-    return NextResponse.json({ message: err.PARAMS_INVALID }, { status: 422 })
+    return NextResponse.json({ message: PARAMS_INVALID }, { status: 422 })
   }
 
   try {
@@ -27,7 +35,7 @@ export async function GET(request: Request, { params }: Params) {
     const post = await Post.findById(postId).lean().exec()
 
     if (!post) {
-      return NextResponse.json({ message: err.POST_NOT_FOUND }, { status: 404 })
+      return NextResponse.json({ message: POST_NOT_FOUND }, { status: 404 })
     }
 
     return NextResponse.json(
@@ -47,7 +55,7 @@ export async function GET(request: Request, { params }: Params) {
     )
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }
@@ -57,20 +65,17 @@ export async function PUT(request: NextRequest, { params }: Params) {
   const postId = params.id
 
   if (!isValidObjectId(postId)) {
-    return NextResponse.json({ message: err.PARAMS_INVALID }, { status: 422 })
+    return NextResponse.json({ message: PARAMS_INVALID }, { status: 422 })
   }
 
   const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
-    return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
+    return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
   }
 
   if (!verifyCsrfTokens(request)) {
-    return NextResponse.json(
-      { message: err.CSRF_TOKEN_INVALID },
-      { status: 422 }
-    )
+    return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
   }
 
   let data = null
@@ -78,7 +83,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
   try {
     data = await request.json()
   } catch (e) {
-    return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
+    return NextResponse.json({ message: DATA_INVALID }, { status: 422 })
   }
 
   const result = validate(updatePost, data)
@@ -96,11 +101,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const post = await Post.findById(postId).lean().exec()
 
     if (!post) {
-      return NextResponse.json({ message: err.POST_NOT_FOUND }, { status: 404 })
+      return NextResponse.json({ message: POST_NOT_FOUND }, { status: 404 })
     }
 
     if (session.id !== post.userId.toString()) {
-      return NextResponse.json({ message: err.FORBIDDEN }, { status: 403 })
+      return NextResponse.json({ message: FORBIDDEN }, { status: 403 })
     }
 
     const update: UpdateQuery<PostDoc> = {}
@@ -143,7 +148,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return new Response(null, { status: 204 })
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }
@@ -153,20 +158,17 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   const postId = params.id
 
   if (!isValidObjectId(postId)) {
-    return NextResponse.json({ message: err.PARAMS_INVALID }, { status: 422 })
+    return NextResponse.json({ message: PARAMS_INVALID }, { status: 422 })
   }
 
   const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
-    return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
+    return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
   }
 
   if (!verifyCsrfTokens(request)) {
-    return NextResponse.json(
-      { message: err.CSRF_TOKEN_INVALID },
-      { status: 422 }
-    )
+    return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
   }
 
   try {
@@ -175,11 +177,11 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     const post = await Post.findById(postId).lean().exec()
 
     if (!post) {
-      return NextResponse.json({ message: err.POST_NOT_FOUND }, { status: 404 })
+      return NextResponse.json({ message: POST_NOT_FOUND }, { status: 404 })
     }
 
     if (session.id !== post.userId.toString()) {
-      return NextResponse.json({ message: err.FORBIDDEN }, { status: 403 })
+      return NextResponse.json({ message: FORBIDDEN }, { status: 403 })
     }
 
     await Post.deleteOne({ _id: postId }).lean().exec()
@@ -187,7 +189,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     return new Response(null, { status: 204 })
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }

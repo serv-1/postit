@@ -1,5 +1,10 @@
+import {
+  NAME_REQUIRED,
+  EMAIL_REQUIRED,
+  PASSWORD_REQUIRED,
+  PASSWORD_SAME,
+} from 'constants/errors'
 import createUser from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = createUser.validate({
@@ -18,7 +23,7 @@ it('fails if the name is undefined', () => {
     password: 'super bob pw',
   })
 
-  expect(error?.details[0].message).toBe(err.NAME_REQUIRED)
+  expect(error?.details[0].message).toBe(NAME_REQUIRED)
 })
 
 it('fails if the email is undefined', () => {
@@ -27,7 +32,7 @@ it('fails if the email is undefined', () => {
     password: 'super bob pw',
   })
 
-  expect(error?.details[0].message).toBe(err.EMAIL_REQUIRED)
+  expect(error?.details[0].message).toBe(EMAIL_REQUIRED)
 })
 
 it('fails if the password is undefined', () => {
@@ -36,7 +41,7 @@ it('fails if the password is undefined', () => {
     email: 'bob@bob.bob',
   })
 
-  expect(error?.details[0].message).toBe(err.PASSWORD_REQUIRED)
+  expect(error?.details[0].message).toBe(PASSWORD_REQUIRED)
 })
 
 describe('fails if the password equals to', () => {
@@ -47,7 +52,7 @@ describe('fails if the password equals to', () => {
       password: 'Bob Bobobob',
     })
 
-    expect(error?.details[0].message).toBe(err.PASSWORD_SAME)
+    expect(error?.details[0].message).toBe(PASSWORD_SAME)
   })
 
   test('the email', () => {
@@ -57,6 +62,6 @@ describe('fails if the password equals to', () => {
       password: 'bob@bob.bob',
     })
 
-    expect(error?.details[0].message).toBe(err.PASSWORD_SAME)
+    expect(error?.details[0].message).toBe(PASSWORD_SAME)
   })
 })

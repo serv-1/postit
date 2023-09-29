@@ -2,9 +2,15 @@ import { scryptSync, timingSafeEqual } from 'crypto'
 import User from 'models/User'
 import { NextResponse } from 'next/server'
 import signIn from 'schemas/signIn'
-import err from 'utils/constants/errors'
-import dbConnect from 'utils/functions/dbConnect'
-import validate from 'utils/functions/validate'
+import dbConnect from 'functions/dbConnect'
+import validate from 'functions/validate'
+import {
+  DATA_INVALID,
+  EMAIL_UNKNOWN,
+  PASSWORD_REQUIRED,
+  PASSWORD_INVALID,
+  INTERNAL_SERVER_ERROR,
+} from 'constants/errors'
 
 export async function POST(request: Request) {
   let data = null
@@ -12,7 +18,7 @@ export async function POST(request: Request) {
   try {
     data = await request.json()
   } catch (e) {
-    return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
+    return NextResponse.json({ message: DATA_INVALID }, { status: 422 })
   }
 
   const result = validate(signIn, data)
@@ -33,14 +39,14 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { name: 'email', message: err.EMAIL_UNKNOWN },
+        { name: 'email', message: EMAIL_UNKNOWN },
         { status: 422 }
       )
     }
 
     if (!user.password) {
       return NextResponse.json(
-        { name: 'password', message: err.PASSWORD_REQUIRED },
+        { name: 'password', message: PASSWORD_REQUIRED },
         { status: 422 }
       )
     }
@@ -51,7 +57,7 @@ export async function POST(request: Request) {
 
     if (!timingSafeEqual(dbHash, givenHash)) {
       return NextResponse.json(
-        { name: 'password', message: err.PASSWORD_INVALID },
+        { name: 'password', message: PASSWORD_INVALID },
         { status: 422 }
       )
     }
@@ -68,7 +74,7 @@ export async function POST(request: Request) {
     )
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }

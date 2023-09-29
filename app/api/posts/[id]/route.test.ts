@@ -2,7 +2,6 @@
  * @jest-environment node
  */
 
-import err from 'utils/constants/errors'
 import { GET, PUT, DELETE } from './route'
 import { Types } from 'mongoose'
 import { NextRequest } from 'next/server'
@@ -12,18 +11,27 @@ import { type PostDoc, mockFindPostById, mockUpdateOnePost, mockDeleteOnePost } 
 // @ts-expect-error
 import { mockGetServerSession } from 'next-auth'
 // @ts-expect-error
-import { mockDbConnect } from 'utils/functions/dbConnect'
+import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
-import { mockDeleteImage } from 'utils/functions/deleteImage'
+import { mockDeleteImage } from 'functions/deleteImage'
 // @ts-expect-error
-import { mockVerifyCsrfTokens } from 'utils/functions/verifyCsrfTokens'
+import { mockVerifyCsrfTokens } from 'functions/verifyCsrfTokens'
+import {
+  PARAMS_INVALID,
+  INTERNAL_SERVER_ERROR,
+  POST_NOT_FOUND,
+  UNAUTHORIZED,
+  CSRF_TOKEN_INVALID,
+  DATA_INVALID,
+  FORBIDDEN,
+} from 'constants/errors'
 
 jest
   .mock('models/Post')
   .mock('next-auth')
-  .mock('utils/functions/dbConnect')
-  .mock('utils/functions/deleteImage')
-  .mock('utils/functions/verifyCsrfTokens')
+  .mock('functions/dbConnect')
+  .mock('functions/deleteImage')
+  .mock('functions/verifyCsrfTokens')
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
   }))
@@ -36,7 +44,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.PARAMS_INVALID })
+    expect(data).toEqual({ message: PARAMS_INVALID })
   })
 
   test('500 - database connection failed', async () => {
@@ -48,7 +56,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find post by id failed', async () => {
@@ -61,7 +69,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('404 - post not found', async () => {
@@ -75,7 +83,7 @@ describe('GET', () => {
 
     expect(mockFindPostById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 404)
-    expect(data).toEqual({ message: err.POST_NOT_FOUND })
+    expect(data).toEqual({ message: POST_NOT_FOUND })
   })
 
   test('200 - get the post', async () => {
@@ -124,7 +132,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.PARAMS_INVALID })
+    expect(data).toEqual({ message: PARAMS_INVALID })
   })
 
   test('401 - unauthorized', async () => {
@@ -136,7 +144,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
-    expect(data).toEqual({ message: err.UNAUTHORIZED })
+    expect(data).toEqual({ message: UNAUTHORIZED })
   })
 
   test('422 - invalid csrf token', async () => {
@@ -153,7 +161,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
   })
 
   test('422 - invalid json', async () => {
@@ -166,7 +174,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.DATA_INVALID })
+    expect(data).toEqual({ message: DATA_INVALID })
   })
 
   test('422 - invalid request body', async () => {
@@ -202,7 +210,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find post by id failed', async () => {
@@ -221,7 +229,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('404 - post not found', async () => {
@@ -241,7 +249,7 @@ describe('PUT', () => {
 
     expect(mockFindPostById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 404)
-    expect(data).toEqual({ message: err.POST_NOT_FOUND })
+    expect(data).toEqual({ message: POST_NOT_FOUND })
   })
 
   test('403 - forbidden', async () => {
@@ -263,7 +271,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 403)
-    expect(data).toEqual({ message: err.FORBIDDEN })
+    expect(data).toEqual({ message: FORBIDDEN })
   })
 
   test('500 - deleting old images failed', async () => {
@@ -286,7 +294,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('204 - images updated', async () => {
@@ -479,7 +487,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.PARAMS_INVALID })
+    expect(data).toEqual({ message: PARAMS_INVALID })
   })
 
   test('401 - unauthorized', async () => {
@@ -491,7 +499,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
-    expect(data).toEqual({ message: err.UNAUTHORIZED })
+    expect(data).toEqual({ message: UNAUTHORIZED })
   })
 
   test('422 - invalid csrf token', async () => {
@@ -504,7 +512,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
   })
 
   test('500 - database connection failed', async () => {
@@ -518,7 +526,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find post by id failed', async () => {
@@ -533,7 +541,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('404 - post not found', async () => {
@@ -549,7 +557,7 @@ describe('DELETE', () => {
 
     expect(mockFindPostById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 404)
-    expect(data).toEqual({ message: err.POST_NOT_FOUND })
+    expect(data).toEqual({ message: POST_NOT_FOUND })
   })
 
   test('403 - forbidden', async () => {
@@ -567,7 +575,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 403)
-    expect(data).toEqual({ message: err.FORBIDDEN })
+    expect(data).toEqual({ message: FORBIDDEN })
   })
 
   test('204 - post deleted', async () => {

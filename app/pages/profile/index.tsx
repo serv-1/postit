@@ -13,7 +13,7 @@ import TabPanel from 'components/TabPanel'
 import UpdateAccountForm from 'components/UpdateAccountForm'
 import DeleteAccountModal from 'components/DeleteAccountModal'
 import ProfilePostList from 'components/ProfilePostList'
-import formatToUrl from 'utils/functions/formatToUrl'
+import formatToUrl from 'functions/formatToUrl'
 import { useState } from 'react'
 
 export default function Profile({

@@ -2,15 +2,19 @@
  * @jest-environment node
  */
 
-import err from 'utils/constants/errors'
 import { GET } from './route'
 import { Types } from 'mongoose'
 // @ts-expect-error
-import { mockDbConnect } from 'utils/functions/dbConnect'
+import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
 import { type UserDoc, mockFindUserById } from 'models/User'
+import {
+  ID_INVALID,
+  INTERNAL_SERVER_ERROR,
+  USER_NOT_FOUND,
+} from 'constants/errors'
 
-jest.mock('models/User').mock('utils/functions/dbConnect')
+jest.mock('models/User').mock('functions/dbConnect')
 
 describe('GET', () => {
   test('422 - invalid id', async () => {
@@ -20,7 +24,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.ID_INVALID })
+    expect(data).toEqual({ message: ID_INVALID })
   })
 
   test('500 - database connection failed', async () => {
@@ -32,7 +36,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find user by id failed', async () => {
@@ -45,7 +49,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('404 - user not found', async () => {
@@ -59,7 +63,7 @@ describe('GET', () => {
 
     expect(mockFindUserById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 404)
-    expect(data).toEqual({ message: err.USER_NOT_FOUND })
+    expect(data).toEqual({ message: USER_NOT_FOUND })
   })
 
   test('200 - get the user', async () => {

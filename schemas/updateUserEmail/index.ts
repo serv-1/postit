@@ -1,6 +1,6 @@
 import userEmail from 'schemas/userEmail'
-import err from 'utils/constants/errors'
-import createObjectSchema from 'utils/functions/createObjectSchema'
+import createObjectSchema from 'functions/createObjectSchema'
+import { EMAIL_REQUIRED } from 'constants/errors'
 
 export interface UpdateUserEmail {
   email: string
@@ -9,7 +9,7 @@ export interface UpdateUserEmail {
 }
 
 const updateUserEmail = createObjectSchema<UpdateUserEmail>({
-  email: userEmail.required().messages({ 'any.required': err.EMAIL_REQUIRED }),
+  email: userEmail.required().messages({ 'any.required': EMAIL_REQUIRED }),
 })
 
 export default updateUserEmail

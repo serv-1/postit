@@ -1,6 +1,6 @@
 import UpdatePost from 'app/pages/postUpdate'
 import type { Metadata } from 'next'
-import getPost from 'utils/functions/getPost'
+import getPost from 'functions/getPost'
 
 interface Params {
   id: string

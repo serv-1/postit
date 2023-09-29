@@ -1,5 +1,5 @@
+import { IMAGES_INVALID, IMAGE_INVALID, IMAGES_MAX } from 'constants/errors'
 import postImages from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = postImages.validate(['key'])
@@ -11,13 +11,13 @@ it('passes', () => {
 it('fails if the value is not an array', () => {
   const { error } = postImages.validate(1)
 
-  expect(error?.details[0].message).toBe(err.IMAGES_INVALID)
+  expect(error?.details[0].message).toBe(IMAGES_INVALID)
 })
 
 it('fails if the items are not image keys', () => {
   const { error } = postImages.validate([1])
 
-  expect(error?.details[0].message).toBe(err.IMAGE_INVALID)
+  expect(error?.details[0].message).toBe(IMAGE_INVALID)
 })
 
 it('fails if there are more than 5 image keys', () => {
@@ -30,5 +30,5 @@ it('fails if there are more than 5 image keys', () => {
     'key',
   ])
 
-  expect(error?.details[0].message).toBe(err.IMAGES_MAX)
+  expect(error?.details[0].message).toBe(IMAGES_MAX)
 })

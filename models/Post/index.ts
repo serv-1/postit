@@ -9,7 +9,7 @@ import {
   type UpdateWriteOpResult,
 } from 'mongoose'
 import type { Categories } from 'types'
-import deleteImage from 'utils/functions/deleteImage'
+import deleteImage from 'functions/deleteImage'
 import Discussion from 'models/Discussion'
 import User from 'models/User'
 

@@ -8,9 +8,9 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import User, { type UserDoc } from 'models/User'
 import Discussion from 'models/Discussion'
 // @ts-expect-error
-import { mockDeleteImage } from 'utils/functions/deleteImage'
+import { mockDeleteImage } from 'functions/deleteImage'
 
-jest.unmock('nanoid').mock('utils/functions/deleteImage')
+jest.unmock('nanoid').mock('functions/deleteImage')
 
 describe('Post model', () => {
   let johnId: Types.ObjectId

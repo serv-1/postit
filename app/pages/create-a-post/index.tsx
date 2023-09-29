@@ -14,11 +14,11 @@ import { useRouter } from 'next/navigation'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import createPost, { type CreatePost } from 'schemas/client/createPost'
 import { joiResolver } from '@hookform/resolvers/joi'
-import err from 'utils/constants/errors'
 import useLinearBackgroundGradient from 'hooks/useLinearBackgroundGradient'
 import ajax from 'libs/ajax'
 import type { S3GetData, S3GetError } from 'app/api/s3/types'
 import type { PostPostError } from 'app/api/post/types'
+import { IMAGE_TOO_BIG, DEFAULT } from 'constants/errors'
 
 export default function Page() {
   const [step, setStep] = useState<0 | 1 | 2>(0)
@@ -57,7 +57,7 @@ export default function Page() {
 
       if (!response.ok) {
         setToast({
-          message: response.status === 400 ? err.IMAGE_TOO_BIG : err.DEFAULT,
+          message: response.status === 400 ? IMAGE_TOO_BIG : DEFAULT,
           error: true,
         })
 

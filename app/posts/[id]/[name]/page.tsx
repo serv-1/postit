@@ -1,8 +1,8 @@
 import PostPage from 'app/pages/post'
 import type { Metadata } from 'next'
-import getPost from 'utils/functions/getPost'
-import getUserPosts from 'utils/functions/getUserPosts'
-import getUser from 'utils/functions/getUser'
+import getPost from 'functions/getPost'
+import getUserPosts from 'functions/getUserPosts'
+import getUser from 'functions/getUser'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import { getServerSession } from 'next-auth'
 

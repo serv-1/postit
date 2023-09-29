@@ -1,8 +1,12 @@
 import User from 'models/User'
 import { isValidObjectId } from 'mongoose'
 import { NextResponse } from 'next/server'
-import err from 'utils/constants/errors'
-import dbConnect from 'utils/functions/dbConnect'
+import dbConnect from 'functions/dbConnect'
+import {
+  ID_INVALID,
+  USER_NOT_FOUND,
+  INTERNAL_SERVER_ERROR,
+} from 'constants/errors'
 
 interface Params {
   params: { id: string }
@@ -12,7 +16,7 @@ export async function GET(request: Request, { params }: Params) {
   const userId = params.id
 
   if (!isValidObjectId(userId)) {
-    return NextResponse.json({ message: err.ID_INVALID }, { status: 422 })
+    return NextResponse.json({ message: ID_INVALID }, { status: 422 })
   }
 
   try {
@@ -21,7 +25,7 @@ export async function GET(request: Request, { params }: Params) {
     const user = await User.findById(userId).lean().exec()
 
     if (!user) {
-      return NextResponse.json({ message: err.USER_NOT_FOUND }, { status: 404 })
+      return NextResponse.json({ message: USER_NOT_FOUND }, { status: 404 })
     }
 
     return NextResponse.json(
@@ -40,7 +44,7 @@ export async function GET(request: Request, { params }: Params) {
     )
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }

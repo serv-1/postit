@@ -4,8 +4,15 @@ import postDescription from 'schemas/postDescription'
 import postCategories from 'schemas/postCategories'
 import postPrice from 'schemas/postPrice'
 import postAddress from 'schemas/postAddress'
-import err from 'utils/constants/errors'
-import createObjectSchema from 'utils/functions/createObjectSchema'
+import createObjectSchema from 'functions/createObjectSchema'
+import {
+  NAME_REQUIRED,
+  DESCRIPTION_REQUIRED,
+  CATEGORIES_REQUIRED,
+  PRICE_REQUIRED,
+  PRICE_INVALID,
+  ADDRESS_REQUIRED,
+} from 'constants/errors'
 
 export interface CreatePost {
   name: string
@@ -16,21 +23,21 @@ export interface CreatePost {
 }
 
 const createPost = createObjectSchema<CreatePost>({
-  name: name.required().messages({ 'any.required': err.NAME_REQUIRED }),
+  name: name.required().messages({ 'any.required': NAME_REQUIRED }),
   description: postDescription
     .required()
-    .messages({ 'any.required': err.DESCRIPTION_REQUIRED }),
+    .messages({ 'any.required': DESCRIPTION_REQUIRED }),
   categories: postCategories.required().min(1).messages({
-    'any.required': err.CATEGORIES_REQUIRED,
-    'array.min': err.CATEGORIES_REQUIRED,
+    'any.required': CATEGORIES_REQUIRED,
+    'array.min': CATEGORIES_REQUIRED,
   }),
   price: postPrice.required().min(1).messages({
-    'any.required': err.PRICE_REQUIRED,
-    'number.min': err.PRICE_INVALID,
+    'any.required': PRICE_REQUIRED,
+    'number.min': PRICE_INVALID,
   }),
   address: postAddress
     .required()
-    .messages({ 'any.required': err.ADDRESS_REQUIRED }),
+    .messages({ 'any.required': ADDRESS_REQUIRED }),
 })
 
 export default createPost

@@ -1,14 +1,14 @@
+import { LATLON_INVALID } from 'constants/errors'
 import Joi from 'joi'
-import err from 'utils/constants/errors'
 
 const postLatLon = Joi.array()
   .items(Joi.number().required(), Joi.number().required())
   .length(2)
   .messages({
-    'array.base': err.LATLON_INVALID,
-    'array.length': err.LATLON_INVALID,
-    'array.includesRequiredUnknowns': err.LATLON_INVALID,
-    'array.includes': err.LATLON_INVALID,
+    'array.base': LATLON_INVALID,
+    'array.length': LATLON_INVALID,
+    'array.includesRequiredUnknowns': LATLON_INVALID,
+    'array.includes': LATLON_INVALID,
   })
 
 export default postLatLon

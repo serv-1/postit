@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import formatToUrl from 'utils/functions/formatToUrl'
+import formatToUrl from 'functions/formatToUrl'
 import ChevronRight from 'public/static/images/chevron-right.svg'
 import X from 'public/static/images/x.svg'
 import Link from 'next/link'

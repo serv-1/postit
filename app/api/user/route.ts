@@ -5,14 +5,20 @@ import { getServerSession } from 'next-auth'
 import { type NextRequest, NextResponse } from 'next/server'
 import createUser from 'schemas/createUser'
 import updateUser from 'schemas/server/updateUser'
-import err from 'utils/constants/errors'
-import dbConnect from 'utils/functions/dbConnect'
-import deleteImage from 'utils/functions/deleteImage'
-import getServerPusher from 'utils/functions/getServerPusher'
-import hashPassword from 'utils/functions/hashPassword'
-import verifyCsrfTokens from 'utils/functions/verifyCsrfTokens'
-import validate from 'utils/functions/validate'
+import dbConnect from 'functions/dbConnect'
+import deleteImage from 'functions/deleteImage'
+import getServerPusher from 'functions/getServerPusher'
+import hashPassword from 'functions/hashPassword'
+import verifyCsrfTokens from 'functions/verifyCsrfTokens'
+import validate from 'functions/validate'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import {
+  DATA_INVALID,
+  EMAIL_USED,
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
+  CSRF_TOKEN_INVALID,
+} from 'constants/errors'
 
 export async function POST(request: Request) {
   let data = null
@@ -20,7 +26,7 @@ export async function POST(request: Request) {
   try {
     data = await request.json()
   } catch (e) {
-    return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
+    return NextResponse.json({ message: DATA_INVALID }, { status: 422 })
   }
 
   const result = validate(createUser, data)
@@ -47,13 +53,13 @@ export async function POST(request: Request) {
   } catch (e) {
     if (e instanceof MongoServerError && e.code === 11000) {
       return NextResponse.json(
-        { message: err.EMAIL_USED, name: 'email' },
+        { message: EMAIL_USED, name: 'email' },
         { status: 422 }
       )
     }
 
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }
@@ -63,14 +69,11 @@ export async function PUT(request: NextRequest) {
   const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
-    return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
+    return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
   }
 
   if (!verifyCsrfTokens(request)) {
-    return NextResponse.json(
-      { message: err.CSRF_TOKEN_INVALID },
-      { status: 422 }
-    )
+    return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
   }
 
   let data = null
@@ -78,7 +81,7 @@ export async function PUT(request: NextRequest) {
   try {
     data = await request.json()
   } catch (e) {
-    return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
+    return NextResponse.json({ message: DATA_INVALID }, { status: 422 })
   }
 
   const result = validate(updateUser, data)
@@ -146,11 +149,11 @@ export async function PUT(request: NextRequest) {
     await User.updateOne({ _id: session.id }, update).lean().exec()
   } catch (e) {
     if (e instanceof MongoServerError && e.code === 11000) {
-      return NextResponse.json({ message: err.EMAIL_USED }, { status: 422 })
+      return NextResponse.json({ message: EMAIL_USED }, { status: 422 })
     }
 
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }
@@ -162,14 +165,11 @@ export async function DELETE(request: NextRequest) {
   const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
-    return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
+    return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
   }
 
   if (!verifyCsrfTokens(request)) {
-    return NextResponse.json(
-      { message: err.CSRF_TOKEN_INVALID },
-      { status: 422 }
-    )
+    return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
   }
 
   try {
@@ -178,7 +178,7 @@ export async function DELETE(request: NextRequest) {
     await User.deleteOne({ _id: session.id }).lean().exec()
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }

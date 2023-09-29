@@ -4,7 +4,7 @@
 
 import { Types } from 'mongoose'
 import id from '.'
-import err from 'utils/constants/errors'
+import { ID_INVALID } from 'constants/errors'
 
 it('passes', () => {
   const result = id.validate(new Types.ObjectId().toString())
@@ -16,5 +16,5 @@ it('passes', () => {
 it("fails if the value can't cast to an ObjectId", () => {
   const { error } = id.validate('oh no')
 
-  expect(error?.details[0].message).toBe(err.ID_INVALID)
+  expect(error?.details[0].message).toBe(ID_INVALID)
 })

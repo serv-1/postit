@@ -2,10 +2,10 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { rest } from 'msw'
 import MapInput from '.'
-import err from 'utils/constants/errors'
 import { setupServer } from 'msw/node'
 import locationIQAutocompleteHandlers from 'app/api/locationIQ/autocomplete/mock'
 import 'cross-fetch/polyfill'
+import { ADDRESS_MAX } from 'constants/errors'
 
 const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
 const setValue = jest.fn()
@@ -86,7 +86,7 @@ it('renders an error if the query is too long', async () => {
 
   const alert = await screen.findByRole('alert')
 
-  expect(alert).toHaveTextContent(err.ADDRESS_MAX)
+  expect(alert).toHaveTextContent(ADDRESS_MAX)
 })
 
 it('renders an error if the server fails to fetch the predictions', async () => {

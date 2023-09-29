@@ -2,19 +2,25 @@
  * @jest-environment node
  */
 
-import err from 'utils/constants/errors'
 import { POST } from './route'
 import { Types } from 'mongoose'
-import hashPassword from 'utils/functions/hashPassword'
+import hashPassword from 'functions/hashPassword'
 // @ts-expect-error
 import { mockFindOneUser } from 'models/User'
 // @ts-expect-error
-import { mockDbConnect } from 'utils/functions/dbConnect'
+import { mockDbConnect } from 'functions/dbConnect'
+import {
+  DATA_INVALID,
+  INTERNAL_SERVER_ERROR,
+  EMAIL_UNKNOWN,
+  PASSWORD_REQUIRED,
+  PASSWORD_INVALID,
+} from 'constants/errors'
 
 jest
-  .unmock('utils/functions/hashPassword')
+  .unmock('functions/hashPassword')
   .mock('models/User')
-  .mock('utils/functions/dbConnect')
+  .mock('functions/dbConnect')
 
 describe('POST', () => {
   test('422 - invalid json', async () => {
@@ -24,7 +30,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.DATA_INVALID })
+    expect(data).toEqual({ message: DATA_INVALID })
   })
 
   test('422 - invalid request body', async () => {
@@ -53,7 +59,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find one user failed', async () => {
@@ -69,7 +75,7 @@ describe('POST', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('422 - email unknown', async () => {
@@ -88,7 +94,7 @@ describe('POST', () => {
 
     expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ name: 'email', message: err.EMAIL_UNKNOWN })
+    expect(data).toEqual({ name: 'email', message: EMAIL_UNKNOWN })
   })
 
   test('422 - password undefined', async () => {
@@ -107,7 +113,7 @@ describe('POST', () => {
 
     expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ name: 'password', message: err.PASSWORD_REQUIRED })
+    expect(data).toEqual({ name: 'password', message: PASSWORD_REQUIRED })
   })
 
   test('422 - invalid password', async () => {
@@ -127,7 +133,7 @@ describe('POST', () => {
 
     expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ name: 'password', message: err.PASSWORD_INVALID })
+    expect(data).toEqual({ name: 'password', message: PASSWORD_INVALID })
   })
 
   test('200 - user ready to sign in', async () => {

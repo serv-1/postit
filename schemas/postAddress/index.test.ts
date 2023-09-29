@@ -1,5 +1,5 @@
+import { ADDRESS_REQUIRED, ADDRESS_INVALID } from 'constants/errors'
 import postAddress from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = postAddress.validate('Oslo, Norway')
@@ -17,11 +17,11 @@ it('trims the value', () => {
 it('fails if the value is an empty string', () => {
   const { error } = postAddress.validate('')
 
-  expect(error?.details[0].message).toBe(err.ADDRESS_REQUIRED)
+  expect(error?.details[0].message).toBe(ADDRESS_REQUIRED)
 })
 
 it('fails if the value is not a string', () => {
   const { error } = postAddress.validate(1)
 
-  expect(error?.details[0].message).toBe(err.ADDRESS_INVALID)
+  expect(error?.details[0].message).toBe(ADDRESS_INVALID)
 })

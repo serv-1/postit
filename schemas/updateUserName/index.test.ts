@@ -1,5 +1,5 @@
+import { NAME_REQUIRED } from 'constants/errors'
 import updateUserName from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = updateUserName.validate({ name: 'bob' })
@@ -11,5 +11,5 @@ it('passes', () => {
 it('fails if the name is undefined', () => {
   const { error } = updateUserName.validate({})
 
-  expect(error?.details[0].message).toBe(err.NAME_REQUIRED)
+  expect(error?.details[0].message).toBe(NAME_REQUIRED)
 })

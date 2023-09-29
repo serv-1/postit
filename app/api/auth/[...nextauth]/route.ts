@@ -5,7 +5,7 @@ import EmailProvider from 'next-auth/providers/email'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from 'libs/mongodb'
 import User, { type UserDoc } from 'models/User'
-import dbConnect from 'utils/functions/dbConnect'
+import dbConnect from 'functions/dbConnect'
 import {
   EMAIL_FROM,
   EMAIL_HOST,

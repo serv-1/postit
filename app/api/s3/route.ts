@@ -1,25 +1,26 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
-import err from 'utils/constants/errors'
-import verifyCsrfTokens from 'utils/functions/verifyCsrfTokens'
+import verifyCsrfTokens from 'functions/verifyCsrfTokens'
 import { nanoid } from 'nanoid'
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
 import s3Client from 'libs/s3Client'
 import { AWS_BUCKET_NAME } from 'env'
+import {
+  UNAUTHORIZED,
+  CSRF_TOKEN_INVALID,
+  INTERNAL_SERVER_ERROR,
+} from 'constants/errors'
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
-    return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
+    return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
   }
 
   if (!verifyCsrfTokens(request)) {
-    return NextResponse.json(
-      { message: err.CSRF_TOKEN_INVALID },
-      { status: 422 }
-    )
+    return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
   }
 
   const key = nanoid()
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ url, fields, key }, { status: 200 })
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }

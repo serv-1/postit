@@ -1,6 +1,6 @@
 import userPassword from 'schemas/userPassword'
-import err from 'utils/constants/errors'
-import createObjectSchema from 'utils/functions/createObjectSchema'
+import createObjectSchema from 'functions/createObjectSchema'
+import { PASSWORD_REQUIRED } from 'constants/errors'
 
 export interface UpdateUserPassword {
   password: string
@@ -11,7 +11,7 @@ export interface UpdateUserPassword {
 const updateUserPassword = createObjectSchema<UpdateUserPassword>({
   password: userPassword
     .required()
-    .messages({ 'any.required': err.PASSWORD_REQUIRED }),
+    .messages({ 'any.required': PASSWORD_REQUIRED }),
 })
 
 export default updateUserPassword

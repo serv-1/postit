@@ -5,11 +5,20 @@ import { isValidObjectId } from 'mongoose'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import updateDiscussion from 'schemas/updateDiscussion'
-import err from 'utils/constants/errors'
-import dbConnect from 'utils/functions/dbConnect'
-import getServerPusher from 'utils/functions/getServerPusher'
-import validate from 'utils/functions/validate'
-import verifyCsrfTokens from 'utils/functions/verifyCsrfTokens'
+import dbConnect from 'functions/dbConnect'
+import getServerPusher from 'functions/getServerPusher'
+import validate from 'functions/validate'
+import verifyCsrfTokens from 'functions/verifyCsrfTokens'
+import {
+  PARAMS_INVALID,
+  UNAUTHORIZED,
+  CSRF_TOKEN_INVALID,
+  DISCUSSION_NOT_FOUND,
+  FORBIDDEN,
+  INTERNAL_SERVER_ERROR,
+  CANNOT_SEND_MSG,
+  DATA_INVALID,
+} from 'constants/errors'
 
 interface Params {
   params: { id: string }
@@ -19,20 +28,17 @@ export async function GET(request: NextRequest, { params }: Params) {
   const discussionId = params.id
 
   if (!isValidObjectId(discussionId)) {
-    return NextResponse.json({ message: err.PARAMS_INVALID }, { status: 422 })
+    return NextResponse.json({ message: PARAMS_INVALID }, { status: 422 })
   }
 
   const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
-    return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
+    return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
   }
 
   if (!verifyCsrfTokens(request)) {
-    return NextResponse.json(
-      { message: err.CSRF_TOKEN_INVALID },
-      { status: 422 }
-    )
+    return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
   }
 
   try {
@@ -42,7 +48,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     if (!discussion) {
       return NextResponse.json(
-        { message: err.DISCUSSION_NOT_FOUND },
+        { message: DISCUSSION_NOT_FOUND },
         { status: 404 }
       )
     }
@@ -51,7 +57,7 @@ export async function GET(request: NextRequest, { params }: Params) {
       session.id !== discussion.buyerId?.toString() &&
       session.id !== discussion.sellerId?.toString()
     ) {
-      return NextResponse.json({ message: err.FORBIDDEN }, { status: 403 })
+      return NextResponse.json({ message: FORBIDDEN }, { status: 403 })
     }
 
     const buyer = await User.findById(discussion.buyerId).lean().exec()
@@ -79,7 +85,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     )
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }
@@ -89,13 +95,13 @@ export async function PUT(request: NextRequest, { params }: Params) {
   const discussionId = params.id
 
   if (!isValidObjectId(discussionId)) {
-    return NextResponse.json({ message: err.PARAMS_INVALID }, { status: 422 })
+    return NextResponse.json({ message: PARAMS_INVALID }, { status: 422 })
   }
 
   const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
-    return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
+    return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
   }
 
   try {
@@ -105,7 +111,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     if (!discussion) {
       return NextResponse.json(
-        { message: err.DISCUSSION_NOT_FOUND },
+        { message: DISCUSSION_NOT_FOUND },
         { status: 404 }
       )
     }
@@ -114,17 +120,14 @@ export async function PUT(request: NextRequest, { params }: Params) {
       session.id !== discussion.buyerId?.toString() &&
       session.id !== discussion.sellerId?.toString()
     ) {
-      return NextResponse.json({ message: err.FORBIDDEN }, { status: 403 })
+      return NextResponse.json({ message: FORBIDDEN }, { status: 403 })
     }
 
     const buyer = await User.findById(discussion.buyerId).lean().exec()
     const seller = await User.findById(discussion.sellerId).lean().exec()
 
     if (!buyer || !seller) {
-      return NextResponse.json(
-        { message: err.CANNOT_SEND_MSG },
-        { status: 409 }
-      )
+      return NextResponse.json({ message: CANNOT_SEND_MSG }, { status: 409 })
     }
 
     let hasBuyerDeletedDiscussion = true
@@ -145,17 +148,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
     }
 
     if (hasBuyerDeletedDiscussion || hasSellerDeletedDiscussion) {
-      return NextResponse.json(
-        { message: err.CANNOT_SEND_MSG },
-        { status: 409 }
-      )
+      return NextResponse.json({ message: CANNOT_SEND_MSG }, { status: 409 })
     }
 
     if (!verifyCsrfTokens(request)) {
-      return NextResponse.json(
-        { message: err.CSRF_TOKEN_INVALID },
-        { status: 422 }
-      )
+      return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
     }
 
     if (request.body) {
@@ -164,7 +161,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       try {
         data = await request.json()
       } catch (e) {
-        return NextResponse.json({ message: err.DATA_INVALID }, { status: 422 })
+        return NextResponse.json({ message: DATA_INVALID }, { status: 422 })
       }
 
       const result = validate(updateDiscussion, data)
@@ -260,7 +257,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return new Response(null, { status: 204 })
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }
@@ -270,20 +267,17 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   const discussionId = params.id
 
   if (!isValidObjectId(discussionId)) {
-    return NextResponse.json({ message: err.PARAMS_INVALID }, { status: 422 })
+    return NextResponse.json({ message: PARAMS_INVALID }, { status: 422 })
   }
 
   const session = await getServerSession(nextAuthOptions)
 
   if (!session) {
-    return NextResponse.json({ message: err.UNAUTHORIZED }, { status: 401 })
+    return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
   }
 
   if (!verifyCsrfTokens(request)) {
-    return NextResponse.json(
-      { message: err.CSRF_TOKEN_INVALID },
-      { status: 422 }
-    )
+    return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
   }
 
   try {
@@ -293,7 +287,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
 
     if (!discussion) {
       return NextResponse.json(
-        { message: err.DISCUSSION_NOT_FOUND },
+        { message: DISCUSSION_NOT_FOUND },
         { status: 404 }
       )
     }
@@ -302,7 +296,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       session.id !== discussion.buyerId?.toString() &&
       session.id !== discussion.sellerId?.toString()
     ) {
-      return NextResponse.json({ message: err.FORBIDDEN }, { status: 403 })
+      return NextResponse.json({ message: FORBIDDEN }, { status: 403 })
     }
 
     await Discussion.deleteOne({ _id: discussionId }).lean().exec()
@@ -310,7 +304,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     return new Response(null, { status: 204 })
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }

@@ -2,13 +2,13 @@ import { type ChangeEvent, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useToast } from 'contexts/toast'
 import Plus from 'public/static/images/plus.svg'
-import err from 'utils/constants/errors'
-import isImage from 'utils/functions/isImage'
+import isImage from 'functions/isImage'
 import ajax from 'libs/ajax'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 import type { S3GetData, S3GetError } from 'app/api/s3/types'
 import type { UserPutError } from 'app/api/user/types'
-import { MAX_IMAGE_SIZE } from 'utils/constants'
+import { MAX_IMAGE_SIZE } from 'constants/index'
+import { IMAGE_INVALID, IMAGE_TOO_BIG, DEFAULT } from 'constants/errors'
 
 interface ProfileUserImageProps {
   image?: string
@@ -31,11 +31,11 @@ export default function ProfileUserImage({
     }
 
     if (!isImage(file)) {
-      return setToast({ message: err.IMAGE_INVALID, error: true })
+      return setToast({ message: IMAGE_INVALID, error: true })
     }
 
     if (file.size > MAX_IMAGE_SIZE) {
-      return setToast({ message: err.IMAGE_TOO_BIG, error: true })
+      return setToast({ message: IMAGE_TOO_BIG, error: true })
     }
 
     let response = await ajax.get('/s3', { csrf: true })
@@ -57,7 +57,7 @@ export default function ProfileUserImage({
     response = await fetch(url, { method: 'POST', body: formData })
 
     if (!response.ok) {
-      setToast({ message: err.DEFAULT, error: true })
+      setToast({ message: DEFAULT, error: true })
 
       return
     }

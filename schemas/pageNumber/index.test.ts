@@ -1,5 +1,5 @@
+import { PAGE_INVALID } from 'constants/errors'
 import pageSchema from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = pageSchema.validate(1)
@@ -11,17 +11,17 @@ it('passes', () => {
 it('fails if the value is not a number', () => {
   const { error } = pageSchema.validate('a')
 
-  expect(error?.details[0].message).toBe(err.PAGE_INVALID)
+  expect(error?.details[0].message).toBe(PAGE_INVALID)
 })
 
 it('fails if the value is infinity', () => {
   const { error } = pageSchema.validate(Infinity)
 
-  expect(error?.details[0].message).toBe(err.PAGE_INVALID)
+  expect(error?.details[0].message).toBe(PAGE_INVALID)
 })
 
 it('fails if the value is a negative number', () => {
   const { error } = pageSchema.validate(-1)
 
-  expect(error?.details[0].message).toBe(err.PAGE_INVALID)
+  expect(error?.details[0].message).toBe(PAGE_INVALID)
 })

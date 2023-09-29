@@ -1,7 +1,7 @@
 import Form from 'components/Form'
 import Input from 'components/Input'
 import Select from 'components/Select'
-import categories from 'utils/constants/categories'
+import { CATEGORIES } from 'constants/index'
 import InputError from 'components/InputError'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
@@ -11,7 +11,7 @@ import Button from 'components/Button'
 import searchPost, { type SearchPost } from 'schemas/searchPost'
 import Popup from 'components/Popup'
 
-const options = categories.map((category) => ({
+const options = CATEGORIES.map((category) => ({
   label: category,
   value: category,
 }))

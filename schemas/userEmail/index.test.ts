@@ -1,5 +1,5 @@
+import { EMAIL_INVALID, EMAIL_REQUIRED } from 'constants/errors'
 import userEmail from '.'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = userEmail.validate('just@do.it')
@@ -17,17 +17,17 @@ it('trims the value', () => {
 it('fails if the value is not a string', () => {
   const { error } = userEmail.validate(1)
 
-  expect(error?.details[0].message).toBe(err.EMAIL_INVALID)
+  expect(error?.details[0].message).toBe(EMAIL_INVALID)
 })
 
 it('fails if the value is an empty string', () => {
   const { error } = userEmail.validate('')
 
-  expect(error?.details[0].message).toBe(err.EMAIL_REQUIRED)
+  expect(error?.details[0].message).toBe(EMAIL_REQUIRED)
 })
 
 it('fails if the value is not an email', () => {
   const { error } = userEmail.validate('no')
 
-  expect(error?.details[0].message).toBe(err.EMAIL_INVALID)
+  expect(error?.details[0].message).toBe(EMAIL_INVALID)
 })

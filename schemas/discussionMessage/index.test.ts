@@ -1,5 +1,9 @@
+import {
+  MESSAGE_INVALID,
+  MESSAGE_REQUIRED,
+  MESSAGE_MAX,
+} from 'constants/errors'
 import discussionMessage from 'schemas/discussionMessage'
-import err from 'utils/constants/errors'
 
 it('passes', () => {
   const result = discussionMessage.validate('yo')
@@ -17,17 +21,17 @@ it('trims the value', () => {
 it('fails if the value is not a string', () => {
   const { error } = discussionMessage.validate(1)
 
-  expect(error?.details[0].message).toBe(err.MESSAGE_INVALID)
+  expect(error?.details[0].message).toBe(MESSAGE_INVALID)
 })
 
 it('fails if the value is an empty string', () => {
   const { error } = discussionMessage.validate('')
 
-  expect(error?.details[0].message).toBe(err.MESSAGE_REQUIRED)
+  expect(error?.details[0].message).toBe(MESSAGE_REQUIRED)
 })
 
 it('fails if the value is too long', () => {
   const { error } = discussionMessage.validate(new Uint8Array(501).toString())
 
-  expect(error?.details[0].message).toBe(err.MESSAGE_MAX)
+  expect(error?.details[0].message).toBe(MESSAGE_MAX)
 })

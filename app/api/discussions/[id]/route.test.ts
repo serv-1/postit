@@ -4,29 +4,38 @@
 
 import { GET, PUT, DELETE } from './route'
 import { NextRequest } from 'next/server'
-import err from 'utils/constants/errors'
 import { Types } from 'mongoose'
 // @ts-expect-error
 import { mockGetServerSession } from 'next-auth'
 // @ts-expect-error
-import { mockDbConnect } from 'utils/functions/dbConnect'
+import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
-import { mockServerPusherTriggerBatch } from 'utils/functions/getServerPusher'
+import { mockServerPusherTriggerBatch } from 'functions/getServerPusher'
 // @ts-expect-error
-import { mockVerifyCsrfTokens } from 'utils/functions/verifyCsrfTokens'
+import { mockVerifyCsrfTokens } from 'functions/verifyCsrfTokens'
 // prettier-ignore
 // @ts-expect-error
 import { mockFindDiscussionById, mockFindDiscussionByIdAndUpdate, mockDeleteOneDiscussion, mockFindDiscussion, DiscussionDoc } from 'models/Discussion'
 // @ts-expect-error
 import { mockFindUserById, mockFindUserByIdAndUpdate } from 'models/User'
+import {
+  CANNOT_SEND_MSG,
+  CSRF_TOKEN_INVALID,
+  DATA_INVALID,
+  DISCUSSION_NOT_FOUND,
+  FORBIDDEN,
+  INTERNAL_SERVER_ERROR,
+  PARAMS_INVALID,
+  UNAUTHORIZED,
+} from 'constants/errors'
 
 jest
   .mock('next-auth')
   .mock('models/User')
   .mock('models/Discussion')
-  .mock('utils/functions/dbConnect')
-  .mock('utils/functions/getServerPusher')
-  .mock('utils/functions/verifyCsrfTokens')
+  .mock('functions/dbConnect')
+  .mock('functions/getServerPusher')
+  .mock('functions/verifyCsrfTokens')
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
   }))
@@ -39,7 +48,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.PARAMS_INVALID })
+    expect(data).toEqual({ message: PARAMS_INVALID })
   })
 
   test('401 - unauthorized', async () => {
@@ -51,7 +60,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
-    expect(data).toEqual({ message: err.UNAUTHORIZED })
+    expect(data).toEqual({ message: UNAUTHORIZED })
   })
 
   test("422 - invalid search params' csrf token", async () => {
@@ -63,7 +72,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
   })
 
   test('422 - invalid csrf token', async () => {
@@ -76,7 +85,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
   })
 
   test('500 - database connection failed', async () => {
@@ -90,7 +99,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find discussion by id failed', async () => {
@@ -105,7 +114,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('404 - discussion not found', async () => {
@@ -121,7 +130,7 @@ describe('GET', () => {
 
     expect(mockFindDiscussionById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 404)
-    expect(data).toEqual({ message: err.DISCUSSION_NOT_FOUND })
+    expect(data).toEqual({ message: DISCUSSION_NOT_FOUND })
   })
 
   test('403 - forbidden', async () => {
@@ -143,7 +152,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 403)
-    expect(data).toEqual({ message: err.FORBIDDEN })
+    expect(data).toEqual({ message: FORBIDDEN })
   })
 
   test('500 - find buyer by id failed', async () => {
@@ -166,7 +175,7 @@ describe('GET', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find seller by id failed', async () => {
@@ -190,7 +199,7 @@ describe('GET', () => {
 
     expect(mockFindUserById).toHaveBeenNthCalledWith(1, discussion.buyerId)
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('200 - get the discussion', async () => {
@@ -333,7 +342,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.PARAMS_INVALID })
+    expect(data).toEqual({ message: PARAMS_INVALID })
   })
 
   test('401 - unauthorized', async () => {
@@ -345,7 +354,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
-    expect(data).toEqual({ message: err.UNAUTHORIZED })
+    expect(data).toEqual({ message: UNAUTHORIZED })
   })
 
   test('500 - database connection failed', async () => {
@@ -358,7 +367,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find discussion by id failed', async () => {
@@ -372,7 +381,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('404 - discussion not found', async () => {
@@ -387,7 +396,7 @@ describe('PUT', () => {
 
     expect(mockFindDiscussionById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 404)
-    expect(data).toEqual({ message: err.DISCUSSION_NOT_FOUND })
+    expect(data).toEqual({ message: DISCUSSION_NOT_FOUND })
   })
 
   test('403 - forbidden', async () => {
@@ -409,7 +418,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 403)
-    expect(data).toEqual({ message: err.FORBIDDEN })
+    expect(data).toEqual({ message: FORBIDDEN })
   })
 
   test('500 - find buyer by id failed', async () => {
@@ -431,7 +440,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find seller by id failed', async () => {
@@ -454,7 +463,7 @@ describe('PUT', () => {
 
     expect(mockFindUserById).toHaveBeenNthCalledWith(1, discussion.buyerId)
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test("409 - can't send a message if the buyer is null", async () => {
@@ -473,7 +482,7 @@ describe('PUT', () => {
 
     expect(mockFindUserById.mock.calls[1][0]).toBe(discussion.sellerId)
     expect(response).toHaveProperty('status', 409)
-    expect(data).toEqual({ message: err.CANNOT_SEND_MSG })
+    expect(data).toEqual({ message: CANNOT_SEND_MSG })
   })
 
   test("409 - can't send a message if the seller is null", async () => {
@@ -491,7 +500,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 409)
-    expect(data).toEqual({ message: err.CANNOT_SEND_MSG })
+    expect(data).toEqual({ message: CANNOT_SEND_MSG })
   })
 
   test("409 - can't send a message if the buyer has deleted the discussion", async () => {
@@ -516,7 +525,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 409)
-    expect(data).toEqual({ message: err.CANNOT_SEND_MSG })
+    expect(data).toEqual({ message: CANNOT_SEND_MSG })
   })
 
   test("409 - can't send a message if the seller has deleted the discussion", async () => {
@@ -541,7 +550,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 409)
-    expect(data).toEqual({ message: err.CANNOT_SEND_MSG })
+    expect(data).toEqual({ message: CANNOT_SEND_MSG })
   })
 
   test('422 - invalid csrf token', async () => {
@@ -567,7 +576,7 @@ describe('PUT', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
   })
 
   describe('add a new message', () => {
@@ -594,7 +603,7 @@ describe('PUT', () => {
       const data = await response.json()
 
       expect(response).toHaveProperty('status', 422)
-      expect(data).toEqual({ message: err.DATA_INVALID })
+      expect(data).toEqual({ message: DATA_INVALID })
     })
 
     test('422 - invalid request body', async () => {
@@ -655,7 +664,7 @@ describe('PUT', () => {
       const data = await response.json()
 
       expect(response).toHaveProperty('status', 500)
-      expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+      expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
     })
 
     test('500 - find user by id and update failed', async () => {
@@ -702,7 +711,7 @@ describe('PUT', () => {
       )
 
       expect(response).toHaveProperty('status', 500)
-      expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+      expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
     })
 
     test('500 - find discussion by id failed', async () => {
@@ -752,7 +761,7 @@ describe('PUT', () => {
       )
 
       expect(response).toHaveProperty('status', 500)
-      expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+      expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
     })
 
     test('500 - pusher events triggering failed', async () => {
@@ -798,7 +807,7 @@ describe('PUT', () => {
 
       expect(mockFindDiscussionById.mock.calls[1][0]).toBe(params.params.id)
       expect(response).toHaveProperty('status', 500)
-      expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+      expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
     })
 
     test("204 - buyer's message added", async () => {
@@ -972,7 +981,7 @@ describe('PUT', () => {
       const data = await response.json()
 
       expect(response).toHaveProperty('status', 500)
-      expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+      expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
     })
 
     test('500 - find user by id failed', async () => {
@@ -1032,7 +1041,7 @@ describe('PUT', () => {
       )
 
       expect(response).toHaveProperty('status', 500)
-      expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+      expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
     })
 
     test("500 - find user's discussions failed", async () => {
@@ -1076,7 +1085,7 @@ describe('PUT', () => {
 
       expect(mockFindUserById.mock.calls[2][0]).toBe(session.id)
       expect(response).toHaveProperty('status', 500)
-      expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+      expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
     })
 
     test('500 - find user by id and update failed', async () => {
@@ -1124,7 +1133,7 @@ describe('PUT', () => {
       })
 
       expect(response).toHaveProperty('status', 500)
-      expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+      expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
     })
 
     test('204 - unseen messages updated but the user still have anothers', async () => {
@@ -1237,7 +1246,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.PARAMS_INVALID })
+    expect(data).toEqual({ message: PARAMS_INVALID })
   })
 
   test('401 - unauthorized', async () => {
@@ -1249,7 +1258,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
-    expect(data).toEqual({ message: err.UNAUTHORIZED })
+    expect(data).toEqual({ message: UNAUTHORIZED })
   })
 
   test('422 - invalid csrf token', async () => {
@@ -1262,7 +1271,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: err.CSRF_TOKEN_INVALID })
+    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
   })
 
   test('500 - database connection failed', async () => {
@@ -1276,7 +1285,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('500 - find discussion by id failed', async () => {
@@ -1291,7 +1300,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('404 - discussion not found', async () => {
@@ -1307,7 +1316,7 @@ describe('DELETE', () => {
 
     expect(mockFindDiscussionById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 404)
-    expect(data).toEqual({ message: err.DISCUSSION_NOT_FOUND })
+    expect(data).toEqual({ message: DISCUSSION_NOT_FOUND })
   })
 
   test('403 - forbidden', async () => {
@@ -1329,7 +1338,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 403)
-    expect(data).toEqual({ message: err.FORBIDDEN })
+    expect(data).toEqual({ message: FORBIDDEN })
   })
 
   test('500 - delete one discussion failed', async () => {
@@ -1352,7 +1361,7 @@ describe('DELETE', () => {
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: err.INTERNAL_SERVER_ERROR })
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
   test('204 - discussion deleted', async () => {

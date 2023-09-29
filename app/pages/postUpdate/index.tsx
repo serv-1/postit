@@ -22,11 +22,11 @@ import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import updatePost, { type UpdatePost } from 'schemas/client/updatePost'
 import type { Entries, Post } from 'types'
-import categories from 'utils/constants/categories'
-import err from 'utils/constants/errors'
-import addSpacesToNum from 'utils/functions/addSpacesToNum'
+import addSpacesToNum from 'functions/addSpacesToNum'
+import { IMAGE_TOO_BIG, DEFAULT } from 'constants/errors'
+import { CATEGORIES } from 'constants/index'
 
-const options = categories.map((category) => ({
+const options = CATEGORIES.map((category) => ({
   label: category,
   value: category,
 }))
@@ -77,7 +77,7 @@ export default function UpdatePost({ post }: { post: Post }) {
 
         if (!response.ok) {
           setToast({
-            message: response.status === 400 ? err.IMAGE_TOO_BIG : err.DEFAULT,
+            message: response.status === 400 ? IMAGE_TOO_BIG : DEFAULT,
             error: true,
           })
 

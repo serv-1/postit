@@ -1,5 +1,5 @@
 import _User from 'models/User'
-import type { AddUserSchema } from 'schemas/addUserSchema'
+import type { CreateUser } from 'schemas/createUser'
 
 export const mockSaveUser = jest.fn()
 export const mockUpdateOneUser = jest.fn()
@@ -9,9 +9,9 @@ export const mockDeleteOneUser = jest.fn()
 export const mockFindOneUser = jest.fn()
 
 export default class User {
-  document: AddUserSchema
+  document: CreateUser
 
-  constructor(document: AddUserSchema) {
+  constructor(document: CreateUser) {
     this.document = document
   }
 

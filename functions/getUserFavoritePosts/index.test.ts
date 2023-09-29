@@ -4,9 +4,9 @@
 
 import type { Post } from 'types'
 import getUserFavoritePosts from '.'
-import getPost from 'utils/functions/getPost'
+import getPost from 'functions/getPost'
 
-jest.mock('utils/functions/getPost', () => ({
+jest.mock('functions/getPost', () => ({
   __esModule: true,
   default: jest.fn(),
 }))

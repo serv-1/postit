@@ -2,9 +2,9 @@ import Post from 'models/Post'
 import { NextRequest, NextResponse } from 'next/server'
 import searchPost from 'schemas/searchPost'
 import type { Categories } from 'types'
-import err from 'utils/constants/errors'
-import dbConnect from 'utils/functions/dbConnect'
-import validate from 'utils/functions/validate'
+import dbConnect from 'functions/dbConnect'
+import validate from 'functions/validate'
+import { INTERNAL_SERVER_ERROR } from 'constants/errors'
 
 interface $Match {
   price?: { $gte?: number; $lte?: number }
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
     )
   } catch (e) {
     return NextResponse.json(
-      { message: err.INTERNAL_SERVER_ERROR },
+      { message: INTERNAL_SERVER_ERROR },
       { status: 500 }
     )
   }

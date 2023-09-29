@@ -1,13 +1,13 @@
 import userEmail from 'schemas/userEmail'
-import err from 'utils/constants/errors'
-import createObjectSchema from 'utils/functions/createObjectSchema'
+import createObjectSchema from 'functions/createObjectSchema'
+import { EMAIL_REQUIRED } from 'constants/errors'
 
 export interface ForgotPassword {
   email: string
 }
 
 const forgotPassword = createObjectSchema<ForgotPassword>({
-  email: userEmail.required().messages({ 'any.required': err.EMAIL_REQUIRED }),
+  email: userEmail.required().messages({ 'any.required': EMAIL_REQUIRED }),
 })
 
 export default forgotPassword

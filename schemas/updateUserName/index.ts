@@ -1,6 +1,6 @@
 import name from 'schemas/name'
-import err from 'utils/constants/errors'
-import createObjectSchema from 'utils/functions/createObjectSchema'
+import createObjectSchema from 'functions/createObjectSchema'
+import { NAME_REQUIRED } from 'constants/errors'
 
 export interface UpdateUserName {
   name: string
@@ -9,7 +9,7 @@ export interface UpdateUserName {
 }
 
 const updateUserName = createObjectSchema<UpdateUserName>({
-  name: name.required().messages({ 'any.required': err.NAME_REQUIRED }),
+  name: name.required().messages({ 'any.required': NAME_REQUIRED }),
 })
 
 export default updateUserName

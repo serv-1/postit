@@ -1,5 +1,5 @@
+import { ID_INVALID } from 'constants/errors'
 import Joi from 'joi'
-import err from 'utils/constants/errors'
 import { isValidObjectId } from 'mongoose'
 
 const id = Joi.any()
@@ -10,6 +10,6 @@ const id = Joi.any()
 
     return value
   })
-  .messages({ 'any.invalid': err.ID_INVALID })
+  .messages({ 'any.invalid': ID_INVALID })
 
 export default id

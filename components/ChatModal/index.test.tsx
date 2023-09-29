@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import ChatModal from '.'
 // prettier-ignore
 // @ts-expect-error
-import { mockClientPusherBind, mockClientPusherUnbind } from 'utils/functions/getClientPusher'
+import { mockClientPusherBind, mockClientPusherUnbind } from 'functions/getClientPusher'
 import { setupServer } from 'msw/node'
 import discussionsIdHandlers from 'app/api/discussions/[id]/mock'
 import 'cross-fetch/polyfill'
@@ -11,7 +11,7 @@ import 'cross-fetch/polyfill'
 const server = setupServer()
 
 jest
-  .mock('utils/functions/getClientPusher')
+  .mock('functions/getClientPusher')
   .mock('contexts/toast', () => ({
     useToast: () => ({ setToast() {}, toast: {} }),
   }))

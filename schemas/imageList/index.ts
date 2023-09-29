@@ -1,7 +1,12 @@
 import Joi from 'joi'
-import { MAX_IMAGE_SIZE } from 'utils/constants'
-import err from 'utils/constants/errors'
-import isImage from 'utils/functions/isImage'
+import { MAX_IMAGE_SIZE } from 'constants/index'
+import isImage from 'functions/isImage'
+import {
+  IMAGES_INVALID,
+  IMAGES_MAX,
+  IMAGE_INVALID,
+  IMAGE_TOO_BIG,
+} from 'constants/errors'
 
 const imageList = Joi.object()
   .custom((value, helpers) => {
@@ -24,10 +29,10 @@ const imageList = Joi.object()
     return files
   })
   .messages({
-    'object.base': err.IMAGES_INVALID,
-    'images.max': err.IMAGES_MAX,
-    'image.type': err.IMAGE_INVALID,
-    'image.size': err.IMAGE_TOO_BIG,
+    'object.base': IMAGES_INVALID,
+    'images.max': IMAGES_MAX,
+    'image.type': IMAGE_INVALID,
+    'image.size': IMAGE_TOO_BIG,
   })
 
 export default imageList

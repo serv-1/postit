@@ -1,12 +1,12 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ChatSendBar from '.'
-import err from 'utils/constants/errors'
 import { setupServer } from 'msw/node'
 import { rest } from 'msw'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import 'cross-fetch/polyfill'
 import discussionsIdHandlers from 'app/api/discussions/[id]/mock'
+import { MESSAGE_REQUIRED } from 'constants/errors'
 
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const mockSetToast = jest.fn()
@@ -131,7 +131,7 @@ it('renders an alert if the given message is invalid', async () => {
 
   await waitFor(() => {
     expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: err.MESSAGE_REQUIRED,
+      message: MESSAGE_REQUIRED,
       error: true,
     })
   })

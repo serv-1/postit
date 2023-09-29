@@ -1,12 +1,12 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import ProfileUserImage from '.'
 import userEvent from '@testing-library/user-event'
-import err from 'utils/constants/errors'
 import { setupServer } from 'msw/node'
 import s3Handlers from 'app/api/s3/mock'
 import { rest } from 'msw'
 import 'cross-fetch/polyfill'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
+import { IMAGE_INVALID, IMAGE_TOO_BIG, DEFAULT } from 'constants/errors'
 
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const mockSetToast = jest.fn()
@@ -93,7 +93,7 @@ describe('renders an error if', () => {
 
     await waitFor(() => {
       expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-        message: err.IMAGE_INVALID,
+        message: IMAGE_INVALID,
         error: true,
       })
     })
@@ -110,7 +110,7 @@ describe('renders an error if', () => {
 
     await waitFor(() => {
       expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-        message: err.IMAGE_TOO_BIG,
+        message: IMAGE_TOO_BIG,
         error: true,
       })
     })
@@ -164,7 +164,7 @@ describe('renders an error if', () => {
 
     await waitFor(() => {
       expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-        message: err.DEFAULT,
+        message: DEFAULT,
         error: true,
       })
     })

@@ -1,6 +1,6 @@
 import discussionMessage from 'schemas/discussionMessage'
-import err from 'utils/constants/errors'
-import createObjectSchema from 'utils/functions/createObjectSchema'
+import createObjectSchema from 'functions/createObjectSchema'
+import { MESSAGE_REQUIRED } from 'constants/errors'
 
 export interface UpdateDiscussion {
   message: string
@@ -8,7 +8,7 @@ export interface UpdateDiscussion {
 
 const updateDiscussion = createObjectSchema<UpdateDiscussion>({
   message: discussionMessage.required().messages({
-    'any.required': err.MESSAGE_REQUIRED,
+    'any.required': MESSAGE_REQUIRED,
   }),
 })
 

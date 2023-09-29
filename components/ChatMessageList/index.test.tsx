@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import ChatMessageList from '.'
 // prettier-ignore
 // @ts-expect-error
-import { mockClientPusherBind, mockClientPusherUnbind } from 'utils/functions/getClientPusher'
+import { mockClientPusherBind, mockClientPusherUnbind } from 'functions/getClientPusher'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import { setupServer } from 'msw/node'
 import discussionsIdHandlers from 'app/api/discussions/[id]/mock'
@@ -18,7 +18,7 @@ jest
   .mock('contexts/toast', () => ({
     useToast: () => ({ setToast: mockSetToast, toast: {} }),
   }))
-  .mock('utils/functions/getClientPusher')
+  .mock('functions/getClientPusher')
 
 beforeEach(() => {
   Element.prototype.scroll = jest.fn()
