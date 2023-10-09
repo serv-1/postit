@@ -1,4 +1,5 @@
 import './global.css'
+import 'leaflet/dist/leaflet.css'
 import { Quicksand } from 'next/font/google'
 import App from 'app/pages/app'
 import { getServerSession } from 'next-auth'
@@ -19,19 +20,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={quicksand.className}>
       <body>
-        <div
-          className={
-            'relative mx-16 grid min-h-screen grid-rows-[auto_1fr_auto]'
-          }
-        >
-          <App session={session}>{children}</App>
-          <footer className="text-s p-8">
-            <p>
-              Copyright © {new Date().getFullYear()} PostIt. All rights
-              reserved.
-            </p>
-          </footer>
-        </div>
+        <App session={session}>{children}</App>
       </body>
     </html>
   )

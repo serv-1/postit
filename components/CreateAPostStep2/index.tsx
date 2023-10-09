@@ -23,7 +23,7 @@ export default function CreateAPostStep2({
     <div
       data-testid="step2"
       className={
-        step === 2 ? 'h-full flex flex-col gap-y-16 justify-between' : 'hidden'
+        step === 2 ? 'flex flex-col gap-y-16 justify-between' : 'hidden'
       }
     >
       <div>

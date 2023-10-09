@@ -79,7 +79,7 @@ export default function CreateAPostStep1({
     <div
       data-testid="step1"
       className={
-        step === 1 ? 'h-full flex flex-col gap-y-16 justify-between' : 'hidden'
+        step === 1 ? 'flex flex-col gap-y-16 justify-between' : 'hidden'
       }
     >
       <div className="flex flex-col">
@@ -91,12 +91,15 @@ export default function CreateAPostStep1({
               document.querySelector<HTMLInputElement>('#images')?.click()
           }}
           aria-label="Images"
-          className="flex flex-row flex-wrap gap-8 justify-center cursor-pointer"
+          className="flex flex-row flex-wrap gap-8 cursor-pointer"
         >
           {[0, 1, 2, 3, 4].map((i) => {
             if (imageSources && imageSources[i]) {
               return (
-                <div key={i} className="relative w-[123.3px] aspect-square">
+                <div
+                  key={i}
+                  className="relative w-[calc(50%-4px)] sm:max-w-[calc((100%/3)-(16px/3))] aspect-square"
+                >
                   <Image
                     src={imageSources[i]}
                     alt=""
@@ -109,7 +112,7 @@ export default function CreateAPostStep1({
             return (
               <div
                 key={i}
-                className="w-[123.3px] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-8 aspect-square flex flex-col justify-center items-center md:bg-fuchsia-100"
+                className="w-[calc(50%-4px)] sm:max-w-[calc((100%/3)-(16px/3))] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-8 aspect-square flex flex-col justify-center items-center md:bg-fuchsia-100"
               >
                 <PlusCircle className="w-24 h-24 mb-4" />
                 Photo n°{i + 1}

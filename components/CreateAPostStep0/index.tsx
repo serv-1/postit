@@ -21,21 +21,19 @@ export default function CreateAPostStep0({
   return (
     <div
       data-testid="step0"
-      className={step === 0 ? 'h-full flex flex-col gap-y-16' : 'hidden'}
+      className={step === 0 ? 'flex flex-col gap-y-16' : 'hidden'}
     >
       <p>If you wrote your true address, it will never be displayed.</p>
       <PostAddressModal latLon={latLon} setLatLon={setLatLon} />
-      <div className="flex-grow flex flex-row items-end">
-        <Button
-          fullWidth
-          type="button"
-          color="primary"
-          onClick={() => setStep(1)}
-          disabled={!address}
-        >
-          Next →
-        </Button>
-      </div>
+      <Button
+        fullWidth
+        type="button"
+        color="primary"
+        onClick={() => setStep(1)}
+        disabled={!address}
+      >
+        Next →
+      </Button>
     </div>
   )
 }

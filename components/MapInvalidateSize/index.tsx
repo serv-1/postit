@@ -6,11 +6,11 @@ interface MapInvalidateSizeProps {
 }
 
 export default function MapInvalidateSize({ resize }: MapInvalidateSizeProps) {
-  const { invalidateSize } = useMap()
+  const map = useMap()
 
   useEffect(() => {
-    if (resize) invalidateSize()
-  }, [resize, invalidateSize])
+    if (resize) map.invalidateSize()
+  }, [resize, map])
 
   return null
 }

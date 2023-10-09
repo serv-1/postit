@@ -74,6 +74,9 @@ module.exports = {
         shape:
           '-8px 8px 0 rgba(217, 70, 239, 0.75), -16px 16px 0 rgba(112, 26, 117, 0.75), inset -4px 4px 8px rgba(250, 232, 255, 0.5), inset 8px -8px 16px rgba(112, 26, 117, 0.5)',
       },
+      screen: {
+        xl: { raw: '(min-width: 1200px)' },
+      },
     },
   },
   plugins: [],

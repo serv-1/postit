@@ -21,11 +21,11 @@ export default function Post({ id, name, price, image, address }: PostProps) {
         openOnHover
         placement="bottom"
         containerClassName="absolute w-full top-8 left-8 z-10"
-        arrowClassName="w-8 absolute before:absolute before:visible before:w-8 before:h-8 before:bg-fuchsia-900 before:rotate-45 -z-10"
+        arrowClassName="w-8 absolute -top-4 before:absolute before:visible before:w-8 before:h-8 before:bg-fuchsia-900 before:rotate-45 -z-10"
         referenceContent={<Location className="w-24 h-24 text-fuchsia-600" />}
-        popupClassName="lg:flex lg:justify-center"
+        popupClassName="mt-4"
         popupContent={
-          <div className="max-w-[300px] bg-fuchsia-900 text-fuchsia-50 rounded py-4 px-8 break-words">
+          <div className="bg-fuchsia-900 text-fuchsia-50 rounded py-4 px-8 break-words">
             {address}
           </div>
         }

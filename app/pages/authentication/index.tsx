@@ -5,12 +5,12 @@ import AuthenticationRegisterForm from 'components/AuthenticationRegisterForm'
 import AuthenticationSignInForm from 'components/AuthenticationSignInForm'
 import GlassWrapper from 'components/GlassWrapper'
 import LeftPanel from 'components/LeftPanel'
+import PageWrapper from 'components/PageWrapper'
 import RightPanel from 'components/RightPanel'
 import Tab from 'components/Tab'
 import TabList from 'components/TabList'
 import TabPanel from 'components/TabPanel'
 import { TabsProvider } from 'contexts/tabs'
-import useLinearBackgroundGradient from 'hooks/useLinearBackgroundGradient'
 import { getProviders } from 'next-auth/react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -29,64 +29,68 @@ export default function Authentication({
 }) {
   const [forgotPassword, setForgotPassword] = useState(false)
 
-  useLinearBackgroundGradient()
-
   return (
-    <main className="flex flex-col justify-center items-center row-span-2">
-      <Link
-        href="/"
-        className="font-bold text-m-xl md:text-t-xl hover:text-fuchsia-600 transition-colors duration-200 p-16"
-      >
-        PostIt
-      </Link>
-      <GlassWrapper minHeight="min-h-[470px] md:min-h-[486px]">
-        <LeftPanel>
-          <div className="h-full flex flex-col md:max-w-[350px] md:mx-auto">
-            {forgotPassword ? (
-              <AuthenticationForgotPassword
-                setForgotPassword={setForgotPassword}
-              />
-            ) : (
-              <>
-                <h1>Authentication</h1>
-                <TabsProvider defaultValue="signIn">
-                  <TabList className="mt-16 mb-32 text-fuchsia-600 flex flex-row flex-nowrap gap-x-16">
-                    <Tab
-                      value="signIn"
-                      activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
-                    >
-                      Sign in
-                    </Tab>
-                    <Tab
-                      value="register"
-                      activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
-                    >
-                      Register
-                    </Tab>
-                  </TabList>
-                  <TabPanel value="signIn">
-                    <AuthenticationSignInForm
-                      providers={providers}
-                      setForgotPassword={setForgotPassword}
-                    />
-                  </TabPanel>
-                  <TabPanel value="register">
-                    <AuthenticationRegisterForm />
-                  </TabPanel>
-                </TabsProvider>
-              </>
-            )}
-          </div>
-        </LeftPanel>
-        <RightPanel>
-          <div className="flex flex-row flex-wrap gap-[60px] justify-center w-[300px] lg:w-[360px] lg:gap-[80px]">
-            <div className={squareClasses}></div>
-            <div className={roundClasses}></div>
-            <div className={roundClasses}></div>
-            <div className={squareClasses}></div>
-          </div>
-        </RightPanel>
-      </GlassWrapper>
-    </main>
+    <PageWrapper hasGradient>
+      <div className="my-auto">
+        <header className="p-16 text-center">
+          <Link
+            href="/"
+            className="font-bold text-m-xl md:text-t-xl hover:text-fuchsia-600 transition-colors duration-200"
+          >
+            PostIt
+          </Link>
+        </header>
+        <main className="flex justify-center">
+          <GlassWrapper minHeight="min-h-[470px] md:min-h-[486px]">
+            <LeftPanel>
+              <div className="h-full flex flex-col md:max-w-[350px] md:mx-auto">
+                {forgotPassword ? (
+                  <AuthenticationForgotPassword
+                    setForgotPassword={setForgotPassword}
+                  />
+                ) : (
+                  <>
+                    <h1>Authentication</h1>
+                    <TabsProvider defaultValue="signIn">
+                      <TabList className="mt-16 mb-32 text-fuchsia-600 flex flex-row flex-nowrap gap-x-16">
+                        <Tab
+                          value="signIn"
+                          activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
+                        >
+                          Sign in
+                        </Tab>
+                        <Tab
+                          value="register"
+                          activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
+                        >
+                          Register
+                        </Tab>
+                      </TabList>
+                      <TabPanel value="signIn">
+                        <AuthenticationSignInForm
+                          providers={providers}
+                          setForgotPassword={setForgotPassword}
+                        />
+                      </TabPanel>
+                      <TabPanel value="register">
+                        <AuthenticationRegisterForm />
+                      </TabPanel>
+                    </TabsProvider>
+                  </>
+                )}
+              </div>
+            </LeftPanel>
+            <RightPanel>
+              <div className="flex flex-row flex-wrap gap-[60px] justify-center w-[300px] lg:w-[360px] lg:gap-[80px]">
+                <div className={squareClasses}></div>
+                <div className={roundClasses}></div>
+                <div className={roundClasses}></div>
+                <div className={squareClasses}></div>
+              </div>
+            </RightPanel>
+          </GlassWrapper>
+        </main>
+      </div>
+    </PageWrapper>
   )
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import { signIn, useSession } from 'next-auth/react'
 import HeaderDropdownMenu from 'components/HeaderDropdownMenu'
 import Link from 'next/link'
@@ -13,7 +15,7 @@ export default function Header() {
   const { status } = useSession()
 
   return (
-    <header className="w-full flex items-center justify-between p-16">
+    <header className="flex items-center justify-between p-16">
       <Link
         href="/"
         className="font-bold text-m-xl md:text-t-xl hover:text-fuchsia-600 transition-colors duration-200"

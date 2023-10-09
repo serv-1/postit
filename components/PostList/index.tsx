@@ -7,12 +7,9 @@ interface PostListProps {
 
 export default function PostList({ posts }: PostListProps) {
   return (
-    <ul className="flex flex-col sm:flex-row flex-wrap gap-x-16 gap-y-8">
+    <ul className="grid grid-cols-[repeat(6,1fr)] gap-x-16 gap-y-8">
       {posts.map((post) => (
-        <li
-          className="w-full h-full sm:w-[calc(50%-8px)] sm:h-[calc(50%-8px)] md:w-[calc(100%/3-32px/3)] md:h-[calc(100%/3-32px/3)]"
-          key={post.id}
-        >
+        <li className="col-span-3 sm:col-span-2" key={post.id}>
           <Post {...post} />
         </li>
       ))}
