@@ -1,9 +1,9 @@
 import './global.css'
 import 'leaflet/dist/leaflet.css'
 import { Quicksand } from 'next/font/google'
-import App from 'app/pages/app'
 import { getServerSession } from 'next-auth'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import Providers from 'components/Providers'
 
 const quicksand = Quicksand({
   subsets: ['latin'],
@@ -13,14 +13,14 @@ const quicksand = Quicksand({
 export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode & { needAuth?: true | undefined }
+  children: React.ReactNode
 }) {
   const session = await getServerSession(nextAuthOptions)
 
   return (
     <html lang="en" className={quicksand.className}>
       <body>
-        <App session={session}>{children}</App>
+        <Providers session={session}>{children}</Providers>
       </body>
     </html>
   )

@@ -1,23 +1,22 @@
 'use client'
 
-import AuthGuard from 'components/AuthGuard'
 import Toast from 'components/Toast'
 import { ToastProvider } from 'contexts/toast'
 import { type Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
 
-export default function App({
+export default function Providers({
   children,
   session,
 }: {
-  children: React.ReactNode & { needAuth?: true | undefined }
+  children: React.ReactNode
   session: Session | null
 }) {
   return (
     <SessionProvider session={session}>
       <ToastProvider>
         <Toast />
-        {children.needAuth ? <AuthGuard>{children}</AuthGuard> : children}
+        {children}
       </ToastProvider>
     </SessionProvider>
   )

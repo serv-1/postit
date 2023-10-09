@@ -127,5 +127,3 @@ export default function Page() {
     </PageWrapper>
   )
 }
-
-Page.needAuth = true

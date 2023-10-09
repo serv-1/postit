@@ -1,3 +1,5 @@
+'use client'
+
 import Form from 'components/Form'
 import Input from 'components/Input'
 import Select from 'components/Select'

@@ -114,5 +114,3 @@ export default function Profile({
     </PageWrapper>
   )
 }
-
-Profile.needAuth = true

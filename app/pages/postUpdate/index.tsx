@@ -245,5 +245,3 @@ export default function UpdatePost({ post }: { post: Post }) {
     </PageWrapper>
   )
 }
-
-UpdatePost.needAuth = true
