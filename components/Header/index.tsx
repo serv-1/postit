@@ -5,6 +5,8 @@ import HeaderDropdownMenu from 'components/HeaderDropdownMenu'
 import Link from 'next/link'
 import PlusCircle from 'public/static/images/plus-circle.svg'
 import dynamic from 'next/dynamic'
+import { usePathname } from 'next/navigation'
+import classNames from 'classnames'
 
 const HeaderChatListModal = dynamic(
   () => import('components/HeaderChatListModal'),
@@ -13,16 +15,26 @@ const HeaderChatListModal = dynamic(
 
 export default function Header() {
   const { status } = useSession()
+  const pathname = usePathname()
+  const isOnAuthPage = pathname === '/authentication'
 
   return (
-    <header className="flex items-center justify-between p-16">
+    <header
+      className={classNames(
+        pathname.startsWith('/posts') && !pathname.endsWith('/update')
+          ? 'hidden md:flex'
+          : 'flex',
+        isOnAuthPage ? 'justify-center' : 'justify-between',
+        'items-center p-16'
+      )}
+    >
       <Link
         href="/"
         className="font-bold text-m-xl md:text-t-xl hover:text-fuchsia-600 transition-colors duration-200"
       >
         PostIt
       </Link>
-      {status === 'unauthenticated' ? (
+      {status === 'unauthenticated' && !isOnAuthPage ? (
         <Link
           href="/authentication"
           className="block bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold"

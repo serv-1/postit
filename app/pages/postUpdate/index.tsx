@@ -8,7 +8,6 @@ import Button from 'components/Button'
 import ExpandedImageModal from 'components/ExpandedImageModal'
 import Form from 'components/Form'
 import GlassWrapper from 'components/GlassWrapper'
-import Header from 'components/Header'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
 import PostAddressModal from 'components/PostAddressModal'
@@ -24,7 +23,6 @@ import type { Entries, Post } from 'types'
 import addSpacesToNum from 'functions/addSpacesToNum'
 import { IMAGE_TOO_BIG, DEFAULT } from 'constants/errors'
 import { CATEGORIES } from 'constants/index'
-import PageWrapper from 'components/PageWrapper'
 
 const options = CATEGORIES.map((category) => ({
   label: category,
@@ -114,134 +112,121 @@ export default function UpdatePost({ post }: { post: Post }) {
   }
 
   return (
-    <PageWrapper hasGradient>
-      <div className="my-auto">
-        <div className="mx-auto max-w-[450px] md:max-w-none">
-          <Header />
-        </div>
-        <main className="flex justify-center items-center">
-          <GlassWrapper padding="p-32">
-            <ShapeContainer>
-              <h1>Update the post</h1>
-              <p className="my-16">Only fill the inputs you want to update.</p>
-              <Form
-                method="post"
-                methods={methods}
-                submitHandler={submitHandler}
-                className="h-full"
-              >
-                <Accordion title="Name" id="name" headingLevel={2}>
-                  <div className="mb-16">
-                    Actual name
-                    <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
-                      {post.name}
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="name">New name</label>
-                    <Input type="text" name="name" />
-                    <InputError inputName="name" />
-                  </div>
-                </Accordion>
+    <GlassWrapper padding="p-32">
+      <ShapeContainer>
+        <h1>Update the post</h1>
+        <p className="my-16">Only fill the inputs you want to update.</p>
+        <Form
+          method="post"
+          methods={methods}
+          submitHandler={submitHandler}
+          className="h-full"
+        >
+          <Accordion title="Name" id="name" headingLevel={2}>
+            <div className="mb-16">
+              Actual name
+              <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
+                {post.name}
+              </div>
+            </div>
+            <div>
+              <label htmlFor="name">New name</label>
+              <Input type="text" name="name" />
+              <InputError inputName="name" />
+            </div>
+          </Accordion>
 
-                <Accordion
-                  title="Description"
-                  id="description"
-                  headingLevel={2}
-                >
-                  <div className="mb-16">
-                    Actual description
-                    <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
-                      {post.description}
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="description">New description</label>
-                    <TextArea name="description" />
-                    <InputError inputName="description" />
-                  </div>
-                </Accordion>
+          <Accordion title="Description" id="description" headingLevel={2}>
+            <div className="mb-16">
+              Actual description
+              <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
+                {post.description}
+              </div>
+            </div>
+            <div>
+              <label htmlFor="description">New description</label>
+              <TextArea name="description" />
+              <InputError inputName="description" />
+            </div>
+          </Accordion>
 
-                <Accordion title="Categories" id="categories" headingLevel={2}>
-                  <div className="mb-16">
-                    Actual categories
-                    <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
-                      {post.categories.join(', ')}
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="categories">New Categories</label>
-                    <Select name="categories" options={options} />
-                    <InputError inputName="categories" />
-                  </div>
-                </Accordion>
+          <Accordion title="Categories" id="categories" headingLevel={2}>
+            <div className="mb-16">
+              Actual categories
+              <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
+                {post.categories.join(', ')}
+              </div>
+            </div>
+            <div>
+              <label htmlFor="categories">New Categories</label>
+              <Select name="categories" options={options} />
+              <InputError inputName="categories" />
+            </div>
+          </Accordion>
 
-                <Accordion title="Price" id="price" headingLevel={2}>
-                  <div className="mb-16">
-                    Actual price
-                    <div className="bg-fuchsia-100 rounded-8 p-8">
-                      {addSpacesToNum(post.price)}€
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="price">New price</label>
-                    <Input type="number" name="price" addOn="€" />
-                    <InputError inputName="price" />
-                  </div>
-                </Accordion>
+          <Accordion title="Price" id="price" headingLevel={2}>
+            <div className="mb-16">
+              Actual price
+              <div className="bg-fuchsia-100 rounded-8 p-8">
+                {addSpacesToNum(post.price)}€
+              </div>
+            </div>
+            <div>
+              <label htmlFor="price">New price</label>
+              <Input type="number" name="price" addOn="€" />
+              <InputError inputName="price" />
+            </div>
+          </Accordion>
 
-                <Accordion title="Images" id="images" headingLevel={2}>
-                  <div className="mb-16">
-                    Actual images
-                    <div className="flex flex-row flex-nowrap gap-x-4">
-                      {[0, 1, 2, 3, 4].map((i) => {
-                        if (post.images[i]) {
-                          return (
-                            <ExpandedImageModal
-                              key={post.images[i]}
-                              src={post.images[i]}
-                              btnClass="w-full aspect-square focus:outline-4 focus:outline-dashed focus:outline-fuchsia-600 rounded-8"
-                              btnImgClass="rounded-8"
-                            />
-                          )
-                        }
-                        return (
-                          <div
-                            key={i}
-                            className="w-full rounded-8 aspect-square bg-fuchsia-100"
-                          ></div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="images">New images</label>
-                    <Input type="file" multiple name="images" />
-                    <InputError inputName="images" />
-                  </div>
-                </Accordion>
+          <Accordion title="Images" id="images" headingLevel={2}>
+            <div className="mb-16">
+              Actual images
+              <div className="flex flex-row flex-nowrap gap-x-4">
+                {[0, 1, 2, 3, 4].map((i) => {
+                  if (post.images[i]) {
+                    return (
+                      <ExpandedImageModal
+                        key={post.images[i]}
+                        src={post.images[i]}
+                        btnClass="w-full aspect-square focus:outline-4 focus:outline-dashed focus:outline-fuchsia-600 rounded-8"
+                        btnImgClass="rounded-8"
+                      />
+                    )
+                  }
+                  return (
+                    <div
+                      key={i}
+                      className="w-full rounded-8 aspect-square bg-fuchsia-100"
+                    ></div>
+                  )
+                })}
+              </div>
+            </div>
+            <div>
+              <label htmlFor="images">New images</label>
+              <Input type="file" multiple name="images" />
+              <InputError inputName="images" />
+            </div>
+          </Accordion>
 
-                <Accordion title="Address" id="address" headingLevel={2}>
-                  <div className="mb-16">
-                    Actual address
-                    <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
-                      {post.address}
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="address">New address</label>
-                    <PostAddressModal setLatLon={setLatLon} latLon={latLon} />
-                  </div>
-                </Accordion>
+          <Accordion title="Address" id="address" headingLevel={2}>
+            <div className="mb-16">
+              Actual address
+              <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
+                {post.address}
+              </div>
+            </div>
+            <div>
+              <label htmlFor="address">New address</label>
+              <PostAddressModal setLatLon={setLatLon} latLon={latLon} />
+            </div>
+          </Accordion>
 
-                <div className="flex justify-end">
-                  <Button color="primary">Update</Button>
-                </div>
-              </Form>
-            </ShapeContainer>
-          </GlassWrapper>
-        </main>
-      </div>
-    </PageWrapper>
+          <div className="flex justify-end">
+            <Button color="primary">Update</Button>
+          </div>
+        </Form>
+      </ShapeContainer>
+    </GlassWrapper>
   )
 }

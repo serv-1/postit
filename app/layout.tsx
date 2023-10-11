@@ -19,9 +19,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={quicksand.className}>
-      <body>
-        <Providers session={session}>{children}</Providers>
-      </body>
+      <Providers session={session}>{children}</Providers>
     </html>
   )
 }

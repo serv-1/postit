@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import Button from 'components/Button'
 import ajax from 'libs/ajax'
 import type { PostsIdDeleteError } from 'app/api/posts/[id]/types'
+import formatToUrl from 'functions/formatToUrl'
 
 interface PostPageUpdateButtonsProps {
   id: string
@@ -38,7 +39,10 @@ export default function PostPageUpdateButtons({
 
   return (
     <>
-      <Link href={`/posts/${id}/${name}/update`} className="mr-8 w-full">
+      <Link
+        href={`/posts/${id}/${formatToUrl(name)}/update`}
+        className="mr-8 w-full"
+      >
         {isDotButton ? (
           <DotButton aria-label="Edit">
             <Pencil className="w-full h-full" />

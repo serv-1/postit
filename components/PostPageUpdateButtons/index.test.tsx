@@ -28,11 +28,11 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 it('renders as simple buttons', () => {
-  render(<PostPageUpdateButtons id="0" name="table" />)
+  render(<PostPageUpdateButtons id="0" name="red table" />)
 
   const link = screen.getByRole('link')
 
-  expect(link).toHaveAttribute('href', '/posts/0/table/update')
+  expect(link).toHaveAttribute('href', '/posts/0/red-table/update')
 
   const editBtn = screen.getByRole('button', { name: /edit/i })
 
