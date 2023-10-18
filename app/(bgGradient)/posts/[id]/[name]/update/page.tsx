@@ -4,6 +4,8 @@ import getPost from 'functions/getPost'
 import { getServerSession } from 'next-auth'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
+import { Post } from 'types'
+import { POST_NOT_FOUND } from 'constants/errors'
 
 interface Params {
   id: string
@@ -15,10 +17,10 @@ export async function generateMetadata({
 }: {
   params: Params
 }): Promise<Metadata> {
-  const { name } = await getPost(params.id)
+  const post = await getPost(params.id)
 
   return {
-    title: 'Update ' + name + ' - PostIt',
+    title: 'Update ' + (post as Post).name + ' - PostIt',
   }
 }
 
@@ -30,6 +32,10 @@ export default async function Page({ params }: { params: Params }) {
   }
 
   const post = await getPost(params.id)
+
+  if (!post) {
+    throw new Error(POST_NOT_FOUND)
+  }
 
   return <UpdatePost post={post} />
 }

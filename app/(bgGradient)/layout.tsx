@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="max-w-[450px] md:max-w-none mx-auto">
             <Header />
           </div>
-          <main className="flex justify-center">{children}</main>
+          {children}
         </div>
       </PageWrapper>
     </body>

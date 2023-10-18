@@ -88,24 +88,29 @@ export default function Page() {
   }
 
   return (
-    <GlassWrapper minHeight="min-h-[553.89px] md:min-h-[598px]" padding="p-32">
-      <ShapeContainer>
-        <h1 className="mb-16">{titles[step]}</h1>
-        <Form method="post" methods={methods} submitHandler={submitHandler}>
-          <CreateAPostStep0
-            step={step}
-            setStep={setStep}
-            latLon={latLon}
-            setLatLon={setLatLon}
-          />
-          <CreateAPostStep1
-            step={step}
-            setStep={setStep}
-            setImages={setImages}
-          />
-          <CreateAPostStep2 step={step} setStep={setStep} />
-        </Form>
-      </ShapeContainer>
-    </GlassWrapper>
+    <main className="flex justify-center">
+      <GlassWrapper
+        minHeight="min-h-[553.89px] md:min-h-[598px]"
+        padding="p-32"
+      >
+        <ShapeContainer>
+          <h1 className="mb-16">{titles[step]}</h1>
+          <Form method="post" methods={methods} submitHandler={submitHandler}>
+            <CreateAPostStep0
+              step={step}
+              setStep={setStep}
+              latLon={latLon}
+              setLatLon={setLatLon}
+            />
+            <CreateAPostStep1
+              step={step}
+              setStep={setStep}
+              setImages={setImages}
+            />
+            <CreateAPostStep2 step={step} setStep={setStep} />
+          </Form>
+        </ShapeContainer>
+      </GlassWrapper>
+    </main>
   )
 }

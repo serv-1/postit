@@ -3,16 +3,22 @@ import getPost from 'functions/getPost'
 
 export default async function getUserFavoritePosts(
   postIds: string[]
-): Promise<UserFavoritePost[]> {
-  const favoritePosts = postIds.map(async (postId) => {
-    const post = await getPost(postId)
+): Promise<UserFavoritePost[] | undefined> {
+  const favoritePosts = await Promise.all(
+    postIds.map(async (postId) => {
+      const post = await getPost(postId)
 
-    return {
-      id: post.id,
-      name: post.name,
-      image: post.images[0],
-    }
-  })
+      if (post) {
+        return {
+          id: post.id,
+          name: post.name,
+          image: post.images[0],
+        }
+      }
+    })
+  )
 
-  return Promise.all(favoritePosts)
+  if (!favoritePosts.includes(undefined)) {
+    return favoritePosts as UserFavoritePost[]
+  }
 }

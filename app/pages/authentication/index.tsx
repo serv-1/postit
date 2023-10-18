@@ -28,53 +28,55 @@ export default function Authentication({
   const [forgotPassword, setForgotPassword] = useState(false)
 
   return (
-    <GlassWrapper minHeight="min-h-[470px] md:min-h-[486px]">
-      <LeftPanel>
-        <div className="h-full flex flex-col md:max-w-[350px] md:mx-auto">
-          {forgotPassword ? (
-            <AuthenticationForgotPassword
-              setForgotPassword={setForgotPassword}
-            />
-          ) : (
-            <>
-              <h1>Authentication</h1>
-              <TabsProvider defaultValue="signIn">
-                <TabList className="mt-16 mb-32 text-fuchsia-600 flex flex-row flex-nowrap gap-x-16">
-                  <Tab
-                    value="signIn"
-                    activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
-                  >
-                    Sign in
-                  </Tab>
-                  <Tab
-                    value="register"
-                    activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
-                  >
-                    Register
-                  </Tab>
-                </TabList>
-                <TabPanel value="signIn">
-                  <AuthenticationSignInForm
-                    providers={providers}
-                    setForgotPassword={setForgotPassword}
-                  />
-                </TabPanel>
-                <TabPanel value="register">
-                  <AuthenticationRegisterForm />
-                </TabPanel>
-              </TabsProvider>
-            </>
-          )}
-        </div>
-      </LeftPanel>
-      <RightPanel>
-        <div className="flex flex-row flex-wrap gap-[60px] justify-center w-[300px] lg:w-[360px] lg:gap-[80px]">
-          <div className={squareClasses}></div>
-          <div className={roundClasses}></div>
-          <div className={roundClasses}></div>
-          <div className={squareClasses}></div>
-        </div>
-      </RightPanel>
-    </GlassWrapper>
+    <main className="flex justify-center">
+      <GlassWrapper minHeight="min-h-[470px] md:min-h-[486px]">
+        <LeftPanel>
+          <div className="h-full flex flex-col md:max-w-[350px] md:mx-auto">
+            {forgotPassword ? (
+              <AuthenticationForgotPassword
+                setForgotPassword={setForgotPassword}
+              />
+            ) : (
+              <>
+                <h1>Authentication</h1>
+                <TabsProvider defaultValue="signIn">
+                  <TabList className="mt-16 mb-32 text-fuchsia-600 flex flex-row flex-nowrap gap-x-16">
+                    <Tab
+                      value="signIn"
+                      activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
+                    >
+                      Sign in
+                    </Tab>
+                    <Tab
+                      value="register"
+                      activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
+                    >
+                      Register
+                    </Tab>
+                  </TabList>
+                  <TabPanel value="signIn">
+                    <AuthenticationSignInForm
+                      providers={providers}
+                      setForgotPassword={setForgotPassword}
+                    />
+                  </TabPanel>
+                  <TabPanel value="register">
+                    <AuthenticationRegisterForm />
+                  </TabPanel>
+                </TabsProvider>
+              </>
+            )}
+          </div>
+        </LeftPanel>
+        <RightPanel>
+          <div className="flex flex-row flex-wrap gap-[60px] justify-center w-[300px] lg:w-[360px] lg:gap-[80px]">
+            <div className={squareClasses}></div>
+            <div className={roundClasses}></div>
+            <div className={roundClasses}></div>
+            <div className={squareClasses}></div>
+          </div>
+        </RightPanel>
+      </GlassWrapper>
+    </main>
   )
 }

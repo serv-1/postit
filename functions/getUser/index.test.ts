@@ -10,12 +10,6 @@ Object.defineProperty(globalThis, 'fetch', {
   value: mockFetch,
 })
 
-jest.mock('next/navigation', () => ({
-  notFound: () => {
-    throw new Error('not found')
-  },
-}))
-
 it('returns the user found by the given id', async () => {
   const user = { id: '0' }
 
@@ -27,8 +21,8 @@ it('returns the user found by the given id', async () => {
   })
 })
 
-it("doesn't found a user with the given id", async () => {
+it("returns undefined if the user hasn't been found", async () => {
   mockFetch.mockResolvedValue({ ok: false })
 
-  await expect(getUser('0')).rejects.toThrow('not found')
+  expect(await getUser('0')).toBeUndefined()
 })
