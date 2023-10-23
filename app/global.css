@@ -41,10 +41,4 @@
       @apply text-t-l font-bold;
     }
   }
-
-  @media screen and (min-width: 1200px) {
-    #__next {
-      @apply max-w-[1200px] mx-auto;
-    }
-  }
 }

@@ -78,63 +78,59 @@ export default function CreateAPostStep1({
   return (
     <div
       data-testid="step1"
-      className={
-        step === 1 ? 'flex flex-col gap-y-16 justify-between' : 'hidden'
-      }
+      className={step === 1 ? 'h-full flex flex-col' : 'hidden'}
     >
-      <div className="flex flex-col">
-        <label
-          tabIndex={0}
-          htmlFor="images"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter')
-              document.querySelector<HTMLInputElement>('#images')?.click()
-          }}
-          aria-label="Images"
-          className="flex flex-row flex-wrap gap-8 cursor-pointer"
-        >
-          {[0, 1, 2, 3, 4].map((i) => {
-            if (imageSources && imageSources[i]) {
-              return (
-                <div
-                  key={i}
-                  className="relative w-[calc(50%-4px)] sm:max-w-[calc((100%/3)-(16px/3))] aspect-square"
-                >
-                  <Image
-                    src={imageSources[i]}
-                    alt=""
-                    fill
-                    className="rounded-8 object-cover"
-                  />
-                </div>
-              )
-            }
+      <label
+        tabIndex={0}
+        htmlFor="images"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter')
+            document.querySelector<HTMLInputElement>('#images')?.click()
+        }}
+        aria-label="Images"
+        className="grow flex flex-row flex-wrap gap-8 cursor-pointer"
+      >
+        {[0, 1, 2, 3, 4].map((i) => {
+          if (imageSources && imageSources[i]) {
             return (
               <div
                 key={i}
-                className="w-[calc(50%-4px)] sm:max-w-[calc((100%/3)-(16px/3))] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-8 aspect-square flex flex-col justify-center items-center md:bg-fuchsia-100"
+                className="relative w-[calc(50%-4px)] h-[calc((100%/3)-(16px/3))]"
               >
-                <PlusCircle className="w-24 h-24 mb-4" />
-                Photo n°{i + 1}
+                <Image
+                  src={imageSources[i]}
+                  alt=""
+                  fill
+                  className="rounded-8 object-cover"
+                />
               </div>
             )
-          })}
-        </label>
-        <input
-          type="file"
-          multiple
-          name="images"
-          onChange={onChange}
-          id="images"
-          className="hidden"
-        />
-        {error && (
-          <div role="alert" className="font-bold text-rose-600">
-            {error}
-          </div>
-        )}
-      </div>
-      <div className="flex gap-x-16">
+          }
+          return (
+            <div
+              key={i}
+              className="w-[calc(50%-4px)] h-[calc((100%/3)-(16px/3))] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-8 flex flex-col justify-center items-center md:bg-fuchsia-100"
+            >
+              <PlusCircle className="w-24 h-24 mb-4" />
+              Photo n°{i + 1}
+            </div>
+          )
+        })}
+      </label>
+      <input
+        type="file"
+        multiple
+        name="images"
+        onChange={onChange}
+        id="images"
+        className="hidden"
+      />
+      {error && (
+        <div role="alert" className="font-bold text-rose-600 break-words">
+          {error}
+        </div>
+      )}
+      <div className="flex gap-x-16 mt-16">
         <Button
           color="secondary"
           fullWidth

@@ -3,9 +3,6 @@
 import AuthenticationForgotPassword from 'components/AuthenticationForgotPassword'
 import AuthenticationRegisterForm from 'components/AuthenticationRegisterForm'
 import AuthenticationSignInForm from 'components/AuthenticationSignInForm'
-import GlassWrapper from 'components/GlassWrapper'
-import LeftPanel from 'components/LeftPanel'
-import RightPanel from 'components/RightPanel'
 import Tab from 'components/Tab'
 import TabList from 'components/TabList'
 import TabPanel from 'components/TabPanel'
@@ -28,55 +25,49 @@ export default function Authentication({
   const [forgotPassword, setForgotPassword] = useState(false)
 
   return (
-    <main className="flex justify-center">
-      <GlassWrapper minHeight="min-h-[470px] md:min-h-[486px]">
-        <LeftPanel>
-          <div className="h-full flex flex-col md:max-w-[350px] md:mx-auto">
-            {forgotPassword ? (
-              <AuthenticationForgotPassword
-                setForgotPassword={setForgotPassword}
-              />
-            ) : (
-              <>
-                <h1>Authentication</h1>
-                <TabsProvider defaultValue="signIn">
-                  <TabList className="mt-16 mb-32 text-fuchsia-600 flex flex-row flex-nowrap gap-x-16">
-                    <Tab
-                      value="signIn"
-                      activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
-                    >
-                      Sign in
-                    </Tab>
-                    <Tab
-                      value="register"
-                      activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
-                    >
-                      Register
-                    </Tab>
-                  </TabList>
-                  <TabPanel value="signIn">
-                    <AuthenticationSignInForm
-                      providers={providers}
-                      setForgotPassword={setForgotPassword}
-                    />
-                  </TabPanel>
-                  <TabPanel value="register">
-                    <AuthenticationRegisterForm />
-                  </TabPanel>
-                </TabsProvider>
-              </>
-            )}
-          </div>
-        </LeftPanel>
-        <RightPanel>
-          <div className="flex flex-row flex-wrap gap-[60px] justify-center w-[300px] lg:w-[360px] lg:gap-[80px]">
-            <div className={squareClasses}></div>
-            <div className={roundClasses}></div>
-            <div className={roundClasses}></div>
-            <div className={squareClasses}></div>
-          </div>
-        </RightPanel>
-      </GlassWrapper>
+    <main className="h-[470px] md:h-[486px] max-w-[450px] mx-auto md:max-w-none md:shadow-wrapper md:flex">
+      <div className="h-full flex flex-col rounded-16 bg-fuchsia-50/60 backdrop-blur-[4px] shadow-glass p-32 md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-none md:w-1/2 md:rounded-r-none md:items-center">
+        {forgotPassword ? (
+          <AuthenticationForgotPassword setForgotPassword={setForgotPassword} />
+        ) : (
+          <>
+            <h1 className="md:w-[350px]">Authentication</h1>
+            <TabsProvider defaultValue="signIn">
+              <TabList className="mt-16 mb-32 text-fuchsia-600 flex flex-row flex-nowrap gap-x-16 md:w-[350px]">
+                <Tab
+                  value="signIn"
+                  activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
+                >
+                  Sign in
+                </Tab>
+                <Tab
+                  value="register"
+                  activeClass="border-b-2 border-fuchsia-600 transition-colors duration-200"
+                >
+                  Register
+                </Tab>
+              </TabList>
+              <TabPanel value="signIn" className="md:w-[350px]">
+                <AuthenticationSignInForm
+                  providers={providers}
+                  setForgotPassword={setForgotPassword}
+                />
+              </TabPanel>
+              <TabPanel value="register" className="md:w-[350px]">
+                <AuthenticationRegisterForm />
+              </TabPanel>
+            </TabsProvider>
+          </>
+        )}
+      </div>
+      <div className="hidden md:flex justify-center items-center w-1/2 bg-linear-wrapper rounded-r-16">
+        <div className="w-[300px] lg:w-[360px] aspect-square flex flex-wrap justify-between content-between">
+          <div className={squareClasses}></div>
+          <div className={roundClasses}></div>
+          <div className={roundClasses}></div>
+          <div className={squareClasses}></div>
+        </div>
+      </div>
     </main>
   )
 }

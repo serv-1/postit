@@ -49,8 +49,8 @@ export default function AuthenticationForgotPassword({
 
   return (
     <>
-      <h1>Forgot password</h1>
-      <p className="mt-16 mb-32">
+      <h1 className="md:w-[350px]">Forgot password</h1>
+      <p className="mt-16 mb-32 md:w-[350px]">
         A mail will be sent to your email with a link to connect to your
         account. Once signed in, you will be able to change your password.
       </p>
@@ -59,6 +59,7 @@ export default function AuthenticationForgotPassword({
         method="post"
         methods={methods}
         submitHandler={submitHandler}
+        className="md:w-[350px]"
       >
         <div className="mb-16">
           <label htmlFor="email">Email</label>
@@ -74,7 +75,7 @@ export default function AuthenticationForgotPassword({
           <Button color="primary">Send</Button>
         </div>
       </Form>
-      <div className="flex-grow flex items-end">
+      <div className="grow flex items-end md:w-[350px]">
         <button
           className="hover:underline text-fuchsia-600"
           onClick={() => setForgotPassword(false)}

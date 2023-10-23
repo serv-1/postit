@@ -4,8 +4,6 @@ import { useState } from 'react'
 import CreateAPostStep0 from 'components/CreateAPostStep0'
 import CreateAPostStep1 from 'components/CreateAPostStep1'
 import CreateAPostStep2 from 'components/CreateAPostStep2'
-import GlassWrapper from 'components/GlassWrapper'
-import ShapeContainer from 'components/ShapeContainer'
 import Form from 'components/Form'
 import { useToast } from 'contexts/toast'
 import { useRouter } from 'next/navigation'
@@ -16,6 +14,7 @@ import ajax from 'libs/ajax'
 import type { S3GetData, S3GetError } from 'app/api/s3/types'
 import type { PostPostError } from 'app/api/post/types'
 import { IMAGE_TOO_BIG, DEFAULT } from 'constants/errors'
+import styles from 'styles/invisibleScrollbar.module.css'
 
 export default function Page() {
   const [step, setStep] = useState<0 | 1 | 2>(0)
@@ -88,29 +87,34 @@ export default function Page() {
   }
 
   return (
-    <main className="flex justify-center">
-      <GlassWrapper
-        minHeight="min-h-[553.89px] md:min-h-[598px]"
-        padding="p-32"
+    <main className="md:bg-linear-wrapper md:rounded-16 md:shadow-wrapper md:p-32">
+      <div
+        className={
+          'flex flex-col h-[518px] p-32 max-w-[450px] rounded-16 bg-fuchsia-50/60 backdrop-blur-[4px] shadow-glass mx-auto md:backdrop-blur-none md:shadow-shape md:bg-fuchsia-200 overflow-y-auto ' +
+          styles.invisibleScrollbar
+        }
       >
-        <ShapeContainer>
-          <h1 className="mb-16">{titles[step]}</h1>
-          <Form method="post" methods={methods} submitHandler={submitHandler}>
-            <CreateAPostStep0
-              step={step}
-              setStep={setStep}
-              latLon={latLon}
-              setLatLon={setLatLon}
-            />
-            <CreateAPostStep1
-              step={step}
-              setStep={setStep}
-              setImages={setImages}
-            />
-            <CreateAPostStep2 step={step} setStep={setStep} />
-          </Form>
-        </ShapeContainer>
-      </GlassWrapper>
+        <h1 className="mb-16">{titles[step]}</h1>
+        <Form
+          method="post"
+          methods={methods}
+          submitHandler={submitHandler}
+          className="grow"
+        >
+          <CreateAPostStep0
+            step={step}
+            setStep={setStep}
+            latLon={latLon}
+            setLatLon={setLatLon}
+          />
+          <CreateAPostStep1
+            step={step}
+            setStep={setStep}
+            setImages={setImages}
+          />
+          <CreateAPostStep2 step={step} setStep={setStep} />
+        </Form>
+      </div>
     </main>
   )
 }

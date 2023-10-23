@@ -22,42 +22,34 @@ export default function CreateAPostStep2({
   return (
     <div
       data-testid="step2"
-      className={
-        step === 2 ? 'flex flex-col gap-y-16 justify-between' : 'hidden'
-      }
+      className={step === 2 ? 'h-full flex flex-col' : 'hidden'}
     >
-      <div>
-        <div className="mb-16">
-          <label htmlFor="name">Name</label>
-          <Input type="text" name="name" needFocus />
-          <InputError inputName="name" />
-        </div>
-
-        <div className="mb-16">
-          <label htmlFor="price">Price</label>
-          <Input
-            type="number"
-            name="price"
-            addOn="€"
-            addOnClass="text-fuchsia-900/50"
-          />
-          <InputError inputName="price" />
-        </div>
-
-        <div className="mb-16">
-          <label htmlFor="categories">Categories</label>
-          <Select name="categories" options={options} />
-          <InputError inputName="categories" />
-        </div>
-
-        <div className="mb-16">
-          <label htmlFor="description">Description</label>
-          <TextArea name="description" />
-          <InputError inputName="description" />
-        </div>
+      <div className="mb-16">
+        <label htmlFor="name">Name</label>
+        <Input type="text" name="name" needFocus />
+        <InputError inputName="name" />
       </div>
-
-      <div className="flex gap-x-16">
+      <div className="mb-16">
+        <label htmlFor="price">Price</label>
+        <Input
+          type="number"
+          name="price"
+          addOn="€"
+          addOnClass="text-fuchsia-900/50"
+        />
+        <InputError inputName="price" />
+      </div>
+      <div className="mb-16">
+        <label htmlFor="categories">Categories</label>
+        <Select name="categories" options={options} />
+        <InputError inputName="categories" />
+      </div>
+      <div className="mb-16">
+        <label htmlFor="description">Description</label>
+        <TextArea name="description" />
+        <InputError inputName="description" />
+      </div>
+      <div className="mt-auto flex gap-x-16">
         <Button
           type="button"
           fullWidth
