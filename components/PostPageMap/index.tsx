@@ -1,5 +1,6 @@
+'use client'
+
 import { useState } from 'react'
-import DotButton from 'components/DotButton'
 import Modal from 'components/Modal'
 import X from 'public/static/images/x.svg'
 import ScreenFull from 'public/static/images/screen-full.svg'
@@ -27,13 +28,13 @@ export default function PostPageMap({ address, latLon }: PostPageMapProps) {
         className="w-full h-[200px] lg:h-[250px] rounded-8"
       >
         <div className="absolute top-8 right-8 z-[501]">
-          <DotButton
+          <button
+            className="sm-round-btn"
             onClick={() => setIsOpen(true)}
-            isSmall
             aria-label="Full screen"
           >
             <ScreenFull className="w-full h-full" />
-          </DotButton>
+          </button>
         </div>
       </Map>
       <div className="text-center break-words">{address}</div>
@@ -48,13 +49,14 @@ export default function PostPageMap({ address, latLon }: PostPageMapProps) {
           <MapInvalidateSize resize={isOpen} />
         </Map>
         <div className="absolute top-8 right-8 z-[501]">
-          <DotButton
+          <button
+            className="round-btn"
             type="button"
             onClick={() => setIsOpen(false)}
             aria-label="Close"
           >
             <X className="w-full h-full" />
-          </DotButton>
+          </button>
         </div>
       </Modal>
     </>

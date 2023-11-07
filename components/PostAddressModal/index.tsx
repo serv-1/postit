@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import MapInput from 'components/MapInput'
 import Modal from 'components/Modal'
-import DotButton from 'components/DotButton'
 import X from 'public/static/images/x.svg'
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
@@ -56,13 +55,14 @@ export default function PostAddressModal({
           <MapFlyToLatLon latLon={latLon} />
         </Map>
         <div className="absolute bottom-[30px] left-1/2 -translate-x-1/2 z-[999] md:bottom-auto md:left-auto md:translate-x-0 md:right-[10px] md:top-[10px]">
-          <DotButton
+          <button
+            className="round-btn"
             type="button"
             onClick={() => setIsOpen(false)}
             aria-label="Close map"
           >
             <X className="w-full h-full" />
-          </DotButton>
+          </button>
         </div>
       </Modal>
     </>

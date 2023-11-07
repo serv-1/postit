@@ -10,8 +10,9 @@ const mockSetToast = jest.fn()
 const mockSignIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const server = setupServer()
 
-jest.mock('contexts/toast', () => ({
-  useToast: () => ({ setToast: mockSetToast, toast: {} }),
+jest.mock('hooks/useToast', () => ({
+  __esModule: true,
+  default: () => ({ setToast: mockSetToast, toast: {} }),
 }))
 
 beforeEach(() => {

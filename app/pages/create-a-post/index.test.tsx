@@ -16,8 +16,9 @@ const mockPush = jest.fn()
 const server = setupServer()
 
 jest
-  .mock('contexts/toast', () => ({
-    useToast: () => ({ setToast: mockSetToast, toast: {} }),
+  .mock('hooks/useToast', () => ({
+    __esModule: true,
+    default: () => ({ setToast: mockSetToast, toast: {} }),
   }))
   .mock('next/navigation', () => ({
     useRouter: () => ({ push: mockPush }),

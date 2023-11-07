@@ -15,8 +15,9 @@ const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const mockSetToast = jest.fn()
 const server = setupServer()
 
-jest.mock('contexts/toast', () => ({
-  useToast: () => ({ setToast: mockSetToast, toast: {} }),
+jest.mock('hooks/useToast', () => ({
+  __esModule: true,
+  default: () => ({ setToast: mockSetToast, toast: {} }),
 }))
 
 beforeEach(() => {

@@ -42,3 +42,30 @@
     }
   }
 }
+
+@layer components {
+  .btn {
+    @apply rounded px-16 py-8 font-bold transition-colors duration-200;
+  }
+
+  .primary-btn {
+    @apply btn bg-fuchsia-600 text-fuchsia-50 hover:bg-fuchsia-300 focus:bg-fuchsia-300 hover:text-fuchsia-900 focus:text-fuchsia-900 disabled:bg-fuchsia-800/70 disabled:text-fuchsia-50/80;
+  }
+
+  .secondary-btn {
+    @apply btn bg-fuchsia-300 text-fuchsia-900 hover:bg-fuchsia-400 focus:bg-fuchsia-400;
+  }
+
+  .danger-btn {
+    @apply btn bg-rose-600 text-rose-50 hover:bg-rose-700 focus:bg-rose-700;
+  }
+
+  .round-btn {
+    box-shadow: 0 2px 8px rgba(112, 26, 117, 0.25);
+    @apply bg-fuchsia-50 text-fuchsia-600 rounded-full transition-colors duration-200 hover:bg-fuchsia-900 hover:text-fuchsia-50 p-8 w-48 h-48;
+  }
+
+  .sm-round-btn {
+    @apply round-btn p-4 w-32 h-32;
+  }
+}

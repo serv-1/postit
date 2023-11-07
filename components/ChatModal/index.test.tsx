@@ -12,8 +12,9 @@ const server = setupServer()
 
 jest
   .mock('functions/getClientPusher')
-  .mock('contexts/toast', () => ({
-    useToast: () => ({ setToast() {}, toast: {} }),
+  .mock('hooks/useToast', () => ({
+    __esModule: true,
+    default: () => ({ setToast() {}, toast: {} }),
   }))
   .mock('next-auth/react', () => ({
     getCsrfToken: async () => 'token',

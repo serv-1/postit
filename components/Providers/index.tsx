@@ -1,7 +1,7 @@
 'use client'
 
 import Toast from 'components/Toast'
-import { ToastProvider } from 'contexts/toast'
+import ToastProvider from 'components/ToastProvider'
 import { type Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
 

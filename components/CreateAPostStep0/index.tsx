@@ -1,4 +1,3 @@
-import Button from 'components/Button'
 import 'node_modules/leaflet/dist/leaflet.css'
 import PostAddressModal from 'components/PostAddressModal'
 import { useWatch } from 'react-hook-form'
@@ -26,15 +25,14 @@ export default function CreateAPostStep0({
       <p>If you wrote your true address, it will never be displayed.</p>
       <PostAddressModal latLon={latLon} setLatLon={setLatLon} />
       <div className="mt-auto">
-        <Button
-          fullWidth
+        <button
+          className="primary-btn w-full"
           type="button"
-          color="primary"
           onClick={() => setStep(1)}
           disabled={!address}
         >
           Next →
-        </Button>
+        </button>
       </div>
     </div>
   )

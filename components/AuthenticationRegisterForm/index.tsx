@@ -2,13 +2,12 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { type SubmitHandler, useForm } from 'react-hook-form'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
 import PasswordStrength from 'components/PasswordStrength'
 import PasswordInput from 'components/PasswordInput'
-import Button from 'components/Button'
 import createUser, { type CreateUser } from 'schemas/createUser'
 import ajax from 'libs/ajax'
 import type { UserPostError } from 'app/api/user/types'
@@ -73,7 +72,6 @@ export default function AuthenticationRegisterForm() {
         />
         <InputError<CreateUser> inputName="name" />
       </div>
-
       <div className="mb-16">
         <label htmlFor="email">Email</label>
         <Input<CreateUser>
@@ -83,7 +81,6 @@ export default function AuthenticationRegisterForm() {
         />
         <InputError<CreateUser> inputName="email" />
       </div>
-
       <div className="mb-16">
         <label htmlFor="password" className="inline-block w-1/2">
           Password
@@ -98,10 +95,7 @@ export default function AuthenticationRegisterForm() {
         </PasswordStrength>
         <InputError<CreateUser> inputName="password" />
       </div>
-
-      <div className="flex justify-end">
-        <Button color="primary">Register</Button>
-      </div>
+      <button className="primary-btn block ml-auto">Register</button>
     </Form>
   )
 }

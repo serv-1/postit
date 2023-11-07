@@ -1,10 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Toast from '.'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 
-jest.mock('contexts/toast', () => ({
-  useToast: jest.fn(),
+jest.mock('hooks/useToast', () => ({
+  __esModule: true,
+  default: jest.fn(),
 }))
 
 const useToastMock = useToast as jest.MockedFunction<typeof useToast>

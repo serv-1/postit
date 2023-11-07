@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import type { SearchedPost } from 'types'
 import PostList from 'components/PostList'
 import Pagination from 'components/Pagination'

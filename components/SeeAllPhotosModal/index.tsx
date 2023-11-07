@@ -1,9 +1,10 @@
+'use client'
+
 import Modal from 'components/Modal'
 import X from 'public/static/images/x.svg'
 import Camera from 'public/static/images/camera.svg'
 import { useState } from 'react'
 import ExpandedImageModal from 'components/ExpandedImageModal'
-import DotButton from 'components/DotButton'
 
 interface SeeAllPhotosModalProps {
   sources: string[]
@@ -15,9 +16,13 @@ export default function SeeAllPhotosModal({ sources }: SeeAllPhotosModalProps) {
   return (
     <>
       <div className="absolute bottom-8 right-8">
-        <DotButton onClick={() => setIsOpen(true)} aria-label="See all photos">
+        <button
+          className="round-btn"
+          onClick={() => setIsOpen(true)}
+          aria-label="See all photos"
+        >
           <Camera className="w-full h-full" />
-        </DotButton>
+        </button>
       </div>
       {isOpen && (
         <Modal

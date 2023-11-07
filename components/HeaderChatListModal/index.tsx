@@ -1,7 +1,7 @@
 import type { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import CommentDiscussion from 'public/static/images/comment-discussion.svg'
 import X from 'public/static/images/x.svg'
 import type { DiscussionEventData } from 'types'

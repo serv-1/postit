@@ -2,7 +2,6 @@ import Input from 'components/Input'
 import InputError from 'components/InputError'
 import Select from 'components/Select'
 import TextArea from 'components/TextArea'
-import Button from 'components/Button'
 import { CATEGORIES } from 'constants/index'
 
 const options = CATEGORIES.map((category) => ({
@@ -50,17 +49,14 @@ export default function CreateAPostStep2({
         <InputError inputName="description" />
       </div>
       <div className="mt-auto flex gap-x-16">
-        <Button
+        <button
+          className="secondary-btn w-full"
           type="button"
-          fullWidth
-          color="secondary"
           onClick={() => setStep(1)}
         >
           ← Back
-        </Button>
-        <Button fullWidth color="primary">
-          Post
-        </Button>
+        </button>
+        <button className="primary-btn w-full">Post</button>
       </div>
     </div>
   )

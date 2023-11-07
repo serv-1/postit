@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { useTabs } from 'contexts/tabs'
+import useTabs from 'hooks/useTabs'
 
 interface TabPanelProps
   extends Omit<

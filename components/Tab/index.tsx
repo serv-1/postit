@@ -1,4 +1,4 @@
-import { useTabs } from 'contexts/tabs'
+import useTabs from 'hooks/useTabs'
 
 interface TabProps {
   value: string

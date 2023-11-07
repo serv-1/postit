@@ -10,8 +10,9 @@ const mockSignOut = jest.spyOn(require('next-auth/react'), 'signOut')
 const server = setupServer()
 
 jest
-  .mock('contexts/toast', () => ({
-    useToast: () => ({ setToast() {}, toast: {} }),
+  .mock('hooks/useToast', () => ({
+    __esModule: true,
+    default: () => ({ setToast() {}, toast: {} }),
   }))
   .mock('components/Header', () => ({
     __esModule: true,

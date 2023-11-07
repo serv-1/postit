@@ -9,7 +9,6 @@ import { type SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { useEffect } from 'react'
 import type { Categories } from 'types'
-import Button from 'components/Button'
 import searchPost, { type SearchPost } from 'schemas/searchPost'
 import Popup from 'components/Popup'
 
@@ -155,7 +154,7 @@ export default function HomeSearchPosts() {
         }
       />
       <div className="absolute right-0 -bottom-[36px] md:left-1/2 md:-translate-x-1/2 md:right-auto lg:right-0 lg:left-auto lg:translate-x-0 z-10">
-        <Button color="primary">Search</Button>
+        <button className="primary-btn">Search</button>
       </div>
     </Form>
   )

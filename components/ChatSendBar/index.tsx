@@ -6,26 +6,17 @@ import updateDiscussion, {
   type UpdateDiscussion,
 } from 'schemas/updateDiscussion'
 import { useEffect } from 'react'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import ajax from 'libs/ajax'
 import type { DiscussionsIdPutError } from 'app/api/discussions/[id]/types'
 import type { DiscussionPostError } from 'app/api/discussion/types'
 
-interface WithDiscussionId {
-  discussionId: string
-  postId?: never
-  postName?: never
-  sellerId?: never
+export interface ChatSendBarProps {
+  discussionId?: string
+  postId?: string
+  postName?: string
+  sellerId?: string
 }
-
-export interface WithoutDiscussionId {
-  discussionId?: never
-  postName: string
-  postId: string
-  sellerId: string
-}
-
-export type ChatSendBarProps = WithDiscussionId | WithoutDiscussionId
 
 export default function ChatSendBar({
   discussionId,
@@ -42,15 +33,15 @@ export default function ChatSendBar({
   const { errors, isSubmitSuccessful } = formState
 
   const submitHandler: SubmitHandler<UpdateDiscussion> = async (data) => {
-    const response = !discussionId
-      ? await ajax.post(
-          '/discussion',
-          { message: data.message, postId, sellerId, postName },
-          { csrf: true }
-        )
-      : await ajax.put(
+    const response = discussionId
+      ? await ajax.put(
           '/discussions/' + discussionId,
           { message: data.message },
+          { csrf: true }
+        )
+      : await ajax.post(
+          '/discussion',
+          { message: data.message, postId, sellerId, postName },
           { csrf: true }
         )
 

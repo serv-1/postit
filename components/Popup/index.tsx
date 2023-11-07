@@ -1,3 +1,5 @@
+'use client'
+
 import type { Options as OffsetOptions } from '@popperjs/core/lib/modifiers/offset'
 import type { Options as ArrowOptions } from '@popperjs/core/lib/modifiers/arrow'
 import type { PreventOverflowModifier } from '@popperjs/core/lib/modifiers/preventOverflow'

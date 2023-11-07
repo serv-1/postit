@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import ChevronRight from 'public/static/images/chevron-right.svg'
 import X from 'public/static/images/x.svg'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'

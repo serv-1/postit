@@ -4,7 +4,6 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import type { PostsIdPutError } from 'app/api/posts/[id]/types'
 import type { S3GetData, S3GetError } from 'app/api/s3/types'
 import Accordion from 'components/Accordion'
-import Button from 'components/Button'
 import ExpandedImageModal from 'components/ExpandedImageModal'
 import Form from 'components/Form'
 import Input from 'components/Input'
@@ -12,7 +11,7 @@ import InputError from 'components/InputError'
 import PostAddressModal from 'components/PostAddressModal'
 import Select from 'components/Select'
 import TextArea from 'components/TextArea'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import ajax from 'libs/ajax'
 import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
@@ -221,7 +220,7 @@ export default function UpdatePost({ post }: { post: Post }) {
           </Accordion>
 
           <div className="flex justify-end">
-            <Button color="primary">Update</Button>
+            <button className="primary-btn">Update</button>
           </div>
         </Form>
       </div>

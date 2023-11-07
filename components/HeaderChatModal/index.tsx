@@ -1,6 +1,6 @@
 import type { Discussion } from 'types'
 import { useEffect, useRef, useState } from 'react'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import { useSession } from 'next-auth/react'
 import type { Session } from 'next-auth'
 import getClientPusher from 'functions/getClientPusher'

@@ -3,8 +3,7 @@ import formatToUrl from 'functions/formatToUrl'
 import ChevronRight from 'public/static/images/chevron-right.svg'
 import X from 'public/static/images/x.svg'
 import Link from 'next/link'
-import DotButton from 'components/DotButton'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import { useState } from 'react'
 import { NEXT_PUBLIC_AWS_URL } from 'env/public'
 import ajax from 'libs/ajax'
@@ -55,14 +54,14 @@ export default function ProfilePostList({
           className="relative md:max-w-[700px] md:mx-auto mb-8 last:mb-0 md:mb-16"
         >
           <div className="absolute -top-4 -left-4 z-20">
-            <DotButton
-              isSmall
+            <button
+              className="sm-round-btn"
               aria-label={'Delete ' + post.name}
               title={'Delete ' + post.name}
               onClick={() => deletePost(post.id)}
             >
               <X className="w-full h-full" />
-            </DotButton>
+            </button>
           </div>
           <Link
             href={`/posts/${post.id}/${formatToUrl(post.name)}`}

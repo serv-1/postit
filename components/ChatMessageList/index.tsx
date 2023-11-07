@@ -1,7 +1,7 @@
 import type { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import type { Discussion, NewDiscussionMessage } from 'types'
 import getClientPusher from 'functions/getClientPusher'
 import ChatMessage from 'components/ChatMessage'

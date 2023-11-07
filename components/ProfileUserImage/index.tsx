@@ -1,6 +1,6 @@
 import { type ChangeEvent, useRef, useState } from 'react'
 import Image from 'next/image'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import Plus from 'public/static/images/plus.svg'
 import isImage from 'functions/isImage'
 import ajax from 'libs/ajax'

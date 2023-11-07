@@ -3,7 +3,6 @@ import { useState } from 'react'
 import type { ChangeHandler } from 'react-hook-form'
 import PlusCircle from 'public/static/images/plus-circle.svg'
 import isImage from 'functions/isImage'
-import Button from 'components/Button'
 import { MAX_IMAGE_SIZE } from 'constants/index'
 import {
   IMAGES_REQUIRED,
@@ -131,23 +130,21 @@ export default function CreateAPostStep1({
         </div>
       )}
       <div className="flex gap-x-16 mt-16">
-        <Button
-          color="secondary"
-          fullWidth
+        <button
+          className="secondary-btn w-full"
           onClick={() => setStep(0)}
           type="button"
         >
           ← Back
-        </Button>
-        <Button
-          color="primary"
-          fullWidth
+        </button>
+        <button
+          className="primary-btn w-full"
           onClick={() => setStep(2)}
           type="button"
           disabled={!imageSources || imageSources.length === 0}
         >
           Next →
-        </Button>
+        </button>
       </div>
     </div>
   )

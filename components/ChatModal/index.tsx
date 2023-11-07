@@ -1,7 +1,4 @@
-import ChatSendBar, {
-  type ChatSendBarProps,
-  type WithoutDiscussionId,
-} from 'components/ChatSendBar'
+import ChatSendBar, { type ChatSendBarProps } from 'components/ChatSendBar'
 import Modal from 'components/Modal'
 import X from 'public/static/images/x.svg'
 import { useEffect, useRef, useState } from 'react'
@@ -49,10 +46,6 @@ export default function ChatModal({
     document.dispatchEvent(new CustomEvent('chatOpen'))
   }, [isOpen])
 
-  const chatSendBarProps = discussionId
-    ? { discussionId }
-    : ({ postId, postName, sellerId } as WithoutDiscussionId)
-
   return isOpen ? (
     <Modal
       className="fixed top-0 left-0 w-screen h-screen z-[1001] md:flex md:justify-center md:items-center md:bg-fuchsia-900/25"
@@ -67,7 +60,12 @@ export default function ChatModal({
           <X className="w-full h-full" />
         </button>
         <ChatMessageList discussionId={discussionId} />
-        <ChatSendBar {...chatSendBarProps} />
+        <ChatSendBar
+          discussionId={discussionId}
+          postId={postId}
+          postName={postName}
+          sellerId={sellerId}
+        />
       </div>
     </Modal>
   ) : null

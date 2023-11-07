@@ -1,12 +1,11 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import { type SubmitHandler, useForm } from 'react-hook-form'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import updateUserEmail, { type UpdateUserEmail } from 'schemas/updateUserEmail'
 import updateUserName, { type UpdateUserName } from 'schemas/updateUserName'
 import updateUserPassword, {
   type UpdateUserPassword,
 } from 'schemas/updateUserPassword'
-import Button from 'components/Button'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
@@ -79,9 +78,7 @@ export default function UpdateAccountForm({
                 )}
               </PasswordStrength>
             </div>
-            <Button color="primary" noRadius="left">
-              Change
-            </Button>
+            <button className="primary-btn rounded-l-none">Change</button>
           </div>
           <InputError<UpdateUserPassword> inputName="password" />
         </div>
@@ -98,9 +95,7 @@ export default function UpdateAccountForm({
               bgColor="bg-fuchsia-100"
             />
             <InputError<UpdateUserEmail | UpdateUserName> inputName={value} />
-            <Button color="primary" noRadius="left">
-              Change
-            </Button>
+            <button className="primary-btn rounded-l-none">Change</button>
           </div>
         </div>
       )}

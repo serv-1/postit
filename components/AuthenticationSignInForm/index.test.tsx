@@ -10,8 +10,9 @@ const mockRouterPush = jest.fn()
 const mockSignIn = jest.spyOn(require('next-auth/react'), 'signIn')
 
 jest
-  .mock('contexts/toast', () => ({
-    useToast: () => ({ setToast: mockSetToast, toast: {} }),
+  .mock('hooks/useToast', () => ({
+    __esModule: true,
+    default: () => ({ setToast: mockSetToast, toast: {} }),
   }))
   .mock('next/navigation', () => ({
     useRouter: () => ({ push: mockRouterPush }),

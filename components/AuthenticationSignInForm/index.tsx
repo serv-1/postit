@@ -2,13 +2,12 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import { getProviders, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { type SubmitHandler, useForm } from 'react-hook-form'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import type { UnPromise } from 'types'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
 import PasswordInput from 'components/PasswordInput'
-import Button from 'components/Button'
 import signInSchema, { type SignIn } from 'schemas/signIn'
 import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 import { DATA_INVALID } from 'constants/errors'
@@ -61,7 +60,6 @@ export default function AuthenticationSignInForm({
           />
           <InputError<SignIn> inputName="email" />
         </div>
-
         <div className="mb-16">
           <label htmlFor="signInPassword" className="inline-block w-1/2">
             Password
@@ -79,10 +77,7 @@ export default function AuthenticationSignInForm({
           />
           <InputError<SignIn> inputName="password" />
         </div>
-
-        <div className="flex justify-end">
-          <Button color="primary">Sign in</Button>
-        </div>
+        <button className="primary-btn block ml-auto">Sign in</button>
       </Form>
       <div className="flex flex-row flex-nowrap items-center gap-x-4 font-bold text-center rounded-full my-16 before:block before:h-[1px] before:w-1/2 before:bg-fuchsia-900 after:block after:h-[1px] after:w-1/2 after:bg-fuchsia-900">
         Or
@@ -92,10 +87,9 @@ export default function AuthenticationSignInForm({
           ({ id, name }) =>
             id === 'credentials' ||
             id === 'email' || (
-              <Button
+              <button
                 key={id}
-                color="primary"
-                fullWidth
+                className="primary-btn w-full"
                 onClick={() =>
                   signIn(id, {
                     callbackUrl: NEXT_PUBLIC_VERCEL_URL + '/profile',
@@ -103,7 +97,7 @@ export default function AuthenticationSignInForm({
                 }
               >
                 Sign in with {name}
-              </Button>
+              </button>
             )
         )}
     </>

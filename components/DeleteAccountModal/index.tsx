@@ -1,9 +1,8 @@
 import { signOut } from 'next-auth/react'
-import { useToast } from 'contexts/toast'
+import useToast from 'hooks/useToast'
 import Modal from 'components/Modal'
 import X from 'public/static/images/x.svg'
 import { useState } from 'react'
-import Button from 'components/Button'
 import ajax from 'libs/ajax'
 import type { UserDeleteError } from 'app/api/user/types'
 
@@ -27,9 +26,9 @@ export default function DeleteAccountModal() {
 
   return (
     <>
-      <Button color="danger" fullWidth onClick={() => setIsOpen(true)}>
+      <button className="danger-btn w-full" onClick={() => setIsOpen(true)}>
         Delete account
-      </Button>
+      </button>
       {isOpen && (
         <Modal
           setIsOpen={setIsOpen}
@@ -52,16 +51,15 @@ export default function DeleteAccountModal() {
               </p>
             </div>
             <div className="flex flex-row flew-nowrap gap-x-24">
-              <Button
-                color="primary"
-                fullWidth
+              <button
+                className="primary-btn w-full"
                 onClick={() => setIsOpen(false)}
               >
                 Cancel
-              </Button>
-              <Button color="danger" fullWidth onClick={deleteUser}>
+              </button>
+              <button className="danger-btn w-full" onClick={deleteUser}>
                 Delete
-              </Button>
+              </button>
             </div>
           </div>
         </Modal>

@@ -1,10 +1,11 @@
+'use client'
+
 import { useEffect, useState } from 'react'
-import { useToast } from 'contexts/toast'
-import DotButton from 'components/DotButton'
 import Heart from 'public/static/images/heart.svg'
 import HeartFill from 'public/static/images/heart-fill.svg'
 import ajax from 'libs/ajax'
 import type { UserPutError } from 'app/api/user/types'
+import useToast from 'hooks/useToast'
 
 interface PostPageFavoriteButtonProps {
   postId: string
@@ -70,15 +71,15 @@ export default function PostPageFavoriteButton({
 
   return (
     <div className="absolute top-8 right-8 group">
-      <DotButton
-        noStates
+      <button
+        className="round-btn hover:bg-fuchsia-50 hover:text-fuchsia-600"
         onClick={handleFavPost}
         title={heartA11y}
         aria-label={heartA11y}
       >
         <HeartFill data-testid="heartFill" className={heartFillClass} />
         <Heart data-testid="heart" className={heartClass} />
-      </DotButton>
+      </button>
     </div>
   )
 }

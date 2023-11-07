@@ -1,10 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import Tab from '.'
 import userEvent from '@testing-library/user-event'
-import { useTabs } from 'contexts/tabs'
+import useTabs from 'hooks/useTabs'
 
-jest.mock('contexts/tabs', () => ({
-  useTabs: jest.fn(),
+jest.mock('hooks/useTabs', () => ({
+  __esModule: true,
+  default: jest.fn(),
 }))
 
 const mockUseTabs = useTabs as jest.MockedFunction<typeof useTabs>

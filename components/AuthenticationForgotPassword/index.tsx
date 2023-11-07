@@ -4,8 +4,7 @@ import { type SubmitHandler, useForm } from 'react-hook-form'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
-import { useToast } from 'contexts/toast'
-import Button from 'components/Button'
+import useToast from 'hooks/useToast'
 import forgotPassword, { type ForgotPassword } from 'schemas/forgotPassword'
 import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 import ajax from 'libs/ajax'
@@ -71,9 +70,7 @@ export default function AuthenticationForgotPassword({
           />
           <InputError<ForgotPassword> inputName="email" />
         </div>
-        <div className="flex justify-end">
-          <Button color="primary">Send</Button>
-        </div>
+        <button className="primary-btn block ml-auto">Send</button>
       </Form>
       <div className="grow flex items-end md:w-[350px]">
         <button
