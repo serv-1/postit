@@ -8,7 +8,7 @@ import getPosts from 'functions/getPosts'
 import getUserFavoritePosts from 'functions/getUserFavoritePosts'
 import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import { redirect } from 'next/navigation'
-import { Post, User, UserFavoritePost } from 'types'
+import type { User } from 'types'
 import { mockGetServerSession } from '__mocks__/next-auth'
 
 jest
@@ -23,10 +23,6 @@ jest
   .mock('functions/getUserFavoritePosts', () => ({
     __esModule: true,
     default: jest.fn(),
-  }))
-  .mock('app/pages/profile', () => ({
-    __esModule: true,
-    default: () => null,
   }))
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
@@ -82,22 +78,4 @@ it("throws an error if a favorite post hasn't been found", async () => {
   await expect(Page()).rejects.toThrow(POST_NOT_FOUND)
 
   expect(mockGetUserFavoritePosts).toHaveBeenNthCalledWith(1, ['0'])
-})
-
-it('passes the user with its posts and favorite posts to <Profile />', async () => {
-  mockGetServerSession.mockResolvedValue({ id: '0' })
-  mockGetUser.mockResolvedValue({ id: '0', name: 'john' } as User)
-  mockGetPosts.mockResolvedValue([{ name: 'table' }] as Post[])
-  mockGetUserFavoritePosts.mockResolvedValue([
-    { name: 'chair' },
-  ] as UserFavoritePost[])
-
-  expect((await Page()).props).toEqual({
-    user: {
-      id: '0',
-      name: 'john',
-      posts: [{ name: 'table' }],
-      favPosts: [{ name: 'chair' }],
-    },
-  })
 })

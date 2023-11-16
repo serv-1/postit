@@ -4,8 +4,6 @@ import { PASSWORD_REQUIRED } from 'constants/errors'
 
 export interface UpdateUserPassword {
   password: string
-  email?: never
-  name?: never
 }
 
 const updateUserPassword = createObjectSchema<UpdateUserPassword>({

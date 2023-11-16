@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image'
 import formatToUrl from 'functions/formatToUrl'
 import ChevronRight from 'public/static/images/chevron-right.svg'

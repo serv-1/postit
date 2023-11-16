@@ -6,7 +6,6 @@ import useToast from 'hooks/useToast'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
-import PasswordStrength from 'components/PasswordStrength'
 import PasswordInput from 'components/PasswordInput'
 import createUser, { type CreateUser } from 'schemas/createUser'
 import ajax from 'libs/ajax'
@@ -68,7 +67,7 @@ export default function AuthenticationRegisterForm() {
           type="text"
           name="name"
           needFocus
-          bgColor="md:bg-fuchsia-100"
+          className="bg-fuchsia-50 md:bg-fuchsia-100"
         />
         <InputError<CreateUser> inputName="name" />
       </div>
@@ -77,7 +76,7 @@ export default function AuthenticationRegisterForm() {
         <Input<CreateUser>
           type="email"
           name="email"
-          bgColor="md:bg-fuchsia-100"
+          className="bg-fuchsia-50 md:bg-fuchsia-100"
         />
         <InputError<CreateUser> inputName="email" />
       </div>
@@ -85,14 +84,10 @@ export default function AuthenticationRegisterForm() {
         <label htmlFor="password" className="inline-block w-1/2">
           Password
         </label>
-        <PasswordStrength className="inline-block w-1/2 text-right">
-          {(onChange) => (
-            <PasswordInput<CreateUser>
-              onChange={onChange}
-              bgColor="bg-fuchsia-50 md:bg-fuchsia-100"
-            />
-          )}
-        </PasswordStrength>
+        <PasswordInput<CreateUser>
+          showStrength
+          className="bg-fuchsia-50 md:bg-fuchsia-100"
+        />
         <InputError<CreateUser> inputName="password" />
       </div>
       <button className="primary-btn block ml-auto">Register</button>

@@ -66,7 +66,7 @@ export default function AuthenticationForgotPassword({
             type="email"
             name="email"
             needFocus
-            bgColor="md:bg-fuchsia-100"
+            className="bg-fuchsia-50 md:bg-fuchsia-100"
           />
           <InputError<ForgotPassword> inputName="email" />
         </div>

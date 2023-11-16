@@ -128,7 +128,7 @@ export default function UpdatePost({ post }: { post: Post }) {
             </div>
             <div>
               <label htmlFor="name">New name</label>
-              <Input type="text" name="name" />
+              <Input type="text" name="name" className="bg-fuchsia-50" />
               <InputError inputName="name" />
             </div>
           </Accordion>
@@ -170,7 +170,12 @@ export default function UpdatePost({ post }: { post: Post }) {
             </div>
             <div>
               <label htmlFor="price">New price</label>
-              <Input type="number" name="price" addOn="€" />
+              <Input
+                type="number"
+                name="price"
+                addOn={<span className="text-fuchsia-900/50">€</span>}
+                className="bg-fuchsia-50"
+              />
               <InputError inputName="price" />
             </div>
           </Accordion>
@@ -201,7 +206,12 @@ export default function UpdatePost({ post }: { post: Post }) {
             </div>
             <div>
               <label htmlFor="images">New images</label>
-              <Input type="file" multiple name="images" />
+              <Input
+                type="file"
+                multiple
+                name="images"
+                className="bg-fuchsia-50"
+              />
               <InputError inputName="images" />
             </div>
           </Accordion>

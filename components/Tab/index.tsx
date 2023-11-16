@@ -1,3 +1,5 @@
+'use client'
+
 import useTabs from 'hooks/useTabs'
 
 interface TabProps {

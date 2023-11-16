@@ -4,7 +4,7 @@ import getPost from 'functions/getPost'
 import { getServerSession } from 'next-auth'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
-import { Post } from 'types'
+import type { Post } from 'types'
 import { POST_NOT_FOUND } from 'constants/errors'
 
 interface Params {

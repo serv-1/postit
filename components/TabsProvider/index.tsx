@@ -1,3 +1,5 @@
+'use client'
+
 import TabsContext from 'contexts/tabs'
 import { useState } from 'react'
 

@@ -1,4 +1,4 @@
-import { ToastState } from 'components/ToastProvider'
+import type { ToastState } from 'components/ToastProvider'
 import { createContext } from 'react'
 
 interface ToastContextValue {

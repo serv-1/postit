@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import useToast from 'hooks/useToast'
 import Popup from 'components/Popup'
 import type { Session } from 'next-auth'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 import ajax from 'libs/ajax'
 import type { UsersIdGetData, UsersIdGetError } from 'app/api/users/[id]/types'
+import SignOutButton from 'components/SignOutButton'
 
 export default function HeaderDropdownMenu() {
   const [image, setImage] = useState<string>(NEXT_PUBLIC_DEFAULT_USER_IMAGE)
@@ -66,16 +67,7 @@ export default function HeaderDropdownMenu() {
             </Link>
           </li>
           <li>
-            <Link
-              href="/api/auth/signout"
-              className="inline-block w-full hover:underline"
-              onClick={(e) => {
-                e.preventDefault()
-                signOut({ callbackUrl: '/' })
-              }}
-            >
-              Sign out
-            </Link>
+            <SignOutButton className="hover:underline">Sign out</SignOutButton>
           </li>
         </ul>
       }

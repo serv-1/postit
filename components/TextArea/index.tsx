@@ -6,10 +6,6 @@ import {
   type RegisterOptions,
   useFormContext,
 } from 'react-hook-form'
-import { BORDER, RED_BORDER } from 'components/Input'
-
-const TEXTAREA_BASE =
-  'rounded p-8 w-full bg-fuchsia-50 border-b-2 outline-none align-bottom transition-colors placeholder:text-[rgba(112,26,117,0.5)]'
 
 interface TextAreaProps<FormFields extends FieldValues>
   extends Omit<
@@ -41,8 +37,10 @@ export default function TextArea<FormFields extends FieldValues>({
       id={name}
       aria-describedby={`${name}Feedback`}
       className={classNames(
-        TEXTAREA_BASE,
-        isSubmitted && errors[name] ? RED_BORDER : BORDER
+        'rounded p-8 w-full bg-fuchsia-50 border-b-2 outline-none align-bottom transition-colors placeholder:text-[rgba(112,26,117,0.5)]',
+        isSubmitted && errors[name]
+          ? 'border-2 border-rose-600 focus-within:border-rose-900'
+          : 'border-fuchsia-900/25 focus-within:border-fuchsia-900/75'
       )}
     ></textarea>
   )

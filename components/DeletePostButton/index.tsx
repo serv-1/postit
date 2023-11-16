@@ -1,6 +1,6 @@
 'use client'
 
-import { PostsIdDeleteError } from 'app/api/posts/[id]/types'
+import type { PostsIdDeleteError } from 'app/api/posts/[id]/types'
 import useToast from 'hooks/useToast'
 import ajax from 'libs/ajax'
 import { useRouter } from 'next/navigation'

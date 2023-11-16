@@ -1,3 +1,5 @@
+'use client'
+
 import { signOut } from 'next-auth/react'
 import useToast from 'hooks/useToast'
 import Modal from 'components/Modal'

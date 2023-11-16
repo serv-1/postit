@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import getUser from 'functions/getUser'
-import { User } from 'types'
+import type { User } from 'types'
 import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import Image from 'next/image'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'

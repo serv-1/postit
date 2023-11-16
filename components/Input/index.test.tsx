@@ -1,118 +1,213 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { RegisterOptions } from 'react-hook-form'
 import Input from '.'
+import { FormProvider, useForm } from 'react-hook-form'
 
-const setFocus = jest.fn()
-const useFormContext = jest.spyOn(require('react-hook-form'), 'useFormContext')
-const setFormContext = (isSubmitted: boolean, message?: string) => ({
-  formState: { isSubmitted, errors: message ? { test: { message } } : {} },
-  register: jest.fn((name: string, opt: RegisterOptions) => ({
-    name,
-    onChange: opt?.onChange,
-  })),
-  setFocus,
-})
+function TestForm({ children }: { children: React.ReactNode }) {
+  const methods = useForm()
 
-beforeEach(() => useFormContext.mockReturnValue(setFormContext(false)))
-
-interface FormFields {
-  test: string
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={methods.handleSubmit(() => {})}>
+        {children}
+        <input type="submit" />
+      </form>
+    </FormProvider>
+  )
 }
 
-it('renders', async () => {
-  const onChange = jest.fn()
-
+it('takes the focus', () => {
   render(
-    <Input<FormFields>
-      type="text"
-      name="test"
-      registerOptions={{ onChange }}
-      bgColor="blue"
-      noRightRadius
-      aria-describedby="described"
-    />
+    <TestForm>
+      <Input needFocus name="city" type="text" />
+    </TestForm>
   )
 
   const input = screen.getByRole('textbox')
-  expect(input).toHaveAttribute('id', 'test')
-  expect(input).toHaveAttribute('name', 'test')
-  expect(input).toHaveAttribute('aria-describedby', 'testFeedback described')
-  expect(input).toHaveClass('blue', 'rounded-r-none')
-  expect(input.className).toContain('border')
-  expect(input.className).not.toContain('rose')
-  expect(input.className).not.toContain('file')
+
+  expect(input).toHaveFocus()
+})
+
+it("doesn't take the focus", () => {
+  render(
+    <TestForm>
+      <Input name="city" type="text" />
+    </TestForm>
+  )
+
+  const input = screen.getByRole('textbox')
+
+  expect(input).not.toHaveFocus()
+})
+
+it('registers into the parent form', () => {
+  render(
+    <TestForm>
+      <Input name="city" type="text" registerOptions={{ disabled: true }} />
+    </TestForm>
+  )
+
+  const input = screen.getByRole('textbox')
+
+  expect(input).toHaveAttribute('name', 'city')
+  expect(input).toBeDisabled()
+})
+
+it('renders red borders if there is an error', async () => {
+  render(
+    <TestForm>
+      <Input name="city" type="text" registerOptions={{ required: true }} />
+    </TestForm>
+  )
+
+  const submitBtn = screen.getByRole('button')
+
+  await userEvent.click(submitBtn)
+
+  const container = screen.getByRole('textbox').parentElement as HTMLElement
+
+  expect(container.className).toContain('border-rose')
+})
+
+it("doesn't render red borders if there is no error", async () => {
+  render(
+    <TestForm>
+      <Input name="city" type="text" registerOptions={{ required: true }} />
+    </TestForm>
+  )
+
+  const input = screen.getByRole('textbox')
 
   await userEvent.type(input, 'a')
-  expect(onChange).toHaveBeenCalledTimes(1)
 
-  expect(setFocus).not.toHaveBeenCalled()
+  const submitBtn = screen.getByRole('button')
 
-  const container = screen.queryByTestId('container')
-  expect(container).not.toBeInTheDocument()
+  await userEvent.click(submitBtn)
+
+  const container = screen.getByRole('textbox').parentElement as HTMLElement
+
+  expect(container.className).not.toContain('border-rose')
+})
+
+it('uses the given class names', () => {
+  render(
+    <TestForm>
+      <Input name="city" type="text" className="city-input" />
+    </TestForm>
+  )
+
+  const container = screen.getByRole('textbox').parentElement as HTMLElement
+
+  expect(container).toHaveClass('city-input')
 })
 
 it('uses the given id', () => {
-  render(<Input<FormFields> type="text" id="turing" name="test" />)
-
-  const input = screen.getByRole('textbox')
-  expect(input).toHaveAttribute('id', 'turing')
-})
-
-it('has the focus', () => {
-  render(<Input<FormFields> type="text" name="test" needFocus />)
-  expect(setFocus).toHaveBeenNthCalledWith(1, 'test')
-})
-
-test('its border is red if the form is submitted and there is an error', () => {
-  useFormContext.mockReturnValueOnce(setFormContext(true, 'Error'))
-
-  render(<Input<FormFields> type="text" name="test" />)
-
-  const input = screen.getByRole('textbox')
-  expect(input.className).toContain('rose')
-})
-
-test("its border isn't red if the form is submitted and there is no error", () => {
-  useFormContext.mockReturnValueOnce(setFormContext(true))
-
-  render(<Input<FormFields> type="text" name="test" />)
-
-  const input = screen.getByRole('textbox')
-  expect(input.className).not.toContain('rose')
-})
-
-test('file input has different class', () => {
   render(
-    <>
-      <label htmlFor="test">Test</label>
-      <Input<FormFields> type="file" name="test" />
-    </>
+    <TestForm>
+      <Input name="city" type="text" id="cityInput" />
+    </TestForm>
   )
 
-  const input = screen.getByLabelText('Test')
-  expect(input.className).toContain('file')
+  const input = screen.getByRole('textbox')
+
+  expect(input).toHaveAttribute('id', 'cityInput')
 })
 
-test('the add-on renders', () => {
+it('uses the given name for id if no id has been given', () => {
   render(
-    <Input<FormFields>
-      type="text"
-      name="test"
-      addOn="@"
-      addOnClass="dark"
-      bgColor="red"
-      noRightRadius
-    />
+    <TestForm>
+      <Input name="city" type="text" />
+    </TestForm>
   )
 
-  const addOn = screen.getByText('@')
-  expect(addOn).toHaveClass('dark')
+  const input = screen.getByRole('textbox')
 
-  const container = screen.getByTestId('container')
-  expect(container).toHaveClass('red rounded-r-none')
-  expect(container.className).toContain('border')
+  expect(input).toHaveAttribute('id', 'city')
+})
+
+it('uses the given type', () => {
+  render(
+    <TestForm>
+      <Input name="city" type="text" />
+    </TestForm>
+  )
 
   const input = screen.getByRole('textbox')
-  expect(input).toHaveClass('bg-transparent')
+
+  expect(input).toHaveAttribute('type', 'text')
+})
+
+it('uses the given placeholder', () => {
+  render(
+    <TestForm>
+      <Input name="city" type="text" placeholder="Paris, ..." />
+    </TestForm>
+  )
+
+  const input = screen.getByRole('textbox')
+
+  expect(input).toHaveAttribute('placeholder', 'Paris, ...')
+})
+
+it('uses the given aria-describedby', () => {
+  render(
+    <TestForm>
+      <Input name="city" type="text" ariaDescribedBy="describer" />
+      <span id="describer">Enter a city</span>
+    </TestForm>
+  )
+
+  const input = screen.getByRole('textbox')
+
+  expect(input).toHaveAccessibleDescription('Enter a city')
+})
+
+it('can upload multiple files when using a file input', () => {
+  render(
+    <TestForm>
+      <label htmlFor="images">Images</label>
+      <Input name="images" type="file" multiple />
+    </TestForm>
+  )
+
+  const input = screen.getByLabelText('Images')
+
+  expect(input).toHaveAttribute('multiple')
+})
+
+it("has specific class names when it's a file input", () => {
+  render(
+    <TestForm>
+      <label htmlFor="images">Images</label>
+      <Input name="images" type="file" />
+    </TestForm>
+  )
+
+  const input = screen.getByLabelText('Images')
+
+  expect(input.className).toContain('file:')
+})
+
+it("doesn't have the file input specific class names when it isn't a file input", () => {
+  render(
+    <TestForm>
+      <Input name="city" type="text" />
+    </TestForm>
+  )
+
+  const input = screen.getByRole('textbox')
+
+  expect(input.className).not.toContain('file:')
+})
+
+it('renders the given add-on', () => {
+  render(
+    <TestForm>
+      <Input name="price" type="number" addOn={<span>€</span>} />
+    </TestForm>
+  )
+
+  const addOn = screen.getByText('€')
+
+  expect(addOn).toBeInTheDocument()
 })

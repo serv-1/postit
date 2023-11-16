@@ -1,3 +1,5 @@
+'use client'
+
 type TabListProps = Omit<
   React.ComponentPropsWithoutRef<'div'>,
   'role' | 'onKeyDown'

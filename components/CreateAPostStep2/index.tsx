@@ -25,7 +25,7 @@ export default function CreateAPostStep2({
     >
       <div className="mb-16">
         <label htmlFor="name">Name</label>
-        <Input type="text" name="name" needFocus />
+        <Input type="text" name="name" className="bg-fuchsia-50" needFocus />
         <InputError inputName="name" />
       </div>
       <div className="mb-16">
@@ -33,8 +33,8 @@ export default function CreateAPostStep2({
         <Input
           type="number"
           name="price"
-          addOn="€"
-          addOnClass="text-fuchsia-900/50"
+          addOn={<span className="text-fuchsia-900/50">€</span>}
+          className="bg-fuchsia-50"
         />
         <InputError inputName="price" />
       </div>

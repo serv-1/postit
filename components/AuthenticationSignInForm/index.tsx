@@ -56,7 +56,7 @@ export default function AuthenticationSignInForm({
             type="email"
             name="email"
             needFocus
-            bgColor="md:bg-fuchsia-100"
+            className="bg-fuchsia-50 md:bg-fuchsia-100"
           />
           <InputError<SignIn> inputName="email" />
         </div>
@@ -73,7 +73,7 @@ export default function AuthenticationSignInForm({
           </button>
           <PasswordInput<SignIn>
             id="signInPassword"
-            bgColor="bg-fuchsia-50 md:bg-fuchsia-100"
+            className="bg-fuchsia-50 md:bg-fuchsia-100"
           />
           <InputError<SignIn> inputName="password" />
         </div>

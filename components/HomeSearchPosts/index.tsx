@@ -88,6 +88,7 @@ export default function HomeSearchPosts() {
         <Input<SearchPost>
           name="query"
           type="search"
+          className="bg-fuchsia-50"
           placeholder="Umbrella, sofa, ..."
         />
         <InputError<SearchPost> inputName="query" />
@@ -103,25 +104,25 @@ export default function HomeSearchPosts() {
           <>
             <div className="font-bold mb-8">Price</div>
             <div className="flex flex-row flex-nowrap">
-              <div className="mr-8">
+              <div className="mr-8 w-[calc(50%-4px)]">
                 <label htmlFor="minPrice">Minimum</label>
                 <Input<SearchPost>
                   id="minPrice"
                   name="minPrice"
                   type="number"
-                  addOn="€"
-                  addOnClass="text-fuchsia-900/50"
+                  addOn={<span className="text-fuchsia-900/50">€</span>}
+                  className="bg-fuchsia-50"
                   needFocus
                 />
               </div>
-              <div>
+              <div className="w-[calc(50%-4px)]">
                 <label htmlFor="maxPrice">Maximum</label>
                 <Input<SearchPost>
                   id="maxPrice"
                   name="maxPrice"
                   type="number"
-                  addOn="€"
-                  addOnClass="text-fuchsia-900/50"
+                  addOn={<span className="text-fuchsia-900/50">€</span>}
+                  className="bg-fuchsia-50"
                 />
               </div>
             </div>
@@ -148,6 +149,7 @@ export default function HomeSearchPosts() {
               name="address"
               type="text"
               needFocus
+              className="bg-fuchsia-50"
             />
             <InputError<SearchPost> inputName="address" />
           </>

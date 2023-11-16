@@ -1,4 +1,6 @@
-import { type ChangeEvent, useRef, useState } from 'react'
+'use client'
+
+import { type ChangeEvent, useRef, useState, type KeyboardEvent } from 'react'
 import Image from 'next/image'
 import useToast from 'hooks/useToast'
 import Plus from 'public/static/images/plus.svg'
@@ -14,16 +16,23 @@ interface ProfileUserImageProps {
   image?: string
 }
 
-export default function ProfileUserImage({
-  image: img,
-}: ProfileUserImageProps) {
-  const [image, setImage] = useState(
-    img ? NEXT_PUBLIC_AWS_URL + '/' + img : NEXT_PUBLIC_DEFAULT_USER_IMAGE
+export default function ProfileUserImage({ image }: ProfileUserImageProps) {
+  const [source, setSource] = useState(
+    image ? NEXT_PUBLIC_AWS_URL + '/' + image : NEXT_PUBLIC_DEFAULT_USER_IMAGE
   )
+
   const { setToast } = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const updateImage = async (e: ChangeEvent<HTMLInputElement>) => {
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.key !== 'Enter') {
+      return
+    }
+
+    inputRef.current?.click()
+  }
+
+  async function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files && e.target.files[0]
 
     if (!file) {
@@ -72,7 +81,7 @@ export default function ProfileUserImage({
       return
     }
 
-    setImage(NEXT_PUBLIC_AWS_URL + '/' + key)
+    setSource(NEXT_PUBLIC_AWS_URL + '/' + key)
     setToast({ message: 'The image has been updated! 🎉' })
   }
 
@@ -80,16 +89,13 @@ export default function ProfileUserImage({
     <div className="mr-8 md:mr-16">
       <label
         tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key !== 'Enter') return
-          inputRef.current?.click()
-        }}
+        onKeyDown={handleKeyDown}
         htmlFor="userImage"
         aria-label="Change your profile image"
         className="block relative group cursor-pointer w-[60px] h-[60px] md:w-[80px] md:h-[80px]"
       >
         <Image
-          src={image}
+          src={source}
           fill
           alt="Your profile image"
           title="Click to change your profile image"
@@ -99,7 +105,7 @@ export default function ProfileUserImage({
       </label>
       <input
         ref={inputRef}
-        onChange={updateImage}
+        onChange={handleChange}
         type="file"
         name="image"
         id="userImage"
