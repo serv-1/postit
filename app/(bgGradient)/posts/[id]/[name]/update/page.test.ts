@@ -5,7 +5,7 @@
 import getPost from 'functions/getPost'
 import Page, { generateMetadata } from './page'
 import { redirect } from 'next/navigation'
-import { Post } from 'types'
+import type { Post } from 'types'
 import { mockGetServerSession } from '__mocks__/next-auth'
 import { POST_NOT_FOUND } from 'constants/errors'
 
@@ -16,10 +16,6 @@ jest
   }))
   .mock('next/navigation', () => ({
     redirect: jest.fn(),
-  }))
-  .mock('app/pages/postUpdate', () => ({
-    __esModule: true,
-    default: () => null,
   }))
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
@@ -60,14 +56,5 @@ describe('<Page />', () => {
     )
 
     expect(mockGetPost).toHaveBeenNthCalledWith(1, '0')
-  })
-
-  it('passes the post to <UpdatePost />', async () => {
-    mockGetServerSession.mockResolvedValue({})
-    mockGetPost.mockResolvedValue({ name: 'table' } as Post)
-
-    expect((await Page({ params: { id: '0', name: 'table' } })).props).toEqual({
-      post: { name: 'table' },
-    })
   })
 })

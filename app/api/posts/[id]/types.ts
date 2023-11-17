@@ -1,3 +1,4 @@
+import type { UpdatePost } from 'schemas/server/updatePost'
 import type { Categories } from 'types'
 
 export interface PostsIdGetData {
@@ -20,7 +21,7 @@ export interface PostsIdGetError {
 export type PostsIdPutData = null
 
 export interface PostsIdPutError {
-  name?: string
+  name?: keyof UpdatePost
   message: string
 }
 
