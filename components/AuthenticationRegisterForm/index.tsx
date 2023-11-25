@@ -69,7 +69,7 @@ export default function AuthenticationRegisterForm() {
           needFocus
           className="bg-fuchsia-50 md:bg-fuchsia-100"
         />
-        <InputError<CreateUser> inputName="name" />
+        <InputError<CreateUser> name="name" />
       </div>
       <div className="mb-16">
         <label htmlFor="email">Email</label>
@@ -78,7 +78,7 @@ export default function AuthenticationRegisterForm() {
           name="email"
           className="bg-fuchsia-50 md:bg-fuchsia-100"
         />
-        <InputError<CreateUser> inputName="email" />
+        <InputError<CreateUser> name="email" />
       </div>
       <div className="mb-16">
         <label htmlFor="password" className="inline-block w-1/2">
@@ -88,7 +88,7 @@ export default function AuthenticationRegisterForm() {
           showStrength
           className="bg-fuchsia-50 md:bg-fuchsia-100"
         />
-        <InputError<CreateUser> inputName="password" />
+        <InputError<CreateUser> name="password" />
       </div>
       <button className="primary-btn block ml-auto">Register</button>
     </Form>

@@ -1,26 +1,22 @@
-import type { ComponentPropsWithoutRef } from 'react'
 import {
   type FieldPath,
   type FieldValues,
   useFormContext,
 } from 'react-hook-form'
 
-interface InputErrorProps<FormFields extends FieldValues = FieldValues>
-  extends ComponentPropsWithoutRef<'div'> {
-  inputName: FieldPath<FormFields>
+interface InputErrorProps<FormFields extends FieldValues> {
+  name: FieldPath<FormFields>
 }
 
-export default function InputError<
-  FormFields extends FieldValues = FieldValues
->({ inputName, ...props }: InputErrorProps<FormFields>) {
+export default function InputError<FormFields extends FieldValues>({
+  name,
+}: InputErrorProps<FormFields>) {
   const { formState } = useFormContext<FormFields>()
-  const { isSubmitted, errors } = formState
-  const error = errors[inputName]
+  const error = formState.errors[name]
 
-  return isSubmitted && error ? (
+  return error ? (
     <div
-      {...props}
-      id={`${inputName}Feedback`}
+      id={`${name}Feedback`}
       role="alert"
       className="text-rose-600 font-bold"
     >

@@ -16,6 +16,6 @@ it('returns the context', () => {
   )
 })
 
-it('throws an error if it is used outside the ToastProvider', () => {
+it('throws an error if it is used outside of the ToastProvider', () => {
   expect(() => useToast()).toThrow()
 })

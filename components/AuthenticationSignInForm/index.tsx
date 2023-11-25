@@ -58,7 +58,7 @@ export default function AuthenticationSignInForm({
             needFocus
             className="bg-fuchsia-50 md:bg-fuchsia-100"
           />
-          <InputError<SignIn> inputName="email" />
+          <InputError<SignIn> name="email" />
         </div>
         <div className="mb-16">
           <label htmlFor="signInPassword" className="inline-block w-1/2">
@@ -75,7 +75,7 @@ export default function AuthenticationSignInForm({
             id="signInPassword"
             className="bg-fuchsia-50 md:bg-fuchsia-100"
           />
-          <InputError<SignIn> inputName="password" />
+          <InputError<SignIn> name="password" />
         </div>
         <button className="primary-btn block ml-auto">Sign in</button>
       </Form>

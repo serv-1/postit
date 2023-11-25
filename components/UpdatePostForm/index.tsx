@@ -93,7 +93,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
         <div>
           <label htmlFor="name">New name</label>
           <Input type="text" name="name" className="bg-fuchsia-50" />
-          <InputError inputName="name" />
+          <InputError name="name" />
         </div>
       </Accordion>
       <Accordion title="Description" id="description" headingLevel={2}>
@@ -106,7 +106,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
         <div>
           <label htmlFor="description">New description</label>
           <TextArea name="description" />
-          <InputError inputName="description" />
+          <InputError name="description" />
         </div>
       </Accordion>
       <Accordion title="Categories" id="categories" headingLevel={2}>
@@ -119,7 +119,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
         <div>
           <label htmlFor="categories">New Categories</label>
           <Select name="categories" options={options} />
-          <InputError inputName="categories" />
+          <InputError name="categories" />
         </div>
       </Accordion>
       <Accordion title="Price" id="price" headingLevel={2}>
@@ -137,7 +137,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
             addOn={<span className="text-fuchsia-900/50">€</span>}
             className="bg-fuchsia-50"
           />
-          <InputError inputName="price" />
+          <InputError name="price" />
         </div>
       </Accordion>
       <Accordion title="Images" id="images" headingLevel={2}>
@@ -164,7 +164,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
         <div>
           <label htmlFor="images">New images</label>
           <Input type="file" multiple name="images" className="bg-fuchsia-50" />
-          <InputError inputName="images" />
+          <InputError name="images" />
         </div>
       </Accordion>
       <Accordion title="Address" id="address" headingLevel={2}>

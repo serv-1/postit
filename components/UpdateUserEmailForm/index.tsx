@@ -46,7 +46,7 @@ export default function UpdateUserEmailForm() {
         />
         <button className="primary-btn rounded-l-none">Change</button>
       </div>
-      <InputError<UpdateUserEmail> inputName="email" />
+      <InputError<UpdateUserEmail> name="email" />
     </Form>
   )
 }

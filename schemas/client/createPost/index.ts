@@ -4,6 +4,7 @@ import postDescription from 'schemas/postDescription'
 import postCategories from 'schemas/postCategories'
 import postPrice from 'schemas/postPrice'
 import postAddress from 'schemas/postAddress'
+import imageList from 'schemas/imageList'
 import createObjectSchema from 'functions/createObjectSchema'
 import {
   NAME_REQUIRED,
@@ -12,6 +13,7 @@ import {
   PRICE_REQUIRED,
   PRICE_INVALID,
   ADDRESS_REQUIRED,
+  IMAGES_REQUIRED,
 } from 'constants/errors'
 
 export interface CreatePost {
@@ -20,6 +22,7 @@ export interface CreatePost {
   categories: Categories[]
   price: number
   address: string
+  images: File[]
 }
 
 const createPost = createObjectSchema<CreatePost>({
@@ -38,6 +41,7 @@ const createPost = createObjectSchema<CreatePost>({
   address: postAddress
     .required()
     .messages({ 'any.required': ADDRESS_REQUIRED }),
+  images: imageList.required().messages({ 'any.required': IMAGES_REQUIRED }),
 })
 
 export default createPost

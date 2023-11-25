@@ -5,6 +5,7 @@ import {
   PRICE_REQUIRED,
   ADDRESS_REQUIRED,
   PRICE_INVALID,
+  IMAGES_REQUIRED,
 } from 'constants/errors'
 import createPost from '.'
 
@@ -15,6 +16,7 @@ it('passes', () => {
     categories: ['furniture'],
     price: 20,
     address: 'Oslo, Norway',
+    images: { 0: new File(['data'], 'img.png', { type: 'image/png' }) },
   })
 
   expect(result).not.toHaveProperty('error')
@@ -74,6 +76,18 @@ it('fails if the address is undefined', () => {
   })
 
   expect(error?.details[0].message).toBe(ADDRESS_REQUIRED)
+})
+
+it('fails if the images are undefined', () => {
+  const { error } = createPost.validate({
+    name: 'table',
+    description: 'magnificent table',
+    categories: ['furniture'],
+    price: 20,
+    address: 'Oslo, Norway',
+  })
+
+  expect(error?.details[0].message).toBe(IMAGES_REQUIRED)
 })
 
 it('fails if there are no categories', () => {

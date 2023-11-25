@@ -50,7 +50,7 @@ export default function UpdateUserNameForm() {
         />
         <button className="primary-btn rounded-l-none">Change</button>
       </div>
-      <InputError<UpdateUserName> inputName="name" />
+      <InputError<UpdateUserName> name="name" />
     </Form>
   )
 }

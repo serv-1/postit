@@ -49,7 +49,7 @@ export default function UpdateUserPasswordForm() {
         />
         <button className="primary-btn rounded-l-none">Change</button>
       </div>
-      <InputError<UpdateUserPassword> inputName="password" />
+      <InputError<UpdateUserPassword> name="password" />
     </Form>
   )
 }

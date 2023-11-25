@@ -82,7 +82,7 @@ export default function HomeSearchPosts() {
           aria-label="Categories"
           placeholder="Categories"
         />
-        <InputError<SearchPost> inputName="categories" />
+        <InputError<SearchPost> name="categories" />
       </div>
       <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] md:align-top lg:block lg:w-auto">
         <Input<SearchPost>
@@ -91,7 +91,7 @@ export default function HomeSearchPosts() {
           className="bg-fuchsia-50"
           placeholder="Umbrella, sofa, ..."
         />
-        <InputError<SearchPost> inputName="query" />
+        <InputError<SearchPost> name="query" />
       </div>
       <Popup
         placement="bottom-start"
@@ -126,8 +126,8 @@ export default function HomeSearchPosts() {
                 />
               </div>
             </div>
-            <InputError<SearchPost> inputName="minPrice" />
-            <InputError<SearchPost> inputName="maxPrice" />
+            <InputError<SearchPost> name="minPrice" />
+            <InputError<SearchPost> name="maxPrice" />
           </>
         }
       />
@@ -151,7 +151,7 @@ export default function HomeSearchPosts() {
               needFocus
               className="bg-fuchsia-50"
             />
-            <InputError<SearchPost> inputName="address" />
+            <InputError<SearchPost> name="address" />
           </>
         }
       />

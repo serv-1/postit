@@ -68,7 +68,7 @@ export default function AuthenticationForgotPassword({
             needFocus
             className="bg-fuchsia-50 md:bg-fuchsia-100"
           />
-          <InputError<ForgotPassword> inputName="email" />
+          <InputError<ForgotPassword> name="email" />
         </div>
         <button className="primary-btn block ml-auto">Send</button>
       </Form>

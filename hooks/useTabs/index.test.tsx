@@ -16,6 +16,6 @@ it('return the context', () => {
   )
 })
 
-it('throws an error if it is used outside the TabsProvider', () => {
+it('throws an error if it is used outside of the TabsProvider', () => {
   expect(() => useTabs()).toThrow()
 })
