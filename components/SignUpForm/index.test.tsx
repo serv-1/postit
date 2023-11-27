@@ -1,5 +1,5 @@
-import AuthenticationRegisterForm from '.'
-import { screen, render, waitFor } from '@testing-library/react'
+import SignUpForm from '.'
+import { screen, render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
@@ -44,7 +44,7 @@ it('registers the user, signs him in and redirects him to its profile', async ()
     })
   )
 
-  render(<AuthenticationRegisterForm />)
+  render(<SignUpForm />)
 
   const nameInput = screen.getByLabelText(/name/i)
 
@@ -64,9 +64,7 @@ it('registers the user, signs him in and redirects him to its profile', async ()
 
   await userEvent.click(submitBtn)
 
-  await waitFor(() => {
-    expect(mockRouterPush).toHaveBeenNthCalledWith(1, '/profile')
-  })
+  expect(mockRouterPush).toHaveBeenNthCalledWith(1, '/profile')
 })
 
 it('renders an alert if the server fails to sign the user in', async () => {
@@ -88,7 +86,7 @@ it('renders an alert if the server fails to sign the user in', async () => {
 
   mockSignIn.mockResolvedValue({ error: 'Error' })
 
-  render(<AuthenticationRegisterForm />)
+  render(<SignUpForm />)
 
   const nameInput = screen.getByLabelText(/name/i)
 
@@ -108,11 +106,8 @@ it('renders an alert if the server fails to sign the user in', async () => {
 
   await userEvent.click(submitBtn)
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message:
-        'Your account has been successfully created. You can now sign in!',
-    })
+  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
+    message: 'Your account has been successfully created. You can now sign in!',
   })
 })
 
@@ -123,7 +118,7 @@ it('renders an error if the server fails to register the user', async () => {
     })
   )
 
-  render(<AuthenticationRegisterForm />)
+  render(<SignUpForm />)
 
   const nameInput = screen.getByLabelText(/name/i)
 
@@ -141,11 +136,9 @@ it('renders an error if the server fails to register the user', async () => {
 
   await userEvent.click(submitBtn)
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: 'error',
-      error: true,
-    })
+  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
+    message: 'error',
+    error: true,
   })
 })
 
@@ -156,7 +149,7 @@ it('renders an error if the server fails to validate the request data', async ()
     })
   )
 
-  render(<AuthenticationRegisterForm />)
+  render(<SignUpForm />)
 
   const nameInput = screen.getByLabelText(/name/i)
 

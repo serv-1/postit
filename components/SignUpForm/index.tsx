@@ -1,3 +1,5 @@
+'use client'
+
 import { joiResolver } from '@hookform/resolvers/joi'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -11,7 +13,7 @@ import createUser, { type CreateUser } from 'schemas/createUser'
 import ajax from 'libs/ajax'
 import type { UserPostError } from 'app/api/user/types'
 
-export default function AuthenticationRegisterForm() {
+export default function SignUpForm() {
   const methods = useForm<CreateUser>({
     resolver: joiResolver(createUser),
   })
