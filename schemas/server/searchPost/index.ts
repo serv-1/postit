@@ -27,14 +27,10 @@ const searchPost = createObjectSchema<SearchPost>({
     .messages({ 'any.required': QUERY_REQUIRED }),
   page: pageNumber.allow(null),
   minPrice: postPrice.allow(null),
-  maxPrice: Joi.alternatives().conditional('minPrice', {
-    is: null,
-    then: postPrice.allow(null),
-    otherwise: postPrice
-      .allow(null)
-      .min(Joi.ref('minPrice'))
-      .messages({ 'number.min': MAX_PRICE_MIN }),
-  }),
+  maxPrice: postPrice
+    .allow(null)
+    .min(Joi.ref('minPrice', { adjust: (price) => price || 0 }))
+    .messages({ 'number.min': MAX_PRICE_MIN }),
   categories: postCategories
     .required()
     .messages({ 'any.required': CATEGORIES_REQUIRED }),

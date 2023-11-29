@@ -9,7 +9,7 @@ import { type SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { useEffect } from 'react'
 import type { Categories } from 'types'
-import searchPost, { type SearchPost } from 'schemas/searchPost'
+import searchPost, { type SearchPost } from 'schemas/client/searchPost'
 import Popup from 'components/Popup'
 
 const options = CATEGORIES.map((category) => ({
@@ -17,54 +17,57 @@ const options = CATEGORIES.map((category) => ({
   value: category,
 }))
 
-export default function HomeSearchPosts() {
+export default function SearchPostForm() {
   const methods = useForm<SearchPost>({ resolver: joiResolver(searchPost) })
 
-  const { formState } = methods
-
-  const submitHandler: SubmitHandler<SearchPost> = (data) => {
-    const { query, minPrice, maxPrice, categories, address } = data
-
-    const url = new URLSearchParams({ query })
+  const submitHandler: SubmitHandler<SearchPost> = ({
+    query,
+    minPrice,
+    maxPrice,
+    categories,
+    address,
+  }) => {
+    const params = new URLSearchParams({ query })
 
     for (const category of categories) {
-      url.append('categories', category)
+      params.append('categories', category)
     }
 
-    if (minPrice) url.append('minPrice', minPrice)
-    if (maxPrice) url.append('maxPrice', maxPrice)
-    if (address) url.append('address', address)
+    if (minPrice) params.append('minPrice', minPrice)
+    if (maxPrice) params.append('maxPrice', maxPrice)
+    if (address) params.append('address', address)
 
-    const newUrl = '?' + url.toString()
-    const state = { ...window.history.state, as: newUrl, url: newUrl }
+    const newUrl = '?' + params.toString()
 
     // To avoid rerender with router.push(), we use pushState.
     // We must specify the state because if we do not NextJS fails to send
     // us back to the previous page.
     // see: https://github.com/vercel/next.js/discussions/18072
-    window.history.pushState(state, '', newUrl)
+    window.history.pushState(
+      { ...window.history.state, as: newUrl, url: newUrl },
+      '',
+      newUrl
+    )
 
-    document.dispatchEvent(new CustomEvent('queryStringChange'))
+    document.dispatchEvent(new CustomEvent('searchPost'))
   }
 
   useEffect(() => {
     if (!window.location.search) return
 
-    const queryString = new URLSearchParams(window.location.search)
-    const categories = queryString.getAll('categories') as Categories[]
-    const query = queryString.get('query')
+    const params = new URLSearchParams(window.location.search)
+    const query = params.get('query')
+    const minPrice = params.get('minPrice')
+    const maxPrice = params.get('maxPrice')
+    const address = params.get('address')
+
+    methods.setValue('categories', params.getAll('categories') as Categories[])
 
     if (query) methods.setValue('query', query)
-    methods.setValue('categories', categories)
-    methods.setValue('minPrice', queryString.get('minPrice'))
-    methods.setValue('maxPrice', queryString.get('maxPrice'))
-    methods.setValue('address', queryString.get('address'))
+    if (minPrice) methods.setValue('minPrice', minPrice)
+    if (maxPrice) methods.setValue('maxPrice', maxPrice)
+    if (address) methods.setValue('address', address)
   }, [methods])
-
-  useEffect(() => {
-    if (!formState.isSubmitSuccessful) return
-    methods.reset(undefined, { keepValues: true })
-  }, [methods, formState])
 
   return (
     <Form

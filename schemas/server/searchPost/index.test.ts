@@ -1,16 +1,16 @@
 import {
-  QUERY_REQUIRED,
   CATEGORIES_REQUIRED,
   MAX_PRICE_MIN,
+  QUERY_REQUIRED,
 } from 'constants/errors'
-import searchPost from '.'
+import serverPost from '.'
 
 it('passes', () => {
-  const result = searchPost.validate({
+  const result = serverPost.validate({
     query: 'table',
-    page: 1,
+    page: 2,
     minPrice: 10,
-    maxPrice: 20,
+    maxPrice: 30,
     categories: ['furniture'],
     address: 'Oslo, Norway',
   })
@@ -20,19 +20,15 @@ it('passes', () => {
 })
 
 it('fails if the query is undefined', () => {
-  const { error } = searchPost.validate({ categories: ['furniture'] })
+  const { error } = serverPost.validate({
+    categories: ['furniture'],
+  })
 
   expect(error?.details[0].message).toBe(QUERY_REQUIRED)
 })
 
-it('fails if the categories are undefined', () => {
-  const { error } = searchPost.validate({ query: 'table' })
-
-  expect(error?.details[0].message).toBe(CATEGORIES_REQUIRED)
-})
-
-it('allows the page number to be null', () => {
-  const result = searchPost.validate({
+it('allows the page to be null', () => {
+  const result = serverPost.validate({
     query: 'table',
     categories: ['furniture'],
     page: null,
@@ -42,8 +38,8 @@ it('allows the page number to be null', () => {
   expect(result).not.toHaveProperty('warning')
 })
 
-it('allows the minimum price to be null', () => {
-  const result = searchPost.validate({
+it('allows the min price to be null', () => {
+  const result = serverPost.validate({
     query: 'table',
     categories: ['furniture'],
     minPrice: null,
@@ -53,8 +49,8 @@ it('allows the minimum price to be null', () => {
   expect(result).not.toHaveProperty('warning')
 })
 
-it('allows the maximum price to be null', () => {
-  const result = searchPost.validate({
+it('allows the max price to be null', () => {
+  const result = serverPost.validate({
     query: 'table',
     categories: ['furniture'],
     maxPrice: null,
@@ -64,8 +60,39 @@ it('allows the maximum price to be null', () => {
   expect(result).not.toHaveProperty('warning')
 })
 
+it("adjusts the min price to 0 if it's null when the max price is defined", () => {
+  const result = serverPost.validate({
+    query: 'table',
+    categories: ['furniture'],
+    minPrice: null,
+    maxPrice: 30,
+  })
+
+  expect(result).not.toHaveProperty('error')
+  expect(result).not.toHaveProperty('warning')
+})
+
+it('fails if the min price is greater than the max price', () => {
+  const { error } = serverPost.validate({
+    query: 'table',
+    categories: ['furniture'],
+    minPrice: 30,
+    maxPrice: 10,
+  })
+
+  expect(error?.details[0].message).toBe(MAX_PRICE_MIN)
+})
+
+it('fails if the categories are undefined', () => {
+  const { error } = serverPost.validate({
+    query: 'table',
+  })
+
+  expect(error?.details[0].message).toBe(CATEGORIES_REQUIRED)
+})
+
 it('allows the address to be null', () => {
-  const result = searchPost.validate({
+  const result = serverPost.validate({
     query: 'table',
     categories: ['furniture'],
     address: null,
@@ -73,15 +100,4 @@ it('allows the address to be null', () => {
 
   expect(result).not.toHaveProperty('error')
   expect(result).not.toHaveProperty('warning')
-})
-
-it('fails if the maximum price is less than the minimum price', () => {
-  const { error } = searchPost.validate({
-    query: 'table',
-    categories: ['furniture'],
-    minPrice: 20,
-    maxPrice: 10,
-  })
-
-  expect(error?.details[0].message).toBe(MAX_PRICE_MIN)
 })

@@ -47,7 +47,7 @@ it('renders an informative text if no posts have been found', async () => {
   await waitFor(() => expect(text).toHaveTextContent(/no posts found/i))
 })
 
-it("fetches the posts matching the url query string's data", async () => {
+it('fetches the posts matching the url search params', async () => {
   server.use(
     rest.get('http://localhost/api/posts/search', (req, res, ctx) => {
       expect(req.url.searchParams.get('query')).toBe('cat')

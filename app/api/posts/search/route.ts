@@ -1,6 +1,6 @@
 import Post from 'models/Post'
 import { NextRequest, NextResponse } from 'next/server'
-import searchPost from 'schemas/searchPost'
+import searchPost from 'schemas/server/searchPost'
 import type { Categories } from 'types'
 import dbConnect from 'functions/dbConnect'
 import validate from 'functions/validate'
