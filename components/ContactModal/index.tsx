@@ -1,61 +1,83 @@
 'use client'
 
 import { useState } from 'react'
-import ChatFill from 'public/static/images/chat-fill.svg'
 import { useSession } from 'next-auth/react'
-import useToast from 'hooks/useToast'
-import ChatModal from 'components/ChatModal'
+import type { Discussion } from 'types'
+import type { Session } from 'next-auth'
+import ContactButton from 'components/ContactButton'
+import useEventListener from 'hooks/useEventListener'
+import usePusher from 'hooks/usePusher'
+import DiscussionModal from 'components/DiscussionModal'
 
-interface ContactModalProps {
+export interface ContactModalProps {
   discussionId?: string
+  isDiscussionHidden?: boolean
   postId: string
   sellerId: string
   postName: string
-  hasFloatingBtn?: boolean
 }
 
 export default function ContactModal({
-  discussionId,
+  discussionId: discussionIdProp,
+  isDiscussionHidden: isDiscussionHiddenProp,
   postId,
   postName,
   sellerId,
-  hasFloatingBtn,
 }: ContactModalProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const { setToast } = useToast()
-  const { status } = useSession()
+  const [discussionId, setDiscussionId] = useState(discussionIdProp)
+  const [isDiscussionHidden, setIsDiscussionHidden] = useState(
+    isDiscussionHiddenProp
+  )
 
-  function handleClick() {
-    if (status === 'authenticated') {
-      setIsOpen(true)
+  const { data: session } = useSession() as { data: Session }
+
+  function openModal() {
+    if (discussionId && !isDiscussionHidden) {
+      document.dispatchEvent(
+        new CustomEvent('openDiscussion', { detail: discussionId })
+      )
     } else {
-      setToast({
-        message: 'You need to be signed in to discuss with the seller.',
-      })
+      setIsOpen(true)
     }
   }
 
+  function closeModal() {
+    setIsOpen(false)
+  }
+
+  function onMessageSent(id: string) {
+    setDiscussionId(id)
+    setIsDiscussionHidden(false)
+    closeModal()
+    document.dispatchEvent(new CustomEvent('openDiscussion', { detail: id }))
+  }
+
+  useEventListener(document, 'discussionDeleted', (e) => {
+    if (discussionId === e.detail) {
+      setIsDiscussionHidden(true)
+    }
+  })
+
+  usePusher<Discussion>(session.channelName, 'discussion:new', (discussion) => {
+    if (discussion.id === discussionId) {
+      setIsDiscussionHidden(false)
+    }
+  })
+
   return (
     <>
-      <button
-        className={
-          hasFloatingBtn
-            ? 'round-btn bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-300 fixed bottom-8 right-8 z-[1001]'
-            : 'primary-btn w-full'
-        }
-        aria-label="Contact"
-        onClick={handleClick}
-      >
-        {hasFloatingBtn ? <ChatFill className="w-full h-full" /> : 'Contact'}
-      </button>
-      <ChatModal
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        discussionId={discussionId}
-        postId={postId}
-        postName={postName}
-        sellerId={sellerId}
-      />
+      <ContactButton onClick={openModal} />
+      {isOpen && (
+        <DiscussionModal
+          onMessageSent={onMessageSent}
+          onClose={closeModal}
+          discussionId={discussionId}
+          postName={postName}
+          postId={postId}
+          sellerId={sellerId}
+        />
+      )}
     </>
   )
 }

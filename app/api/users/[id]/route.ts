@@ -33,12 +33,11 @@ export async function GET(request: Request, { params }: Params) {
         id: userId,
         name: user.name,
         email: user.email,
-        hasUnseenMessages: user.hasUnseenMessages,
         channelName: user.channelName,
         image: user.image,
         postIds: user.postIds,
         favPostIds: user.favPostIds,
-        discussionIds: user.discussionIds,
+        discussions: user.discussions,
       },
       { status: 200 }
     )

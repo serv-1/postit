@@ -7,7 +7,6 @@ import createUser from 'schemas/createUser'
 import updateUser from 'schemas/server/updateUser'
 import dbConnect from 'functions/dbConnect'
 import deleteImage from 'functions/deleteImage'
-import getServerPusher from 'functions/getServerPusher'
 import hashPassword from 'functions/hashPassword'
 import verifyCsrfTokens from 'functions/verifyCsrfTokens'
 import validate from 'functions/validate'
@@ -104,7 +103,7 @@ export async function PUT(request: NextRequest) {
     } else if ('password' in data) {
       update.password = hashPassword(data.password)
     } else {
-      const user = (await User.findById(session.id).lean().exec()) as UserDoc
+      const user = (await User.findById(session.id).lean().exec())!
 
       if ('image' in data) {
         if (user.image) {
@@ -124,25 +123,22 @@ export async function PUT(request: NextRequest) {
 
         update[action] = { favPostIds: data.favPostId }
       } else if ('discussionId' in data) {
-        await getServerPusher().trigger(
-          'private-' + session.channelName,
-          'discussion-deleted',
-          data.discussionId
-        )
+        let isHidden = false
 
-        let action = '$push'
-
-        for (const discussionId of user.discussionIds) {
-          if (discussionId.toString() === data.discussionId) {
-            action = '$pull'
-            break
+        for (const { id, hidden } of user.discussions) {
+          if (id.toString() === data.discussionId) {
+            isHidden = !hidden
           }
         }
 
-        update = {
-          [action]: { discussionIds: data.discussionId },
-          hasUnseenMessages: false,
-        }
+        await User.updateOne(
+          { _id: session.id, 'discussions.id': data.discussionId },
+          { $set: { 'discussions.$.hidden': isHidden } }
+        )
+          .lean()
+          .exec()
+
+        return new Response(null, { status: 204 })
       }
     }
 

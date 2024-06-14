@@ -91,7 +91,7 @@ it("doesn't open if the hover is disabled", async () => {
     <Popup referenceContent="open" popupContent="popup" openOnHover={false} />
   )
 
-  const container = screen.getByRole('button').parentElement as HTMLDivElement
+  const container = screen.getByRole('button').parentElement!
   await userEvent.hover(container)
 
   const popup = screen.queryByText('popup')
@@ -107,7 +107,7 @@ it("doesn't open if the hover is disabled", async () => {
 it('opens/closes if the container is hovered', async () => {
   render(<Popup referenceContent="open" popupContent="popup" openOnHover />)
 
-  const container = screen.getByRole('button').parentElement as HTMLDivElement
+  const container = screen.getByRole('button').parentElement!
   await userEvent.hover(container)
 
   const popup = screen.getByText('popup')
@@ -126,7 +126,7 @@ it("doesn't close if the reference is clicked and the container unhovered", asyn
   const popup = screen.getByText('popup')
   expect(popup).toBeInTheDocument()
 
-  const container = reference.parentElement as HTMLDivElement
+  const container = reference.parentElement!
   await userEvent.unhover(container)
 
   expect(popup).toBeInTheDocument()

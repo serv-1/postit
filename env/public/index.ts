@@ -28,10 +28,10 @@ if (name) {
   throw new Error('env: "' + name + '" is undefined')
 }
 
-export const NEXT_PUBLIC_VERCEL_URL = process.env.NEXT_PUBLIC_VERCEL_URL as string
-export const NEXT_PUBLIC_PUSHER_KEY = process.env.NEXT_PUBLIC_PUSHER_KEY as string
-export const NEXT_PUBLIC_PUSHER_CLUSTER = process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string
-export const NEXT_PUBLIC_CSRF_HEADER_NAME = process.env.NEXT_PUBLIC_CSRF_HEADER_NAME as string
-export const NEXT_PUBLIC_AWS_URL = process.env.NEXT_PUBLIC_AWS_URL as string
-export const NEXT_PUBLIC_DEFAULT_USER_IMAGE = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE as string
-export const NEXT_PUBLIC_LOCATION_IQ_TOKEN = process.env.NEXT_PUBLIC_LOCATION_IQ_TOKEN as string
+export const NEXT_PUBLIC_VERCEL_URL = process.env.NEXT_PUBLIC_VERCEL_URL!
+export const NEXT_PUBLIC_PUSHER_KEY = process.env.NEXT_PUBLIC_PUSHER_KEY!
+export const NEXT_PUBLIC_PUSHER_CLUSTER = process.env.NEXT_PUBLIC_PUSHER_CLUSTER!
+export const NEXT_PUBLIC_CSRF_HEADER_NAME = process.env.NEXT_PUBLIC_CSRF_HEADER_NAME!
+export const NEXT_PUBLIC_AWS_URL = process.env.NEXT_PUBLIC_AWS_URL!
+export const NEXT_PUBLIC_DEFAULT_USER_IMAGE = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE!
+export const NEXT_PUBLIC_LOCATION_IQ_TOKEN = process.env.NEXT_PUBLIC_LOCATION_IQ_TOKEN!

@@ -7,6 +7,8 @@ import {
   useController,
   type FieldValues,
   type FieldPath,
+  type PathValue,
+  type Path,
 } from 'react-hook-form'
 import type { StateManagerProps } from 'react-select/dist/declarations/src/useStateManager'
 import type { Categories } from 'types'
@@ -73,7 +75,9 @@ export default function Select<FormFields extends FieldValues = FieldValues>({
   })
 
   const onChange = (val: MultiValue<Option>) =>
-    field.onChange(val.map(({ value }) => value) as any)
+    field.onChange(
+      val.map(({ value }) => value) as PathValue<FormFields, Path<FormFields>>
+    )
 
   return (
     <ReactSelect

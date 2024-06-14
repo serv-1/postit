@@ -51,10 +51,9 @@ describe('User model', () => {
 
   describe('when a user is saved', () => {
     it('defines the default values', async () => {
-      const john = (await User.findById(johnId).lean().exec()) as UserDoc
+      const john = (await User.findById(johnId).lean().exec())!
 
-      expect(john.channelName).toBeTruthy()
-      expect(john.hasUnseenMessages).toBe(false)
+      expect(john.channelName).toContain('private-encrypted-')
     })
 
     it('generates a different channel name for each one of them', async () => {
@@ -64,13 +63,13 @@ describe('User model', () => {
         password: 'bob password',
       }).save()
 
-      const john = (await User.findById(johnId).lean().exec()) as UserDoc
+      const john = (await User.findById(johnId).lean().exec())!
 
       expect(john.channelName).not.toBe(bob.channelName)
     })
 
     it('encrypts its password', async () => {
-      const john = (await User.findById(johnId).lean().exec()) as UserDoc
+      const john = (await User.findById(johnId).lean().exec())!
 
       expect(john.password).toBe('hashedpassword')
     })
@@ -80,7 +79,7 @@ describe('User model', () => {
     it('deletes its image', async () => {
       const john = (await User.findByIdAndUpdate(johnId, { image: 'john.jpeg' })
         .lean()
-        .exec()) as UserDoc
+        .exec())!
 
       await User.deleteOne({ _id: john._id }).lean().exec()
 
@@ -140,258 +139,205 @@ describe('User model', () => {
       expect(posts).toHaveLength(0)
     })
 
-    describe('when its a buyer', () => {
-      it('deletes a discussion if the seller has already deleted it', async () => {
-        const seller = await new User({
-          name: 'bob',
-          email: 'bob@test.com',
-          password: 'password',
-        }).save()
+    it('deletes a discussion if the buyer has deleted its account', async () => {
+      const seller = await new User({
+        name: 'bob',
+        email: 'bob@test.com',
+        password: 'password',
+      }).save()
 
-        const tableDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'table',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-          sellerId: seller._id,
-        }).save()
+      const tableDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'table',
+        postId: new mongoose.Types.ObjectId(),
+        sellerId: seller._id,
+      }).save()
 
-        const chairDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'chair',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-          sellerId: seller._id,
-        }).save()
+      const chairDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'chair',
+        postId: new mongoose.Types.ObjectId(),
+        sellerId: seller._id,
+      }).save()
 
-        await User.updateOne(
-          { _id: seller._id },
-          {
-            $pull: {
-              discussionIds: {
-                $in: [tableDiscussion._id, chairDiscussion._id],
-              },
-            },
-          }
-        )
+      await User.deleteOne({ _id: seller._id }).lean().exec()
 
-        await User.deleteOne({ _id: johnId }).lean().exec()
+      expect(
+        await Discussion.findById(tableDiscussion._id).lean().exec()
+      ).toBeNull()
 
-        expect(
-          await Discussion.findById(tableDiscussion._id).lean().exec()
-        ).toBeNull()
-        expect(
-          await Discussion.findById(chairDiscussion._id).lean().exec()
-        ).toBeNull()
-      })
-
-      it('deletes a discussion if the seller has deleted its account', async () => {
-        const tableDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'table',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-        }).save()
-
-        const chairDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'chair',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-        }).save()
-
-        await User.deleteOne({ _id: johnId }).lean().exec()
-
-        expect(
-          await Discussion.findById(tableDiscussion._id).lean().exec()
-        ).toBeNull()
-        expect(
-          await Discussion.findById(chairDiscussion._id).lean().exec()
-        ).toBeNull()
-      })
-
-      it('deletes its id in all discussions in which it was', async () => {
-        const seller = await new User({
-          name: 'bob',
-          email: 'bob@test.com',
-          password: 'password',
-        }).save()
-
-        const tableDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'table',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-          sellerId: seller._id,
-        }).save()
-
-        const chairDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'chair',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-          sellerId: seller._id,
-        }).save()
-
-        await User.deleteOne({ _id: johnId }).lean().exec()
-
-        expect(
-          await Discussion.findById(tableDiscussion._id).lean().exec()
-        ).not.toHaveProperty('buyerId')
-        expect(
-          await Discussion.findById(chairDiscussion._id).lean().exec()
-        ).not.toHaveProperty('buyerId')
-      })
-
-      it("doesn't delete a discussion if the seller didn't deleted it", async () => {
-        const seller = await new User({
-          name: 'bob',
-          email: 'bob@test.com',
-          password: 'password',
-        }).save()
-
-        const tableDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'table',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-          sellerId: seller._id,
-        }).save()
-
-        await User.deleteOne({ _id: johnId }).lean().exec()
-
-        expect(
-          await Discussion.findById(tableDiscussion._id).lean().exec()
-        ).not.toBeNull()
-      })
+      expect(
+        await Discussion.findById(chairDiscussion._id).lean().exec()
+      ).toBeNull()
     })
 
-    describe('when its a seller', () => {
-      it('deletes a discussion if the buyer has already deleted it', async () => {
-        const seller = await new User({
-          name: 'bob',
-          email: 'bob@test.com',
-          password: 'password',
-        }).save()
+    it('deletes a discussion if the seller has deleted its account', async () => {
+      const tableDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'table',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+      }).save()
 
-        const tableDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'table',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-          sellerId: seller._id,
-        }).save()
+      const chairDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'chair',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+      }).save()
 
-        const chairDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'chair',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-          sellerId: seller._id,
-        }).save()
+      await User.deleteOne({ _id: johnId }).lean().exec()
 
-        await User.updateOne(
-          { _id: johnId },
-          {
-            $pull: {
-              discussionIds: {
-                $in: [tableDiscussion._id, chairDiscussion._id],
-              },
-            },
-          }
-        )
-        await User.deleteOne({ _id: seller._id }).lean().exec()
+      expect(
+        await Discussion.findById(tableDiscussion._id).lean().exec()
+      ).toBeNull()
+      expect(
+        await Discussion.findById(chairDiscussion._id).lean().exec()
+      ).toBeNull()
+    })
 
-        expect(
-          await Discussion.findById(tableDiscussion._id).lean().exec()
-        ).toBeNull()
+    it('deletes a discussion if the buyer has hidden it', async () => {
+      const seller = await new User({
+        name: 'bob',
+        email: 'bob@test.com',
+        password: 'password',
+      }).save()
 
-        expect(
-          await Discussion.findById(chairDiscussion._id).lean().exec()
-        ).toBeNull()
-      })
+      const tableDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'table',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+        sellerId: seller._id,
+      }).save()
 
-      it('deletes a discussion if the buyer has deleted its account', async () => {
-        const tableDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: new mongoose.Types.ObjectId() }],
-          postName: 'table',
-          postId: new mongoose.Types.ObjectId(),
-          sellerId: johnId,
-        }).save()
+      const chairDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'chair',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+        sellerId: seller._id,
+      }).save()
 
-        const chairDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: new mongoose.Types.ObjectId() }],
-          postName: 'chair',
-          postId: new mongoose.Types.ObjectId(),
-          sellerId: johnId,
-        }).save()
+      await User.updateOne(
+        { _id: johnId },
+        { $set: { 'discussions.$[].hidden': true } }
+      )
 
-        await User.deleteOne({ _id: johnId }).lean().exec()
+      await User.deleteOne({ _id: seller._id }).lean().exec()
 
-        expect(
-          await Discussion.findById(tableDiscussion._id).lean().exec()
-        ).toBeNull()
+      expect(
+        await Discussion.findById(tableDiscussion._id).lean().exec()
+      ).toBeNull()
 
-        expect(
-          await Discussion.findById(chairDiscussion._id).lean().exec()
-        ).toBeNull()
-      })
+      expect(
+        await Discussion.findById(chairDiscussion._id).lean().exec()
+      ).toBeNull()
+    })
 
-      it('deletes its id in all discussions in which it was', async () => {
-        const seller = await new User({
-          name: 'bob',
-          email: 'bob@test.com',
-          password: 'password',
-        }).save()
+    it('deletes a discussion if the seller has hidden it', async () => {
+      const seller = await new User({
+        name: 'bob',
+        email: 'bob@test.com',
+        password: 'password',
+      }).save()
 
-        const tableDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'table',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-          sellerId: seller._id,
-        }).save()
+      const tableDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'table',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+        sellerId: seller._id,
+      }).save()
 
-        const chairDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'chair',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-          sellerId: seller._id,
-        }).save()
+      const chairDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'chair',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+        sellerId: seller._id,
+      }).save()
 
-        await User.deleteOne({ _id: seller._id }).lean().exec()
+      await User.updateOne(
+        { _id: seller._id },
+        { $set: { 'discussions.$[].hidden': true } }
+      )
 
-        expect(
-          await Discussion.findById(tableDiscussion._id).lean().exec()
-        ).not.toHaveProperty('sellerId')
+      await User.deleteOne({ _id: johnId }).lean().exec()
 
-        expect(
-          await Discussion.findById(chairDiscussion._id).lean().exec()
-        ).not.toHaveProperty('sellerId')
-      })
+      expect(
+        await Discussion.findById(tableDiscussion._id).lean().exec()
+      ).toBeNull()
+      expect(
+        await Discussion.findById(chairDiscussion._id).lean().exec()
+      ).toBeNull()
+    })
 
-      it("doesn't delete a discussion if the buyer didn't deleted it", async () => {
-        const seller = await new User({
-          name: 'bob',
-          email: 'bob@test.com',
-          password: 'password',
-        }).save()
+    it("removes the buyer from the discussion if the seller hasn't hidden it", async () => {
+      const seller = await new User({
+        name: 'bob',
+        email: 'bob@test.com',
+        password: 'password',
+      }).save()
 
-        const tableDiscussion = await new Discussion({
-          messages: [{ message: 'yo', userId: johnId }],
-          postName: 'table',
-          postId: new mongoose.Types.ObjectId(),
-          buyerId: johnId,
-          sellerId: seller._id,
-        }).save()
+      const tableDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'table',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+        sellerId: seller._id,
+      }).save()
 
-        await User.deleteOne({ _id: seller._id }).lean().exec()
+      const chairDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'chair',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+        sellerId: seller._id,
+      }).save()
 
-        expect(
-          await Discussion.findById(tableDiscussion._id).lean().exec()
-        ).not.toBeNull()
-      })
+      await User.deleteOne({ _id: johnId }).lean().exec()
+
+      expect(
+        await Discussion.findById(tableDiscussion._id).lean().exec()
+      ).not.toHaveProperty('buyerId')
+      expect(
+        await Discussion.findById(chairDiscussion._id).lean().exec()
+      ).not.toHaveProperty('buyerId')
+    })
+
+    it("removes the seller from the discussion if the buyer hasn't hidden it", async () => {
+      const seller = await new User({
+        name: 'bob',
+        email: 'bob@test.com',
+        password: 'password',
+      }).save()
+
+      const tableDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'table',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+        sellerId: seller._id,
+      }).save()
+
+      const chairDiscussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'chair',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+        sellerId: seller._id,
+      }).save()
+
+      await User.deleteOne({ _id: seller._id }).lean().exec()
+
+      expect(
+        await Discussion.findById(tableDiscussion._id).lean().exec()
+      ).not.toHaveProperty('sellerId')
+
+      expect(
+        await Discussion.findById(chairDiscussion._id).lean().exec()
+      ).not.toHaveProperty('sellerId')
     })
   })
 })

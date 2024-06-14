@@ -4,7 +4,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/email'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from 'libs/mongodb'
-import User, { type UserDoc } from 'models/User'
+import User from 'models/User'
 import dbConnect from 'functions/dbConnect'
 import {
   EMAIL_FROM,
@@ -26,7 +26,7 @@ export const nextAuthOptions: AuthOptions = {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         const res = await fetch(NEXT_PUBLIC_VERCEL_URL + '/api/sign-in', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -78,15 +78,13 @@ export const nextAuthOptions: AuthOptions = {
               image: '',
               postsIds: [],
               favPostsIds: [],
-              discussionsIds: [],
+              discussions: [],
               hasUnseenMessages: false,
               channelName: token.channelName,
             }
           ).exec()
         } else {
-          const { channelName } = (await User.findById(user.id)
-            .lean()
-            .exec()) as UserDoc
+          const { channelName } = (await User.findById(user.id).lean().exec())!
 
           token.channelName = channelName
         }

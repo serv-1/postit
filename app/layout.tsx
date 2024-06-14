@@ -4,6 +4,8 @@ import { Quicksand } from 'next/font/google'
 import { getServerSession } from 'next-auth'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import Providers from 'components/Providers'
+import getUser from 'functions/getUser'
+import PageWrapper from 'components/PageWrapper'
 
 const quicksand = Quicksand({
   subsets: ['latin'],
@@ -16,10 +18,15 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const session = await getServerSession(nextAuthOptions)
+  const user = session ? await getUser(session.id) : undefined
 
   return (
     <html lang="en" className={quicksand.className}>
-      <Providers session={session}>{children}</Providers>
+      <body>
+        <Providers session={session}>
+          <PageWrapper user={user}>{children}</PageWrapper>
+        </Providers>
+      </body>
     </html>
   )
 }

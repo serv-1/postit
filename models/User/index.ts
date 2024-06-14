@@ -3,9 +3,15 @@ import { models, model, Schema, type Model, Types, Query } from 'mongoose'
 import { nanoid } from 'nanoid'
 import deleteImage from 'functions/deleteImage'
 import Account from 'models/Account'
-import Discussion, { type DiscussionDoc } from 'models/Discussion'
+import Discussion from 'models/Discussion'
 import Post from 'models/Post'
 import hashPassword from 'functions/hashPassword'
+
+export interface UserDiscussionDoc {
+  id: Types.ObjectId
+  hidden: boolean
+  hasNewMessage: boolean
+}
 
 export interface UserDoc {
   _id: Types.ObjectId
@@ -16,26 +22,33 @@ export interface UserDoc {
   emailVerified?: Date
   postIds: Types.ObjectId[]
   favPostIds: Types.ObjectId[]
-  discussionIds: Types.ObjectId[]
+  discussions: UserDiscussionDoc[]
   channelName: string
-  hasUnseenMessages: boolean
 }
+
+const userDiscussionSchema = new Schema<UserDiscussionDoc>({
+  id: Schema.Types.ObjectId,
+  hidden: { type: Boolean, default: false },
+  hasNewMessage: { type: Boolean, default: false },
+})
 
 const userSchema = new Schema<UserDoc>({
   name: String,
   email: { type: String, unique: true },
-  image: { type: String },
+  image: String,
   password: String,
   emailVerified: Date,
   postIds: [Schema.Types.ObjectId],
   favPostIds: [Schema.Types.ObjectId],
-  discussionIds: [Schema.Types.ObjectId],
-  channelName: { type: String, default: () => nanoid() },
-  hasUnseenMessages: { type: Boolean, default: false },
+  discussions: [userDiscussionSchema],
+  channelName: {
+    type: String,
+    default: () => 'private-encrypted-' + nanoid(),
+  },
 })
 
 userSchema.pre('save', function (next) {
-  this.password = hashPassword(this.password as string)
+  this.password = hashPassword(this.password!)
   next()
 })
 
@@ -44,7 +57,7 @@ userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
 
   await Account.deleteOne({ userId }).lean().exec()
 
-  const user = (await User.findById(userId).lean().exec()) as UserDoc
+  const user = (await User.findById(userId).lean().exec())!
 
   if (user.image) {
     await deleteImage(user.image)
@@ -56,40 +69,37 @@ userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
 
   await Promise.all(postDeletions)
 
-  for (const discussionId of user.discussionIds) {
-    const { buyerId, sellerId } = (await Discussion.findById(discussionId)
+  for (const discussion of user.discussions) {
+    const { buyerId, sellerId } = (await Discussion.findById(discussion.id)
       .lean()
-      .exec()) as DiscussionDoc
+      .exec())!
 
-    let hasDiscussionBeenUpdated = false
+    if (!buyerId || !sellerId) {
+      await Discussion.deleteOne({ _id: discussion.id }).lean().exec()
 
-    if (buyerId && sellerId) {
-      const isBuyer = buyerId?.toString() === userId
-      const { discussionIds } = (await User.findById(
-        isBuyer ? sellerId : buyerId
-      )
-        .lean()
-        .exec()) as UserDoc
-
-      for (const id of discussionIds) {
-        if (id.toString() === discussionId.toString()) {
-          await Discussion.updateOne(
-            { _id: discussionId },
-            { $unset: { [isBuyer ? 'buyerId' : 'sellerId']: '' } },
-            { omitUndefined: true }
-          )
-            .lean()
-            .exec()
-
-          hasDiscussionBeenUpdated = true
-
-          break
-        }
-      }
+      continue
     }
 
-    if (!hasDiscussionBeenUpdated) {
-      await Discussion.deleteOne({ _id: discussionId }).lean().exec()
+    const isBuyer = userId === buyerId.toString()
+
+    const interlocutor = (await User.findById(isBuyer ? sellerId : buyerId)
+      .lean()
+      .exec())!
+
+    const { hidden } = interlocutor.discussions.find(
+      (d) => d.id.toString() === discussion.id.toString()
+    )!
+
+    if (hidden) {
+      await Discussion.deleteOne({ _id: discussion.id }).lean().exec()
+    } else {
+      await Discussion.updateOne(
+        { _id: discussion.id },
+        { $unset: { [isBuyer ? 'buyerId' : 'sellerId']: '' } },
+        { omitUndefined: true }
+      )
+        .lean()
+        .exec()
     }
   }
 })

@@ -17,8 +17,6 @@ import { mockGetServerSession } from 'next-auth'
 import { mockVerifyCsrfTokens } from 'functions/verifyCsrfTokens'
 // @ts-expect-error
 import { mockDeleteImage } from 'functions/deleteImage'
-// @ts-expect-error
-import { mockServerPusherTrigger } from 'functions/getServerPusher'
 import {
   DATA_INVALID,
   INTERNAL_SERVER_ERROR,
@@ -33,7 +31,6 @@ jest
   .mock('next-auth')
   .mock('functions/verifyCsrfTokens')
   .mock('functions/deleteImage')
-  .mock('functions/getServerPusher')
   .mock('functions/hashPassword')
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
@@ -483,64 +480,17 @@ describe('PUT', () => {
     expect(response.body).toBeNull()
   })
 
-  test("500 - 'discussion-deleted' pusher event triggering failed", async () => {
-    mockGetServerSession.mockResolvedValue({})
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({})
-    mockUpdateOneUser.mockResolvedValue({})
-    mockFindUserById.mockResolvedValue({})
-    mockServerPusherTrigger.mockRejectedValue({})
-
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-      body: JSON.stringify({ discussionId: new Types.ObjectId().toString() }),
-    })
-
-    const response = await PUT(request)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
-  })
-
-  it("triggers a 'discussion-deleted' pusher event", async () => {
-    const session = { channelName: 'chanName' }
-
-    mockGetServerSession.mockResolvedValue(session)
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({})
-    mockUpdateOneUser.mockResolvedValue({})
-    mockFindUserById.mockResolvedValue({})
-    mockServerPusherTrigger.mockRejectedValue({})
-
-    const discussionId = new Types.ObjectId().toString()
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-      body: JSON.stringify({ discussionId }),
-    })
-
-    await PUT(request)
-
-    expect(mockServerPusherTrigger).toHaveBeenNthCalledWith(
-      1,
-      'private-' + session.channelName,
-      'discussion-deleted',
-      discussionId
-    )
-  })
-
-  test('204 - add discussion', async () => {
+  test('204 - hide a discussion', async () => {
     const session = { id: 'sessId', channelName: 'chanName' }
-    const user = { discussionIds: [] }
+    const discussionId = new Types.ObjectId()
+    const user = { discussions: [{ id: discussionId, hidden: false }] }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({})
-    mockUpdateOneUser.mockResolvedValue({})
+    mockDbConnect.mockResolvedValue()
     mockFindUserById.mockResolvedValue(user)
-    mockServerPusherTrigger.mockResolvedValue({})
+    mockUpdateOneUser.mockResolvedValue()
 
-    const discussionId = new Types.ObjectId().toString()
     const request = new NextRequest('http://-', {
       method: 'PUT',
       body: JSON.stringify({ discussionId }),
@@ -551,32 +501,28 @@ describe('PUT', () => {
     expect(mockFindUserById).toHaveBeenNthCalledWith(1, session.id)
     expect(mockUpdateOneUser).toHaveBeenNthCalledWith(
       1,
-      { _id: session.id },
-      {
-        $push: { discussionIds: discussionId },
-        hasUnseenMessages: false,
-      }
+      { _id: session.id, 'discussions.id': discussionId.toString() },
+      { $set: { 'discussions.$.hidden': true } }
     )
 
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
   })
 
-  test('204 - delete discussion', async () => {
+  test('204 - unhide a discussion', async () => {
     const session = { id: 'sessId', channelName: 'chanName' }
     const discussionId = new Types.ObjectId()
-    const user = { discussionIds: [discussionId] }
+    const user = { discussions: [{ id: discussionId, hidden: true }] }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({})
-    mockUpdateOneUser.mockResolvedValue({})
+    mockDbConnect.mockResolvedValue()
     mockFindUserById.mockResolvedValue(user)
-    mockServerPusherTrigger.mockResolvedValue({})
+    mockUpdateOneUser.mockResolvedValue()
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ discussionId: discussionId.toString() }),
+      body: JSON.stringify({ discussionId }),
     })
 
     const response = await PUT(request)
@@ -584,11 +530,8 @@ describe('PUT', () => {
     expect(mockFindUserById).toHaveBeenNthCalledWith(1, session.id)
     expect(mockUpdateOneUser).toHaveBeenNthCalledWith(
       1,
-      { _id: session.id },
-      {
-        $pull: { discussionIds: discussionId.toString() },
-        hasUnseenMessages: false,
-      }
+      { _id: session.id, 'discussions.id': discussionId.toString() },
+      { $set: { 'discussions.$.hidden': false } }
     )
 
     expect(response).toHaveProperty('status', 204)

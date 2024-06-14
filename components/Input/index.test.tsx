@@ -64,7 +64,7 @@ it('renders red borders if there is an error', async () => {
 
   await userEvent.click(submitBtn)
 
-  const container = screen.getByRole('textbox').parentElement as HTMLElement
+  const container = screen.getByRole('textbox').parentElement!
 
   expect(container.className).toContain('border-rose')
 })
@@ -84,7 +84,7 @@ it("doesn't render red borders if there is no error", async () => {
 
   await userEvent.click(submitBtn)
 
-  const container = screen.getByRole('textbox').parentElement as HTMLElement
+  const container = screen.getByRole('textbox').parentElement!
 
   expect(container.className).not.toContain('border-rose')
 })
@@ -96,7 +96,7 @@ it('uses the given class names', () => {
     </TestForm>
   )
 
-  const container = screen.getByRole('textbox').parentElement as HTMLElement
+  const container = screen.getByRole('textbox').parentElement!
 
   expect(container).toHaveClass('city-input')
 })

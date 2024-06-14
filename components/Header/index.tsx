@@ -1,31 +1,27 @@
-'use client'
-
-import { signIn, useSession } from 'next-auth/react'
-import HeaderDropdownMenu from 'components/HeaderDropdownMenu'
+import { signIn } from 'next-auth/react'
 import Link from 'next/link'
-import PlusCircle from 'public/static/images/plus-circle.svg'
-import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
 import classNames from 'classnames'
+import type { User } from 'types'
+import HeaderDiscussions from 'components/HeaderDiscussions'
+import HeaderDropdownMenu from 'components/HeaderDropdownMenu'
+import PlusCircle from 'public/static/images/plus-circle.svg'
+import { POST_PAGE_REGEX } from 'constants/regex'
 
-const HeaderChatListModal = dynamic(
-  () => import('components/HeaderChatListModal'),
-  { ssr: false }
-)
+interface HeaderProps {
+  user?: User
+}
 
-export default function Header() {
-  const { status } = useSession()
-  const pathname = usePathname()
-  const isOnAuthPage = pathname === '/authentication'
+export default function Header({ user }: HeaderProps) {
+  const path = usePathname()
+  const isOnAuthPage = path === '/authentication'
 
   return (
     <header
       className={classNames(
-        pathname.startsWith('/posts') && !pathname.endsWith('/update')
-          ? 'hidden md:flex'
-          : 'flex',
+        path.match(POST_PAGE_REGEX) ? 'hidden md:flex' : 'flex',
         isOnAuthPage ? 'justify-center' : 'justify-between',
-        'items-center p-16'
+        'items-center p-16 mt-auto'
       )}
     >
       <Link
@@ -34,7 +30,7 @@ export default function Header() {
       >
         PostIt
       </Link>
-      {status === 'unauthenticated' && !isOnAuthPage ? (
+      {!user && !isOnAuthPage ? (
         <Link
           href="/authentication"
           className="block bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold"
@@ -45,11 +41,11 @@ export default function Header() {
         >
           Sign in
         </Link>
-      ) : status === 'authenticated' ? (
+      ) : user ? (
         <nav>
           <ul className="flex flex-row flew-nowrap gap-x-8 items-center">
             <li>
-              <HeaderChatListModal />
+              <HeaderDiscussions user={user} />
             </li>
             <li>
               <Link
@@ -61,7 +57,7 @@ export default function Header() {
               </Link>
             </li>
             <li>
-              <HeaderDropdownMenu />
+              <HeaderDropdownMenu userImage={user.image} />
             </li>
           </ul>
         </nav>

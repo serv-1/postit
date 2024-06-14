@@ -1,76 +1,19 @@
 import HeaderDropdownMenu from '.'
-import { render, screen, waitFor } from '@testing-library/react'
-import { rest } from 'msw'
-import { setupServer } from 'msw/node'
+import { render, screen } from '@testing-library/react'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
-import 'cross-fetch/polyfill'
-
-const mockUseSession = jest.spyOn(require('next-auth/react'), 'useSession')
-const mockSetToast = jest.fn()
-const server = setupServer()
-
-jest.mock('hooks/useToast', () => ({
-  __esModule: true,
-  default: () => ({ setToast: mockSetToast, toast: {} }),
-}))
-
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
-
-it("renders the default user image if it doesn't have one", async () => {
-  server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-      expect(req.params.id).toBe('0')
-
-      return res(ctx.status(200), ctx.json({}))
-    })
-  )
-
-  mockUseSession.mockReturnValue({ data: { id: '0' } })
-
-  render(<HeaderDropdownMenu />)
-
-  const userImage = screen.getByRole('img')
-
-  expect(userImage).toHaveAttribute('src', NEXT_PUBLIC_DEFAULT_USER_IMAGE)
-})
 
 it('renders the user image', async () => {
-  server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-      expect(req.params.id).toBe('0')
+  render(<HeaderDropdownMenu userImage="test.png" />)
 
-      return res(ctx.status(200), ctx.json({ image: 'john.jpeg' }))
-    })
-  )
+  const image = screen.getByRole('img')
 
-  mockUseSession.mockReturnValue({ data: { id: '0' } })
-
-  render(<HeaderDropdownMenu />)
-
-  const userImage = screen.getByRole('img')
-
-  await waitFor(() => {
-    expect(userImage).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/john.jpeg')
-  })
+  expect(image).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/test.png')
 })
 
-it('renders an error if the server fails to fetch the user image', async () => {
-  server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
-    })
-  )
-
-  mockUseSession.mockReturnValue({ data: { id: '0' } })
-
+it('renders the default user image', async () => {
   render(<HeaderDropdownMenu />)
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: 'error',
-      error: true,
-    })
-  })
+  const image = screen.getByRole('img')
+
+  expect(image).toHaveAttribute('src', NEXT_PUBLIC_DEFAULT_USER_IMAGE)
 })

@@ -71,12 +71,11 @@ describe('GET', () => {
       _id: new Types.ObjectId(),
       name: 'john',
       email: 'john@test.com',
-      hasUnseenMessages: false,
       channelName: 'channelName',
       image: 'john.jpeg',
       postIds: [],
       favPostIds: [],
-      discussionIds: [],
+      discussions: [],
     }
 
     mockDbConnect.mockResolvedValue({})
@@ -93,12 +92,11 @@ describe('GET', () => {
       id: params.params.id,
       name: user.name,
       email: user.email,
-      hasUnseenMessages: user.hasUnseenMessages,
       channelName: user.channelName,
       image: user.image,
       postIds: user.postIds,
       favPostIds: user.favPostIds,
-      discussionIds: user.discussionIds,
+      discussions: user.discussions,
     })
   })
 
@@ -107,15 +105,14 @@ describe('GET', () => {
       _id: new Types.ObjectId(),
       name: 'john',
       email: 'john@test.com',
-      hasUnseenMessages: false,
       channelName: 'channelName',
       image: 'john.jpeg',
       postIds: [new Types.ObjectId()],
       favPostIds: [new Types.ObjectId(), new Types.ObjectId()],
-      discussionIds: [
-        new Types.ObjectId(),
-        new Types.ObjectId(),
-        new Types.ObjectId(),
+      discussions: [
+        { id: new Types.ObjectId(), hidden: false, hasNewMessage: false },
+        { id: new Types.ObjectId(), hidden: false, hasNewMessage: false },
+        { id: new Types.ObjectId(), hidden: false, hasNewMessage: false },
       ],
     }
 
@@ -133,12 +130,11 @@ describe('GET', () => {
       id: params.params.id,
       name: user.name,
       email: user.email,
-      hasUnseenMessages: user.hasUnseenMessages,
       channelName: user.channelName,
       image: user.image,
       postIds: user.postIds.map((id) => id.toString()),
       favPostIds: user.favPostIds.map((id) => id.toString()),
-      discussionIds: user.discussionIds.map((id) => id.toString()),
+      discussions: JSON.parse(JSON.stringify(user.discussions)),
     })
   })
 })

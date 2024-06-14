@@ -1,25 +1,20 @@
 import { render, screen } from '@testing-library/react'
 import Header from '.'
 import { usePathname } from 'next/navigation'
+import type { User } from 'types'
 
 jest
-  .mock('next/dynamic', () => ({
-    __esModule: true,
-    default: () => () => <ul></ul>,
-  }))
-  .mock('components/HeaderDropdownMenu', () => ({
-    __esModule: true,
-    default: () => <ul></ul>,
-  }))
   .mock('next/navigation', () => ({
     usePathname: jest.fn(),
   }))
+  .mock('components/HeaderDiscussions', () => ({
+    __esModule: true,
+    default: () => <div></div>,
+  }))
 
-const mockUseSession = jest.spyOn(require('next-auth/react'), 'useSession')
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>
 
 it('renders the sign in link if the user is unauthenticated', () => {
-  mockUseSession.mockReturnValue({ status: 'unauthenticated' })
   mockUsePathname.mockReturnValue('/')
 
   render(<Header />)
@@ -30,10 +25,9 @@ it('renders the sign in link if the user is unauthenticated', () => {
 })
 
 it('renders the menu if the user is authenticated', () => {
-  mockUseSession.mockReturnValue({ status: 'authenticated' })
   mockUsePathname.mockReturnValue('/')
 
-  render(<Header />)
+  render(<Header user={{ id: '0' } as User} />)
 
   const link = screen.getByRole('link', { name: /create a post/i })
 
@@ -41,7 +35,6 @@ it('renders the menu if the user is authenticated', () => {
 })
 
 it('renders without the sign in link if the user is on the authentication page', () => {
-  mockUseSession.mockReturnValue({ status: 'unauthenticated' })
   mockUsePathname.mockReturnValue('/authentication')
 
   render(<Header />)
@@ -55,9 +48,8 @@ it('renders without the sign in link if the user is on the authentication page',
   expect(link).not.toBeInTheDocument()
 })
 
-it("isn't displayed on mobile screen if the user is on the post's page", () => {
-  mockUseSession.mockReturnValue({ status: 'unauthenticated' })
-  mockUsePathname.mockReturnValue('/posts/0/table')
+it("isn't displayed on mobile screen if the user is on a post page", () => {
+  mockUsePathname.mockReturnValue('/posts/000000000000000000000000/table')
 
   render(<Header />)
 
@@ -66,8 +58,7 @@ it("isn't displayed on mobile screen if the user is on the post's page", () => {
   expect(header).toHaveClass('hidden md:flex')
 })
 
-it("is displayed on mobile screen if the user isn't on the post's page", () => {
-  mockUseSession.mockReturnValue({ status: 'unauthenticated' })
+it("is displayed on mobile screen if the user isn't on a post page", () => {
   mockUsePathname.mockReturnValue('/create-a-post')
 
   render(<Header />)
@@ -77,8 +68,7 @@ it("is displayed on mobile screen if the user isn't on the post's page", () => {
   expect(header).toHaveClass('flex')
 })
 
-it("is displayed on mobile screen if the user is on the post's update page", () => {
-  mockUseSession.mockReturnValue({ status: 'authenticated' })
+it('is displayed on mobile screen if the user is on a post update page', () => {
   mockUsePathname.mockReturnValue('/posts/0/table/update')
 
   render(<Header />)

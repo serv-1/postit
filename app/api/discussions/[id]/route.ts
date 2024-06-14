@@ -1,12 +1,11 @@
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
-import Discussion, { type DiscussionDoc } from 'models/Discussion'
-import User, { type UserDoc } from 'models/User'
+import Discussion from 'models/Discussion'
+import User from 'models/User'
 import { isValidObjectId } from 'mongoose'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import updateDiscussion from 'schemas/updateDiscussion'
 import dbConnect from 'functions/dbConnect'
-import getServerPusher from 'functions/getServerPusher'
 import validate from 'functions/validate'
 import verifyCsrfTokens from 'functions/verifyCsrfTokens'
 import {
@@ -19,6 +18,8 @@ import {
   CANNOT_SEND_MSG,
   DATA_INVALID,
 } from 'constants/errors'
+import pusher from 'libs/pusher/server'
+import formatDiscussionForClient from 'functions/formatDiscussionForClient'
 
 interface Params {
   params: { id: string }
@@ -44,7 +45,11 @@ export async function GET(request: NextRequest, { params }: Params) {
   try {
     await dbConnect()
 
-    const discussion = await Discussion.findById(discussionId).lean().exec()
+    const discussion = await Discussion.findById(discussionId, {
+      'messages._id': 0,
+    })
+      .lean()
+      .exec()
 
     if (!discussion) {
       return NextResponse.json(
@@ -63,24 +68,12 @@ export async function GET(request: NextRequest, { params }: Params) {
     const buyer = await User.findById(discussion.buyerId).lean().exec()
     const seller = await User.findById(discussion.sellerId).lean().exec()
 
+    const { hasNewMessage } = (
+      session.id === buyer?._id.toString() ? buyer : seller
+    )!.discussions.find((d) => d.id.toString() === discussionId)!
+
     return NextResponse.json(
-      {
-        id: discussion._id,
-        postId: discussion.postId,
-        postName: discussion.postName,
-        channelName: discussion.channelName,
-        messages: discussion.messages,
-        buyer: {
-          id: buyer?._id,
-          name: buyer ? buyer.name : '[DELETED]',
-          image: buyer?.image,
-        },
-        seller: {
-          id: seller?._id,
-          name: seller ? seller.name : '[DELETED]',
-          image: seller?.image,
-        },
-      },
+      formatDiscussionForClient(discussion, buyer, seller, hasNewMessage),
       { status: 200 }
     )
   } catch (e) {
@@ -130,32 +123,13 @@ export async function PUT(request: NextRequest, { params }: Params) {
       return NextResponse.json({ message: CANNOT_SEND_MSG }, { status: 409 })
     }
 
-    let hasBuyerDeletedDiscussion = true
-    let hasSellerDeletedDiscussion = true
-
-    for (const id of buyer.discussionIds) {
-      if (id.toString() === discussionId) {
-        hasBuyerDeletedDiscussion = false
-        break
-      }
-    }
-
-    for (const id of seller.discussionIds) {
-      if (id.toString() === discussionId) {
-        hasSellerDeletedDiscussion = false
-        break
-      }
-    }
-
-    if (hasBuyerDeletedDiscussion || hasSellerDeletedDiscussion) {
-      return NextResponse.json({ message: CANNOT_SEND_MSG }, { status: 409 })
-    }
-
     if (!verifyCsrfTokens(request)) {
       return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
     }
 
-    if (request.body) {
+    const contentLength = request.headers.get('content-length')
+
+    if (contentLength !== null && contentLength !== '0') {
       let data = null
 
       try {
@@ -170,41 +144,100 @@ export async function PUT(request: NextRequest, { params }: Params) {
         return NextResponse.json({ message: result.message }, { status: 422 })
       }
 
-      const userId =
-        session.id === buyer._id.toString()
-          ? seller._id.toString()
-          : buyer._id.toString()
-
-      await Discussion.findByIdAndUpdate(discussionId, {
-        $push: {
-          messages: [{ message: result.value.message, userId: session.id }],
-        },
-      })
-        .lean()
-        .exec()
-
-      const user = (await User.findByIdAndUpdate(userId, {
-        hasUnseenMessages: true,
-      })
-        .lean()
-        .exec()) as UserDoc
-
-      discussion = (await Discussion.findById(discussionId)
-        .lean()
-        .exec()) as DiscussionDoc
-
-      await getServerPusher().triggerBatch([
+      const discussion = (await Discussion.findByIdAndUpdate(
+        discussionId,
         {
-          channel: 'private-' + user.channelName,
-          name: 'new-message',
-          data: '',
+          $push: {
+            messages: [{ message: result.value.message, userId: session.id }],
+          },
         },
         {
-          channel: 'private-encrypted-' + discussion.channelName,
-          name: 'new-message',
-          data: discussion.messages[discussion.messages.length - 1],
-        },
-      ])
+          new: true,
+          projection: { 'messages._id': 0 },
+        }
+      )
+        .lean()
+        .exec())!
+
+      await pusher.trigger(
+        discussion.channelName,
+        'message:new',
+        discussion.messages[discussion.messages.length - 1]
+      )
+
+      const isBuyer = session.id === buyer._id.toString()
+
+      const sellerDiscussion = seller.discussions.find(
+        (discussion) => discussion.id.toString() === discussionId
+      )!
+
+      const buyerDiscussion = buyer.discussions.find(
+        (discussion) => discussion.id.toString() === discussionId
+      )!
+
+      if (isBuyer) {
+        if (sellerDiscussion.hidden) {
+          await pusher.trigger(
+            seller.channelName,
+            'discussion:new',
+            formatDiscussionForClient(discussion, buyer, seller, true)
+          )
+        }
+
+        if (buyerDiscussion.hidden) {
+          await User.updateOne(
+            { _id: buyer._id, 'discussions.id': discussionId },
+            { $set: { 'discussions.$.hidden': false } }
+          )
+            .lean()
+            .exec()
+        }
+
+        await User.updateOne(
+          { _id: seller._id, 'discussions.id': discussionId },
+          {
+            $set: {
+              'discussions.$.hidden': false,
+              'discussions.$.hasNewMessage': true,
+            },
+          }
+        )
+          .lean()
+          .exec()
+
+        await pusher.trigger(seller.channelName, 'message:new', '')
+      } else {
+        if (buyerDiscussion.hidden) {
+          await pusher.trigger(
+            buyer.channelName,
+            'discussion:new',
+            formatDiscussionForClient(discussion, buyer, seller, true)
+          )
+        }
+
+        if (sellerDiscussion.hidden) {
+          await User.updateOne(
+            { _id: seller._id, 'discussions.id': discussionId },
+            { $set: { 'discussions.$.hidden': false } }
+          )
+            .lean()
+            .exec()
+        }
+
+        await User.updateOne(
+          { _id: buyer._id, 'discussions.id': discussionId },
+          {
+            $set: {
+              'discussions.$.hidden': false,
+              'discussions.$.hasNewMessage': true,
+            },
+          }
+        )
+          .lean()
+          .exec()
+
+        await pusher.trigger(buyer.channelName, 'message:new', '')
+      }
     } else {
       for (let i = discussion.messages.length - 1; i >= 0; i--) {
         const message = discussion.messages[i]
@@ -218,40 +251,19 @@ export async function PUT(request: NextRequest, { params }: Params) {
         }
       }
 
-      await Discussion.findByIdAndUpdate(discussionId, {
-        $set: { messages: discussion.messages },
-      })
+      await Discussion.updateOne(
+        { _id: discussionId },
+        { $set: { messages: discussion.messages } }
+      )
         .lean()
         .exec()
 
-      const user = (await User.findById(session.id).lean().exec()) as UserDoc
-
-      const discussions = await Discussion.find({
-        _id: {
-          $in: user.discussionIds.filter(
-            (id) => id.toString() !== discussionId
-          ),
-        },
-      })
+      await User.updateOne(
+        { _id: session.id, 'discussions.id': discussionId },
+        { $set: { 'discussions.$.hasNewMessage': false } }
+      )
         .lean()
         .exec()
-
-      let hasUnseenMessages = false
-
-      for (const discussion of discussions) {
-        const lastMsg = discussion.messages[discussion.messages.length - 1]
-
-        if (lastMsg.userId.toString() !== session.id && !lastMsg.seen) {
-          hasUnseenMessages = true
-          break
-        }
-      }
-
-      if (!hasUnseenMessages) {
-        await User.findByIdAndUpdate(session.id, { hasUnseenMessages })
-          .lean()
-          .exec()
-      }
     }
 
     return new Response(null, { status: 204 })

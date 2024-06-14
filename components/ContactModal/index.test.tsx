@@ -1,80 +1,220 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ContactModal from '.'
-
-const mockSetToast = jest.fn()
-const mockUseSession = jest.spyOn(require('next-auth/react'), 'useSession')
+import { setupServer } from 'msw/node'
+import { rest } from 'msw'
+import 'cross-fetch/polyfill'
+import { act } from 'react-dom/test-utils'
+import usePusher from 'hooks/usePusher'
 
 jest
   .mock('hooks/useToast', () => ({
     __esModule: true,
-    default: () => ({ setToast: mockSetToast, toast: {} }),
+    default: () => ({ setToast: () => null, toast: {} }),
   }))
-  .mock('components/ChatModal', () => ({
+  .mock('hooks/usePusher', () => ({
     __esModule: true,
-    default: ({ isOpen }: { isOpen: boolean }) =>
-      isOpen ? <div role="dialog"></div> : null,
+    default: jest.fn(),
   }))
 
-it('is closed by default', () => {
-  mockUseSession.mockReturnValue({ status: 'authenticated' })
+const server = setupServer()
+const mockUseSession = jest.spyOn(require('next-auth/react'), 'useSession')
+const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
+const mockUsePusher = usePusher as jest.MockedFunction<typeof usePusher>
 
+beforeEach(() => {
+  mockUseSession.mockReturnValue({
+    status: 'authenticated',
+    data: { channelName: 'test' },
+  })
+
+  mockGetCsrfToken.mockResolvedValue('token')
+})
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
+it('opens/closes', async () => {
   render(<ContactModal postId="0" postName="table" sellerId="0" />)
 
-  const modal = screen.queryByRole('dialog')
+  let modal = screen.queryByRole('dialog')
+
+  expect(modal).not.toBeInTheDocument()
+
+  const openBtn = screen.getByRole('button')
+
+  await userEvent.click(openBtn)
+
+  modal = screen.getByRole('dialog')
+
+  expect(modal).toBeInTheDocument()
+
+  const closeBtn = screen.getByRole('button', { name: /close/i })
+
+  await userEvent.click(closeBtn)
 
   expect(modal).not.toBeInTheDocument()
 })
 
-it('renders a floating round button', () => {
-  mockUseSession.mockReturnValue({ status: 'authenticated' })
-
+it("opens the discussion if it isn't hidden", async () => {
   render(
-    <ContactModal postId="0" postName="table" sellerId="0" hasFloatingBtn />
+    <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />
   )
 
-  const btn = screen.getByRole('button')
+  const openBtn = screen.getByRole('button')
+  const openDiscussionHandler = jest.fn()
 
-  expect(btn).toHaveClass('round-btn')
-  expect(btn).not.toHaveTextContent(/contact/i)
+  document.addEventListener('openDiscussion', openDiscussionHandler)
+
+  await userEvent.click(openBtn)
+
+  const modal = screen.queryByRole('dialog')
+
+  expect(modal).not.toBeInTheDocument()
+  expect(openDiscussionHandler).toHaveBeenCalledTimes(1)
 })
 
-it('renders a primary button', () => {
-  mockUseSession.mockReturnValue({ status: 'authenticated' })
+it("doesn't open the discussion if it is hidden", async () => {
+  render(
+    <ContactModal
+      discussionId="0"
+      postId="1"
+      postName="table"
+      sellerId="2"
+      isDiscussionHidden
+    />
+  )
 
-  render(<ContactModal postId="0" postName="table" sellerId="0" />)
+  const openBtn = screen.getByRole('button')
+  const openDiscussionHandler = jest.fn()
 
-  const btn = screen.getByRole('button')
+  document.addEventListener('openDiscussion', openDiscussionHandler)
 
-  expect(btn).toHaveClass('primary-btn')
-  expect(btn).toHaveTextContent(/contact/i)
-})
-
-it('opens by clicking on the button if the user is authenticated', async () => {
-  mockUseSession.mockReturnValue({ status: 'authenticated' })
-
-  render(<ContactModal postId="0" postName="table" sellerId="0" />)
-
-  const btn = screen.getByRole('button')
-
-  await userEvent.click(btn)
+  await userEvent.click(openBtn)
 
   const modal = screen.getByRole('dialog')
 
   expect(modal).toBeInTheDocument()
+  expect(openDiscussionHandler).not.toHaveBeenCalled()
 })
 
-it('renders a message after clicking on the button if the user is unauthenticated', async () => {
-  mockUseSession.mockReturnValue({ status: 'unauthenticated' })
+it('closes the modal and opens the discussion on message sent', async () => {
+  server.use(
+    rest.post('http://localhost/api/discussion', (req, res, ctx) => {
+      return res(ctx.status(201), ctx.json({ id: '0' }))
+    })
+  )
 
   render(<ContactModal postId="0" postName="table" sellerId="0" />)
 
-  const btn = screen.getByRole('button')
+  const openBtn = screen.getByRole('button')
 
-  await userEvent.click(btn)
+  await userEvent.click(openBtn)
+
+  const input = screen.getByRole('textbox')
+
+  await userEvent.type(input, 'a')
+
+  const sendBtn = screen.getByRole('button', { name: /send/i })
+  const openDiscussionHandler = jest.fn()
+
+  document.addEventListener('openDiscussion', openDiscussionHandler)
+
+  await userEvent.click(sendBtn)
 
   const modal = screen.queryByRole('dialog')
 
   expect(modal).not.toBeInTheDocument()
-  expect(mockSetToast).toHaveBeenCalledTimes(1)
+  expect(openDiscussionHandler).toHaveBeenCalledTimes(1)
+
+  await userEvent.click(openBtn)
+
+  expect(openDiscussionHandler).toHaveBeenCalledTimes(2)
+})
+
+it("can't open the discussion if it has been deleted", async () => {
+  render(
+    <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />
+  )
+
+  act(() => {
+    document.dispatchEvent(
+      new CustomEvent('discussionDeleted', { detail: '0' })
+    )
+  })
+
+  const openBtn = screen.getByRole('button')
+  const openDiscussionHandler = jest.fn()
+
+  document.addEventListener('openDiscussion', openDiscussionHandler)
+
+  await userEvent.click(openBtn)
+
+  expect(openDiscussionHandler).not.toHaveBeenCalled()
+})
+
+it('still can open the discussion if it is another discussion that has been deleted', async () => {
+  render(
+    <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />
+  )
+
+  act(() => {
+    document.dispatchEvent(
+      new CustomEvent('discussionDeleted', { detail: '6' })
+    )
+  })
+
+  const openBtn = screen.getByRole('button')
+  const openDiscussionHandler = jest.fn()
+
+  document.addEventListener('openDiscussion', openDiscussionHandler)
+
+  await userEvent.click(openBtn)
+
+  expect(openDiscussionHandler).toHaveBeenCalledTimes(1)
+})
+
+it('can open the discussion if it has a new message', async () => {
+  render(
+    <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />
+  )
+
+  act(() => {
+    mockUsePusher.mock.calls[0][2]({ discussionId: '0' })
+  })
+
+  const openBtn = screen.getByRole('button')
+  const openDiscussionHandler = jest.fn()
+
+  document.addEventListener('openDiscussion', openDiscussionHandler)
+
+  await userEvent.click(openBtn)
+
+  expect(openDiscussionHandler).toHaveBeenCalledTimes(1)
+})
+
+it("still can't open the discussion if it is another discussion that has a new message", async () => {
+  render(
+    <ContactModal
+      discussionId="0"
+      postId="1"
+      postName="table"
+      sellerId="2"
+      isDiscussionHidden
+    />
+  )
+
+  act(() => {
+    mockUsePusher.mock.calls[0][2]({ discussionId: '6' })
+  })
+
+  const openBtn = screen.getByRole('button')
+  const openDiscussionHandler = jest.fn()
+
+  document.addEventListener('openDiscussion', openDiscussionHandler)
+
+  await userEvent.click(openBtn)
+
+  expect(openDiscussionHandler).not.toHaveBeenCalled()
 })

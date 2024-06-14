@@ -34,8 +34,7 @@ it('uses the given class names', () => {
     </TestForm>
   )
 
-  const container = screen.getByLabelText(/^password$/i)
-    .parentElement as HTMLElement
+  const container = screen.getByLabelText(/^password$/i).parentElement!
 
   expect(container).toHaveClass('blue-password')
 })

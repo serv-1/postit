@@ -10,6 +10,8 @@ export type SearchedPost = UnArray<PostsSearchGetData['posts']>
 
 export type User = UsersIdGetData
 
+export type Discussion = DiscussionsIdGetData
+
 export interface UserPost {
   id: string
   name: string
@@ -22,19 +24,6 @@ export interface UserFavoritePost {
   id: string
   name: string
   image: string
-}
-
-export type Discussion = Omit<DiscussionsIdGetData, 'messages'> & {
-  messages: (Omit<UnArray<DiscussionsIdGetData['messages']>, 'createdAt'> & {
-    createdAt: Date
-  })[]
-}
-
-export interface NewDiscussionMessage {
-  message: string
-  createdAt: string
-  userId: string
-  seen: boolean
 }
 
 export type Categories = UnArray<typeof CATEGORIES>
@@ -52,9 +41,4 @@ export type UnArray<T> = T extends Array<infer U> | ReadonlyArray<infer U>
 export interface DeferredPromise<T extends unknown> {
   resolve: (value: T) => void
   reject: (reason?: any) => void
-}
-
-export interface DiscussionEventData {
-  discussionId: string
-  userId: string
 }

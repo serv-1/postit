@@ -43,7 +43,7 @@ export default function PostPageMap({ address, latLon }: PostPageMapProps) {
         className={
           isOpen ? 'fixed top-0 left-0 w-screen h-screen z-[9999]' : 'hidden'
         }
-        setIsOpen={setIsOpen}
+        onClose={() => setIsOpen(false)}
       >
         <Map zoom={11} center={latLon} className="w-screen h-screen">
           <MapInvalidateSize resize={isOpen} />

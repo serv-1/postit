@@ -1,28 +1,21 @@
 import { nanoid } from 'nanoid'
-import {
-  type ComponentPropsWithoutRef,
-  type Dispatch,
-  type ReactNode,
-  type SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 type ModalProps = Omit<
-  ComponentPropsWithoutRef<'div'>,
+  React.ComponentPropsWithoutRef<'div'>,
   'role' | 'aria-modal'
 > & {
-  children: ReactNode
-  setIsOpen: Dispatch<SetStateAction<boolean>>
+  children: React.ReactNode
+  onClose: () => void
   isHidden?: boolean
 }
 
 export default function Modal({
   children,
-  setIsOpen,
+  onClose,
   isHidden,
+  className,
   ...rest
 }: ModalProps) {
   const focusableEls =
@@ -31,15 +24,20 @@ export default function Modal({
   const [isContainerMounted, setIsContainerMounted] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
   const idRef = useRef('a' + nanoid())
+  const onCloseRef = useRef(onClose)
 
   useEffect(() => {
     const restoreFocus = document.activeElement as HTMLElement
     const container = document.createElement('div')
+
     container.setAttribute('id', idRef.current)
 
     const onClick = (e: MouseEvent) => {
-      if (modalRef.current?.contains(e.target as HTMLElement)) return
-      setIsOpen(false)
+      if (modalRef.current?.contains(e.target as HTMLElement)) {
+        return
+      }
+
+      onCloseRef.current()
     }
 
     container.addEventListener('click', onClick)
@@ -51,29 +49,27 @@ export default function Modal({
       container.removeEventListener('click', onClick)
       restoreFocus.focus()
     }
-  }, [setIsOpen])
+  }, [])
 
   useEffect(() => {
     if (!modalRef.current) return
+
     const el = modalRef.current.querySelectorAll<HTMLElement>(focusableEls)[0]
+
     if (el) el.focus()
   }, [isContainerMounted])
 
   useEffect(() => {
-    const _class = ' overflow-hidden'
-
-    if (document.body.className.includes(_class)) return
-
-    if (isHidden) {
-      document.body.className = document.body.className.replace(_class, '')
-    } else if (isHidden === false) {
-      document.body.className += _class
-    } else {
-      document.body.className += _class
+    if (document.body.classList.contains('overflow-hidden') || isHidden) {
+      return
     }
 
+    const noScrollbar = 'overflow-hidden'
+
+    document.body.classList.add(noScrollbar)
+
     return () => {
-      document.body.className = document.body.className.replace(_class, '')
+      document.body.classList.remove(noScrollbar)
     }
   }, [isHidden])
 
@@ -82,12 +78,13 @@ export default function Modal({
   return createPortal(
     <div
       {...rest}
+      className={isHidden ? 'hidden' : className}
       ref={modalRef}
       role="dialog"
       aria-modal="true"
       onKeyDown={(e) => {
         if (e.key === 'Escape') {
-          setIsOpen(false)
+          onCloseRef.current()
         } else if (e.key === 'Tab') {
           const modal = modalRef.current
           if (!modal) return
@@ -110,6 +107,6 @@ export default function Modal({
     >
       {children}
     </div>,
-    document.querySelector('#' + idRef.current) as HTMLElement
+    document.querySelector('#' + idRef.current)!
   )
 }

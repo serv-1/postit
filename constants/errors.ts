@@ -61,4 +61,4 @@ export const DISCUSSION_NOT_FOUND = 'Discussion not found.'
 export const DISCUSSION_ALREADY_EXISTS = 'You already have started a discussion for this post.'
 export const CSRF_TOKEN_INVALID = 'Something weird happened! Try to refresh the page or sign out and sign in again.'
 export const DEFAULT = "Something go wrong! Try your action again or just wait if it still doesn't work."
-export const CANNOT_SEND_MSG = 'You cannot send a message because your interlocutor has deleted its account or the discussion.'
+export const CANNOT_SEND_MSG = 'Your interlocutor has deleted its account.'

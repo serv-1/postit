@@ -125,7 +125,7 @@ it("renders the actual post's images", async () => {
 
   expect(expandImageBtns).toHaveLength(2)
 
-  const container = expandImageBtns[0].parentElement as HTMLElement
+  const container = expandImageBtns[0].parentElement!
 
   expect(container.children.length).toBe(5)
 })

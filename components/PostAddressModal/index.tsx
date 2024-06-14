@@ -46,7 +46,7 @@ export default function PostAddressModal({
       </button>
       <Modal
         isHidden={!isOpen}
-        setIsOpen={setIsOpen}
+        onClose={() => setIsOpen(false)}
         className={isOpen ? 'w-screen h-screen fixed top-0 left-0' : 'hidden'}
       >
         <MapInput setLatLon={setLatLon} />

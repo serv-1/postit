@@ -19,6 +19,7 @@ export interface DiscussionsIdGetData {
     name: string
     image?: string
   }
+  hasNewMessage: boolean
 }
 
 export interface DiscussionsIdGetError {

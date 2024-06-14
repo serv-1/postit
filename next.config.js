@@ -30,5 +30,4 @@ module.exports = {
       'postit-images-bucket-dev.s3.eu-west-3.amazonaws.com',
     ],
   },
-  optimizeFonts: false,
 }

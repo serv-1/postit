@@ -4,19 +4,18 @@
 
 import { POST } from './route'
 import { NextRequest } from 'next/server'
-import { Types } from 'mongoose'
+import mongoose from 'mongoose'
 // @ts-expect-error
 import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
 import { mockGetServerSession } from 'next-auth'
 // @ts-expect-error
-import { mockServerPusherTrigger } from 'functions/getServerPusher'
+import { mockPusherTrigger } from 'libs/pusher/server'
 // @ts-expect-error
 import { mockVerifyCsrfTokens } from 'functions/verifyCsrfTokens'
-// @ts-expect-error
-import { mockFindOneDiscussion, mockSaveDiscussion } from 'models/Discussion'
-// @ts-expect-error
-import { mockFindUserById } from 'models/User'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import User from 'models/User'
+import Discussion from 'models/Discussion'
 import {
   CSRF_TOKEN_INVALID,
   DATA_INVALID,
@@ -26,17 +25,29 @@ import {
   UNAUTHORIZED,
   USER_NOT_FOUND,
 } from 'constants/errors'
+import Post from 'models/Post'
 
 jest
   .mock('next-auth')
-  .mock('models/Discussion')
-  .mock('models/User')
   .mock('functions/dbConnect')
-  .mock('functions/getServerPusher')
+  .mock('libs/pusher/server')
   .mock('functions/verifyCsrfTokens')
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
   }))
+
+let mongoServer: MongoMemoryServer
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create()
+
+  await mongoose.connect(mongoServer.getUri())
+})
+
+afterAll(async () => {
+  await mongoose.disconnect()
+  await mongoServer.stop()
+})
 
 describe('POST', () => {
   test('401 - unauthorized', async () => {
@@ -84,8 +95,8 @@ describe('POST', () => {
       method: 'POST',
       body: JSON.stringify({
         message: 'yo',
-        postId: new Types.ObjectId().toString(),
-        sellerId: new Types.ObjectId().toString(),
+        postId: new mongoose.Types.ObjectId().toString(),
+        sellerId: new mongoose.Types.ObjectId().toString(),
         postName: 'table',
       }),
     })
@@ -98,7 +109,7 @@ describe('POST', () => {
   })
 
   test("422 - the authenticated user can't be the seller", async () => {
-    const session = { id: new Types.ObjectId().toString() }
+    const session = { id: new mongoose.Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -107,7 +118,7 @@ describe('POST', () => {
       method: 'POST',
       body: JSON.stringify({
         message: 'yo',
-        postId: new Types.ObjectId().toString(),
+        postId: new mongoose.Types.ObjectId().toString(),
         sellerId: session.id,
         postName: 'table',
       }),
@@ -129,31 +140,8 @@ describe('POST', () => {
       method: 'POST',
       body: JSON.stringify({
         message: 'yo',
-        postId: new Types.ObjectId().toString(),
-        sellerId: new Types.ObjectId().toString(),
-        postName: 'table',
-      }),
-    })
-
-    const response = await POST(request)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
-  })
-
-  test('500 - find one discussion failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({})
-    mockFindOneDiscussion.mockRejectedValue({})
-
-    const request = new NextRequest('http://-', {
-      method: 'POST',
-      body: JSON.stringify({
-        message: 'yo',
-        postId: new Types.ObjectId().toString(),
-        sellerId: new Types.ObjectId().toString(),
+        postId: new mongoose.Types.ObjectId().toString(),
+        sellerId: new mongoose.Types.ObjectId().toString(),
         postName: 'table',
       }),
     })
@@ -166,112 +154,27 @@ describe('POST', () => {
   })
 
   test('409 - discussion already exists', async () => {
-    const session = { id: new Types.ObjectId().toString() }
+    const session = { id: new mongoose.Types.ObjectId().toString() }
+    const postId = new mongoose.Types.ObjectId().toString()
+    const sellerId = new mongoose.Types.ObjectId().toString()
+
+    await new Discussion({
+      messages: [],
+      buyerId: session.id,
+      sellerId,
+      postName: 'table',
+      postId,
+    }).save()
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindOneDiscussion.mockResolvedValue({})
 
-    const postId = new Types.ObjectId().toString()
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
         message: 'yo',
         postId,
-        sellerId: new Types.ObjectId().toString(),
-        postName: 'table',
-      }),
-    })
-
-    const response = await POST(request)
-    const data = await response.json()
-
-    expect(mockFindOneDiscussion).toHaveBeenNthCalledWith(1, {
-      buyerId: session.id,
-      postId,
-    })
-
-    expect(response).toHaveProperty('status', 409)
-    expect(data).toEqual({ message: DISCUSSION_ALREADY_EXISTS })
-  })
-
-  test('500 - discussion creation failed', async () => {
-    const session = { id: new Types.ObjectId().toString() }
-
-    mockGetServerSession.mockResolvedValue(session)
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({})
-    mockFindOneDiscussion.mockResolvedValue(null)
-    mockSaveDiscussion.mockRejectedValue({})
-
-    const request = new NextRequest('http://-', {
-      method: 'POST',
-      body: JSON.stringify({
-        message: 'yo',
-        postId: new Types.ObjectId().toString(),
-        sellerId: new Types.ObjectId().toString(),
-        postName: 'table',
-      }),
-    })
-
-    const response = await POST(request)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
-  })
-
-  test('500 - find seller by id failed', async () => {
-    const session = { id: new Types.ObjectId().toString() }
-
-    mockGetServerSession.mockResolvedValue(session)
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({})
-    mockFindOneDiscussion.mockResolvedValue(null)
-    mockSaveDiscussion.mockResolvedValue({})
-    mockFindUserById.mockRejectedValue({})
-
-    const message = 'yo'
-    const postId = new Types.ObjectId().toString()
-    const sellerId = new Types.ObjectId().toString()
-    const postName = 'table'
-    const request = new NextRequest('http://-', {
-      method: 'POST',
-      body: JSON.stringify({ message, postId, sellerId, postName }),
-    })
-
-    const response = await POST(request)
-    const data = await response.json()
-
-    expect(mockSaveDiscussion).toHaveBeenNthCalledWith(1, {
-      messages: [{ message, userId: session.id }],
-      buyerId: session.id,
-      sellerId,
-      postId,
-      postName,
-    })
-
-    expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
-  })
-
-  test('404 - seller not found', async () => {
-    const session = { id: new Types.ObjectId().toString() }
-
-    mockGetServerSession.mockResolvedValue(session)
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({})
-    mockFindOneDiscussion.mockResolvedValue(null)
-    mockSaveDiscussion.mockResolvedValue({})
-    mockFindUserById.mockResolvedValue(null)
-
-    const sellerId = new Types.ObjectId().toString()
-    const request = new NextRequest('http://-', {
-      method: 'POST',
-      body: JSON.stringify({
-        message: 'yo',
-        postId: new Types.ObjectId().toString(),
         sellerId,
         postName: 'table',
       }),
@@ -280,28 +183,68 @@ describe('POST', () => {
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockFindUserById).toHaveBeenNthCalledWith(1, sellerId)
-    expect(response).toHaveProperty('status', 404)
-    expect(data).toEqual({ message: USER_NOT_FOUND })
+    expect(response).toHaveProperty('status', 409)
+    expect(data).toEqual({ message: DISCUSSION_ALREADY_EXISTS })
+
+    await Discussion.deleteMany()
   })
 
-  test('500 - "discussion-created" pusher event triggering failed', async () => {
-    const session = { id: new Types.ObjectId().toString() }
+  test('404 - seller not found', async () => {
+    const session = { id: new mongoose.Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindOneDiscussion.mockResolvedValue(null)
-    mockSaveDiscussion.mockResolvedValue({})
-    mockFindUserById.mockResolvedValue({})
-    mockServerPusherTrigger.mockRejectedValue({})
 
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
         message: 'yo',
-        postId: new Types.ObjectId().toString(),
-        sellerId: new Types.ObjectId().toString(),
+        postId: new mongoose.Types.ObjectId().toString(),
+        sellerId: new mongoose.Types.ObjectId().toString(),
+        postName: 'table',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response).toHaveProperty('status', 404)
+    expect(data).toEqual({ message: USER_NOT_FOUND })
+  })
+
+  test('500 - "discussion:new" pusher event triggering failed', async () => {
+    const buyer = await new User({
+      name: 'john',
+      email: 'john@test.com',
+      password: 'password',
+      postIds: [],
+      favPostIds: [],
+      discussions: [],
+    }).save()
+
+    const seller = await new User({
+      name: 'jane',
+      email: 'jane@test.com',
+      password: 'password',
+      postIds: [],
+      favPostIds: [],
+      discussions: [],
+    }).save()
+
+    const session = { id: buyer._id.toString() }
+
+    mockGetServerSession.mockResolvedValue(session)
+    mockVerifyCsrfTokens.mockReturnValue(true)
+    mockDbConnect.mockResolvedValue({})
+    mockPusherTrigger.mockRejectedValue({})
+
+    const request = new NextRequest('http://-', {
+      method: 'POST',
+      body: JSON.stringify({
+        message: 'yo',
+        postId: new mongoose.Types.ObjectId().toString(),
+        sellerId: seller._id.toString(),
         postName: 'table',
       }),
     })
@@ -311,31 +254,54 @@ describe('POST', () => {
 
     expect(response).toHaveProperty('status', 500)
     expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
+
+    await User.deleteMany()
   })
 
   test('201 - discussion created', async () => {
-    const session = {
-      id: new Types.ObjectId().toString(),
-      channelName: 'chanName',
-    }
+    const buyer = await new User({
+      name: 'john',
+      email: 'john@test.com',
+      password: 'password',
+      postIds: [],
+      favPostIds: [],
+      discussions: [],
+    }).save()
 
-    const discussion = { _id: new Types.ObjectId() }
-    const seller = { channelName: 'chanName' }
+    const seller = await new User({
+      name: 'jane',
+      email: 'jane@test.com',
+      password: 'password',
+      postIds: [],
+      favPostIds: [],
+      discussions: [],
+    }).save()
+
+    const post = await new Post({
+      name: 'table',
+      description: 'magnificent table',
+      categories: ['furniture'],
+      price: 4000,
+      images: ['table.jpg'],
+      userId: seller._id,
+      address: 'France',
+      latLon: [42, 58],
+      discussionIds: [],
+    }).save()
+
+    const session = { id: buyer._id.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindOneDiscussion.mockResolvedValue(null)
-    mockSaveDiscussion.mockResolvedValue(discussion)
-    mockFindUserById.mockResolvedValue(seller)
-    mockServerPusherTrigger.mockResolvedValue({})
+    mockPusherTrigger.mockResolvedValue({})
 
     const request = new NextRequest('http://-', {
       method: 'POST',
       body: JSON.stringify({
         message: 'yo',
-        postId: new Types.ObjectId().toString(),
-        sellerId: new Types.ObjectId().toString(),
+        postId: post._id.toString(),
+        sellerId: seller._id.toString(),
         postName: 'table',
       }),
     })
@@ -343,11 +309,35 @@ describe('POST', () => {
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockServerPusherTrigger).toHaveBeenNthCalledWith(
+    const discussion = (await Discussion.findOne(
+      { buyerId: buyer._id, postId: post._id },
+      { 'messages._id': 0 }
+    )
+      .lean()
+      .exec())!
+
+    expect(mockPusherTrigger).toHaveBeenNthCalledWith(
       1,
-      ['private-' + session.channelName, 'private-' + seller.channelName],
-      'discussion-created',
-      { discussionId: discussion._id, userId: session.id }
+      seller.channelName,
+      'discussion:new',
+      {
+        id: discussion._id,
+        postId: discussion.postId,
+        postName: discussion.postName,
+        channelName: discussion.channelName,
+        messages: discussion.messages,
+        buyer: {
+          id: buyer._id,
+          name: buyer.name,
+          image: buyer.image,
+        },
+        seller: {
+          id: seller._id,
+          name: seller.name,
+          image: seller.image,
+        },
+        hasNewMessage: true,
+      }
     )
 
     expect(response).toHaveProperty('status', 201)

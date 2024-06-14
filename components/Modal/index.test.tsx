@@ -3,44 +3,73 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import Modal from '.'
 
-it('renders', async () => {
-  const setIsOpen = jest.fn()
-
+it('uses the given class names', () => {
   render(
-    <Modal className="red" setIsOpen={setIsOpen}>
-      <button>Ok</button>
+    <Modal className="red" onClose={() => null}>
+      ah
     </Modal>
   )
 
   const modal = screen.getByRole('dialog')
+
   expect(modal).toHaveClass('red')
+})
+
+it('gives the focus to the first focusable element in the modal', () => {
+  render(
+    <Modal onClose={() => null}>
+      <button>ok</button>
+    </Modal>
+  )
 
   const btn = screen.getByRole('button')
+
   expect(btn).toHaveFocus()
 })
 
-test("clicking in the modal don't close it but clicking outside (in the modal container) should", async () => {
-  const setIsOpen = jest.fn()
+it('closes the modal by clicking outside of it', async () => {
+  const onClose = jest.fn()
+
+  render(<Modal onClose={onClose}>ah</Modal>)
+
+  const modal = screen.getByRole('dialog')
+
+  await userEvent.click(modal.parentElement!)
+
+  expect(onClose).toHaveBeenCalledTimes(1)
+})
+
+it("doesn't close the modal by clicking inside of it", async () => {
+  const onClose = jest.fn()
+
+  render(<Modal onClose={onClose}>ah</Modal>)
+
+  const modal = screen.getByRole('dialog')
+
+  await userEvent.click(modal)
+
+  expect(onClose).not.toHaveBeenCalled()
+})
+
+it('closes the modal by pressing "Escape"', async () => {
+  const onClose = jest.fn()
 
   render(
-    <Modal setIsOpen={setIsOpen}>
-      <h1>Fabulous modal</h1>
+    <Modal onClose={onClose}>
+      <button>ok</button>
     </Modal>
   )
 
-  const modal = screen.getByRole('dialog')
-  await userEvent.click(modal)
-  expect(setIsOpen).not.toHaveBeenCalled()
+  await userEvent.keyboard('{Escape}')
 
-  await userEvent.click(modal.parentElement as HTMLElement)
-  expect(setIsOpen).toHaveBeenNthCalledWith(1, false)
+  expect(onClose).toHaveBeenCalledTimes(1)
 })
 
 test("the focus can't leave the modal", async () => {
-  const setIsOpen = jest.fn()
+  const onClose = jest.fn()
 
   render(
-    <Modal setIsOpen={setIsOpen}>
+    <Modal onClose={onClose}>
       <input type="text" />
       <button>Update</button>
     </Modal>
@@ -49,46 +78,29 @@ test("the focus can't leave the modal", async () => {
   await userEvent.tab()
 
   const btn = screen.getByRole('button')
+
   expect(btn).toHaveFocus()
 
   await userEvent.tab()
 
   const input = screen.getByRole('textbox')
+
   expect(input).toHaveFocus()
 
   await userEvent.tab({ shift: true })
+
   expect(btn).toHaveFocus()
 
   await userEvent.tab({ shift: true })
+
   expect(input).toHaveFocus()
 })
 
-test('pressing "Escape" close the modal but not its parent modal', async () => {
-  const setIsParentOpen = jest.fn()
-  const setIsChildOpen = jest.fn()
+it('removes the modal container from the DOM once the modal is unmounted', () => {
+  const { unmount } = render(<Modal onClose={() => null}>ah</Modal>)
 
-  render(
-    <Modal setIsOpen={setIsParentOpen}>
-      <Modal setIsOpen={setIsChildOpen}>
-        <h1 tabIndex={0}>Child Modal</h1>
-      </Modal>
-    </Modal>
-  )
+  const container = screen.getByRole('dialog').parentElement!
 
-  await userEvent.keyboard('{Escape}')
-
-  expect(setIsChildOpen).toHaveBeenNthCalledWith(1, false)
-  expect(setIsParentOpen).not.toHaveBeenCalled()
-})
-
-test('the modal container is removed from the DOM once the modal is unmounted', () => {
-  const { unmount } = render(
-    <Modal setIsOpen={() => null}>
-      <h1>Fabulous modal</h1>
-    </Modal>
-  )
-
-  const container = screen.getByRole('dialog').parentElement as HTMLElement
   container.remove = jest.fn()
   container.removeEventListener = jest.fn()
 
@@ -98,14 +110,15 @@ test('the modal container is removed from the DOM once the modal is unmounted', 
   expect(container.removeEventListener).toHaveBeenCalledTimes(1)
 })
 
-test('when the modal is closed, the focus goes back to the last element focused before the modal opens', async () => {
+it('gives the focus back to the last element focused before the modal is opened on close', async () => {
   const Test = () => {
     const [isOpen, setIsOpen] = useState(false)
+
     return (
       <>
         <button onClick={() => setIsOpen(true)}>Open</button>
         {isOpen && (
-          <Modal setIsOpen={setIsOpen}>
+          <Modal onClose={() => setIsOpen(false)}>
             <button onClick={() => setIsOpen(false)}>Close</button>
           </Modal>
         )}
@@ -116,64 +129,52 @@ test('when the modal is closed, the focus goes back to the last element focused 
   render(<Test />)
 
   const openBtn = screen.getByRole('button')
+
   await userEvent.click(openBtn)
 
   const closeBtn = screen.getByRole('button', { name: /close/i })
+
   await userEvent.click(closeBtn)
 
   expect(openBtn).toHaveFocus()
 })
 
-test('the scroll is disabled if the modal is opened and enabled again if the modal is closed', () => {
-  const { unmount } = render(<Modal setIsOpen={() => null}>Ah</Modal>)
-
-  expect(document.body.className).toBe(' overflow-hidden')
-
-  unmount()
-  expect(document.body.className).toBe('')
-})
-
-test('the scroll is disabled if the modal is displayed and enabled again if the modal is hidden', () => {
-  const { rerender } = render(
-    <Modal setIsOpen={() => null} isHidden={false}>
-      Ah
+it('is hidden', () => {
+  render(
+    <Modal onClose={() => null} isHidden={true}>
+      ah
     </Modal>
   )
 
-  expect(document.body.className).toBe(' overflow-hidden')
+  const modal = screen.getByRole('dialog')
 
-  rerender(
-    <Modal setIsOpen={() => null} isHidden>
-      Ah
-    </Modal>
-  )
-  expect(document.body.className).toBe('')
+  expect(modal).toHaveClass('hidden')
+  expect(document.body).not.toHaveClass('overflow-hidden')
 })
 
-test('the scroll is enabled again if the modal is closed after being opened', () => {
-  const { unmount } = render(
-    <Modal setIsOpen={() => null} isHidden={false}>
-      Ah
-    </Modal>
-  )
+it('disables the scroll', () => {
+  render(<Modal onClose={() => null}>ah</Modal>)
 
-  expect(document.body.className).toBe(' overflow-hidden')
-
-  unmount()
-  expect(document.body.className).toBe('')
+  expect(document.body).toHaveClass('overflow-hidden')
 })
 
-test('the scroll is correctly handled with nested modals', async () => {
+it('re-enables the scroll on unmount', () => {
+  render(<Modal onClose={() => null}>ah</Modal>).unmount()
+
+  expect(document.body).not.toHaveClass('overflow-hidden')
+})
+
+it('handles the scroll correctly with nested modals', async () => {
   const Test = () => {
     const [isChildOpen, setIsChildOpen] = useState(true)
     const [isParentOpen, setIsParentOpen] = useState(true)
 
     return isParentOpen ? (
-      <Modal setIsOpen={setIsParentOpen}>
+      <Modal onClose={() => setIsParentOpen(false)}>
         Parent Modal
         <button onClick={() => setIsParentOpen(false)}>Close Parent</button>
         {isChildOpen && (
-          <Modal setIsOpen={setIsChildOpen}>
+          <Modal onClose={() => setIsChildOpen(false)}>
             Child Modal
             <button onClick={() => setIsChildOpen(false)}>Close child</button>
           </Modal>
@@ -184,15 +185,17 @@ test('the scroll is correctly handled with nested modals', async () => {
 
   render(<Test />)
 
-  expect(document.body.className).toBe(' overflow-hidden')
+  expect(document.body).toHaveClass('overflow-hidden')
 
   const closeChildBtn = screen.getByRole('button', { name: /child/i })
+
   await userEvent.click(closeChildBtn)
 
-  expect(document.body.className).toBe(' overflow-hidden')
+  expect(document.body).toHaveClass('overflow-hidden')
 
   const closeParentBtn = screen.getByRole('button', { name: /parent/i })
+
   await userEvent.click(closeParentBtn)
 
-  expect(document.body.className).toBe('')
+  expect(document.body).not.toHaveClass('overflow-hidden')
 })

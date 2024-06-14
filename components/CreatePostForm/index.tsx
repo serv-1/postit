@@ -66,7 +66,7 @@ export default function CreatePostForm() {
       return
     }
 
-    router.push(response.headers.get('location') as string)
+    router.push(response.headers.get('location')!)
   }
 
   return (

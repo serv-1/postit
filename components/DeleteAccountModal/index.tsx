@@ -33,7 +33,7 @@ export default function DeleteAccountModal() {
       </button>
       {isOpen && (
         <Modal
-          setIsOpen={setIsOpen}
+          onClose={() => setIsOpen(false)}
           className="absolute top-0 left-0 w-screen h-screen md:bg-[rgba(112,26,117,0.25)] md:flex md:justify-center md:items-center"
         >
           <div className="h-full bg-fuchsia-100 flex flex-col p-16 md:bg-fuchsia-50 md:rounded-16 md:shadow-[0_0_32px_rgba(112,26,117,0.25)] md:w-[450px] md:h-auto">

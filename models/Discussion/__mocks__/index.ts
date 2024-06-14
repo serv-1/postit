@@ -7,6 +7,7 @@ export const mockFindDiscussionById = jest.fn()
 export const mockFindDiscussionByIdAndUpdate = jest.fn()
 export const mockDeleteOneDiscussion = jest.fn()
 export const mockFindDiscussion = jest.fn()
+export const mockUpdateOneDiscussion = jest.fn()
 
 export default class Discussion {
   document: Omit<DiscussionDoc, '_id' | 'channelName'>
@@ -50,6 +51,12 @@ export default class Discussion {
   static deleteOne(...args: Parameters<(typeof _Discussion)['deleteOne']>) {
     return {
       lean: () => ({ exec: async () => mockDeleteOneDiscussion(...args) }),
+    }
+  }
+
+  static updateOne(...args: Parameters<(typeof _Discussion)['updateOne']>) {
+    return {
+      lean: () => ({ exec: async () => mockUpdateOneDiscussion(...args) }),
     }
   }
 }

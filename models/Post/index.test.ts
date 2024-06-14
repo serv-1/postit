@@ -55,7 +55,7 @@ describe('Post model', () => {
         latLon: [42, 58],
       }).save()
 
-      const { postIds } = (await User.findById(johnId).lean().exec()) as UserDoc
+      const { postIds } = (await User.findById(johnId).lean().exec())!
 
       expect(postIds.map((id) => id.toString())).toContain(table._id.toString())
     })
@@ -76,7 +76,7 @@ describe('Post model', () => {
 
       await Post.deleteOne({ _id: table._id }).lean().exec()
 
-      const { postIds } = (await User.findById(johnId).lean().exec()) as UserDoc
+      const { postIds } = (await User.findById(johnId).lean().exec())!
 
       expect(postIds).toHaveLength(0)
     })
@@ -109,8 +109,8 @@ describe('Post model', () => {
 
       await Post.deleteOne({ _id: table._id }).lean().exec()
 
-      bob = (await User.findById(bob._id).lean().exec()) as UserDoc
-      mike = (await User.findById(mike._id).lean().exec()) as UserDoc
+      bob = (await User.findById(bob._id).lean().exec())!
+      mike = (await User.findById(mike._id).lean().exec())!
 
       expect(bob.favPostIds).toHaveLength(0)
       expect(mike.favPostIds).toHaveLength(0)

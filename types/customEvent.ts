@@ -3,3 +3,15 @@ export type UpdateProfileUserNameEvent = CustomEvent<{
 }>
 
 export type SearchPostEvent = CustomEvent<undefined>
+
+export type OpenDiscussionEventData = string
+
+export type OpenDiscussionEvent = CustomEvent<OpenDiscussionEventData>
+
+export type DiscussionDeletedEventData = string
+
+export type DiscussionDeletedEvent = CustomEvent<DiscussionDeletedEventData>
+
+export type NewDiscussionEventData = string
+
+export type NewDiscussionEvent = CustomEvent<NewDiscussionEventData>

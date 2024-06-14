@@ -46,7 +46,7 @@ postSchema.pre('save', async function () {
 
 postSchema.pre<Query<DeleteResult, PostDoc>>('deleteOne', async function () {
   const postId = this.getFilter()._id
-  const post = (await Post.findById(postId).lean().exec()) as PostDoc
+  const post = (await Post.findById(postId).lean().exec())!
 
   await User.updateOne({ _id: post.userId }, { $pull: { postIds: postId } })
     .lean()

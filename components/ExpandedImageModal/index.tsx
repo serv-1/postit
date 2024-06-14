@@ -35,7 +35,7 @@ export default function ExpandedImageModal({
       </button>
       {isOpen && (
         <Modal
-          setIsOpen={setIsOpen}
+          onClose={() => setIsOpen(false)}
           className="fixed top-0 left-0 w-screen h-screen bg-fuchsia-50 z-[9999]"
         >
           <div className="pb-8 flex flex-col h-full md:pb-16 lg:max-w-[1200px] lg:mx-auto">

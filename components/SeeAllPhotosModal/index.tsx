@@ -26,7 +26,7 @@ export default function SeeAllPhotosModal({ sources }: SeeAllPhotosModalProps) {
       </div>
       {isOpen && (
         <Modal
-          setIsOpen={setIsOpen}
+          onClose={() => setIsOpen(false)}
           className="fixed top-0 left-0 w-screen h-screen bg-fuchsia-50 z-[9999]"
         >
           <div className="h-full overflow-y-auto flex flex-col lg:max-w-[1200px] lg:mx-auto pb-8 md:pb-16">
