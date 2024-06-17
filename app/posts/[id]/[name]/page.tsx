@@ -129,7 +129,7 @@ export default async function Page({ params }: { params: Params }) {
           </Link>
         </div>
       )}
-      <aside className="fixed bottom-8 right-8 z-[1001] md:sticky md:top-16 md:z-auto md:bg-fuchsia-100 md:rounded-16 md:p-16">
+      <div className="fixed bottom-8 right-8 z-[1001] md:sticky md:top-16 md:z-auto md:bg-fuchsia-100 md:rounded-16 md:p-16">
         <div className="hidden md:block mb-16 text-t-xl font-bold">
           {isAuthor ? (
             'Manage your post'
@@ -166,7 +166,7 @@ export default async function Page({ params }: { params: Params }) {
         ) : (
           <ContactButton />
         )}
-      </aside>
+      </div>
       <section className="my-32">
         <h1 className="mb-8 break-words">{post.name}</h1>
         <span className="text-m-2xl font-bold md:text-t-2xl">
