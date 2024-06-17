@@ -1,7 +1,6 @@
 import CommentDiscussion from 'public/static/images/comment-discussion.svg'
 import X from 'public/static/images/x.svg'
 import Modal from 'components/Modal'
-import styles from 'styles/chatScrollbar.module.css'
 import Discussion from 'components/Discussion'
 import LoadingSpinner from 'components/LoadingSpinner'
 import type { Discussion as IDiscussion } from 'types'
@@ -39,11 +38,7 @@ export default function DiscussionListModal({
         </button>
         {discussions ? (
           discussions.length > 0 ? (
-            <ul
-              className={
-                'overflow-y-auto px-[12px] py-16 mx-[4px] ' + styles.container
-              }
-            >
+            <ul className="overflow-y-auto px-[12px] py-16 mx-[4px] chatScrollbar">
               {discussions.map((discussion) => (
                 <li className="mb-8 last:mb-0" key={discussion.id}>
                   <Discussion

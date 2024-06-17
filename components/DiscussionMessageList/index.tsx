@@ -3,7 +3,6 @@ import { useSession } from 'next-auth/react'
 import { useEffect, useRef } from 'react'
 import useToast from 'hooks/useToast'
 import DiscussionMessage from 'components/DiscussionMessage'
-import styles from 'styles/chatScrollbar.module.css'
 import ajax from 'libs/ajax'
 import type {
   DiscussionsIdGetData,
@@ -55,10 +54,7 @@ export default function DiscussionMessageList({
   return (
     <ul
       ref={msgListRef}
-      className={
-        'flex flex-col h-full overflow-y-auto px-8 md:px-[12px] md:mx-4 ' +
-        styles.container
-      }
+      className="flex flex-col h-full overflow-y-auto px-8 md:px-[12px] md:mx-4 chatScrollbar"
     >
       {messages.map((message, i) => (
         <li key={i}>
