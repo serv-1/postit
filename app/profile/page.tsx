@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import getUser from 'functions/getUser'
 import getPosts from 'functions/getPosts'
-import getUserFavoritePosts from 'functions/getUserFavoritePosts'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import { getServerSession } from 'next-auth'
 import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
@@ -44,7 +43,7 @@ export default async function Page() {
     throw new Error(POST_NOT_FOUND)
   }
 
-  const favPosts = await getUserFavoritePosts(user.favPostIds)
+  const favPosts = await getPosts(user.favPostIds)
 
   if (!favPosts) {
     throw new Error(POST_NOT_FOUND)
@@ -92,19 +91,16 @@ export default async function Page() {
           </TabList>
           <TabPanel value="post">
             <ProfilePostList
-              posts={posts.map((post) => ({
-                id: post.id,
-                name: post.name,
-                image: post.images[0],
-              }))}
-              altText="You haven't created any posts yet."
+              type="default"
+              posts={posts}
+              placeholder="You haven't created any posts yet."
             />
           </TabPanel>
           <TabPanel value="favorite">
             <ProfilePostList
-              isFavPost
+              type="favorite"
               posts={favPosts}
-              altText="Your favorite list is empty."
+              placeholder="Your favorite list is empty."
             />
           </TabPanel>
           <TabPanel

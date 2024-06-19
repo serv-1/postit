@@ -20,12 +20,6 @@ export interface UserPost {
   image: string
 }
 
-export interface UserFavoritePost {
-  id: string
-  name: string
-  image: string
-}
-
 export type Categories = UnArray<typeof CATEGORIES>
 
 export type Entries<O> = {
