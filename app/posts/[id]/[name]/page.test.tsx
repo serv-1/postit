@@ -2,7 +2,7 @@ import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import Page, { generateMetadata } from './page'
 import getPost from 'functions/getPost'
 import getUser from 'functions/getUser'
-import getUserPosts from 'functions/getUserPosts'
+import getPosts from 'functions/getPosts'
 import type { Post, User } from 'types'
 import { mockGetServerSession } from '__mocks__/next-auth'
 import { render, screen } from '@testing-library/react'
@@ -20,7 +20,7 @@ jest
     __esModule: true,
     default: jest.fn(),
   }))
-  .mock('functions/getUserPosts', () => ({
+  .mock('functions/getPosts', () => ({
     __esModule: true,
     default: jest.fn(),
   }))
@@ -53,10 +53,7 @@ jest
 
 const mockGetPost = getPost as jest.MockedFunction<typeof getPost>
 const mockGetUser = getUser as jest.MockedFunction<typeof getUser>
-
-const mockGetUserPosts = getUserPosts as jest.MockedFunction<
-  typeof getUserPosts
->
+const mockGetPosts = getPosts as jest.MockedFunction<typeof getPosts>
 
 const params = { id: '0', name: 'table' }
 
@@ -97,7 +94,7 @@ describe('<Page />', () => {
       discussions: [],
     })
 
-    mockGetUserPosts.mockResolvedValue([])
+    mockGetPosts.mockResolvedValue([])
 
     mockGetServerSession.mockResolvedValue(null)
   })
@@ -110,7 +107,7 @@ describe('<Page />', () => {
     expect(mockGetPost).toHaveBeenNthCalledWith(1, '0')
   })
 
-  it("throws an error if the post's author hasn't been found", async () => {
+  it("throws an error if the seller hasn't been found", async () => {
     mockGetPost.mockResolvedValue({ userId: '1' } as Post)
     mockGetUser.mockResolvedValue(undefined)
 
@@ -119,14 +116,14 @@ describe('<Page />', () => {
     expect(mockGetUser).toHaveBeenNthCalledWith(1, '1')
   })
 
-  it("throws an error if one of the user's posts hasn't been found", async () => {
+  it("throws an error if one of the seller's posts hasn't been found", async () => {
     mockGetPost.mockResolvedValue({ userId: '1' } as Post)
     mockGetUser.mockResolvedValue({ postIds: ['0', '1'] } as User)
-    mockGetUserPosts.mockResolvedValue(undefined)
+    mockGetPosts.mockResolvedValue(undefined)
 
     await expect(Page({ params })).rejects.toThrow(POST_NOT_FOUND)
 
-    expect(mockGetUserPosts).toHaveBeenNthCalledWith(1, ['1'])
+    expect(mockGetPosts).toHaveBeenNthCalledWith(1, ['1'])
   })
 
   it("throws an error if the authenticated user hasn't been found", async () => {
@@ -134,7 +131,7 @@ describe('<Page />', () => {
     mockGetUser
       .mockResolvedValue(undefined)
       .mockResolvedValueOnce({ postIds: ['0', '1'] } as User)
-    mockGetUserPosts.mockResolvedValue([])
+    mockGetPosts.mockResolvedValue([])
     mockGetServerSession.mockResolvedValue({ id: '2' })
 
     await expect(Page({ params })).rejects.toThrow(USER_NOT_FOUND)
@@ -176,7 +173,7 @@ describe('<Page />', () => {
       expect(favoriteBtn).toBeInTheDocument()
     })
 
-    it("renders the post author's name in a link", async () => {
+    it("renders the seller's name in a link", async () => {
       render(await Page({ params }))
 
       const links = screen.getAllByRole('link', { name: /john doe/i })
@@ -193,14 +190,19 @@ describe('<Page />', () => {
       expect(contactBtn).toBeInTheDocument()
     })
 
-    it("renders the other posts of the post's author", async () => {
-      mockGetUserPosts.mockResolvedValue([
+    it('renders the other posts of the seller', async () => {
+      mockGetPosts.mockResolvedValue([
         {
           id: '1',
           name: 'chair',
           price: 40,
           address: 'Paris',
-          image: 'img',
+          images: ['chair.jpg'],
+          userId: '0',
+          discussionIds: [],
+          categories: ['furniture'],
+          description: 'I sell this chair.',
+          latLon: [42, 58],
         },
       ])
 
@@ -232,7 +234,7 @@ describe('<Page />', () => {
     })
   })
 
-  describe("if the authenticated user is the post's author", () => {
+  describe('if the authenticated user is the seller', () => {
     beforeEach(() => {
       mockGetServerSession.mockResolvedValue({ id: '0' })
     })
@@ -266,7 +268,7 @@ describe('<Page />', () => {
       expect(favoriteBtn).not.toBeInTheDocument()
     })
 
-    it("doesn't render the post author's name in a link", async () => {
+    it("doesn't render the seller's name in a link", async () => {
       render(await Page({ params }))
 
       const link = screen.queryByRole('link', { name: /john doe/i })
@@ -282,14 +284,19 @@ describe('<Page />', () => {
       expect(contactBtn).not.toBeInTheDocument()
     })
 
-    it("doesn't render the other posts of the post's author", async () => {
-      mockGetUserPosts.mockResolvedValue([
+    it("doesn't render the other posts of the seller", async () => {
+      mockGetPosts.mockResolvedValue([
         {
           id: '1',
           name: 'chair',
           price: 40,
           address: 'Paris',
-          image: 'img',
+          images: ['chair.jpg'],
+          userId: '0',
+          discussionIds: [],
+          categories: ['furniture'],
+          description: 'I sell this chair.',
+          latLon: [42, 58],
         },
       ])
 
@@ -304,7 +311,7 @@ describe('<Page />', () => {
     })
   })
 
-  describe("if the authenticated user isn't the post's author", () => {
+  describe("if the authenticated user isn't the seller", () => {
     beforeEach(() => {
       mockGetServerSession.mockResolvedValue({ id: '1' })
 
@@ -337,7 +344,7 @@ describe('<Page />', () => {
       expect(favoriteBtn).toBeInTheDocument()
     })
 
-    it("renders the post author's name in a link", async () => {
+    it("renders the seller's name in a link", async () => {
       render(await Page({ params }))
 
       const links = screen.getAllByRole('link', { name: /john doe/i })
@@ -395,14 +402,19 @@ describe('<Page />', () => {
       expect(contactModalProps).toHaveProperty('isDiscussionHidden', false)
     })
 
-    it("renders the other posts of the post's author", async () => {
-      mockGetUserPosts.mockResolvedValue([
+    it('renders the other posts of the seller', async () => {
+      mockGetPosts.mockResolvedValue([
         {
           id: '1',
           name: 'chair',
           price: 40,
           address: 'Paris',
-          image: 'img',
+          images: ['chair.jpg'],
+          userId: '0',
+          discussionIds: [],
+          categories: ['furniture'],
+          description: 'I sell this chair.',
+          latLon: [42, 58],
         },
       ])
 
@@ -425,7 +437,7 @@ describe('<Page />', () => {
       expect(deleteBtn).not.toBeInTheDocument()
     })
 
-    it('doesn\'t render "manage your post "', async () => {
+    it('doesn\'t render "manage your post"', async () => {
       render(await Page({ params }))
 
       const text = screen.queryByText(/manager your post/i)

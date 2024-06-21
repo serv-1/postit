@@ -1,6 +1,6 @@
 import getUser from 'functions/getUser'
 import Page, { generateMetadata } from './page'
-import getUserPosts from 'functions/getUserPosts'
+import getPosts from 'functions/getPosts'
 import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import type { User } from 'types'
 import { render, screen } from '@testing-library/react'
@@ -11,15 +11,13 @@ jest
     __esModule: true,
     default: jest.fn(),
   }))
-  .mock('functions/getUserPosts', () => ({
+  .mock('functions/getPosts', () => ({
     __esModule: true,
     default: jest.fn(),
   }))
 
 const mockGetUser = getUser as jest.MockedFunction<typeof getUser>
-const mockGetUserPosts = getUserPosts as jest.MockedFunction<
-  typeof getUserPosts
->
+const mockGetPosts = getPosts as jest.MockedFunction<typeof getPosts>
 
 const params = { id: '0', name: 'john' }
 
@@ -46,7 +44,7 @@ describe('<Page />', () => {
       discussions: [],
     })
 
-    mockGetUserPosts.mockResolvedValue([])
+    mockGetPosts.mockResolvedValue([])
   })
 
   it("throws an error if the user hasn't been found", async () => {
@@ -59,11 +57,11 @@ describe('<Page />', () => {
 
   it("throws an error if one of the user's posts hasn't been found", async () => {
     mockGetUser.mockResolvedValue({ postIds: ['0'] } as User)
-    mockGetUserPosts.mockResolvedValue(undefined)
+    mockGetPosts.mockResolvedValue(undefined)
 
     await expect(Page({ params })).rejects.toThrow(POST_NOT_FOUND)
 
-    expect(mockGetUserPosts).toHaveBeenNthCalledWith(1, ['0'])
+    expect(mockGetPosts).toHaveBeenNthCalledWith(1, ['0'])
   })
 
   it("renders the default user's image", async () => {
@@ -89,20 +87,30 @@ describe('<Page />', () => {
   })
 
   it("renders the user's posts", async () => {
-    mockGetUserPosts.mockResolvedValue([
+    mockGetPosts.mockResolvedValue([
       {
         id: '0',
         name: 'table',
-        image: 'table.jpeg',
+        images: ['table.jpeg'],
         address: 'Paris',
         price: 40,
+        categories: ['furniture'],
+        discussionIds: [],
+        userId: '0',
+        description: 'I sell this table.',
+        latLon: [42, 58],
       },
       {
         id: '1',
         name: 'chair',
-        image: 'chair.jpeg',
+        images: ['chair.jpeg'],
         address: 'Paris',
         price: 20,
+        categories: ['furniture'],
+        discussionIds: [],
+        userId: '0',
+        description: 'I sell this chair.',
+        latLon: [42, 58],
       },
     ])
 
@@ -114,13 +122,18 @@ describe('<Page />', () => {
   })
 
   it('doesn\'t render an "s" if the user has only one post', async () => {
-    mockGetUserPosts.mockResolvedValue([
+    mockGetPosts.mockResolvedValue([
       {
         id: '0',
         name: 'table',
-        image: 'table.jpeg',
+        images: ['table.jpeg'],
         address: 'Paris',
         price: 40,
+        categories: ['furniture'],
+        discussionIds: [],
+        userId: '0',
+        description: 'I sell this table.',
+        latLon: [42, 58],
       },
     ])
 

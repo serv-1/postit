@@ -1,8 +1,8 @@
-import type { SearchedPost, UserPost } from 'types'
+import type { Post as IPost } from 'types'
 import Post from 'components/Post'
 
 interface PostListProps {
-  posts: (SearchedPost | UserPost)[]
+  posts: IPost[]
 }
 
 export default function PostList({ posts }: PostListProps) {
@@ -10,7 +10,13 @@ export default function PostList({ posts }: PostListProps) {
     <ul className="grid grid-cols-[repeat(6,1fr)] gap-x-16 gap-y-8">
       {posts.map((post) => (
         <li className="col-span-3 sm:col-span-2" key={post.id}>
-          <Post {...post} />
+          <Post
+            id={post.id}
+            name={post.name}
+            price={post.price}
+            image={post.images[0]}
+            address={post.address}
+          />
         </li>
       ))}
     </ul>

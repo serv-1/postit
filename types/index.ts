@@ -2,23 +2,12 @@ import { CATEGORIES } from 'constants/index'
 import type { PostsIdGetData } from 'app/api/posts/[id]/types'
 import type { UsersIdGetData } from 'app/api/users/[id]/types'
 import type { DiscussionsIdGetData } from 'app/api/discussions/[id]/types'
-import type { PostsSearchGetData } from 'app/api/posts/search/types'
 
 export type Post = PostsIdGetData
-
-export type SearchedPost = UnArray<PostsSearchGetData['posts']>
 
 export type User = UsersIdGetData
 
 export type Discussion = DiscussionsIdGetData
-
-export interface UserPost {
-  id: string
-  name: string
-  price: number
-  address: string
-  image: string
-}
 
 export type Categories = UnArray<typeof CATEGORIES>
 

@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
 import getUser from 'functions/getUser'
-import type { User } from 'types'
 import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import Image from 'next/image'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 import PostList from 'components/PostList'
 import Blob from 'public/static/images/blob.svg'
-import getUserPosts from 'functions/getUserPosts'
+import getPosts from 'functions/getPosts'
 
 interface Params {
   id: string
@@ -32,9 +31,9 @@ export default async function Page({ params }: { params: Params }) {
     throw new Error(USER_NOT_FOUND)
   }
 
-  const userPosts = await getUserPosts(user.postIds)
+  const posts = await getPosts(user.postIds)
 
-  if (!userPosts) {
+  if (!posts) {
     throw new Error(POST_NOT_FOUND)
   }
 
@@ -56,12 +55,12 @@ export default async function Page({ params }: { params: Params }) {
         </div>
         <h1 className="text-center break-words">{user.name}</h1>
       </section>
-      {userPosts.length > 0 ? (
+      {posts.length > 0 ? (
         <section className="mb-32">
           <h2 className="mb-16">
-            Its {userPosts.length} post{userPosts.length > 1 ? 's' : ''}
+            Its {posts.length} post{posts.length > 1 ? 's' : ''}
           </h2>
-          <PostList posts={userPosts} />
+          <PostList posts={posts} />
         </section>
       ) : (
         <div

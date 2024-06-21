@@ -90,19 +90,9 @@ export async function GET(request: NextRequest) {
               $set: {
                 id: { $toString: '$_id' },
                 price: { $divide: ['$price', 100] },
-                image: { $arrayElemAt: ['$images', 0] },
               },
             },
-            {
-              $project: {
-                _id: 0,
-                id: 1,
-                name: 1,
-                price: 1,
-                image: 1,
-                address: 1,
-              },
-            },
+            { $project: { _id: 0 } },
             { $limit: 20 },
           ],
           totalPosts: [{ $count: 'total' }],

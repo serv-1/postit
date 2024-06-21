@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import useToast from 'hooks/useToast'
-import type { SearchedPost } from 'types'
+import type { Post } from 'types'
 import PostList from 'components/PostList'
 import Pagination from 'components/Pagination'
 import Blob from 'public/static/images/blob.svg'
@@ -14,7 +14,7 @@ import type {
 import useEventListener from 'hooks/useEventListener'
 
 export default function HomePostPage() {
-  const [posts, setPosts] = useState<SearchedPost[]>()
+  const [posts, setPosts] = useState<Post[]>()
   const [totalPosts, setTotalPosts] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
 

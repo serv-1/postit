@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import getPost from 'functions/getPost'
-import getUserPosts from 'functions/getUserPosts'
+import getPosts from 'functions/getPosts'
 import getUser from 'functions/getUser'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import { getServerSession } from 'next-auth'
 import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
-import type { UnArray, User } from 'types'
+import type { User } from 'types'
 import Image from 'next/image'
 import { NEXT_PUBLIC_AWS_URL } from 'env/public'
 import PostPageFavoriteButton from 'components/PostPageFavoriteButton'
@@ -43,44 +43,47 @@ export default async function Page({ params }: { params: Params }) {
     throw new Error(POST_NOT_FOUND)
   }
 
-  const postUser = await getUser(post.userId)
+  const seller = await getUser(post.userId)
 
-  if (!postUser) {
+  if (!seller) {
     throw new Error(USER_NOT_FOUND)
   }
 
-  const postUserPosts = await getUserPosts(
-    postUser.postIds.filter((postId) => postId !== params.id)
+  const sellerPosts = await getPosts(
+    seller.postIds.filter((postId) => postId !== params.id)
   )
 
-  if (!postUserPosts) {
+  if (!sellerPosts) {
     throw new Error(POST_NOT_FOUND)
   }
 
   const session = await getServerSession(nextAuthOptions)
 
   let user: User | undefined = undefined
+  let isSeller = false
+  let discussionId: string | undefined = undefined
+  let isDiscussionHidden: boolean | undefined = undefined
 
   if (session) {
-    user = await getUser(session.id)
+    if (seller.id === session.id) {
+      user = seller
+      isSeller = true
+    } else {
+      user = await getUser(session.id)
 
-    if (!user) {
-      throw new Error(USER_NOT_FOUND)
-    }
-  }
+      if (!user) {
+        throw new Error(USER_NOT_FOUND)
+      }
 
-  const isAuthor = user && user.id === postUser.id
+      const postSet = new Set(post.discussionIds)
 
-  let userDiscussion: UnArray<User['discussions']> | null = null
+      for (const discussion of user.discussions) {
+        if (postSet.has(discussion.id)) {
+          discussionId = discussion.id
+          isDiscussionHidden = discussion.hidden
 
-  if (user) {
-    const set = new Set(post.discussionIds)
-
-    for (const discussion of user.discussions) {
-      if (set.has(discussion.id)) {
-        userDiscussion = discussion
-
-        break
+          break
+        }
       }
     }
   }
@@ -99,7 +102,7 @@ export default async function Page({ params }: { params: Params }) {
         <div className="absolute top-8 left-8 md:hidden">
           <PreviousPageButton />
         </div>
-        {isAuthor ? (
+        {isSeller ? (
           <div className="absolute top-8 right-8 md:hidden flex">
             <Link
               href={`/posts/${post.id}/${formatToUrl(post.name)}/update`}
@@ -118,34 +121,34 @@ export default async function Page({ params }: { params: Params }) {
         )}
         <SeeAllPhotosModal sources={post.images} />
       </div>
-      {!isAuthor && (
+      {!isSeller && (
         <div className="md:hidden">
           Posted by{' '}
           <Link
-            href={`/users/${postUser.id}/${formatToUrl(postUser.name)}`}
+            href={`/users/${seller.id}/${formatToUrl(seller.name)}`}
             className="text-fuchsia-600 hover:underline break-all"
           >
-            {postUser.name}
+            {seller.name}
           </Link>
         </div>
       )}
       <div className="fixed bottom-8 right-8 z-[1001] md:sticky md:top-16 md:z-auto md:bg-fuchsia-100 md:rounded-16 md:p-16">
         <div className="hidden md:block mb-16 text-t-xl font-bold">
-          {isAuthor ? (
+          {isSeller ? (
             'Manage your post'
           ) : (
             <>
               Posted by{' '}
               <Link
-                href={`/users/${postUser.id}/${formatToUrl(postUser.name)}`}
+                href={`/users/${seller.id}/${formatToUrl(seller.name)}`}
                 className="text-fuchsia-600 hover:underline break-all"
               >
-                {postUser.name}
+                {seller.name}
               </Link>
             </>
           )}
         </div>
-        {isAuthor ? (
+        {isSeller ? (
           <div className="hidden md:flex md:flex-row md:flex-nowrap">
             <Link
               href={`/posts/${post.id}/${formatToUrl(post.name)}/update`}
@@ -159,9 +162,9 @@ export default async function Page({ params }: { params: Params }) {
           <ContactModal
             postId={post.id}
             postName={post.name}
-            sellerId={postUser.id}
-            discussionId={userDiscussion?.id}
-            isDiscussionHidden={userDiscussion?.hidden}
+            sellerId={seller.id}
+            discussionId={discussionId}
+            isDiscussionHidden={isDiscussionHidden}
           />
         ) : (
           <ContactButton />
@@ -175,18 +178,18 @@ export default async function Page({ params }: { params: Params }) {
         <p className="my-16 break-words">{post.description}</p>
         <PostPageMap address={post.address} latLon={post.latLon} />
       </section>
-      {!isAuthor && postUserPosts.length > 0 && (
+      {!isSeller && sellerPosts.length > 0 && (
         <section className="mb-32 md:col-start-1">
           <h2 className="mb-16">
             <Link
-              href={`/users/${postUser.id}/${formatToUrl(postUser.name)}`}
+              href={`/users/${seller.id}/${formatToUrl(seller.name)}`}
               className="text-fuchsia-600 hover:underline break-words"
             >
-              {postUser.name}
+              {seller.name}
             </Link>
             {"'"}s other posts
           </h2>
-          <PostList posts={postUserPosts} />
+          <PostList posts={sellerPosts} />
         </section>
       )}
     </main>
