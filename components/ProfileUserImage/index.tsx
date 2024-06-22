@@ -7,10 +7,10 @@ import Plus from 'public/static/images/plus.svg'
 import isImage from 'functions/isImage'
 import ajax from 'libs/ajax'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
-import type { S3GetData, S3GetError } from 'app/api/s3/types'
 import type { UserPutError } from 'app/api/user/types'
 import { MAX_IMAGE_SIZE } from 'constants/index'
-import { IMAGE_INVALID, IMAGE_TOO_BIG, DEFAULT } from 'constants/errors'
+import { IMAGE_INVALID, IMAGE_TOO_BIG } from 'constants/errors'
+import sendImage from 'functions/sendImage'
 
 interface ProfileUserImageProps {
   image?: string
@@ -47,42 +47,23 @@ export default function ProfileUserImage({ image }: ProfileUserImageProps) {
       return setToast({ message: IMAGE_TOO_BIG, error: true })
     }
 
-    let response = await ajax.get('/s3', { csrf: true })
+    try {
+      const key = await sendImage(file)
+      const response = await ajax.put('/user', { image: key }, { csrf: true })
 
-    if (!response.ok) {
-      const { message }: S3GetError = await response.json()
+      if (!response.ok) {
+        const { message }: UserPutError = await response.json()
 
-      setToast({ message, error: true })
+        setToast({ message, error: true })
 
-      return
+        return
+      }
+
+      setSource(NEXT_PUBLIC_AWS_URL + '/' + key)
+      setToast({ message: 'The image has been updated! 🎉' })
+    } catch (e) {
+      setToast({ message: (e as Error).message, error: true })
     }
-
-    const { url, fields, key }: S3GetData = await response.json()
-    const formData = new FormData()
-
-    Object.entries(fields).forEach(([k, v]) => formData.append(k, v))
-    formData.append('file', file)
-
-    response = await fetch(url, { method: 'POST', body: formData })
-
-    if (!response.ok) {
-      setToast({ message: DEFAULT, error: true })
-
-      return
-    }
-
-    response = await ajax.put('/user', { image: key }, { csrf: true })
-
-    if (!response.ok) {
-      const { message }: UserPutError = await response.json()
-
-      setToast({ message, error: true })
-
-      return
-    }
-
-    setSource(NEXT_PUBLIC_AWS_URL + '/' + key)
-    setToast({ message: 'The image has been updated! 🎉' })
   }
 
   return (
