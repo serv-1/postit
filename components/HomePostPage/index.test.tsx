@@ -3,9 +3,23 @@ import HomePostPage from '.'
 import { setupServer } from 'msw/node'
 import { rest } from 'msw'
 import 'cross-fetch/polyfill'
+import type { Post } from 'types'
 
 const mockSetToast = jest.fn()
 const server = setupServer()
+
+const post: Post = {
+  _id: '0',
+  name: 'Blue cat',
+  price: 50,
+  images: ['blue-cat.jpeg'],
+  address: 'Paris, France',
+  latLon: [42, 58],
+  categories: ['animal'],
+  description: 'I sell this blue cat.',
+  userId: '0',
+  discussionIds: [],
+}
 
 jest.mock('hooks/useToast', () => ({
   __esModule: true,
@@ -56,29 +70,13 @@ it('fetches the posts matching the url search params', async () => {
         ctx.status(200),
         ctx.json({
           posts: [
+            post,
             {
-              id: '0',
-              name: 'Blue cat',
-              price: 50,
-              images: ['blue-cat.jpeg'],
-              address: 'Paris, France',
-              latLon: [42, 58],
-              categories: ['animal'],
-              description: 'I sell this blue cat.',
-              userId: '0',
-              discussionIds: [],
-            },
-            {
-              id: '1',
+              ...post,
+              _id: '1',
               name: 'Red cat',
-              price: 100,
               images: ['red-cat.jpeg'],
-              address: 'Oslo, Norway',
-              latLon: [42, 58],
-              categories: ['animal'],
               description: 'I sell this red cat.',
-              userId: '0',
-              discussionIds: [],
             },
           ],
           totalPosts: 2,
@@ -115,20 +113,7 @@ it('renders "post" in the singular if there is only one post found', async () =>
       return res(
         ctx.status(200),
         ctx.json({
-          posts: [
-            {
-              id: '0',
-              name: 'Blue cat',
-              price: 50,
-              images: ['blue-cat.jpeg'],
-              address: 'Paris, France',
-              latLon: [42, 58],
-              categories: ['animal'],
-              description: 'I sell this blue cat.',
-              userId: '0',
-              discussionIds: [],
-            },
-          ],
+          posts: [post],
           totalPosts: 1,
           totalPages: 1,
         })

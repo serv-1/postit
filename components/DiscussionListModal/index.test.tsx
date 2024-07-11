@@ -1,8 +1,8 @@
 import DiscussionListModal from '.'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { DiscussionsIdGetData } from 'app/api/discussions/[id]/types'
 import type { DiscussionProps } from 'components/Discussion'
+import type { Discussion, User } from 'types'
 
 jest.mock('components/Discussion', () => ({
   __esModule: true,
@@ -10,6 +10,27 @@ jest.mock('components/Discussion', () => ({
     <div role="dialog">{isModalOpen ? 'open' : 'closed'}</div>
   ),
 }))
+
+const signedInUser: User = {
+  _id: '0',
+  name: 'john',
+  email: 'john@test.com',
+  channelName: '',
+  postIds: [],
+  favPostIds: [],
+  discussions: [],
+}
+
+const discussion: Discussion = {
+  _id: '1',
+  postId: '2',
+  postName: 'table',
+  buyerId: '3',
+  sellerId: '4',
+  messages: [],
+  channelName: '',
+  hasNewMessage: false,
+}
 
 it('closes on close button click', async () => {
   const onClose = jest.fn()
@@ -20,6 +41,7 @@ it('closes on close button click', async () => {
       onClose={onClose}
       openedDiscussionId={null}
       setOpenedDiscussionId={() => null}
+      signedInUser={signedInUser}
     />
   )
 
@@ -37,6 +59,7 @@ it('renders a loading indicator if the discussions are undefined', () => {
       onClose={() => null}
       openedDiscussionId={null}
       setOpenedDiscussionId={() => null}
+      signedInUser={signedInUser}
     />
   )
 
@@ -53,6 +76,7 @@ it('renders a informative text if there are no discussions', () => {
       openedDiscussionId={null}
       setOpenedDiscussionId={() => null}
       discussions={[]}
+      signedInUser={signedInUser}
     />
   )
 
@@ -68,7 +92,8 @@ it('renders a list of discussions', () => {
       onClose={() => null}
       openedDiscussionId={null}
       setOpenedDiscussionId={() => null}
-      discussions={[{ id: '0' }, { id: '1' }] as DiscussionsIdGetData[]}
+      discussions={[discussion, { ...discussion, _id: '9' }]}
+      signedInUser={signedInUser}
     />
   )
 
@@ -82,9 +107,10 @@ it('opens the discussion which has to be open', () => {
     <DiscussionListModal
       isHidden={false}
       onClose={() => null}
-      openedDiscussionId="0"
+      openedDiscussionId="1"
       setOpenedDiscussionId={() => null}
-      discussions={[{ id: '0' }, { id: '1' }] as DiscussionsIdGetData[]}
+      discussions={[discussion, { ...discussion, _id: '9' }]}
+      signedInUser={signedInUser}
     />
   )
 

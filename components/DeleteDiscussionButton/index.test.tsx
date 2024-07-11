@@ -24,7 +24,7 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 describe('when clicked', () => {
-  describe('if the interlocutor has deleted its account', () => {
+  describe('if the interlocutor has no discussions', () => {
     it('deletes the discussion', async () => {
       server.use(
         rest.delete('http://localhost/api/discussions/:id', (req, res, ctx) => {
@@ -62,31 +62,47 @@ describe('when clicked', () => {
     })
   })
 
-  describe("if the interlocutor hasn't deleted its account", () => {
-    it('fetches the interlocutor', async () => {
+  describe('if the interlocutor has one or more discussions', () => {
+    it('deletes the hidden discussions of the interlocutor', async () => {
       server.use(
-        rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-          expect(req.params.id).toBe('0')
+        rest.delete('http://localhost/api/discussions/:id', (req, res, ctx) => {
+          expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+          expect(req.params.id).toBe('1')
 
-          return res(ctx.status(200), ctx.json({ discussions: [] }))
+          return res(ctx.status(204))
         })
       )
 
-      render(<DeleteDiscussionButton discussionId="0" userId="0" />)
+      render(
+        <DeleteDiscussionButton
+          discussionId="1"
+          interlocutorDiscussions={[
+            { _id: '0', id: '0', hidden: false, hasNewMessage: false },
+            { _id: '1', id: '1', hidden: true, hasNewMessage: false },
+          ]}
+        />
+      )
 
       const deleteBtn = screen.getByRole('button')
 
       await userEvent.click(deleteBtn)
     })
 
-    it('renders an error if the server fails to fetch the interlocutor', async () => {
+    it('renders an error if the server fails to delete the discussions', async () => {
       server.use(
-        rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+        rest.delete('http://localhost/api/discussions/:id', (req, res, ctx) => {
           return res(ctx.status(500), ctx.json({ message: 'error' }))
         })
       )
 
-      render(<DeleteDiscussionButton discussionId="0" userId="0" />)
+      render(
+        <DeleteDiscussionButton
+          discussionId="0"
+          interlocutorDiscussions={[
+            { _id: '0', id: '0', hidden: true, hasNewMessage: false },
+          ]}
+        />
+      )
 
       const deleteBtn = screen.getByRole('button')
 
@@ -98,106 +114,46 @@ describe('when clicked', () => {
       })
     })
 
-    it('deletes the discussion if the interlocutor has hidden it', async () => {
+    it('hides the unhidden discussions of the interlocutor', async () => {
       server.use(
-        rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              discussions: [
-                { id: '1', hidden: false },
-                { id: '0', hidden: true },
-              ],
-            })
-          )
-        }),
-        rest.delete('http://localhost/api/discussions/:id', (req, res, ctx) => {
+        rest.put('http://localhost/api/user', async (req, res, ctx) => {
           expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-          expect(req.params.id).toBe('0')
+          expect(await req.json()).toEqual({ discussionId: '1' })
 
           return res(ctx.status(204))
         })
       )
 
-      render(<DeleteDiscussionButton discussionId="0" userId="0" />)
-
-      const deleteBtn = screen.getByRole('button')
-
-      await userEvent.click(deleteBtn)
-    })
-
-    it('renders an error if the server fails to delete the discussion if the interlocutor has hidden it', async () => {
-      server.use(
-        rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({ discussions: [{ id: '0', hidden: true }] })
-          )
-        }),
-        rest.delete('http://localhost/api/discussions/:id', (req, res, ctx) => {
-          return res(ctx.status(500), ctx.json({ message: 'error' }))
-        })
+      render(
+        <DeleteDiscussionButton
+          discussionId="1"
+          interlocutorDiscussions={[
+            { _id: '0', id: '0', hidden: true, hasNewMessage: false },
+            { _id: '1', id: '1', hidden: false, hasNewMessage: false },
+          ]}
+        />
       )
 
-      render(<DeleteDiscussionButton discussionId="0" userId="0" />)
-
-      const deleteBtn = screen.getByRole('button')
-
-      await userEvent.click(deleteBtn)
-
-      expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-        message: 'error',
-        error: true,
-      })
-    })
-
-    it("hides the discussion if the interlocutor hasn't hidden it", async () => {
-      server.use(
-        rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              discussions: [
-                { id: '1', hidden: true },
-                { id: '0', hidden: false },
-              ],
-            })
-          )
-        }),
-        rest.put('http://localhost/api/user', async (req, res, ctx) => {
-          expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-          expect(await req.json()).toEqual({ discussionId: '0' })
-
-          return res(ctx.status(204))
-        })
-      )
-
-      render(<DeleteDiscussionButton discussionId="0" userId="0" />)
-
       const deleteBtn = screen.getByRole('button')
 
       await userEvent.click(deleteBtn)
     })
 
-    it("renders an error if the server fails to hide the discussion if the interlocutor hasn't hidden it", async () => {
+    it('renders an error if the server fails to hide the discussions', async () => {
       server.use(
-        rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              discussions: [
-                { id: '1', hidden: true },
-                { id: '0', hidden: false },
-              ],
-            })
-          )
-        }),
         rest.put('http://localhost/api/user', async (req, res, ctx) => {
           return res(ctx.status(500), ctx.json({ message: 'error' }))
         })
       )
 
-      render(<DeleteDiscussionButton discussionId="0" userId="0" />)
+      render(
+        <DeleteDiscussionButton
+          discussionId="0"
+          interlocutorDiscussions={[
+            { _id: '0', id: '0', hidden: false, hasNewMessage: false },
+          ]}
+        />
+      )
 
       const deleteBtn = screen.getByRole('button')
 

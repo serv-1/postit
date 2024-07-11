@@ -6,15 +6,15 @@ import ChevronRight from 'public/static/images/chevron-right.svg'
 interface OpenDiscussionButton {
   onClick: MouseEventHandler<HTMLButtonElement>
   postName: string
-  userName: string
-  userImage?: string
+  interlocutorName?: string
+  interlocutorImage?: string
 }
 
 export default function OpenDiscussionButton({
   onClick,
   postName,
-  userName,
-  userImage,
+  interlocutorName,
+  interlocutorImage,
 }: OpenDiscussionButton) {
   return (
     <button
@@ -24,17 +24,25 @@ export default function OpenDiscussionButton({
     >
       <Image
         src={
-          userImage
-            ? NEXT_PUBLIC_AWS_URL + '/' + userImage
+          interlocutorImage
+            ? NEXT_PUBLIC_AWS_URL + '/' + interlocutorImage
             : NEXT_PUBLIC_DEFAULT_USER_IMAGE
         }
-        alt={userName + "'s profile picture"}
+        alt={
+          interlocutorName
+            ? interlocutorName + "'s profile picture"
+            : 'Default profile picture'
+        }
         width={64}
         height={64}
         className="rounded-r-full w-[52px] h-64 object-cover"
       />
       <div className="flex-grow text-left">
-        <span className="block text-fuchsia-600">{userName}</span>
+        {interlocutorName ? (
+          <span className="block text-fuchsia-600">{interlocutorName}</span>
+        ) : (
+          <span className="block text-rose-600 line-through">deleted</span>
+        )}
         <span className="block font-bold">{postName}</span>
       </div>
       <div className="w-[20px] h-[20px] text-fuchsia-600 relative left-0 group-hover:left-4 transition-[left] duration-200">

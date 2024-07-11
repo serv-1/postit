@@ -102,7 +102,7 @@ it("doesn't open the discussion if it is hidden", async () => {
 it('closes the modal and opens the discussion on message sent', async () => {
   server.use(
     rest.post('http://localhost/api/discussion', (req, res, ctx) => {
-      return res(ctx.status(201), ctx.json({ id: '0' }))
+      return res(ctx.status(201), ctx.json({ _id: '0' }))
     })
   )
 

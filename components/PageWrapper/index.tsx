@@ -17,12 +17,12 @@ import type { User } from 'types'
 
 export default function PageWrapper({
   children,
-  user: userProp,
+  signedInUser: signedInUserProp,
 }: {
   children: React.ReactNode
-  user?: User
+  signedInUser?: User
 }) {
-  const [user, setUser] = useState(userProp)
+  const [signedInUser, setUser] = useState(signedInUserProp)
   const session = useSession()
   const path = usePathname()
   const { setToast } = useToast()
@@ -31,7 +31,7 @@ export default function PageWrapper({
     if (
       path === '/authentication' ||
       session.status !== 'authenticated' ||
-      user
+      signedInUser
     ) {
       return
     }
@@ -51,7 +51,7 @@ export default function PageWrapper({
     }
 
     initUser()
-  }, [user, session, setToast, path])
+  }, [signedInUser, session, setToast, path])
 
   const isBgLinear =
     path === '/authentication' ||
@@ -72,7 +72,7 @@ export default function PageWrapper({
           isBgLinear && 'mx-auto max-w-[450px]'
         )}
       >
-        <Header user={user} />
+        <Header signedInUser={signedInUser} />
         {children}
         <footer className="text-s p-8">
           Copyright © {new Date().getFullYear()} PostIt. All rights reserved.

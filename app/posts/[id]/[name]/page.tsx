@@ -65,7 +65,7 @@ export default async function Page({ params }: { params: Params }) {
   let isDiscussionHidden: boolean | undefined = undefined
 
   if (session) {
-    if (seller.id === session.id) {
+    if (seller._id === session.id) {
       user = seller
       isSeller = true
     } else {
@@ -105,17 +105,17 @@ export default async function Page({ params }: { params: Params }) {
         {isSeller ? (
           <div className="absolute top-8 right-8 md:hidden flex">
             <Link
-              href={`/posts/${post.id}/${formatToUrl(post.name)}/update`}
+              href={`/posts/${post._id}/${formatToUrl(post.name)}/update`}
               className="mr-8 round-btn"
               aria-label="Edit"
             >
               <Pencil className="w-full h-full" />
             </Link>
-            <DeletePostButton postId={post.id} isRound />
+            <DeletePostButton postId={post._id} isRound />
           </div>
         ) : (
           <PostPageFavoriteButton
-            postId={post.id}
+            postId={post._id}
             favPostIds={user?.favPostIds}
           />
         )}
@@ -125,7 +125,7 @@ export default async function Page({ params }: { params: Params }) {
         <div className="md:hidden">
           Posted by{' '}
           <Link
-            href={`/users/${seller.id}/${formatToUrl(seller.name)}`}
+            href={`/users/${seller._id}/${formatToUrl(seller.name)}`}
             className="text-fuchsia-600 hover:underline break-all"
           >
             {seller.name}
@@ -140,7 +140,7 @@ export default async function Page({ params }: { params: Params }) {
             <>
               Posted by{' '}
               <Link
-                href={`/users/${seller.id}/${formatToUrl(seller.name)}`}
+                href={`/users/${seller._id}/${formatToUrl(seller.name)}`}
                 className="text-fuchsia-600 hover:underline break-all"
               >
                 {seller.name}
@@ -151,18 +151,18 @@ export default async function Page({ params }: { params: Params }) {
         {isSeller ? (
           <div className="hidden md:flex md:flex-row md:flex-nowrap">
             <Link
-              href={`/posts/${post.id}/${formatToUrl(post.name)}/update`}
+              href={`/posts/${post._id}/${formatToUrl(post.name)}/update`}
               className="w-full text-center mr-8 primary-btn"
             >
               Edit
             </Link>
-            <DeletePostButton postId={post.id} />
+            <DeletePostButton postId={post._id} />
           </div>
         ) : user ? (
           <ContactModal
-            postId={post.id}
+            postId={post._id}
             postName={post.name}
-            sellerId={seller.id}
+            sellerId={seller._id}
             discussionId={discussionId}
             isDiscussionHidden={isDiscussionHidden}
           />
@@ -182,7 +182,7 @@ export default async function Page({ params }: { params: Params }) {
         <section className="mb-32 md:col-start-1">
           <h2 className="mb-16">
             <Link
-              href={`/users/${seller.id}/${formatToUrl(seller.name)}`}
+              href={`/users/${seller._id}/${formatToUrl(seller.name)}`}
               className="text-fuchsia-600 hover:underline break-words"
             >
               {seller.name}

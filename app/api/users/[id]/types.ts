@@ -1,5 +1,5 @@
 export interface UsersIdGetData {
-  id: string
+  _id: string
   name: string
   email: string
   channelName: string
@@ -7,6 +7,7 @@ export interface UsersIdGetData {
   postIds: string[]
   favPostIds: string[]
   discussions: {
+    _id: string
     id: string
     hidden: boolean
     hasNewMessage: boolean

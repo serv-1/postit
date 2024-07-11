@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     const user = await new User(result.value).save()
 
     return NextResponse.json(
-      { id: user._id },
+      { _id: user._id },
       {
         status: 201,
         headers: { Location: '/profile' },

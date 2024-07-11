@@ -40,7 +40,7 @@ export async function GET(request: Request, { params }: Params) {
 
     return NextResponse.json(
       {
-        id: post._id,
+        _id: post._id,
         name: post.name,
         description: post.description,
         categories: post.categories,

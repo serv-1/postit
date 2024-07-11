@@ -3,7 +3,7 @@ import X from 'public/static/images/x.svg'
 import Modal from 'components/Modal'
 import Discussion from 'components/Discussion'
 import LoadingSpinner from 'components/LoadingSpinner'
-import type { Discussion as IDiscussion } from 'types'
+import type { Discussion as IDiscussion, User } from 'types'
 
 export interface DiscussionListModalProps {
   discussions?: IDiscussion[]
@@ -11,6 +11,7 @@ export interface DiscussionListModalProps {
   onClose: () => void
   openedDiscussionId: string | null
   setOpenedDiscussionId: React.Dispatch<React.SetStateAction<string | null>>
+  signedInUser: User
 }
 
 export default function DiscussionListModal({
@@ -19,6 +20,7 @@ export default function DiscussionListModal({
   onClose,
   openedDiscussionId,
   setOpenedDiscussionId,
+  signedInUser,
 }: DiscussionListModalProps) {
   return (
     <Modal
@@ -40,11 +42,12 @@ export default function DiscussionListModal({
           discussions.length > 0 ? (
             <ul className="overflow-y-auto px-[12px] py-16 mx-[4px] chatScrollbar">
               {discussions.map((discussion) => (
-                <li className="mb-8 last:mb-0" key={discussion.id}>
+                <li className="mb-8 last:mb-0" key={discussion._id}>
                   <Discussion
                     discussion={discussion}
-                    isModalOpen={discussion.id === openedDiscussionId}
+                    isModalOpen={discussion._id === openedDiscussionId}
                     setOpenedDiscussionId={setOpenedDiscussionId}
+                    signedInUser={signedInUser}
                   />
                 </li>
               ))}

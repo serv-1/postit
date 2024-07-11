@@ -1,5 +1,5 @@
 export interface DiscussionPostData {
-  id: string
+  _id: string
 }
 
 export interface DiscussionPostError {

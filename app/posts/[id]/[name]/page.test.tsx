@@ -57,6 +57,39 @@ const mockGetPosts = getPosts as jest.MockedFunction<typeof getPosts>
 
 const params = { id: '0', name: 'table' }
 
+const post: Post = {
+  _id: '0',
+  name: 'blue table',
+  description: 'magnificent blue table',
+  categories: ['furniture'],
+  price: 5000.12,
+  images: ['img1', 'img2'],
+  address: 'Oslo, Norway',
+  latLon: [17, 45],
+  discussionIds: [],
+  userId: '0',
+}
+
+const seller: User = {
+  _id: '0',
+  name: 'john doe',
+  email: 'john@test.com',
+  channelName: 'test',
+  postIds: [],
+  favPostIds: [],
+  discussions: [],
+}
+
+const signedInUser: User = {
+  _id: '1',
+  name: 'bob',
+  email: 'bob@test.com',
+  channelName: 'test',
+  postIds: [],
+  favPostIds: [],
+  discussions: [],
+}
+
 describe('generateMetadata()', () => {
   it('generates the metadata', async () => {
     mockGetPost.mockResolvedValue({ name: 'table' } as Post)
@@ -71,31 +104,9 @@ describe('generateMetadata()', () => {
 
 describe('<Page />', () => {
   beforeEach(() => {
-    mockGetPost.mockResolvedValue({
-      id: '0',
-      name: 'blue table',
-      description: 'magnificent blue table',
-      categories: ['furniture'],
-      price: 5000.12,
-      images: ['img1', 'img2'],
-      address: 'Oslo, Norway',
-      latLon: [17, 45],
-      discussionIds: [],
-      userId: '0',
-    })
-
-    mockGetUser.mockResolvedValue({
-      id: '0',
-      name: 'john doe',
-      email: 'john@test.com',
-      channelName: 'test',
-      postIds: [],
-      favPostIds: [],
-      discussions: [],
-    })
-
+    mockGetPost.mockResolvedValue(post)
+    mockGetUser.mockResolvedValue(seller)
     mockGetPosts.mockResolvedValue([])
-
     mockGetServerSession.mockResolvedValue(null)
   })
 
@@ -108,7 +119,7 @@ describe('<Page />', () => {
   })
 
   it("throws an error if the seller hasn't been found", async () => {
-    mockGetPost.mockResolvedValue({ userId: '1' } as Post)
+    mockGetPost.mockResolvedValue({ ...post, userId: '1' })
     mockGetUser.mockResolvedValue(undefined)
 
     await expect(Page({ params })).rejects.toThrow(USER_NOT_FOUND)
@@ -117,8 +128,8 @@ describe('<Page />', () => {
   })
 
   it("throws an error if one of the seller's posts hasn't been found", async () => {
-    mockGetPost.mockResolvedValue({ userId: '1' } as Post)
-    mockGetUser.mockResolvedValue({ postIds: ['0', '1'] } as User)
+    mockGetPost.mockResolvedValue({ ...post, userId: '1' })
+    mockGetUser.mockResolvedValue({ ...seller, postIds: ['0', '1'] })
     mockGetPosts.mockResolvedValue(undefined)
 
     await expect(Page({ params })).rejects.toThrow(POST_NOT_FOUND)
@@ -127,10 +138,10 @@ describe('<Page />', () => {
   })
 
   it("throws an error if the authenticated user hasn't been found", async () => {
-    mockGetPost.mockResolvedValue({ userId: '1' } as Post)
+    mockGetPost.mockResolvedValue({ ...post, userId: '1' })
     mockGetUser
       .mockResolvedValue(undefined)
-      .mockResolvedValueOnce({ postIds: ['0', '1'] } as User)
+      .mockResolvedValueOnce({ ...seller, postIds: ['0', '1'] })
     mockGetPosts.mockResolvedValue([])
     mockGetServerSession.mockResolvedValue({ id: '2' })
 
@@ -191,20 +202,7 @@ describe('<Page />', () => {
     })
 
     it('renders the other posts of the seller', async () => {
-      mockGetPosts.mockResolvedValue([
-        {
-          id: '1',
-          name: 'chair',
-          price: 40,
-          address: 'Paris',
-          images: ['chair.jpg'],
-          userId: '0',
-          discussionIds: [],
-          categories: ['furniture'],
-          description: 'I sell this chair.',
-          latLon: [42, 58],
-        },
-      ])
+      mockGetPosts.mockResolvedValue([post])
 
       render(await Page({ params }))
 
@@ -285,20 +283,7 @@ describe('<Page />', () => {
     })
 
     it("doesn't render the other posts of the seller", async () => {
-      mockGetPosts.mockResolvedValue([
-        {
-          id: '1',
-          name: 'chair',
-          price: 40,
-          address: 'Paris',
-          images: ['chair.jpg'],
-          userId: '0',
-          discussionIds: [],
-          categories: ['furniture'],
-          description: 'I sell this chair.',
-          latLon: [42, 58],
-        },
-      ])
+      mockGetPosts.mockResolvedValue([post])
 
       render(await Page({ params }))
 
@@ -316,24 +301,8 @@ describe('<Page />', () => {
       mockGetServerSession.mockResolvedValue({ id: '1' })
 
       mockGetUser
-        .mockResolvedValueOnce({
-          id: '0',
-          name: 'john doe',
-          email: 'john@test.com',
-          channelName: 'test',
-          postIds: [],
-          favPostIds: [],
-          discussions: [],
-        })
-        .mockResolvedValueOnce({
-          id: '1',
-          name: 'bob',
-          email: 'bob@test.com',
-          channelName: 'test',
-          postIds: [],
-          favPostIds: [],
-          discussions: [],
-        })
+        .mockResolvedValueOnce(seller)
+        .mockResolvedValueOnce(signedInUser)
     })
 
     it('renders the favorite button', async () => {
@@ -356,40 +325,19 @@ describe('<Page />', () => {
     it('renders the contact modal', async () => {
       mockGetUser
         .mockReset()
+        .mockResolvedValueOnce(seller)
         .mockResolvedValueOnce({
-          id: '0',
-          name: 'john doe',
-          email: 'john@test.com',
-          channelName: 'test',
-          postIds: [],
-          favPostIds: [],
-          discussions: [],
-        })
-        .mockResolvedValueOnce({
-          id: '1',
-          name: 'bob',
-          email: 'bob@test.com',
-          channelName: 'test',
-          postIds: [],
-          favPostIds: [],
+          ...signedInUser,
           discussions: [
-            { id: '0', hidden: true, hasNewMessage: false },
-            { id: '1', hidden: false, hasNewMessage: false },
-            { id: '2', hidden: false, hasNewMessage: false },
+            { _id: '0', id: '0', hidden: true, hasNewMessage: false },
+            { _id: '1', id: '1', hidden: false, hasNewMessage: false },
+            { _id: '2', id: '2', hidden: false, hasNewMessage: false },
           ],
         })
 
       mockGetPost.mockReset().mockResolvedValueOnce({
-        id: '0',
-        name: 'blue table',
-        description: 'magnificent blue table',
-        categories: ['furniture'],
-        price: 5000.12,
-        images: ['img1', 'img2'],
-        address: 'Oslo, Norway',
-        latLon: [17, 45],
+        ...post,
         discussionIds: ['45', '1', '77'],
-        userId: '0',
       })
 
       render(await Page({ params }))
@@ -403,20 +351,7 @@ describe('<Page />', () => {
     })
 
     it('renders the other posts of the seller', async () => {
-      mockGetPosts.mockResolvedValue([
-        {
-          id: '1',
-          name: 'chair',
-          price: 40,
-          address: 'Paris',
-          images: ['chair.jpg'],
-          userId: '0',
-          discussionIds: [],
-          categories: ['furniture'],
-          description: 'I sell this chair.',
-          latLon: [42, 58],
-        },
-      ])
+      mockGetPosts.mockResolvedValue([post])
 
       render(await Page({ params }))
 

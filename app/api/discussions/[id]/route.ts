@@ -19,7 +19,6 @@ import {
   DATA_INVALID,
 } from 'constants/errors'
 import pusher from 'libs/pusher/server'
-import formatDiscussionForClient from 'functions/formatDiscussionForClient'
 
 interface Params {
   params: { id: string }
@@ -45,11 +44,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   try {
     await dbConnect()
 
-    const discussion = await Discussion.findById(discussionId, {
-      'messages._id': 0,
-    })
-      .lean()
-      .exec()
+    const discussion = await Discussion.findById(discussionId).lean().exec()
 
     if (!discussion) {
       return NextResponse.json(
@@ -65,17 +60,19 @@ export async function GET(request: NextRequest, { params }: Params) {
       return NextResponse.json({ message: FORBIDDEN }, { status: 403 })
     }
 
-    const buyer = await User.findById(discussion.buyerId).lean().exec()
-    const seller = await User.findById(discussion.sellerId).lean().exec()
+    const signedInUser = (await User.findById(session.id).lean().exec())!
 
-    const { hasNewMessage } = (
-      session.id === buyer?._id.toString() ? buyer : seller
-    )!.discussions.find((d) => d.id.toString() === discussionId)!
+    let hasNewMessage = false
 
-    return NextResponse.json(
-      formatDiscussionForClient(discussion, buyer, seller, hasNewMessage),
-      { status: 200 }
-    )
+    for (const discussion of signedInUser.discussions) {
+      if (discussion.id.toString() === discussionId) {
+        hasNewMessage = discussion.hasNewMessage
+
+        break
+      }
+    }
+
+    return NextResponse.json({ ...discussion, hasNewMessage }, { status: 200 })
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
@@ -151,10 +148,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
             messages: [{ message: result.value.message, userId: session.id }],
           },
         },
-        {
-          new: true,
-          projection: { 'messages._id': 0 },
-        }
+        { new: true }
       )
         .lean()
         .exec())!
@@ -177,11 +171,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
       if (isBuyer) {
         if (sellerDiscussion.hidden) {
-          await pusher.trigger(
-            seller.channelName,
-            'discussion:new',
-            formatDiscussionForClient(discussion, buyer, seller, true)
-          )
+          await pusher.trigger(seller.channelName, 'discussion:new', {
+            ...discussion,
+            hasNewMessage: true,
+          })
         }
 
         if (buyerDiscussion.hidden) {
@@ -208,11 +201,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
         await pusher.trigger(seller.channelName, 'message:new', '')
       } else {
         if (buyerDiscussion.hidden) {
-          await pusher.trigger(
-            buyer.channelName,
-            'discussion:new',
-            formatDiscussionForClient(discussion, buyer, seller, true)
-          )
+          await pusher.trigger(buyer.channelName, 'discussion:new', {
+            ...discussion,
+            hasNewMessage: true,
+          })
         }
 
         if (sellerDiscussion.hidden) {
@@ -242,7 +234,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       for (let i = discussion.messages.length - 1; i >= 0; i--) {
         const message = discussion.messages[i]
 
-        if (message.userId.toString() !== session.id) {
+        if (message.userId?.toString() !== session.id) {
           if (message.seen) {
             break
           }

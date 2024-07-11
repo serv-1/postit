@@ -1,7 +1,7 @@
 import type { CreateUser } from 'schemas/createUser'
 
 export interface UserPostData {
-  id: string
+  _id: string
 }
 
 export interface UserPostError {

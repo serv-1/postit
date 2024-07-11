@@ -145,7 +145,7 @@ describe('POST', () => {
     expect(mockSaveUser).toHaveBeenNthCalledWith(1, body)
     expect(response).toHaveProperty('status', 201)
     expect(response.headers.get('Location')).toBe('/profile')
-    expect(data).toEqual({ id: user._id.toString() })
+    expect(data).toEqual({ _id: user._id.toString() })
   })
 })
 

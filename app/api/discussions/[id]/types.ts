@@ -1,24 +1,17 @@
 export interface DiscussionsIdGetData {
-  id: string
+  _id: string
   postId: string
   postName: string
   channelName: string
   messages: {
+    _id: string
     message: string
     createdAt: string
-    userId: string
     seen: boolean
+    userId?: string
   }[]
-  buyer: {
-    id?: string
-    name: string
-    image?: string
-  }
-  seller: {
-    id?: string
-    name: string
-    image?: string
-  }
+  buyerId?: string
+  sellerId?: string
   hasNewMessage: boolean
 }
 

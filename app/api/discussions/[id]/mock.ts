@@ -1,32 +1,27 @@
 import { rest } from 'msw'
+import type { Discussion } from 'types'
 
 const handlers = [
   rest.get('http://localhost/api/discussions/:id', (req, res, ctx) => {
     return res(
       ctx.status(200),
-      ctx.json({
-        id: '0',
+      ctx.json<Discussion>({
+        _id: '0',
         postId: '0',
         postName: 'table',
         channelName: 'channel name',
         messages: [
           {
+            _id: '0',
             message: 'yo',
-            createdAt: new Date(),
+            createdAt: new Date().toString(),
             userId: '0',
             seen: false,
           },
         ],
-        buyer: {
-          id: '0',
-          name: 'john',
-          image: 'john.jpeg',
-        },
-        seller: {
-          id: '1',
-          name: 'bob',
-          image: 'bob.jpeg',
-        },
+        buyerId: '0',
+        sellerId: '1',
+        hasNewMessage: false,
       })
     )
   }),

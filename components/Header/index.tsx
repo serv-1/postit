@@ -9,10 +9,10 @@ import PlusCircle from 'public/static/images/plus-circle.svg'
 import { POST_PAGE_REGEX } from 'constants/regex'
 
 interface HeaderProps {
-  user?: User
+  signedInUser?: User
 }
 
-export default function Header({ user }: HeaderProps) {
+export default function Header({ signedInUser }: HeaderProps) {
   const path = usePathname()
   const isOnAuthPage = path === '/authentication'
 
@@ -30,7 +30,7 @@ export default function Header({ user }: HeaderProps) {
       >
         PostIt
       </Link>
-      {!user && !isOnAuthPage ? (
+      {!signedInUser && !isOnAuthPage ? (
         <Link
           href="/authentication"
           className="block bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded font-bold"
@@ -41,11 +41,11 @@ export default function Header({ user }: HeaderProps) {
         >
           Sign in
         </Link>
-      ) : user ? (
+      ) : signedInUser ? (
         <nav>
           <ul className="flex flex-row flew-nowrap gap-x-8 items-center">
             <li>
-              <HeaderDiscussions user={user} />
+              <HeaderDiscussions signedInUser={signedInUser} />
             </li>
             <li>
               <Link
@@ -57,7 +57,7 @@ export default function Header({ user }: HeaderProps) {
               </Link>
             </li>
             <li>
-              <HeaderDropdownMenu userImage={user.image} />
+              <HeaderDropdownMenu userImage={signedInUser.image} />
             </li>
           </ul>
         </nav>

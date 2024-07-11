@@ -2,7 +2,7 @@ import getUser from 'functions/getUser'
 import Page, { generateMetadata } from './page'
 import getPosts from 'functions/getPosts'
 import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
-import type { User } from 'types'
+import type { Post, User } from 'types'
 import { render, screen } from '@testing-library/react'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 
@@ -21,9 +21,33 @@ const mockGetPosts = getPosts as jest.MockedFunction<typeof getPosts>
 
 const params = { id: '0', name: 'john' }
 
+const user: User = {
+  _id: '0',
+  name: 'john',
+  email: 'john@test.com',
+  image: 'john.jpeg',
+  channelName: 'test',
+  postIds: [],
+  favPostIds: [],
+  discussions: [],
+}
+
+const post: Post = {
+  _id: '0',
+  name: 'table',
+  images: ['table.jpeg'],
+  address: 'Paris',
+  price: 40,
+  categories: ['furniture'],
+  discussionIds: [],
+  userId: '0',
+  description: 'I sell this table.',
+  latLon: [42, 58],
+}
+
 describe('generateMetadata()', () => {
   it('generates the metadata', async () => {
-    mockGetUser.mockResolvedValue({ name: 'john' } as User)
+    mockGetUser.mockResolvedValue(user)
 
     expect(await generateMetadata({ params })).toEqual({
       title: "john's profile - PostIt",
@@ -33,17 +57,7 @@ describe('generateMetadata()', () => {
 
 describe('<Page />', () => {
   beforeEach(() => {
-    mockGetUser.mockResolvedValue({
-      id: '0',
-      name: 'john doe',
-      email: 'john@test.com',
-      image: 'john.jpeg',
-      channelName: 'test',
-      postIds: [],
-      favPostIds: [],
-      discussions: [],
-    })
-
+    mockGetUser.mockResolvedValue(user)
     mockGetPosts.mockResolvedValue([])
   })
 
@@ -56,7 +70,7 @@ describe('<Page />', () => {
   })
 
   it("throws an error if one of the user's posts hasn't been found", async () => {
-    mockGetUser.mockResolvedValue({ postIds: ['0'] } as User)
+    mockGetUser.mockResolvedValue({ ...user, postIds: ['0'] })
     mockGetPosts.mockResolvedValue(undefined)
 
     await expect(Page({ params })).rejects.toThrow(POST_NOT_FOUND)
@@ -65,10 +79,7 @@ describe('<Page />', () => {
   })
 
   it("renders the default user's image", async () => {
-    mockGetUser.mockResolvedValue({
-      postIds: [] as string[],
-      name: 'john',
-    } as User)
+    mockGetUser.mockResolvedValue({ ...user, image: undefined })
 
     render(await Page({ params }))
 
@@ -88,29 +99,13 @@ describe('<Page />', () => {
 
   it("renders the user's posts", async () => {
     mockGetPosts.mockResolvedValue([
+      post,
       {
-        id: '0',
-        name: 'table',
-        images: ['table.jpeg'],
-        address: 'Paris',
-        price: 40,
-        categories: ['furniture'],
-        discussionIds: [],
-        userId: '0',
-        description: 'I sell this table.',
-        latLon: [42, 58],
-      },
-      {
-        id: '1',
+        ...post,
+        _id: '1',
         name: 'chair',
         images: ['chair.jpeg'],
-        address: 'Paris',
-        price: 20,
-        categories: ['furniture'],
-        discussionIds: [],
-        userId: '0',
         description: 'I sell this chair.',
-        latLon: [42, 58],
       },
     ])
 
@@ -122,20 +117,7 @@ describe('<Page />', () => {
   })
 
   it('doesn\'t render an "s" if the user has only one post', async () => {
-    mockGetPosts.mockResolvedValue([
-      {
-        id: '0',
-        name: 'table',
-        images: ['table.jpeg'],
-        address: 'Paris',
-        price: 40,
-        categories: ['furniture'],
-        discussionIds: [],
-        userId: '0',
-        description: 'I sell this table.',
-        latLon: [42, 58],
-      },
-    ])
+    mockGetPosts.mockResolvedValue([post])
 
     render(await Page({ params }))
 
@@ -149,6 +131,6 @@ describe('<Page />', () => {
 
     const statusText = screen.getByRole('status')
 
-    expect(statusText).toHaveTextContent(/john doe/i)
+    expect(statusText).toHaveTextContent(/john/i)
   })
 })

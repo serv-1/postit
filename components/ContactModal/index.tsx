@@ -60,7 +60,7 @@ export default function ContactModal({
   })
 
   usePusher<Discussion>(session.channelName, 'discussion:new', (discussion) => {
-    if (discussion.id === discussionId) {
+    if (discussion._id === discussionId) {
       setIsDiscussionHidden(false)
     }
   })
@@ -72,7 +72,6 @@ export default function ContactModal({
         <DiscussionModal
           onMessageSent={onMessageSent}
           onClose={closeModal}
-          discussionId={discussionId}
           postName={postName}
           postId={postId}
           sellerId={sellerId}

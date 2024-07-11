@@ -67,7 +67,7 @@ it('deletes the post on click', async () => {
   })
 
   const callback = mockSetPosts.mock.calls[0][0]
-  const posts = [{ id: '0' }, { id: '1' }, { id: '2' }]
+  const posts = [{ _id: '0' }, { _id: '1' }, { _id: '2' }]
 
   expect(callback(posts)).not.toContain(posts[0])
 })
@@ -102,7 +102,7 @@ it('deletes the favorite post on click', async () => {
   })
 
   const callback = mockSetPosts.mock.calls[0][0]
-  const posts = [{ id: '0' }, { id: '1' }, { id: '2' }]
+  const posts = [{ _id: '0' }, { _id: '1' }, { _id: '2' }]
 
   expect(callback(posts)).not.toContain(posts[0])
 })

@@ -45,7 +45,7 @@ export default function ProfilePostDeleteButton({
           : 'Your post has been successfully deleted.',
     })
 
-    setPosts((posts) => posts.filter((post) => post.id !== postId))
+    setPosts((posts) => posts.filter((post) => post._id !== postId))
   }
 
   return (

@@ -36,7 +36,7 @@ it('creates a discussion if none exist when the first message is sent', async ()
         sellerId: '1',
       })
 
-      return res(ctx.status(201), ctx.json({ id: '0' }))
+      return res(ctx.status(201), ctx.json({ _id: '0' }))
     })
   )
 

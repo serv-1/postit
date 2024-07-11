@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import DiscussionModal from '.'
 import 'cross-fetch/polyfill'
 import type { DiscussionMessageListProps } from 'components/DiscussionMessageList'
+import type { User } from 'types'
 
 jest
   .mock('components/DiscussionMessageList', () => ({
@@ -11,9 +12,7 @@ jest
       return (
         <ul>
           {messages.map((message) => (
-            <li key={message.message}>
-              {message.authorName} {message.authorImage}
-            </li>
+            <li key={message._id}></li>
           ))}
         </ul>
       )
@@ -23,6 +22,16 @@ jest
     __esModule: true,
     default: () => <input type="text" />,
   }))
+
+const signedInUser: User = {
+  _id: '1',
+  name: 'john',
+  email: 'john@test.com',
+  channelName: '',
+  postIds: [],
+  favPostIds: [],
+  discussions: [],
+}
 
 it('closes the modal if the close button is clicked', async () => {
   const onClose = jest.fn()
@@ -47,23 +56,10 @@ it('renders the message list if there is a discussion', () => {
   render(
     <DiscussionModal
       onClose={() => null}
-      discussion={{
-        id: '1',
-        messages: [
-          {
-            message: 'yo',
-            createdAt: new Date().toString(),
-            seen: true,
-            userId: '0',
-          },
-        ],
-        buyer: { id: '0', name: 'john' },
-        seller: { id: '2', name: 'jane' },
-        postName: 'table',
-        postId: '3',
-        channelName: 'test',
-        hasNewMessage: false,
-      }}
+      discussionId="0"
+      messages={[]}
+      signedInUser={signedInUser}
+      interlocutor={null}
     />
   )
 
@@ -85,40 +81,4 @@ it("doesn't render the message list if there isn't a discussion", () => {
   const messageList = screen.queryByRole('list')
 
   expect(messageList).not.toBeInTheDocument()
-})
-
-it('renders the name and image of the author of a message correctly', () => {
-  render(
-    <DiscussionModal
-      onClose={() => null}
-      discussion={{
-        id: '1',
-        messages: [
-          {
-            message: 'yo',
-            createdAt: new Date().toString(),
-            seen: true,
-            userId: '0',
-          },
-          {
-            message: 'hi',
-            createdAt: new Date().toString(),
-            seen: false,
-            userId: '2',
-          },
-        ],
-        buyer: { id: '0', name: 'john', image: 'john.jpeg' },
-        seller: { id: '2', name: 'jane', image: 'jane.jpeg' },
-        postName: 'table',
-        postId: '3',
-        channelName: 'test',
-        hasNewMessage: false,
-      }}
-    />
-  )
-
-  const messages = screen.getAllByRole('listitem')
-
-  expect(messages[0]).toHaveTextContent('john john.jpeg')
-  expect(messages[1]).toHaveTextContent('jane jane.jpeg')
 })

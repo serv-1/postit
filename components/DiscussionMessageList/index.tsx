@@ -2,24 +2,27 @@ import type { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef } from 'react'
 import useToast from 'hooks/useToast'
-import DiscussionMessage from 'components/DiscussionMessage'
+import DiscussionMessage, {
+  type DiscussionMessageProps,
+} from 'components/DiscussionMessage'
 import ajax from 'libs/ajax'
 import type {
   DiscussionsIdGetData,
   DiscussionsIdGetError,
 } from 'app/api/discussions/[id]/types'
-import type { UnArray } from 'types'
+import type { User } from 'types'
 
 export interface DiscussionMessageListProps {
   discussionId: string
-  messages: (UnArray<DiscussionsIdGetData['messages']> & {
-    authorName: string
-    authorImage?: string
-  })[]
+  signedInUser: User
+  interlocutor: User | null
+  messages: DiscussionsIdGetData['messages']
 }
 
 export default function DiscussionMessageList({
   discussionId,
+  signedInUser,
+  interlocutor,
   messages,
 }: DiscussionMessageListProps) {
   const { setToast } = useToast()
@@ -56,17 +59,34 @@ export default function DiscussionMessageList({
       ref={msgListRef}
       className="flex flex-col h-full overflow-y-auto px-8 md:px-[12px] md:mx-4 chatScrollbar"
     >
-      {messages.map((message, i) => (
-        <li key={i}>
-          <DiscussionMessage
-            message={message.message}
-            createdAt={message.createdAt}
-            isLeftAligned={message.userId !== session.id}
-            authorName={message.authorName}
-            authorImage={message.authorImage}
-          />
-        </li>
-      ))}
+      {messages.map((message, i) => {
+        let author: DiscussionMessageProps['author'] = undefined
+
+        if (message.userId) {
+          let name = 'deleted'
+          let image: string | undefined = undefined
+
+          if (message.userId === signedInUser._id) {
+            name = signedInUser.name
+            image = signedInUser.image
+          } else if (interlocutor) {
+            name = interlocutor.name
+            image = interlocutor.image
+          }
+
+          author = { id: message.userId, name, image }
+        }
+
+        return (
+          <li key={i}>
+            <DiscussionMessage
+              message={message.message}
+              createdAt={message.createdAt}
+              author={author}
+            />
+          </li>
+        )
+      })}
     </ul>
   )
 }

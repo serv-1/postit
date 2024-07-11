@@ -69,7 +69,7 @@ export default function DiscussionSendBar({
         return
       }
 
-      id = ((await response.json()) as DiscussionPostData).id
+      id = ((await response.json()) as DiscussionPostData)._id
     }
 
     if (onMessageSent) {

@@ -1,7 +1,7 @@
 import type { CreatePost } from 'schemas/server/createPost'
 
 export interface PostPostData {
-  id: string
+  _id: string
 }
 
 export interface PostPostError {

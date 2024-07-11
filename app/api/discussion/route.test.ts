@@ -214,15 +214,6 @@ describe('POST', () => {
   })
 
   test('500 - "discussion:new" pusher event triggering failed', async () => {
-    const buyer = await new User({
-      name: 'john',
-      email: 'john@test.com',
-      password: 'password',
-      postIds: [],
-      favPostIds: [],
-      discussions: [],
-    }).save()
-
     const seller = await new User({
       name: 'jane',
       email: 'jane@test.com',
@@ -232,7 +223,7 @@ describe('POST', () => {
       discussions: [],
     }).save()
 
-    const session = { id: buyer._id.toString() }
+    const session = { id: new mongoose.Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -259,15 +250,6 @@ describe('POST', () => {
   })
 
   test('201 - discussion created', async () => {
-    const buyer = await new User({
-      name: 'john',
-      email: 'john@test.com',
-      password: 'password',
-      postIds: [],
-      favPostIds: [],
-      discussions: [],
-    }).save()
-
     const seller = await new User({
       name: 'jane',
       email: 'jane@test.com',
@@ -289,7 +271,7 @@ describe('POST', () => {
       discussionIds: [],
     }).save()
 
-    const session = { id: buyer._id.toString() }
+    const session = { id: new mongoose.Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
@@ -309,10 +291,10 @@ describe('POST', () => {
     const response = await POST(request)
     const data = await response.json()
 
-    const discussion = (await Discussion.findOne(
-      { buyerId: buyer._id, postId: post._id },
-      { 'messages._id': 0 }
-    )
+    const discussion = (await Discussion.findOne({
+      buyerId: session.id,
+      postId: post._id,
+    })
       .lean()
       .exec())!
 
@@ -320,27 +302,10 @@ describe('POST', () => {
       1,
       seller.channelName,
       'discussion:new',
-      {
-        id: discussion._id,
-        postId: discussion.postId,
-        postName: discussion.postName,
-        channelName: discussion.channelName,
-        messages: discussion.messages,
-        buyer: {
-          id: buyer._id,
-          name: buyer.name,
-          image: buyer.image,
-        },
-        seller: {
-          id: seller._id,
-          name: seller.name,
-          image: seller.image,
-        },
-        hasNewMessage: true,
-      }
+      { ...discussion, hasNewMessage: true }
     )
 
     expect(response).toHaveProperty('status', 201)
-    expect(data).toEqual({ id: discussion._id.toString() })
+    expect(data).toEqual({ _id: discussion._id.toString() })
   })
 })

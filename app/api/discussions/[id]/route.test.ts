@@ -226,28 +226,7 @@ describe('GET', () => {
 
     expect(response).toHaveProperty('status', 200)
     expect(data).toEqual({
-      id: discussion._id.toString(),
-      postId: discussion.postId!.toString(),
-      postName: discussion.postName,
-      channelName: discussion.channelName,
-      messages: discussion.messages.map(
-        ({ message, userId, createdAt, seen }) => ({
-          message,
-          userId: userId.toString(),
-          createdAt: createdAt.toISOString(),
-          seen,
-        })
-      ),
-      buyer: {
-        id: buyer._id.toString(),
-        name: buyer.name,
-        image: buyer.image,
-      },
-      seller: {
-        id: seller._id.toString(),
-        name: seller.name,
-        image: seller.image,
-      },
+      ...JSON.parse(JSON.stringify(discussion)),
       hasNewMessage: true,
     })
   })
@@ -436,9 +415,7 @@ describe('PUT', () => {
       const response = await PUT(request, params)
       const data = await response.json()
 
-      const { messages } = (await Discussion.findById(discussion._id, {
-        'messages._id': 0,
-      })
+      const updatedDiscussion = (await Discussion.findById(discussion._id)
         .lean()
         .exec())!
 
@@ -448,7 +425,7 @@ describe('PUT', () => {
         1,
         discussion.channelName,
         'message:new',
-        messages[messages.length - 1]
+        updatedDiscussion.messages.at(-1)
       )
 
       expect(response).toHaveProperty('status', 500)
@@ -481,9 +458,7 @@ describe('PUT', () => {
         const response = await PUT(request, params)
         const data = await response.json()
 
-        const { messages } = (await Discussion.findById(discussion._id, {
-          'messages._id': 0,
-        })
+        const updatedDiscussion = (await Discussion.findById(discussion._id)
           .lean()
           .exec())!
 
@@ -494,21 +469,7 @@ describe('PUT', () => {
           seller.channelName,
           'discussion:new',
           {
-            id: discussion._id,
-            postId: discussion.postId,
-            postName: discussion.postName,
-            channelName: discussion.channelName,
-            messages,
-            buyer: {
-              id: buyer._id,
-              name: buyer.name,
-              image: buyer.image,
-            },
-            seller: {
-              id: seller._id,
-              name: seller.name,
-              image: seller.image,
-            },
+            ...updatedDiscussion,
             hasNewMessage: true,
           }
         )
@@ -630,9 +591,7 @@ describe('PUT', () => {
         const response = await PUT(request, params)
         const data = await response.json()
 
-        const { messages } = (await Discussion.findById(discussion._id, {
-          'messages._id': 0,
-        })
+        const updatedDiscussion = (await Discussion.findById(discussion._id)
           .lean()
           .exec())!
 
@@ -642,24 +601,7 @@ describe('PUT', () => {
           2,
           buyer.channelName,
           'discussion:new',
-          {
-            id: discussion._id,
-            postId: discussion.postId,
-            postName: discussion.postName,
-            channelName: discussion.channelName,
-            messages,
-            buyer: {
-              id: buyer._id,
-              name: buyer.name,
-              image: buyer.image,
-            },
-            seller: {
-              id: seller._id,
-              name: seller.name,
-              image: seller.image,
-            },
-            hasNewMessage: true,
-          }
+          { ...updatedDiscussion, hasNewMessage: true }
         )
 
         expect(response).toHaveProperty('status', 500)
@@ -803,7 +745,7 @@ describe('PUT', () => {
             messages: [
               { message: 'a', userId: seller._id, seen: true },
               { message: 'b', userId: seller._id, seen: false },
-              { message: 'c', userId: seller._id, seen: false },
+              { message: 'c', seen: false },
             ],
           },
         }

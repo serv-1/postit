@@ -196,6 +196,6 @@ describe('POST', () => {
       `/posts/${post._id.toString()}/table`
     )
 
-    expect(data).toEqual({ id: post._id.toString() })
+    expect(data).toEqual({ _id: post._id.toString() })
   })
 })

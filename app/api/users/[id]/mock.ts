@@ -5,14 +5,13 @@ const handlers = [
     return res(
       ctx.status(200),
       ctx.json({
-        id: '0',
+        _id: '0',
         name: 'john',
         email: 'john@test.com',
         image: 'john.jpeg',
         postIds: [],
         favPostIds: [],
-        discussionIds: [],
-        hasUnseenMessages: false,
+        discussions: [],
         channelName: 'channel name',
       })
     )

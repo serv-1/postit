@@ -5,7 +5,6 @@
 import Page from './page'
 import getUser from 'functions/getUser'
 import getPosts from 'functions/getPosts'
-import getUserFavoritePosts from 'functions/getUserFavoritePosts'
 import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import { redirect } from 'next/navigation'
 import type { User } from 'types'
@@ -20,20 +19,12 @@ jest
     __esModule: true,
     default: jest.fn(),
   }))
-  .mock('functions/getUserFavoritePosts', () => ({
-    __esModule: true,
-    default: jest.fn(),
-  }))
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
   }))
   .mock('next/navigation', () => ({
     redirect: jest.fn(),
   }))
-
-const mockGetUserFavoritePosts = getUserFavoritePosts as jest.MockedFunction<
-  typeof getUserFavoritePosts
->
 
 const mockRedirect = redirect as jest.MockedFunction<typeof redirect>
 const mockGetUser = getUser as jest.MockedFunction<typeof getUser>
@@ -61,21 +52,22 @@ it("throws an error if the authenticated user hasn't been found", async () => {
 
 it("throws an error if a post hasn't been found", async () => {
   mockGetServerSession.mockResolvedValue({ id: '0' })
-  mockGetUser.mockResolvedValue({ postIds: ['0'] } as User)
+  mockGetUser.mockResolvedValue({ postIds: ['1'] } as User)
   mockGetPosts.mockResolvedValue(undefined)
 
   await expect(Page()).rejects.toThrow(POST_NOT_FOUND)
 
-  expect(mockGetPosts).toHaveBeenNthCalledWith(1, ['0'])
+  expect(mockGetPosts).toHaveBeenCalledTimes(1)
+  expect(mockGetPosts.mock.calls[0][0]).toEqual(['1'])
 })
 
 it("throws an error if a favorite post hasn't been found", async () => {
   mockGetServerSession.mockResolvedValue({ id: '0' })
-  mockGetUser.mockResolvedValue({ favPostIds: ['0'] } as User)
-  mockGetPosts.mockResolvedValue([])
-  mockGetUserFavoritePosts.mockResolvedValue(undefined)
+  mockGetUser.mockResolvedValue({ postIds: ['1'], favPostIds: ['2'] } as User)
+  mockGetPosts.mockResolvedValueOnce([]).mockResolvedValueOnce(undefined)
 
   await expect(Page()).rejects.toThrow(POST_NOT_FOUND)
 
-  expect(mockGetUserFavoritePosts).toHaveBeenNthCalledWith(1, ['0'])
+  expect(mockGetPosts).toHaveBeenCalledTimes(2)
+  expect(mockGetPosts.mock.calls[1][0]).toEqual(['2'])
 })

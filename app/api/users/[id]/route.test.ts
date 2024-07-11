@@ -89,7 +89,7 @@ describe('GET', () => {
     expect(mockFindUserById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 200)
     expect(data).toEqual({
-      id: params.params.id,
+      _id: params.params.id,
       name: user.name,
       email: user.email,
       channelName: user.channelName,
@@ -110,9 +110,24 @@ describe('GET', () => {
       postIds: [new Types.ObjectId()],
       favPostIds: [new Types.ObjectId(), new Types.ObjectId()],
       discussions: [
-        { id: new Types.ObjectId(), hidden: false, hasNewMessage: false },
-        { id: new Types.ObjectId(), hidden: false, hasNewMessage: false },
-        { id: new Types.ObjectId(), hidden: false, hasNewMessage: false },
+        {
+          _id: new Types.ObjectId(),
+          id: new Types.ObjectId(),
+          hidden: false,
+          hasNewMessage: false,
+        },
+        {
+          _id: new Types.ObjectId(),
+          id: new Types.ObjectId(),
+          hidden: false,
+          hasNewMessage: false,
+        },
+        {
+          _id: new Types.ObjectId(),
+          id: new Types.ObjectId(),
+          hidden: false,
+          hasNewMessage: false,
+        },
       ],
     }
 
@@ -127,7 +142,7 @@ describe('GET', () => {
     expect(mockFindUserById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 200)
     expect(data).toEqual({
-      id: params.params.id,
+      _id: params.params.id,
       name: user.name,
       email: user.email,
       channelName: user.channelName,

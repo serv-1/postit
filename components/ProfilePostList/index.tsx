@@ -20,14 +20,15 @@ export default function ProfilePostList({
   return posts.length > 0 ? (
     <ul>
       {posts.map((post) => (
-        <ProfilePost
-          key={post.id}
-          id={post.id}
-          name={post.name}
-          image={post.images[0]}
-          type={type}
-          setPosts={setPosts}
-        />
+        <li key={post._id} className="mb-8 last:mb-0 md:mb-16">
+          <ProfilePost
+            id={post._id}
+            name={post.name}
+            image={post.images[0]}
+            type={type}
+            setPosts={setPosts}
+          />
+        </li>
       ))}
     </ul>
   ) : (

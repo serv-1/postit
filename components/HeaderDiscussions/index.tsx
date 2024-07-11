@@ -8,13 +8,15 @@ import useToast from 'hooks/useToast'
 import fetchDiscussion from 'functions/fetchDiscussion'
 
 interface HeaderDiscussionsProps {
-  user: User
+  signedInUser: User
 }
 
-export default function HeaderDiscussions({ user }: HeaderDiscussionsProps) {
+export default function HeaderDiscussions({
+  signedInUser,
+}: HeaderDiscussionsProps) {
   let hasNewMessage = false
 
-  for (const discussion of user.discussions) {
+  for (const discussion of signedInUser.discussions) {
     if (discussion.hasNewMessage) {
       hasNewMessage = true
       break
@@ -33,14 +35,14 @@ export default function HeaderDiscussions({ user }: HeaderDiscussionsProps) {
   const getUserDiscussions = useCallback(async () => {
     const promises: Promise<Discussion>[] = []
 
-    for (const { id, hidden } of user.discussions) {
+    for (const { id, hidden } of signedInUser.discussions) {
       if (hidden) continue
 
       promises.push(fetchDiscussion(id))
     }
 
     return Promise.all(promises)
-  }, [user.discussions])
+  }, [signedInUser.discussions])
 
   function openModal() {
     setIsModalHidden(false)
@@ -53,11 +55,11 @@ export default function HeaderDiscussions({ user }: HeaderDiscussionsProps) {
   })
 
   useEventListener(document, 'discussionDeleted', (e) => {
-    setDiscussions((d) => d?.filter((d) => d.id !== e.detail))
+    setDiscussions((d) => d?.filter((d) => d._id !== e.detail))
   })
 
   usePusher<Discussion>(
-    user.channelName,
+    signedInUser.channelName,
     'discussion:new',
     async (discussion) => {
       if (discussions) {
@@ -78,7 +80,7 @@ export default function HeaderDiscussions({ user }: HeaderDiscussionsProps) {
     }
   )
 
-  usePusher(user.channelName, 'message:new', () => {
+  usePusher(signedInUser.channelName, 'message:new', () => {
     if (isModalHidden) {
       setShowBadge(true)
     }
@@ -102,7 +104,7 @@ export default function HeaderDiscussions({ user }: HeaderDiscussionsProps) {
     if (
       !openedDiscussionId ||
       !discussions ||
-      discussions.find((d) => d.id === openedDiscussionId)
+      discussions.find((d) => d._id === openedDiscussionId)
     ) {
       return
     }
@@ -135,7 +137,7 @@ export default function HeaderDiscussions({ user }: HeaderDiscussionsProps) {
         {showBadge && (
           <div
             role="status"
-            aria-label="Someone has responded to you."
+            aria-label="You have a new message"
             className="w-full h-full absolute top-0 left-0 bg-red-100 rounded-full animate-ping"
           ></div>
         )}
@@ -147,6 +149,7 @@ export default function HeaderDiscussions({ user }: HeaderDiscussionsProps) {
         discussions={discussions}
         openedDiscussionId={openedDiscussionId}
         setOpenedDiscussionId={setOpenedDiscussionId}
+        signedInUser={signedInUser}
       />
     </>
   )

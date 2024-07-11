@@ -9,6 +9,7 @@ import 'cross-fetch/polyfill'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import { useEffect as mockUseEffect } from 'react'
 import { useFormContext as mockUseFormContext } from 'react-hook-form'
+import type { Post } from 'types'
 
 jest
   .mock('next-auth/react', () => ({
@@ -40,24 +41,24 @@ jest
 
 const server = setupServer()
 
+const post: Post = {
+  _id: '0',
+  name: 'table',
+  description: 'magnificent table',
+  price: 39.99,
+  categories: ['furniture', 'decoration'],
+  images: ['img1', 'img2'],
+  address: 'Paris',
+  latLon: [1, 2],
+  userId: '1',
+  discussionIds: [],
+}
+
 function Test() {
   return (
     <ToastProvider>
       <Toast />
-      <UpdatePostForm
-        post={{
-          id: '0',
-          name: 'table',
-          description: 'magnificent table',
-          price: 39.99,
-          categories: ['furniture', 'decoration'],
-          images: ['img1', 'img2'],
-          address: 'Paris',
-          latLon: [1, 2],
-          userId: '1',
-          discussionIds: [],
-        }}
-      />
+      <UpdatePostForm post={post} />
     </ToastProvider>
   )
 }

@@ -4,7 +4,7 @@
 
 import mongoose, { Types } from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import User, { type UserDoc } from '.'
+import User from '.'
 import Account from 'models/Account'
 import Post from 'models/Post'
 import Discussion from 'models/Discussion'
@@ -281,7 +281,10 @@ describe('User model', () => {
       }).save()
 
       const tableDiscussion = await new Discussion({
-        messages: [{ message: 'yo', userId: johnId }],
+        messages: [
+          { message: 'yo', userId: johnId },
+          { message: 'hi', userId: seller._id },
+        ],
         postName: 'table',
         postId: new mongoose.Types.ObjectId(),
         buyerId: johnId,
@@ -289,7 +292,10 @@ describe('User model', () => {
       }).save()
 
       const chairDiscussion = await new Discussion({
-        messages: [{ message: 'yo', userId: johnId }],
+        messages: [
+          { message: 'yo', userId: johnId },
+          { message: 'hi', userId: seller._id },
+        ],
         postName: 'chair',
         postId: new mongoose.Types.ObjectId(),
         buyerId: johnId,
@@ -298,12 +304,25 @@ describe('User model', () => {
 
       await User.deleteOne({ _id: johnId }).lean().exec()
 
-      expect(
-        await Discussion.findById(tableDiscussion._id).lean().exec()
-      ).not.toHaveProperty('buyerId')
-      expect(
-        await Discussion.findById(chairDiscussion._id).lean().exec()
-      ).not.toHaveProperty('buyerId')
+      const updatedTableDiscussion = (await Discussion.findById(
+        tableDiscussion._id
+      )
+        .lean()
+        .exec())!
+
+      const updatedChairDiscussion = (await Discussion.findById(
+        chairDiscussion._id
+      )
+        .lean()
+        .exec())!
+
+      expect(updatedTableDiscussion).not.toHaveProperty('buyerId')
+      expect(updatedTableDiscussion.messages[0]).not.toHaveProperty('userId')
+      expect(updatedTableDiscussion.messages[1]).toHaveProperty('userId')
+
+      expect(updatedChairDiscussion).not.toHaveProperty('buyerId')
+      expect(updatedChairDiscussion.messages[0]).not.toHaveProperty('userId')
+      expect(updatedChairDiscussion.messages[1]).toHaveProperty('userId')
     })
 
     it("removes the seller from the discussion if the buyer hasn't hidden it", async () => {
@@ -314,7 +333,10 @@ describe('User model', () => {
       }).save()
 
       const tableDiscussion = await new Discussion({
-        messages: [{ message: 'yo', userId: johnId }],
+        messages: [
+          { message: 'yo', userId: johnId },
+          { message: 'hi', userId: seller._id },
+        ],
         postName: 'table',
         postId: new mongoose.Types.ObjectId(),
         buyerId: johnId,
@@ -322,7 +344,10 @@ describe('User model', () => {
       }).save()
 
       const chairDiscussion = await new Discussion({
-        messages: [{ message: 'yo', userId: johnId }],
+        messages: [
+          { message: 'yo', userId: johnId },
+          { message: 'hi', userId: seller._id },
+        ],
         postName: 'chair',
         postId: new mongoose.Types.ObjectId(),
         buyerId: johnId,
@@ -331,13 +356,25 @@ describe('User model', () => {
 
       await User.deleteOne({ _id: seller._id }).lean().exec()
 
-      expect(
-        await Discussion.findById(tableDiscussion._id).lean().exec()
-      ).not.toHaveProperty('sellerId')
+      const updatedTableDiscussion = (await Discussion.findById(
+        tableDiscussion._id
+      )
+        .lean()
+        .exec())!
 
-      expect(
-        await Discussion.findById(chairDiscussion._id).lean().exec()
-      ).not.toHaveProperty('sellerId')
+      const updatedChairDiscussion = (await Discussion.findById(
+        chairDiscussion._id
+      )
+        .lean()
+        .exec())!
+
+      expect(updatedTableDiscussion).not.toHaveProperty('sellerId')
+      expect(updatedTableDiscussion.messages[0]).toHaveProperty('userId')
+      expect(updatedTableDiscussion.messages[1]).not.toHaveProperty('userId')
+
+      expect(updatedChairDiscussion).not.toHaveProperty('sellerId')
+      expect(updatedChairDiscussion.messages[0]).toHaveProperty('userId')
+      expect(updatedChairDiscussion.messages[1]).not.toHaveProperty('userId')
     })
   })
 })

@@ -10,11 +10,22 @@ import { setupServer } from 'msw/node'
 import { rest } from 'msw'
 import 'cross-fetch/polyfill'
 import type { UsersIdGetData } from 'app/api/users/[id]/types'
+import type { User } from 'types'
 
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>
 const mockSetToast = jest.fn()
 const server = setupServer()
+
+const signedInUser: User = {
+  _id: '0',
+  name: 'john',
+  email: 'john@test.com',
+  channelName: 'channelName',
+  discussions: [],
+  postIds: [],
+  favPostIds: [],
+}
 
 jest
   .mock('next/navigation', () => ({
@@ -26,6 +37,10 @@ jest
   .mock('hooks/useToast', () => ({
     __esModule: true,
     default: () => ({ toast: {}, setToast: mockSetToast }),
+  }))
+  .mock('hooks/usePusher', () => ({
+    __esModule: true,
+    default: () => null,
   }))
 
 beforeAll(() => server.listen())
@@ -133,18 +148,7 @@ it('fetches the authenticated user if it isn\'t on the "authentication" page', a
     rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
       expect(req.params.id).toBe('0')
 
-      return res(
-        ctx.status(200),
-        ctx.json<UsersIdGetData>({
-          id: '0',
-          name: 'john',
-          email: 'john@test.com',
-          channelName: 'channelName',
-          discussions: [],
-          postIds: [],
-          favPostIds: [],
-        })
-      )
+      return res(ctx.status(200), ctx.json<UsersIdGetData>(signedInUser))
     })
   )
 
@@ -199,18 +203,7 @@ it("doesn't fetch the authenticated user twice", async () => {
 
   server.use(
     rest.get('http://localhost/api/users/:id', (req, res, ctx) =>
-      res(
-        ctx.status(200),
-        ctx.json<UsersIdGetData>({
-          id: '0',
-          name: 'john',
-          email: 'john@test.com',
-          channelName: 'channelName',
-          discussions: [],
-          postIds: [],
-          favPostIds: [],
-        })
-      )
+      res(ctx.status(200), ctx.json<UsersIdGetData>(signedInUser))
     )
   )
 
@@ -245,19 +238,5 @@ it("doesn't fetch the authenticated user if it is given as a prop", () => {
     })
   )
 
-  render(
-    <PageWrapper
-      user={{
-        id: '0',
-        name: 'john',
-        email: 'john@test.com',
-        channelName: 'channelName',
-        discussions: [],
-        postIds: [],
-        favPostIds: [],
-      }}
-    >
-      page
-    </PageWrapper>
-  )
+  render(<PageWrapper signedInUser={signedInUser}>page</PageWrapper>)
 })

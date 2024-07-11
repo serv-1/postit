@@ -18,13 +18,13 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const session = await getServerSession(nextAuthOptions)
-  const user = session ? await getUser(session.id) : undefined
+  const signedInUser = session ? await getUser(session.id) : undefined
 
   return (
     <html lang="en" className={quicksand.className}>
       <body>
         <Providers session={session}>
-          <PageWrapper user={user}>{children}</PageWrapper>
+          <PageWrapper signedInUser={signedInUser}>{children}</PageWrapper>
         </Providers>
       </body>
     </html>

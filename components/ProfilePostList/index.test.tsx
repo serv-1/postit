@@ -1,39 +1,37 @@
 import { render, screen } from '@testing-library/react'
 import ProfilePostList from '.'
+import type { Post } from 'types'
 
 jest.mock('components/ProfilePost', () => ({
   __esModule: true,
   default: () => <div></div>,
 }))
 
+const post: Post = {
+  _id: '0',
+  name: 'table',
+  images: ['table.jpg'],
+  discussionIds: [],
+  address: 'Paris, France',
+  latLon: [42, 58],
+  price: 40,
+  categories: ['furniture'],
+  description: 'I sell this table.',
+  userId: '0',
+}
+
 it('renders the post list if there are posts', () => {
   render(
     <ProfilePostList
       type="default"
       posts={[
+        post,
         {
-          id: '0',
-          name: 'table',
-          images: ['table.jpg'],
-          discussionIds: [],
-          address: 'Paris, France',
-          latLon: [42, 58],
-          price: 40,
-          categories: ['furniture'],
-          description: 'I sell this table.',
-          userId: '0',
-        },
-        {
-          id: '1',
+          ...post,
+          _id: '1',
           name: 'chair',
           images: ['chair.jpg'],
-          discussionIds: [],
-          address: 'Paris, France',
-          latLon: [42, 58],
-          price: 40,
-          categories: ['furniture'],
           description: 'I sell this chair.',
-          userId: '0',
         },
       ]}
       placeholder="test"

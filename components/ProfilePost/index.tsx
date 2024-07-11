@@ -22,7 +22,7 @@ export default function ProfilePost({
   setPosts,
 }: ProfilePostProps) {
   return (
-    <li className="relative md:max-w-[700px] md:mx-auto mb-8 last:mb-0 md:mb-16">
+    <div className="relative md:max-w-[700px] md:mx-auto">
       <div className="absolute -top-4 -left-4 z-20">
         <ProfilePostDeleteButton
           postType={type}
@@ -50,6 +50,6 @@ export default function ProfilePost({
           </div>
         </div>
       </Link>
-    </li>
+    </div>
   )
 }

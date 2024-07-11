@@ -17,7 +17,6 @@ import {
   USER_NOT_FOUND,
 } from 'constants/errors'
 import pusher from 'libs/pusher/server'
-import formatDiscussionForClient from 'functions/formatDiscussionForClient'
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(nextAuthOptions)
@@ -80,21 +79,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: USER_NOT_FOUND }, { status: 404 })
     }
 
-    const buyer = (await User.findById(session.id).lean().exec())!
+    await pusher.trigger(seller.channelName, 'discussion:new', {
+      ...savedDiscussion,
+      hasNewMessage: true,
+    })
 
-    savedDiscussion.messages = savedDiscussion.messages.map(
-      ({ message, userId, createdAt, seen }) => {
-        return { message, userId, createdAt, seen }
-      }
-    )
-
-    await pusher.trigger(
-      seller.channelName,
-      'discussion:new',
-      formatDiscussionForClient(savedDiscussion, buyer, seller, true)
-    )
-
-    return NextResponse.json({ id: savedDiscussion._id }, { status: 201 })
+    return NextResponse.json({ _id: savedDiscussion._id }, { status: 201 })
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },

@@ -3,19 +3,24 @@ import Modal from 'components/Modal'
 import X from 'public/static/images/x.svg'
 import DiscussionMessageList from 'components/DiscussionMessageList'
 import type { DiscussionsIdGetData } from 'app/api/discussions/[id]/types'
+import type { User } from 'types'
 
 type DiscussionModalProps =
   | (
       | {
-          discussion: DiscussionsIdGetData
-          discussionId?: never
+          discussionId: string
+          messages: DiscussionsIdGetData['messages']
+          signedInUser: User
+          interlocutor: User | null
           postName?: never
           postId?: never
           sellerId?: never
         }
       | {
-          discussion?: never
-          discussionId?: string
+          discussionId?: never
+          messages?: never
+          signedInUser?: never
+          interlocutor?: never
           postName: string
           postId: string
           sellerId: string
@@ -28,8 +33,10 @@ export default function DiscussionModal({
   postName,
   postId,
   sellerId,
-  discussion,
   discussionId,
+  messages,
+  signedInUser,
+  interlocutor,
 }: DiscussionModalProps) {
   return (
     <Modal
@@ -44,34 +51,25 @@ export default function DiscussionModal({
         >
           <X className="w-full h-full" />
         </button>
-        {discussion ? (
+        {discussionId ? (
           <>
             <DiscussionMessageList
-              discussionId={discussion.id}
-              messages={discussion.messages.map((message) => ({
-                ...message,
-                authorName:
-                  message.userId === discussion.buyer.id
-                    ? discussion.buyer.name
-                    : discussion.seller.name,
-                authorImage:
-                  message.userId === discussion.buyer.id
-                    ? discussion.buyer.image
-                    : discussion.seller.image,
-              }))}
+              signedInUser={signedInUser}
+              interlocutor={interlocutor}
+              discussionId={discussionId}
+              messages={messages}
             />
             <DiscussionSendBar
               onMessageSent={onMessageSent}
-              discussionId={discussion.id}
+              discussionId={discussionId}
             />
           </>
         ) : (
           <DiscussionSendBar
             onMessageSent={onMessageSent}
-            discussionId={discussionId}
+            sellerId={sellerId}
             postName={postName}
             postId={postId}
-            sellerId={sellerId}
           />
         )}
       </div>

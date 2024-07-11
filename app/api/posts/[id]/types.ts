@@ -2,7 +2,7 @@ import type { UpdatePost } from 'schemas/server/updatePost'
 import type { Categories } from 'types'
 
 export interface PostsIdGetData {
-  id: string
+  _id: string
   name: string
   description: string
   categories: Categories[]

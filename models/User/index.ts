@@ -8,6 +8,7 @@ import Post from 'models/Post'
 import hashPassword from 'functions/hashPassword'
 
 export interface UserDiscussionDoc {
+  _id: Types.ObjectId
   id: Types.ObjectId
   hidden: boolean
   hasNewMessage: boolean
@@ -69,33 +70,42 @@ userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
 
   await Promise.all(postDeletions)
 
-  for (const discussion of user.discussions) {
-    const { buyerId, sellerId } = (await Discussion.findById(discussion.id)
-      .lean()
-      .exec())!
+  for (const { id } of user.discussions) {
+    const discussion = (await Discussion.findById(id).lean().exec())!
 
-    if (!buyerId || !sellerId) {
-      await Discussion.deleteOne({ _id: discussion.id }).lean().exec()
+    if (!discussion.buyerId || !discussion.sellerId) {
+      await Discussion.deleteOne({ _id: discussion._id }).lean().exec()
 
       continue
     }
 
-    const isBuyer = userId === buyerId.toString()
+    const isBuyer = userId === discussion.buyerId.toString()
 
-    const interlocutor = (await User.findById(isBuyer ? sellerId : buyerId)
+    const interlocutor = (await User.findById(
+      isBuyer ? discussion.sellerId : discussion.buyerId
+    )
       .lean()
       .exec())!
 
     const { hidden } = interlocutor.discussions.find(
-      (d) => d.id.toString() === discussion.id.toString()
+      (d) => d.id.toString() === discussion._id.toString()
     )!
 
     if (hidden) {
-      await Discussion.deleteOne({ _id: discussion.id }).lean().exec()
+      await Discussion.deleteOne({ _id: discussion._id }).lean().exec()
     } else {
       await Discussion.updateOne(
-        { _id: discussion.id },
-        { $unset: { [isBuyer ? 'buyerId' : 'sellerId']: '' } },
+        { _id: discussion._id },
+        {
+          $unset: { [isBuyer ? 'buyerId' : 'sellerId']: '' },
+          $set: {
+            messages: discussion.messages.map((message) =>
+              message.userId!.toString() === userId
+                ? { ...message, userId: undefined }
+                : message
+            ),
+          },
+        },
         { omitUndefined: true }
       )
         .lean()

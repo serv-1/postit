@@ -5,9 +5,10 @@ import Post from 'models/Post'
 import User from 'models/User'
 
 export interface MessageDoc {
+  _id: Types.ObjectId
   message: string
   createdAt: Date
-  userId: Types.ObjectId
+  userId?: Types.ObjectId
   seen: boolean
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import type { Session } from 'next-auth'
 import useEventListener from 'hooks/useEventListener'
@@ -6,33 +6,41 @@ import DeleteDiscussionButton from 'components/DeleteDiscussionButton'
 import usePusher from 'hooks/usePusher'
 import DiscussionModal from 'components/DiscussionModal'
 import OpenDiscussionButton from 'components/OpenDiscussionButton'
-import type { UnArray, Discussion as IDiscussion } from 'types'
+import type { UnArray, Discussion as IDiscussion, User } from 'types'
+import ajax from 'libs/ajax'
+import type { UsersIdGetError } from 'app/api/users/[id]/types'
+import useToast from 'hooks/useToast'
+import LoadingSpinner from 'components/LoadingSpinner'
 
 export interface DiscussionProps {
   discussion: IDiscussion
   isModalOpen: boolean
   setOpenedDiscussionId: React.Dispatch<React.SetStateAction<string | null>>
+  signedInUser: User
 }
 
 export default function Discussion({
   discussion: discussionProp,
   isModalOpen,
   setOpenedDiscussionId,
+  signedInUser,
 }: DiscussionProps) {
   const [discussion, setDiscussion] = useState(discussionProp)
+  const [interlocutor, setInterlocutor] = useState<User | null>()
   const [showBadge, setShowBadge] = useState(
     discussionProp.hasNewMessage && !isModalOpen
   )
 
   const { data: session } = useSession() as { data: Session }
+  const { setToast } = useToast()
 
   function openModal() {
-    setOpenedDiscussionId(discussion.id)
+    setOpenedDiscussionId(discussion._id)
     setShowBadge(false)
   }
 
   useEventListener(document, 'openDiscussion', (e) => {
-    if (e.detail === discussion.id) {
+    if (e.detail === discussion._id) {
       openModal()
     }
   })
@@ -52,17 +60,40 @@ export default function Discussion({
     }
   )
 
-  const interlocutor =
-    session.id === discussion.buyer.id ? discussion.seller : discussion.buyer
+  useEffect(() => {
+    async function getInterlocutor() {
+      let response: Response | null = null
 
-  return (
+      if (session.id === discussion.buyerId && discussion.sellerId) {
+        response = await ajax.get('/users/' + discussion.sellerId)
+      } else if (session.id === discussion.sellerId && discussion.buyerId) {
+        response = await ajax.get('/users/' + discussion.buyerId)
+      }
+
+      if (response) {
+        if (!response.ok) {
+          const { message }: UsersIdGetError = await response.json()
+
+          setToast({ message, error: true })
+        } else {
+          setInterlocutor((await response.json()) as User)
+        }
+      } else {
+        setInterlocutor(null)
+      }
+    }
+
+    getInterlocutor()
+  }, [discussion.sellerId, discussion.buyerId, session.id, setToast])
+
+  return interlocutor !== undefined ? (
     <>
       <div className="relative w-full">
         <DeleteDiscussionButton
-          discussionId={discussion.id}
-          userId={interlocutor.id}
+          discussionId={discussion._id}
+          interlocutorDiscussions={interlocutor?.discussions}
         />
-        {showBadge && (
+        {interlocutor && showBadge && (
           <div
             role="status"
             aria-label={interlocutor.name + ' has responded'}
@@ -76,16 +107,23 @@ export default function Discussion({
         <OpenDiscussionButton
           onClick={openModal}
           postName={discussion.postName}
-          userName={interlocutor.name}
-          userImage={interlocutor.image}
+          interlocutorName={interlocutor?.name}
+          interlocutorImage={interlocutor?.image}
         />
       </div>
       {isModalOpen && (
         <DiscussionModal
           onClose={() => setOpenedDiscussionId(null)}
-          discussion={discussion}
+          discussionId={discussion._id}
+          signedInUser={signedInUser}
+          interlocutor={interlocutor}
+          messages={discussion.messages}
         />
       )}
     </>
+  ) : (
+    <div className="bg-fuchsia-200 rounded-8 h-56 flex justify-center items-center">
+      <LoadingSpinner />
+    </div>
   )
 }

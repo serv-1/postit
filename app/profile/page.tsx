@@ -59,7 +59,7 @@ export default async function Page() {
             <SignOut className="w-32 h-32" />
           </SignOutButton>
         </div>
-        <PublicProfileLink id={user.id} name={user.name} />
+        <PublicProfileLink id={user._id} name={user.name} />
       </div>
       <div className="mb-32 md:bg-fuchsia-100 md:p-32 md:rounded-16">
         <TabsProvider defaultValue="post">

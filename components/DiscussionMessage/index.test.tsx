@@ -2,27 +2,45 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DiscussionMessage from '.'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
+import { useSession } from 'next-auth/react'
 
-it("renders the message's text", () => {
-  render(
-    <DiscussionMessage
-      message="hi"
-      createdAt={new Date().toString()}
-      authorName="john"
-    />
-  )
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(),
+}))
 
-  const messageText = screen.getByText(/hi/i)
+const mockUseSession = useSession as jest.MockedFunction<typeof useSession>
 
-  expect(messageText).toBeInTheDocument()
+beforeEach(() => {
+  mockUseSession.mockReturnValue({
+    data: { id: '1', channelName: '', expires: '' },
+    update: async () => null,
+    status: 'authenticated',
+  })
 })
 
-it("renders the default image if the user doesn't have one", () => {
+it('renders the message', () => {
+  render(<DiscussionMessage message="hi" createdAt={new Date().toString()} />)
+
+  const message = screen.getByText(/hi/i)
+
+  expect(message).toBeInTheDocument()
+})
+
+it('renders the default user image if there is no author', () => {
+  render(<DiscussionMessage message="hi" createdAt={new Date().toString()} />)
+
+  const image = screen.getByRole('img')
+
+  expect(image).toHaveAttribute('src', NEXT_PUBLIC_DEFAULT_USER_IMAGE)
+  expect(image).toHaveAttribute('alt', 'Default profile picture')
+})
+
+it("renders the default user image if the author doesn't have one", () => {
   render(
     <DiscussionMessage
       message="hi"
       createdAt={new Date().toString()}
-      authorName="john"
+      author={{ id: '0', name: 'john' }}
     />
   )
 
@@ -32,26 +50,26 @@ it("renders the default image if the user doesn't have one", () => {
   expect(image).toHaveAttribute('alt', "john's profile picture")
 })
 
-it('renders the user image', () => {
+it("renders the author's image", () => {
   render(
     <DiscussionMessage
       message="hi"
       createdAt={new Date().toString()}
-      authorImage="john.jpg"
-      authorName="john"
+      author={{ id: '0', name: 'john', image: 'john.jpg' }}
     />
   )
 
   const image = screen.getByRole('img')
 
   expect(image).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/john.jpg')
+  expect(image).toHaveAttribute('alt', "john's profile picture")
 })
 
 it('shows/hides the creation date on click', async () => {
   const dateStr = new Date().toString()
 
   const { container } = render(
-    <DiscussionMessage message="hi" createdAt={dateStr} authorName="john" />
+    <DiscussionMessage message="hi" createdAt={dateStr} />
   )
 
   const message = container.firstElementChild!
@@ -77,12 +95,7 @@ it('renders the message aligned to the left', () => {
   const dateStr = new Date().toString()
 
   const { container } = render(
-    <DiscussionMessage
-      message="hi"
-      createdAt={dateStr}
-      authorName="john"
-      isLeftAligned
-    />
+    <DiscussionMessage message="hi" createdAt={dateStr} />
   )
 
   const messageText = screen.getByText(/hi/i)
@@ -101,7 +114,11 @@ it('renders the message aligned to the right', () => {
   const dateStr = new Date().toString()
 
   const { container } = render(
-    <DiscussionMessage message="hi" createdAt={dateStr} authorName="john" />
+    <DiscussionMessage
+      message="hi"
+      createdAt={dateStr}
+      author={{ id: '1', name: 'john' }}
+    />
   )
 
   const messageText = screen.getByText(/hi/i)

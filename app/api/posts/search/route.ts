@@ -1,7 +1,7 @@
 import Post from 'models/Post'
 import { NextRequest, NextResponse } from 'next/server'
 import searchPost from 'schemas/server/searchPost'
-import type { Categories } from 'types'
+import type { Categories, Post as IPost } from 'types'
 import dbConnect from 'functions/dbConnect'
 import validate from 'functions/validate'
 import { INTERNAL_SERVER_ERROR } from 'constants/errors'
@@ -12,13 +12,7 @@ interface $Match {
 }
 
 interface SearchResult {
-  posts: {
-    id: string
-    name: string
-    price: number
-    image: string
-    address: string
-  }[]
+  posts: IPost[]
   totalPosts: { total: number }[]
 }
 
@@ -86,13 +80,7 @@ export async function GET(request: NextRequest) {
           posts: [
             { $sort: { name: 1, _id: 1 } },
             { $skip },
-            {
-              $set: {
-                id: { $toString: '$_id' },
-                price: { $divide: ['$price', 100] },
-              },
-            },
-            { $project: { _id: 0 } },
+            { $set: { price: { $divide: ['$price', 100] } } },
             { $limit: 20 },
           ],
           totalPosts: [{ $count: 'total' }],

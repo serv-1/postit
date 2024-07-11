@@ -110,7 +110,7 @@ describe('GET', () => {
 
     expect(response).toHaveProperty('status', 200)
     expect(data).toEqual({
-      id: post._id.toString(),
+      _id: post._id.toString(),
       name: post.name,
       description: post.description,
       categories: post.categories,

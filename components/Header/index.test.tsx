@@ -14,6 +14,16 @@ jest
 
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>
 
+const signedInUser: User = {
+  _id: '0',
+  name: 'john',
+  email: 'john@test.com',
+  channelName: '',
+  postIds: [],
+  favPostIds: [],
+  discussions: [],
+}
+
 it('renders the sign in link if the user is unauthenticated', () => {
   mockUsePathname.mockReturnValue('/')
 
@@ -27,7 +37,7 @@ it('renders the sign in link if the user is unauthenticated', () => {
 it('renders the menu if the user is authenticated', () => {
   mockUsePathname.mockReturnValue('/')
 
-  render(<Header user={{ id: '0' } as User} />)
+  render(<Header signedInUser={signedInUser} />)
 
   const link = screen.getByRole('link', { name: /create a post/i })
 
