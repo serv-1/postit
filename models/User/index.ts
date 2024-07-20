@@ -6,6 +6,7 @@ import Account from 'models/Account'
 import Discussion from 'models/Discussion'
 import Post from 'models/Post'
 import hashPassword from 'functions/hashPassword'
+import pusher from 'libs/pusher/server'
 
 export interface UserDiscussionDoc {
   _id: Types.ObjectId
@@ -110,6 +111,8 @@ userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
       )
         .lean()
         .exec()
+
+      await pusher.trigger(discussion.channelName, 'interlocutor:deleted', null)
     }
   }
 })

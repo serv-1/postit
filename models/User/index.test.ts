@@ -10,12 +10,15 @@ import Post from 'models/Post'
 import Discussion from 'models/Discussion'
 // @ts-expect-error
 import { mockDeleteImage } from 'functions/deleteImage'
+// @ts-expect-error
+import { mockPusherTrigger } from 'libs/pusher/server'
 
 jest
   .unmock('nanoid')
   .unmock('models/User')
   .mock('functions/deleteImage')
   .mock('functions/hashPassword')
+  .mock('libs/pusher/server')
 
 describe('User model', () => {
   let johnId: Types.ObjectId
@@ -375,6 +378,31 @@ describe('User model', () => {
       expect(updatedChairDiscussion).not.toHaveProperty('sellerId')
       expect(updatedChairDiscussion.messages[0]).toHaveProperty('userId')
       expect(updatedChairDiscussion.messages[1]).not.toHaveProperty('userId')
+    })
+
+    it("triggers an 'interlocutor:deleted' event if the interlocutor hasn't hidden the discussion", async () => {
+      const seller = await new User({
+        name: 'jane',
+        email: 'jane@test.com',
+        password: 'password',
+      }).save()
+
+      const discussion = await new Discussion({
+        messages: [{ message: 'yo', userId: johnId }],
+        postName: 'table',
+        postId: new mongoose.Types.ObjectId(),
+        buyerId: johnId,
+        sellerId: seller._id,
+      }).save()
+
+      await User.deleteOne({ _id: seller._id }).lean().exec()
+
+      expect(mockPusherTrigger).toHaveBeenNthCalledWith(
+        1,
+        discussion.channelName,
+        'interlocutor:deleted',
+        null
+      )
     })
   })
 })

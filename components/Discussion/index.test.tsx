@@ -502,3 +502,31 @@ it("doesn't fetch the interlocutor if he has deleted its account", async () => {
 
   expect(interlocutorName).toBeInTheDocument()
 })
+
+it('removes the interlocutor if he has deleted his account', async () => {
+  server.use(
+    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json({ ...signedInUser, _id: '2', name: 'john' })
+      )
+    })
+  )
+
+  render(
+    <Discussion
+      discussion={discussion}
+      signedInUser={signedInUser}
+      isModalOpen={false}
+      setOpenedDiscussionId={() => null}
+    />
+  )
+
+  const interlocutorName = await screen.findByText(/john/i)
+
+  act(() => {
+    mockUsePusher.mock.calls[3][2](null)
+  })
+
+  expect(interlocutorName).not.toHaveTextContent(/john/i)
+})

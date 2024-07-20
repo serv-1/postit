@@ -1,36 +1,83 @@
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 import Image from 'next/image'
-import type { MouseEventHandler } from 'react'
 import ChevronRight from 'public/static/images/chevron-right.svg'
+import type { Discussion, User } from 'types'
+import { useSession } from 'next-auth/react'
+import type { Session } from 'next-auth'
+import useToast from 'hooks/useToast'
+import ajax from 'libs/ajax'
+import type { DiscussionsIdGetError } from 'app/api/discussions/[id]/types'
 
 interface OpenDiscussionButton {
-  onClick: MouseEventHandler<HTMLButtonElement>
+  onOpen: () => void
   postName: string
-  interlocutorName?: string
-  interlocutorImage?: string
+  discussion: Discussion
+  interlocutor: User | null
+  setDiscussion: React.Dispatch<React.SetStateAction<Discussion>>
 }
 
 export default function OpenDiscussionButton({
-  onClick,
+  onOpen,
   postName,
-  interlocutorName,
-  interlocutorImage,
+  discussion,
+  interlocutor,
+  setDiscussion,
 }: OpenDiscussionButton) {
+  const { data: session } = useSession() as { data: Session }
+  const { setToast } = useToast()
+
+  async function openModal() {
+    onOpen()
+
+    const lastMessage = discussion.messages[discussion.messages.length - 1]
+
+    if (session.id !== lastMessage.userId && !lastMessage.seen) {
+      const updateUnseenMessages = async () => {
+        const response = await ajax.put(
+          '/discussions/' + discussion._id,
+          null,
+          { csrf: true }
+        )
+
+        if (!response.ok) {
+          const { message }: DiscussionsIdGetError = await response.json()
+
+          setToast({ message, error: true })
+
+          return
+        }
+
+        setDiscussion((discussion) => {
+          const messages = [...discussion.messages]
+
+          messages[messages.length - 1] = {
+            ...messages[messages.length - 1],
+            seen: true,
+          }
+
+          return { ...discussion, messages }
+        })
+      }
+
+      updateUnseenMessages()
+    }
+  }
+
   return (
     <button
       className="relative w-full flex flex-row flex-nowrap items-center gap-x-4 pr-4 bg-fuchsia-200 rounded-8 hover:bg-fuchsia-300 transition-colors duration-200 group overflow-hidden h-56"
-      onClick={onClick}
+      onClick={openModal}
       aria-label="Open discussion"
     >
       <Image
         src={
-          interlocutorImage
-            ? NEXT_PUBLIC_AWS_URL + '/' + interlocutorImage
+          interlocutor?.image
+            ? NEXT_PUBLIC_AWS_URL + '/' + interlocutor.image
             : NEXT_PUBLIC_DEFAULT_USER_IMAGE
         }
         alt={
-          interlocutorName
-            ? interlocutorName + "'s profile picture"
+          interlocutor
+            ? interlocutor.name + "'s profile picture"
             : 'Default profile picture'
         }
         width={64}
@@ -38,8 +85,8 @@ export default function OpenDiscussionButton({
         className="rounded-r-full w-[52px] h-64 object-cover"
       />
       <div className="flex-grow text-left">
-        {interlocutorName ? (
-          <span className="block text-fuchsia-600">{interlocutorName}</span>
+        {interlocutor ? (
+          <span className="block text-fuchsia-600">{interlocutor.name}</span>
         ) : (
           <span className="block text-rose-600 line-through">deleted</span>
         )}

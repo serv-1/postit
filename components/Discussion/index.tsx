@@ -60,6 +60,10 @@ export default function Discussion({
     }
   )
 
+  usePusher(discussion.channelName, 'interlocutor:deleted', () => {
+    setInterlocutor(null)
+  })
+
   useEffect(() => {
     async function getInterlocutor() {
       let response: Response | null = null
@@ -105,10 +109,11 @@ export default function Discussion({
           </div>
         )}
         <OpenDiscussionButton
-          onClick={openModal}
+          onOpen={openModal}
           postName={discussion.postName}
-          interlocutorName={interlocutor?.name}
-          interlocutorImage={interlocutor?.image}
+          interlocutor={interlocutor}
+          discussion={discussion}
+          setDiscussion={setDiscussion}
         />
       </div>
       {isModalOpen && (
