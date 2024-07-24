@@ -10,10 +10,35 @@ import {
 import { POST } from './route'
 // @ts-expect-error
 import { mockDbConnect } from 'functions/dbConnect'
-// @ts-expect-error
-import { mockFindOneUser } from 'models/User'
+import User, { type UserDoc } from 'models/User'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import mongoose from 'mongoose'
 
-jest.mock('models/User').mock('functions/dbConnect')
+jest.mock('libs/pusher/server').mock('functions/dbConnect')
+
+let mongoServer: MongoMemoryServer
+let user: UserDoc
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create()
+
+  await mongoose.connect(mongoServer.getUri())
+
+  user = await new User({
+    name: 'john',
+    email: 'john@test.com',
+    password: '0123456789',
+    image: 'john.jpg',
+    postIds: [],
+    favPostIds: [],
+    discussions: [],
+  }).save()
+})
+
+afterAll(async () => {
+  await mongoose.disconnect()
+  await mongoServer.stop()
+})
 
 describe('POST', () => {
   test('422 - invalid json', async () => {
@@ -56,29 +81,12 @@ describe('POST', () => {
     expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
-  test('500 - find user by email failed', async () => {
-    mockDbConnect.mockResolvedValue({})
-    mockFindOneUser.mockRejectedValue({})
-
-    const request = new Request('http://-', {
-      method: 'POST',
-      body: JSON.stringify({ email: 'john@test.com' }),
-    })
-
-    const response = await POST(request)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
-  })
-
   test('422 - email unknown', async () => {
     mockDbConnect.mockResolvedValue({})
-    mockFindOneUser.mockResolvedValue(null)
 
     const request = new Request('http://-', {
       method: 'POST',
-      body: JSON.stringify({ email: 'john@test.com' }),
+      body: JSON.stringify({ email: 'jane@test.com' }),
     })
 
     const response = await POST(request)
@@ -90,7 +98,6 @@ describe('POST', () => {
 
   test('204 - valid email', async () => {
     mockDbConnect.mockResolvedValue({})
-    mockFindOneUser.mockResolvedValue({})
 
     const request = new Request('http://-', {
       method: 'POST',

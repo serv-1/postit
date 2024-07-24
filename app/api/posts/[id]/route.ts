@@ -38,21 +38,9 @@ export async function GET(request: Request, { params }: Params) {
       return NextResponse.json({ message: POST_NOT_FOUND }, { status: 404 })
     }
 
-    return NextResponse.json(
-      {
-        _id: post._id,
-        name: post.name,
-        description: post.description,
-        categories: post.categories,
-        price: post.price / 100,
-        images: post.images,
-        address: post.address,
-        latLon: post.latLon,
-        discussionIds: post.discussionIds,
-        userId: post.userId,
-      },
-      { status: 200 }
-    )
+    post.price = post.price / 100
+
+    return NextResponse.json(post, { status: 200 })
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },

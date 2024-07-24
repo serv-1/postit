@@ -3,10 +3,7 @@
  */
 
 import { POST } from './route'
-import { Types } from 'mongoose'
-import hashPassword from 'functions/hashPassword'
-// @ts-expect-error
-import { mockFindOneUser } from 'models/User'
+import mongoose from 'mongoose'
 // @ts-expect-error
 import { mockDbConnect } from 'functions/dbConnect'
 import {
@@ -16,11 +13,41 @@ import {
   PASSWORD_REQUIRED,
   PASSWORD_INVALID,
 } from 'constants/errors'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import User, { type UserDoc } from 'models/User'
 
-jest
-  .unmock('functions/hashPassword')
-  .mock('models/User')
-  .mock('functions/dbConnect')
+jest.mock('libs/pusher/server').mock('functions/dbConnect')
+
+let mongoServer: MongoMemoryServer
+let user: UserDoc
+
+async function populateDb() {
+  user = await new User({
+    name: 'john',
+    email: 'john@test.com',
+    password: '0123456789',
+    postIds: [],
+    favPostIds: [],
+    discussions: [],
+  }).save()
+}
+
+async function resetDb() {
+  await User.deleteMany({})
+  await populateDb()
+}
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create()
+
+  await mongoose.connect(mongoServer.getUri())
+  await populateDb()
+})
+
+afterAll(async () => {
+  await mongoose.disconnect()
+  await mongoServer.stop()
+})
 
 describe('POST', () => {
   test('422 - invalid json', async () => {
@@ -62,28 +89,10 @@ describe('POST', () => {
     expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
   })
 
-  test('500 - find one user failed', async () => {
-    mockDbConnect.mockResolvedValue({})
-    mockFindOneUser.mockRejectedValue({})
-
-    const request = new Request('http://-', {
-      method: 'POST',
-      body: JSON.stringify({ email: 'a@a.a', password: '0123456789' }),
-    })
-
-    const response = await POST(request)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
-  })
-
   test('422 - email unknown', async () => {
     mockDbConnect.mockResolvedValue({})
-    mockFindOneUser.mockResolvedValue(null)
 
     const email = 'bob@test.com'
-
     const request = new Request('http://-', {
       method: 'POST',
       body: JSON.stringify({ email, password: '0123456789' }),
@@ -92,73 +101,66 @@ describe('POST', () => {
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 422)
     expect(data).toEqual({ name: 'email', message: EMAIL_UNKNOWN })
   })
 
   test('422 - password undefined', async () => {
-    mockDbConnect.mockResolvedValue({})
-    mockFindOneUser.mockResolvedValue({})
+    await User.updateOne(
+      { _id: user._id },
+      { password: '' },
+      { omitUndefined: true }
+    )
+      .lean()
+      .exec()
 
-    const email = 'bob@test.com'
+    mockDbConnect.mockResolvedValue({})
 
     const request = new Request('http://-', {
       method: 'POST',
-      body: JSON.stringify({ email, password: '0123456789' }),
+      body: JSON.stringify({ email: user.email, password: '0123456789' }),
     })
 
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 422)
     expect(data).toEqual({ name: 'password', message: PASSWORD_REQUIRED })
+
+    await resetDb()
   })
 
   test('422 - invalid password', async () => {
-    const user = { password: hashPassword('0123123123') }
-
     mockDbConnect.mockResolvedValue({})
-    mockFindOneUser.mockResolvedValue(user)
 
-    const email = 'bob@test.com'
     const request = new Request('http://-', {
       method: 'POST',
-      body: JSON.stringify({ email, password: '0123456789' }),
+      body: JSON.stringify({ email: user.email, password: 'invalid pw' }),
     })
 
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 422)
     expect(data).toEqual({ name: 'password', message: PASSWORD_INVALID })
   })
 
   test('200 - user ready to sign in', async () => {
-    const email = 'bob@test.com'
-    const password = '0123456789'
-    const user = {
-      _id: new Types.ObjectId(),
-      name: 'bob',
-      email,
-      password: hashPassword(password),
-    }
-
     mockDbConnect.mockResolvedValue({})
-    mockFindOneUser.mockResolvedValue(user)
 
     const request = new Request('http://-', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email: user.email, password: '0123456789' }),
     })
 
     const response = await POST(request)
     const data = await response.json()
 
-    expect(mockFindOneUser).toHaveBeenNthCalledWith(1, { email })
     expect(response).toHaveProperty('status', 200)
-    expect(data).toEqual({ id: user._id.toString(), name: user.name, email })
+    expect(data).toEqual({
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+    })
   })
 })

@@ -3,11 +3,8 @@
  */
 
 import { GET, PUT, DELETE } from './route'
-import { Types } from 'mongoose'
+import mongoose from 'mongoose'
 import { NextRequest } from 'next/server'
-// prettier-ignore
-// @ts-expect-error
-import { type PostDoc, mockFindPostById, mockUpdateOnePost, mockDeleteOnePost } from 'models/Post'
 // @ts-expect-error
 import { mockGetServerSession } from 'next-auth'
 // @ts-expect-error
@@ -25,9 +22,11 @@ import {
   DATA_INVALID,
   FORBIDDEN,
 } from 'constants/errors'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import Post, { type PostDoc } from 'models/Post'
 
 jest
-  .mock('models/Post')
+  .mock('libs/pusher/server')
   .mock('next-auth')
   .mock('functions/dbConnect')
   .mock('functions/deleteImage')
@@ -35,6 +34,40 @@ jest
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
   }))
+
+let mongoServer: MongoMemoryServer
+let post: PostDoc
+
+async function populateDb() {
+  post = await new Post({
+    name: 'table',
+    description: 'Magnificent table',
+    price: 4000,
+    categories: ['furniture'],
+    images: ['table1', 'table2'],
+    address: 'Tokyo, Japan',
+    latLon: [44, 33],
+    userId: new mongoose.Types.ObjectId(),
+    discussionIds: [],
+  }).save()
+}
+
+async function resetDb() {
+  await Post.deleteMany({})
+  await populateDb()
+}
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create()
+
+  await mongoose.connect(mongoServer.getUri())
+  await populateDb()
+})
+
+afterAll(async () => {
+  await mongoose.disconnect()
+  await mongoServer.stop()
+})
 
 describe('GET', () => {
   test('422 - invalid id', async () => {
@@ -51,20 +84,7 @@ describe('GET', () => {
     mockDbConnect.mockRejectedValue({})
 
     const request = new Request('http://-')
-    const params = { params: { id: new Types.ObjectId().toString() } }
-    const response = await GET(request, params)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
-  })
-
-  test('500 - find post by id failed', async () => {
-    mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockRejectedValue({})
-
-    const request = new Request('http://-')
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await GET(request, params)
     const data = await response.json()
 
@@ -74,34 +94,18 @@ describe('GET', () => {
 
   test('404 - post not found', async () => {
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(null)
 
     const request = new Request('http://-')
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
     const response = await GET(request, params)
     const data = await response.json()
 
-    expect(mockFindPostById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 404)
     expect(data).toEqual({ message: POST_NOT_FOUND })
   })
 
   test('200 - get the post', async () => {
-    const post: PostDoc = {
-      _id: new Types.ObjectId(),
-      name: 'table',
-      description: 'Magnificent table',
-      price: 4000,
-      categories: ['furniture'],
-      images: ['image'],
-      address: 'Tokyo, Japan',
-      latLon: [44, 33],
-      discussionIds: [],
-      userId: new Types.ObjectId(),
-    }
-
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
 
     const request = new Request('http://-')
     const params = { params: { id: post._id.toString() } }
@@ -110,16 +114,8 @@ describe('GET', () => {
 
     expect(response).toHaveProperty('status', 200)
     expect(data).toEqual({
-      _id: post._id.toString(),
-      name: post.name,
-      description: post.description,
-      categories: post.categories,
+      ...JSON.parse(JSON.stringify(post)),
       price: post.price / 100,
-      images: post.images,
-      address: post.address,
-      latLon: post.latLon,
-      discussionIds: post.discussionIds.map((id) => id.toString()),
-      userId: post.userId.toString(),
     })
   })
 })
@@ -139,7 +135,7 @@ describe('PUT', () => {
     mockGetServerSession.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
     const data = await response.json()
 
@@ -156,7 +152,7 @@ describe('PUT', () => {
       body: JSON.stringify({ name: 'blue table' }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
     const data = await response.json()
 
@@ -169,7 +165,7 @@ describe('PUT', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
     const data = await response.json()
 
@@ -186,7 +182,7 @@ describe('PUT', () => {
       body: JSON.stringify({ name: 1 }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
     const data = await response.json()
 
@@ -205,26 +201,7 @@ describe('PUT', () => {
       body: JSON.stringify({ name: 'blue table' }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
-    const response = await PUT(request, params)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
-  })
-
-  test('500 - find post by id failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockRejectedValue({})
-
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-      body: JSON.stringify({ name: 'blue table' }),
-    })
-
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
     const data = await response.json()
 
@@ -233,40 +210,40 @@ describe('PUT', () => {
   })
 
   test('404 - post not found', async () => {
+    await Post.deleteOne({ _id: post._id }).lean().exec()
+
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
       body: JSON.stringify({ name: 'blue table' }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
     const data = await response.json()
 
-    expect(mockFindPostById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 404)
     expect(data).toEqual({ message: POST_NOT_FOUND })
+
+    await resetDb()
   })
 
   test('403 - forbidden', async () => {
-    const session = { id: new Types.ObjectId().toString() }
-    const post = { userId: new Types.ObjectId() }
+    const session = { id: new mongoose.Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
       body: JSON.stringify({ name: 'blue table' }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
     const data = await response.json()
 
@@ -275,13 +252,11 @@ describe('PUT', () => {
   })
 
   test('500 - deleting old images failed', async () => {
-    const post = { userId: new Types.ObjectId() }
     const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
     mockDeleteImage.mockRejectedValue({})
 
     const request = new NextRequest('http://-', {
@@ -289,7 +264,7 @@ describe('PUT', () => {
       body: JSON.stringify({ images: ['newImage1', 'newImage2'] }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
     const data = await response.json()
 
@@ -298,17 +273,11 @@ describe('PUT', () => {
   })
 
   test('204 - images updated', async () => {
-    const post = {
-      images: ['image1', 'image2'],
-      userId: new Types.ObjectId(),
-    }
-
     const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
     mockDeleteImage.mockResolvedValue({})
 
     const newImages = ['newImage1', 'newImage2']
@@ -317,29 +286,27 @@ describe('PUT', () => {
       body: JSON.stringify({ images: newImages }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
 
     expect(mockDeleteImage).toHaveBeenNthCalledWith(1, post.images[0])
     expect(mockDeleteImage).toHaveBeenNthCalledWith(2, post.images[1])
-    expect(mockUpdateOnePost).toHaveBeenNthCalledWith(
-      1,
-      { _id: params.params.id },
-      { images: newImages }
-    )
 
+    const updatedPost = await Post.findById(post._id).lean().exec()!
+
+    expect(updatedPost).toHaveProperty('images', newImages)
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
+
+    await resetDb()
   })
 
   test('204 - price updated', async () => {
-    const post = { userId: new Types.ObjectId() }
     const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
     mockDeleteImage.mockResolvedValue({})
 
     const newPrice = 80
@@ -348,27 +315,23 @@ describe('PUT', () => {
       body: JSON.stringify({ price: newPrice }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
+    const updatedPost = await Post.findById(post._id).lean().exec()!
 
-    expect(mockUpdateOnePost).toHaveBeenNthCalledWith(
-      1,
-      { _id: params.params.id },
-      { price: newPrice * 100 }
-    )
-
+    expect(updatedPost).toHaveProperty('price', newPrice * 100)
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
+
+    await resetDb()
   })
 
   test('204 - name updated', async () => {
-    const post = { userId: new Types.ObjectId() }
     const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
     mockDeleteImage.mockResolvedValue({})
 
     const newName = 'blue table'
@@ -377,27 +340,23 @@ describe('PUT', () => {
       body: JSON.stringify({ name: newName }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
+    const updatedPost = await Post.findById(post._id).lean().exec()!
 
-    expect(mockUpdateOnePost).toHaveBeenNthCalledWith(
-      1,
-      { _id: params.params.id },
-      { name: newName }
-    )
-
+    expect(updatedPost).toHaveProperty('name', newName)
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
+
+    await resetDb()
   })
 
   test('204 - description updated', async () => {
-    const post = { userId: new Types.ObjectId() }
     const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
     mockDeleteImage.mockResolvedValue({})
 
     const newDescription = 'awesome table'
@@ -406,27 +365,23 @@ describe('PUT', () => {
       body: JSON.stringify({ description: newDescription }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
+    const updatedPost = await Post.findById(post._id).lean().exec()!
 
-    expect(mockUpdateOnePost).toHaveBeenNthCalledWith(
-      1,
-      { _id: params.params.id },
-      { description: newDescription }
-    )
-
+    expect(updatedPost).toHaveProperty('description', newDescription)
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
+
+    await resetDb()
   })
 
   test('204 - categories updated', async () => {
-    const post = { userId: new Types.ObjectId() }
     const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
     mockDeleteImage.mockResolvedValue({})
 
     const newCategories = ['decoration', 'Do-It-Yourself']
@@ -435,27 +390,23 @@ describe('PUT', () => {
       body: JSON.stringify({ categories: newCategories }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
+    const updatedPost = await Post.findById(post._id).lean().exec()!
 
-    expect(mockUpdateOnePost).toHaveBeenNthCalledWith(
-      1,
-      { _id: params.params.id },
-      { categories: newCategories }
-    )
-
+    expect(updatedPost).toHaveProperty('categories', newCategories)
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
+
+    await resetDb()
   })
 
   test('204 - address updated', async () => {
-    const post = { userId: new Types.ObjectId() }
     const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
     mockDeleteImage.mockResolvedValue({})
 
     const newAddress = 'Oslo, Norway'
@@ -465,17 +416,16 @@ describe('PUT', () => {
       body: JSON.stringify({ address: newAddress, latLon: newLatLon }),
     })
 
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await PUT(request, params)
+    const updatedPost = await Post.findById(post._id).lean().exec()!
 
-    expect(mockUpdateOnePost).toHaveBeenNthCalledWith(
-      1,
-      { _id: params.params.id },
-      { address: newAddress, latLon: newLatLon }
-    )
-
+    expect(updatedPost).toHaveProperty('address', newAddress)
+    expect(updatedPost).toHaveProperty('latLon', newLatLon)
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
+
+    await resetDb()
   })
 })
 
@@ -494,7 +444,7 @@ describe('DELETE', () => {
     mockGetServerSession.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'DELETE' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
 
@@ -507,7 +457,7 @@ describe('DELETE', () => {
     mockVerifyCsrfTokens.mockReturnValue(false)
 
     const request = new NextRequest('http://-', { method: 'DELETE' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
 
@@ -521,22 +471,7 @@ describe('DELETE', () => {
     mockDbConnect.mockRejectedValue({})
 
     const request = new NextRequest('http://-', { method: 'DELETE' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
-    const response = await DELETE(request, params)
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
-  })
-
-  test('500 - find post by id failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockRejectedValue({})
-
-    const request = new NextRequest('http://-', { method: 'DELETE' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
 
@@ -548,29 +483,25 @@ describe('DELETE', () => {
     mockGetServerSession.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'DELETE' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
 
-    expect(mockFindPostById).toHaveBeenNthCalledWith(1, params.params.id)
     expect(response).toHaveProperty('status', 404)
     expect(data).toEqual({ message: POST_NOT_FOUND })
   })
 
   test('403 - forbidden', async () => {
-    const session = { id: new Types.ObjectId().toString() }
-    const post = { userId: new Types.ObjectId() }
+    const session = { id: new mongoose.Types.ObjectId().toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
 
     const request = new NextRequest('http://-', { method: 'DELETE' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await DELETE(request, params)
     const data = await response.json()
 
@@ -579,23 +510,21 @@ describe('DELETE', () => {
   })
 
   test('204 - post deleted', async () => {
-    const post = { userId: new Types.ObjectId() }
     const session = { id: post.userId.toString() }
 
     mockGetServerSession.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
-    mockFindPostById.mockResolvedValue(post)
 
     const request = new NextRequest('http://-', { method: 'DELETE' })
-    const params = { params: { id: new Types.ObjectId().toString() } }
+    const params = { params: { id: post._id.toString() } }
     const response = await DELETE(request, params)
+    const deletedPost = await Post.findById(post._id).lean().exec()
 
-    expect(mockDeleteOnePost).toHaveBeenNthCalledWith(1, {
-      _id: params.params.id,
-    })
-
+    expect(deletedPost).toBeNull()
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
+
+    await resetDb()
   })
 })
