@@ -7,10 +7,10 @@ import { CATEGORIES } from 'constants/index'
 import InputError from 'components/InputError'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
-import { useEffect } from 'react'
 import type { Categories } from 'types'
 import searchPost, { type SearchPost } from 'schemas/client/searchPost'
 import Popup from 'components/Popup'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 const options = CATEGORIES.map((category) => ({
   label: category,
@@ -18,7 +18,31 @@ const options = CATEGORIES.map((category) => ({
 }))
 
 export default function SearchPostForm() {
-  const methods = useForm<SearchPost>({ resolver: joiResolver(searchPost) })
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  let values: SearchPost | undefined = undefined
+
+  if (searchParams.has('query')) {
+    values = {
+      query: searchParams.get('query')!,
+      categories: searchParams.getAll('categories') as Categories[],
+    }
+
+    const minPrice = searchParams.get('minPrice')
+    const maxPrice = searchParams.get('maxPrice')
+    const address = searchParams.get('address')
+
+    if (minPrice) values.minPrice = minPrice
+    if (maxPrice) values.maxPrice = maxPrice
+    if (address) values.address = address
+  }
+
+  const methods = useForm<SearchPost>({
+    resolver: joiResolver(searchPost),
+    values,
+  })
 
   const submitHandler: SubmitHandler<SearchPost> = ({
     query,
@@ -27,47 +51,18 @@ export default function SearchPostForm() {
     categories,
     address,
   }) => {
-    const params = new URLSearchParams({ query })
+    const searchParams = new URLSearchParams({ query })
 
     for (const category of categories) {
-      params.append('categories', category)
+      searchParams.append('categories', category)
     }
 
-    if (minPrice) params.append('minPrice', minPrice)
-    if (maxPrice) params.append('maxPrice', maxPrice)
-    if (address) params.append('address', address)
+    if (minPrice) searchParams.append('minPrice', minPrice)
+    if (maxPrice) searchParams.append('maxPrice', maxPrice)
+    if (address) searchParams.append('address', address)
 
-    const newUrl = '?' + params.toString()
-
-    // To avoid rerender with router.push(), we use pushState.
-    // We must specify the state because if we do not NextJS fails to send
-    // us back to the previous page.
-    // see: https://github.com/vercel/next.js/discussions/18072
-    window.history.pushState(
-      { ...window.history.state, as: newUrl, url: newUrl },
-      '',
-      newUrl
-    )
-
-    document.dispatchEvent(new CustomEvent('searchPost'))
+    router.push(pathname + '?' + searchParams.toString())
   }
-
-  useEffect(() => {
-    if (!window.location.search) return
-
-    const params = new URLSearchParams(window.location.search)
-    const query = params.get('query')
-    const minPrice = params.get('minPrice')
-    const maxPrice = params.get('maxPrice')
-    const address = params.get('address')
-
-    methods.setValue('categories', params.getAll('categories') as Categories[])
-
-    if (query) methods.setValue('query', query)
-    if (minPrice) methods.setValue('minPrice', minPrice)
-    if (maxPrice) methods.setValue('maxPrice', maxPrice)
-    if (address) methods.setValue('address', address)
-  }, [methods])
 
   return (
     <Form

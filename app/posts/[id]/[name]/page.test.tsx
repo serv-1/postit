@@ -1,4 +1,3 @@
-import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import Page, { generateMetadata } from './page'
 import getPost from 'functions/getPost'
 import getUser from 'functions/getUser'
@@ -54,7 +53,6 @@ jest
 const mockGetPost = getPost as jest.MockedFunction<typeof getPost>
 const mockGetUser = getUser as jest.MockedFunction<typeof getUser>
 const mockGetPosts = getPosts as jest.MockedFunction<typeof getPosts>
-
 const params = { id: '0', name: 'table' }
 
 const post: Post = {
@@ -108,46 +106,6 @@ describe('<Page />', () => {
     mockGetUser.mockResolvedValue(seller)
     mockGetPosts.mockResolvedValue([])
     mockGetServerSession.mockResolvedValue(null)
-  })
-
-  it("throws an error if the post hasn't been found", async () => {
-    mockGetPost.mockResolvedValue(undefined)
-
-    await expect(Page({ params })).rejects.toThrow(POST_NOT_FOUND)
-
-    expect(mockGetPost).toHaveBeenNthCalledWith(1, '0')
-  })
-
-  it("throws an error if the seller hasn't been found", async () => {
-    mockGetPost.mockResolvedValue({ ...post, userId: '1' })
-    mockGetUser.mockResolvedValue(undefined)
-
-    await expect(Page({ params })).rejects.toThrow(USER_NOT_FOUND)
-
-    expect(mockGetUser).toHaveBeenNthCalledWith(1, '1')
-  })
-
-  it("throws an error if one of the seller's posts hasn't been found", async () => {
-    mockGetPost.mockResolvedValue({ ...post, userId: '1' })
-    mockGetUser.mockResolvedValue({ ...seller, postIds: ['0', '1'] })
-    mockGetPosts.mockResolvedValue(undefined)
-
-    await expect(Page({ params })).rejects.toThrow(POST_NOT_FOUND)
-
-    expect(mockGetPosts).toHaveBeenNthCalledWith(1, ['1'])
-  })
-
-  it("throws an error if the authenticated user hasn't been found", async () => {
-    mockGetPost.mockResolvedValue({ ...post, userId: '1' })
-    mockGetUser
-      .mockResolvedValue(undefined)
-      .mockResolvedValueOnce({ ...seller, postIds: ['0', '1'] })
-    mockGetPosts.mockResolvedValue([])
-    mockGetServerSession.mockResolvedValue({ id: '2' })
-
-    await expect(Page({ params })).rejects.toThrow(USER_NOT_FOUND)
-
-    expect(mockGetUser.mock.calls[1][0]).toBe('2')
   })
 
   it("renders the post's first image", async () => {

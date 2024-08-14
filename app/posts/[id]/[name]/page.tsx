@@ -4,7 +4,6 @@ import getPosts from 'functions/getPosts'
 import getUser from 'functions/getUser'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import { getServerSession } from 'next-auth'
-import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import type { User } from 'types'
 import Image from 'next/image'
 import { NEXT_PUBLIC_AWS_URL } from 'env/public'
@@ -37,27 +36,12 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: { params: Params }) {
+  const session = await getServerSession(nextAuthOptions)
   const post = await getPost(params.id)
-
-  if (!post) {
-    throw new Error(POST_NOT_FOUND)
-  }
-
   const seller = await getUser(post.userId)
-
-  if (!seller) {
-    throw new Error(USER_NOT_FOUND)
-  }
-
   const sellerPosts = await getPosts(
     seller.postIds.filter((postId) => postId !== params.id)
   )
-
-  if (!sellerPosts) {
-    throw new Error(POST_NOT_FOUND)
-  }
-
-  const session = await getServerSession(nextAuthOptions)
 
   let user: User | undefined = undefined
   let isSeller = false
@@ -70,10 +54,6 @@ export default async function Page({ params }: { params: Params }) {
       isSeller = true
     } else {
       user = await getUser(session.id)
-
-      if (!user) {
-        throw new Error(USER_NOT_FOUND)
-      }
 
       const postSet = new Set(post.discussionIds)
 

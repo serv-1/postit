@@ -56,7 +56,6 @@ export default function DiscussionModal({
             <DiscussionMessageList
               signedInUser={signedInUser}
               interlocutor={interlocutor}
-              discussionId={discussionId}
               messages={messages}
             />
             <DiscussionSendBar

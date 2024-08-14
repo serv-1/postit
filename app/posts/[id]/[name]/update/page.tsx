@@ -3,7 +3,6 @@ import getPost from 'functions/getPost'
 import { getServerSession } from 'next-auth'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
-import { POST_NOT_FOUND } from 'constants/errors'
 import UpdatePostForm from 'components/UpdatePostForm'
 
 interface Params {
@@ -29,10 +28,6 @@ export default async function Page({ params }: { params: Params }) {
   }
 
   const post = await getPost(params.id)
-
-  if (!post) {
-    throw new Error(POST_NOT_FOUND)
-  }
 
   return (
     <main className="mb-auto md:bg-linear-wrapper md:rounded-16 md:shadow-wrapper md:p-32">

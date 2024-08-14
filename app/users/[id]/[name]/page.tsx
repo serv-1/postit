@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import getUser from 'functions/getUser'
-import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import Image from 'next/image'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 import PostList from 'components/PostList'
@@ -26,16 +25,7 @@ export async function generateMetadata({
 
 export default async function Page({ params }: { params: Params }) {
   const user = await getUser(params.id)
-
-  if (!user) {
-    throw new Error(USER_NOT_FOUND)
-  }
-
   const posts = await getPosts(user.postIds)
-
-  if (!posts) {
-    throw new Error(POST_NOT_FOUND)
-  }
 
   return (
     <main className="grow flex flex-col lg:flex-row lg:items-start lg:gap-x-24">

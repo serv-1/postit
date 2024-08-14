@@ -1,7 +1,6 @@
 import getUser from 'functions/getUser'
 import Page, { generateMetadata } from './page'
 import getPosts from 'functions/getPosts'
-import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import type { Post, User } from 'types'
 import { render, screen } from '@testing-library/react'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
@@ -18,7 +17,6 @@ jest
 
 const mockGetUser = getUser as jest.MockedFunction<typeof getUser>
 const mockGetPosts = getPosts as jest.MockedFunction<typeof getPosts>
-
 const params = { id: '0', name: 'john' }
 
 const user: User = {
@@ -59,23 +57,6 @@ describe('<Page />', () => {
   beforeEach(() => {
     mockGetUser.mockResolvedValue(user)
     mockGetPosts.mockResolvedValue([])
-  })
-
-  it("throws an error if the user hasn't been found", async () => {
-    mockGetUser.mockResolvedValue(undefined)
-
-    await expect(Page({ params })).rejects.toThrow(USER_NOT_FOUND)
-
-    expect(mockGetUser).toHaveBeenNthCalledWith(1, '0')
-  })
-
-  it("throws an error if one of the user's posts hasn't been found", async () => {
-    mockGetUser.mockResolvedValue({ ...user, postIds: ['0'] })
-    mockGetPosts.mockResolvedValue(undefined)
-
-    await expect(Page({ params })).rejects.toThrow(POST_NOT_FOUND)
-
-    expect(mockGetPosts).toHaveBeenNthCalledWith(1, ['0'])
   })
 
   it("renders the default user's image", async () => {

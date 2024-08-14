@@ -3,26 +3,36 @@
  */
 
 import getUser from '.'
+import { setupServer } from 'msw/node'
+import { rest } from 'msw'
+import 'cross-fetch/polyfill'
 
-const mockFetch = jest.fn()
+const server = setupServer()
 
-Object.defineProperty(globalThis, 'fetch', {
-  value: mockFetch,
-})
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
-it('returns the user found by the given id', async () => {
+it('returns the user', async () => {
   const user = { id: '0' }
 
-  mockFetch.mockResolvedValue({ ok: true, json: async () => user })
+  server.use(
+    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+      expect(req.params.id).toBe('0')
+
+      return res(ctx.status(200), ctx.json(user))
+    })
+  )
 
   expect(await getUser('0')).toEqual(user)
-  expect(mockFetch).toHaveBeenNthCalledWith(1, 'http://localhost/api/users/0', {
-    cache: 'no-store',
-  })
 })
 
-it("returns undefined if the user hasn't been found", async () => {
-  mockFetch.mockResolvedValue({ ok: false })
+it('returns an error if the request fails', async () => {
+  server.use(
+    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    })
+  )
 
-  expect(await getUser('0')).toBeUndefined()
+  await expect(getUser('0')).rejects.toThrow('error')
 })

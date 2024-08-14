@@ -4,7 +4,6 @@ import getUser from 'functions/getUser'
 import getPosts from 'functions/getPosts'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
 import { getServerSession } from 'next-auth'
-import { POST_NOT_FOUND, USER_NOT_FOUND } from 'constants/errors'
 import ProfileUserImage from 'components/ProfileUserImage'
 import TabsProvider from 'components/TabsProvider'
 import TabList from 'components/TabList'
@@ -32,22 +31,8 @@ export default async function Page() {
   }
 
   const user = await getUser(session.id)
-
-  if (!user) {
-    throw new Error(USER_NOT_FOUND)
-  }
-
   const posts = await getPosts(user.postIds)
-
-  if (!posts) {
-    throw new Error(POST_NOT_FOUND)
-  }
-
   const favPosts = await getPosts(user.favPostIds)
-
-  if (!favPosts) {
-    throw new Error(POST_NOT_FOUND)
-  }
 
   return (
     <main className="grow flex flex-col gap-x-24">

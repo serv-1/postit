@@ -7,7 +7,6 @@ import Page, { generateMetadata } from './page'
 import { redirect } from 'next/navigation'
 import type { Post } from 'types'
 import { mockGetServerSession } from '__mocks__/next-auth'
-import { POST_NOT_FOUND } from 'constants/errors'
 
 jest
   .mock('functions/getPost', () => ({
@@ -45,16 +44,5 @@ describe('<Page />', () => {
     await expect(Page({ params: { id: '0', name: 'table' } })).rejects.toThrow()
 
     expect(mockRedirect).toHaveBeenNthCalledWith(1, '/authentication')
-  })
-
-  it("throws an error if the post hasn't been found", async () => {
-    mockGetServerSession.mockResolvedValue({})
-    mockGetPost.mockResolvedValue(undefined)
-
-    await expect(Page({ params: { id: '0', name: 'table' } })).rejects.toThrow(
-      POST_NOT_FOUND
-    )
-
-    expect(mockGetPost).toHaveBeenNthCalledWith(1, '0')
   })
 })
