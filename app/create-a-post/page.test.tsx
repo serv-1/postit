@@ -14,6 +14,10 @@ jest
     nextAuthOptions: {},
   }))
   .mock('next-auth')
+  .mock('components/CreatePostForm', () => ({
+    __esModule: true,
+    default: () => <form></form>,
+  }))
 
 const mockRedirect = redirect as jest.MockedFunction<typeof redirect>
 

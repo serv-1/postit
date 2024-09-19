@@ -22,6 +22,9 @@ switch (undefined) {
   case process.env.NEXT_PUBLIC_LOCATION_IQ_TOKEN:
     name = 'NEXT_PUBLIC_LOCATION_IQ_TOKEN'
     break
+	case process.env.NEXT_PUBLIC_LOCATION_IQ_URL:
+		name = 'NEXT_PUBLIC_LOCATION_IQ_URL'
+		break
 }
 
 if (name) {
@@ -35,3 +38,4 @@ export const NEXT_PUBLIC_CSRF_HEADER_NAME = process.env.NEXT_PUBLIC_CSRF_HEADER_
 export const NEXT_PUBLIC_AWS_URL = process.env.NEXT_PUBLIC_AWS_URL!
 export const NEXT_PUBLIC_DEFAULT_USER_IMAGE = process.env.NEXT_PUBLIC_DEFAULT_USER_IMAGE!
 export const NEXT_PUBLIC_LOCATION_IQ_TOKEN = process.env.NEXT_PUBLIC_LOCATION_IQ_TOKEN!
+export const NEXT_PUBLIC_LOCATION_IQ_URL = process.env.NEXT_PUBLIC_LOCATION_IQ_URL!

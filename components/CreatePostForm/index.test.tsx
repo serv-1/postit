@@ -4,15 +4,32 @@ import 'cross-fetch/polyfill'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import userEvent from '@testing-library/user-event'
-import { useFormContext } from 'react-hook-form'
-import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
+import {
+  NEXT_PUBLIC_CSRF_HEADER_NAME,
+  NEXT_PUBLIC_LOCATION_IQ_URL,
+} from 'env/public'
 import sendImage from 'functions/sendImage'
 import selectEvent from 'react-select-event'
 
 const mockSetToast = jest.fn()
 const mockPush = jest.fn()
 const mockSendImage = sendImage as jest.MockedFunction<typeof sendImage>
-const server = setupServer()
+const server = setupServer(
+  rest.get(NEXT_PUBLIC_LOCATION_IQ_URL + '/autocomplete', (req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json([
+        {
+          place_id: '0',
+          lat: 1,
+          lon: 2,
+          display_address: 'France',
+          display_place: 'Paris',
+        },
+      ])
+    )
+  })
+)
 
 jest
   .mock('hooks/useToast', () => ({
@@ -21,26 +38,6 @@ jest
   }))
   .mock('next/navigation', () => ({
     useRouter: () => ({ push: mockPush }),
-  }))
-  .mock('components/PostAddressModal', () => ({
-    __esModule: true,
-    default: function PostAddressModal({
-      setLatLon,
-    }: {
-      setLatLon: React.Dispatch<
-        React.SetStateAction<[number, number] | undefined>
-      >
-    }) {
-      const { register } = useFormContext()
-
-      return (
-        <>
-          <label htmlFor="address">Address</label>
-          <input type="textbox" {...register('address')} id="address" />
-          <button onClick={() => setLatLon([0, 0])}>latlon</button>
-        </>
-      )
-    },
   }))
   .mock('functions/sendImage', () => ({
     __esModule: true,
@@ -51,6 +48,7 @@ jest
   }))
 
 beforeEach(() => {
+  window.scrollTo = jest.fn()
   mockSendImage.mockImplementation(async (image: File) => image.name)
 })
 
@@ -69,9 +67,10 @@ it("disables the next button of the first step if the address isn't defined", as
 it('enables the next button of the first step if the address is defined', async () => {
   render(<CreatePostForm />)
 
-  const latlonBtn = screen.getByRole('button', { name: /latlon/i })
+  const addressInput = screen.getAllByRole('combobox')[0]
 
-  await userEvent.click(latlonBtn)
+  await userEvent.type(addressInput, 'a')
+  await userEvent.tab()
 
   const nextBtn = screen.getAllByRole('button', { name: /next/i })[0]
 
@@ -87,8 +86,8 @@ it('redirects to the page of the created post', async () => {
         description: 'magnificent table',
         categories: ['furniture'],
         images: ['1.jpeg'],
-        latLon: [0, 0],
-        address: 'paris',
+        latLon: [1, 2],
+        address: 'Paris, France',
       })
 
       expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toEqual('token')
@@ -99,13 +98,10 @@ it('redirects to the page of the created post', async () => {
 
   render(<CreatePostForm />)
 
-  const latLonBtn = screen.getByRole('button', { name: /latlon/i })
+  const addressInput = screen.getAllByRole('combobox')[0]
 
-  await userEvent.click(latLonBtn)
-
-  const addressInput = screen.getByLabelText(/address/i)
-
-  await userEvent.type(addressInput, 'paris')
+  await userEvent.type(addressInput, 'a')
+  await userEvent.tab()
 
   const imagesInput = screen.getByLabelText(/images/i)
 
@@ -142,13 +138,10 @@ it('renders an error if the server fails to send the images', async () => {
 
   render(<CreatePostForm />)
 
-  const latLonBtn = screen.getByRole('button', { name: /latlon/i })
+  const addressInput = screen.getAllByRole('combobox')[0]
 
-  await userEvent.click(latLonBtn)
-
-  const addressInput = screen.getByLabelText(/address/i)
-
-  await userEvent.type(addressInput, 'paris')
+  await userEvent.type(addressInput, 'a')
+  await userEvent.tab()
 
   const imagesInput = screen.getByLabelText(/images/i)
 
@@ -192,13 +185,10 @@ it('renders an error if the server fails to validate the data', async () => {
 
   render(<CreatePostForm />)
 
-  const latLonBtn = screen.getByRole('button', { name: /latlon/i })
+  const addressInput = screen.getAllByRole('combobox')[0]
 
-  await userEvent.click(latLonBtn)
-
-  const addressInput = screen.getByLabelText(/address/i)
-
-  await userEvent.type(addressInput, 'paris')
+  await userEvent.type(addressInput, 'a')
+  await userEvent.tab()
 
   const imagesInput = screen.getByLabelText(/images/i)
 
@@ -241,13 +231,10 @@ it('renders an error if the server fails to create the post', async () => {
 
   render(<CreatePostForm />)
 
-  const latLonBtn = screen.getByRole('button', { name: /latlon/i })
+  const addressInput = screen.getAllByRole('combobox')[0]
 
-  await userEvent.click(latLonBtn)
-
-  const addressInput = screen.getByLabelText(/address/i)
-
-  await userEvent.type(addressInput, 'paris')
+  await userEvent.type(addressInput, 'a')
+  await userEvent.tab()
 
   const imagesInput = screen.getByLabelText(/images/i)
 
@@ -291,13 +278,10 @@ it('gives the focus to the input with the error', async () => {
 
   render(<CreatePostForm />)
 
-  const latLonBtn = screen.getByRole('button', { name: /latlon/i })
+  const addressInput = screen.getAllByRole('combobox')[0]
 
-  await userEvent.click(latLonBtn)
-
-  const addressInput = screen.getByLabelText(/address/i)
-
-  await userEvent.type(addressInput, 'paris')
+  await userEvent.type(addressInput, 'a')
+  await userEvent.tab()
 
   const imagesInput = screen.getByLabelText(/images/i)
 

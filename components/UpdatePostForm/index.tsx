@@ -7,7 +7,7 @@ import ExpandedImageModal from 'components/ExpandedImageModal'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
-import PostAddressModal from 'components/PostAddressModal'
+import AddressField from 'components/AddressField'
 import Select from 'components/Select'
 import TextArea from 'components/TextArea'
 import { CATEGORIES } from 'constants/index'
@@ -53,7 +53,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
 
     const response = await ajax.put(
       '/posts/' + post._id,
-      { ...data, images, latLon: data.address ? latLon : undefined },
+      { ...data, images, latLon },
       { csrf: true }
     )
 
@@ -176,7 +176,11 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
         </div>
         <div>
           <label htmlFor="address">New address</label>
-          <PostAddressModal setLatLon={setLatLon} latLon={latLon} />
+          <AddressField
+            setLatLon={setLatLon}
+            center={latLon}
+            className="h-[250px] rounded"
+          />
         </div>
       </Accordion>
       <button className="primary-btn block ml-auto">Update</button>

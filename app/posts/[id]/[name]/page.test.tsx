@@ -31,7 +31,7 @@ jest
     __esModule: true,
     default: () => ({ toast: {}, setToast() {} }),
   }))
-  .mock('components/PostPageMap', () => ({
+  .mock('components/Map', () => ({
     __esModule: true,
     default: () => <div></div>,
   }))
@@ -117,7 +117,7 @@ describe('<Page />', () => {
     expect(image).toHaveAttribute('alt', 'blue table')
   })
 
-  it("renders the post's name, price and description", async () => {
+  it("renders the post's name, price, description and address", async () => {
     render(await Page({ params }))
 
     const name = screen.getByRole('heading', { level: 1 })
@@ -131,6 +131,10 @@ describe('<Page />', () => {
     const description = screen.getByText(/magnificent blue table/i)
 
     expect(description).toBeInTheDocument()
+
+    const address = screen.getByText(/oslo, norway/i)
+
+    expect(address).toBeInTheDocument()
   })
 
   describe('if the user is unauthenticated', () => {

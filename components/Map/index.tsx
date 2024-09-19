@@ -1,22 +1,52 @@
-import { MapContainer, TileLayer } from 'react-leaflet'
+'use client'
 
-interface MapProps {
-  children?: React.ReactNode
+import MapFullScreenButton from 'components/MapFullScreenButton'
+import type { Map as LeafletMap } from 'leaflet'
+import { useEffect, useState } from 'react'
+import { MapContainer, TileLayer, useMap } from 'react-leaflet'
+
+export interface MapProps {
+  renderContent?: (map: LeafletMap) => React.ReactNode
   className?: string
   zoom: number
   center?: [number, number]
+  showZoomBtn?: boolean
+  showFullScreenBtn?: boolean
 }
 
-export default function Map({ children, className, zoom, center }: MapProps) {
+export default function Map({
+  renderContent,
+  className,
+  zoom,
+  center,
+  showZoomBtn,
+  showFullScreenBtn,
+}: MapProps) {
+  const [fullScreen, setFullScreen] = useState(false)
+
   return (
-    <div data-testid="leaflet-map">
+    <div
+      className={
+        fullScreen
+          ? 'absolute top-0 left-0 z-[9999] w-screen h-screen'
+          : className
+      }
+    >
       <MapContainer
-        className={className}
+        className="w-full h-full"
         center={center || [37.777, -122.42]}
         zoom={zoom}
-        scrollWheelZoom={true}
+        scrollWheelZoom
+        zoomControl={showZoomBtn}
       >
-        {children}
+        <MapResize />
+        {showFullScreenBtn && (
+          <MapFullScreenButton
+            fullScreen={fullScreen}
+            setFullScreen={setFullScreen}
+          />
+        )}
+        {renderContent && <MapContent renderContent={renderContent} />}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -24,4 +54,24 @@ export default function Map({ children, className, zoom, center }: MapProps) {
       </MapContainer>
     </div>
   )
+}
+
+function MapResize() {
+  const map = useMap()
+
+  useEffect(() => {
+    map.invalidateSize()
+  })
+
+  return null
+}
+
+interface MapContentProps {
+  renderContent: (map: LeafletMap) => React.ReactNode
+}
+
+function MapContent({ renderContent }: MapContentProps) {
+  const map = useMap()
+
+  return renderContent(map)
 }

@@ -13,7 +13,7 @@ import formatToUrl from 'functions/formatToUrl'
 import Link from 'next/link'
 import ContactModal from 'components/ContactModal'
 import addSpacesToNum from 'functions/addSpacesToNum'
-import PostPageMap from 'components/PostPageMap'
+import Map from 'components/Map'
 import PostList from 'components/PostList'
 import PreviousPageButton from 'components/PreviousPageButton'
 import Pencil from 'public/static/images/pencil.svg'
@@ -156,7 +156,14 @@ export default async function Page({ params }: { params: Params }) {
           {addSpacesToNum(post.price)}€
         </span>
         <p className="my-16 break-words">{post.description}</p>
-        <PostPageMap address={post.address} latLon={post.latLon} />
+        <Map
+          zoom={11}
+          center={post.latLon}
+          className="w-full h-[200px] lg:h-[250px] rounded-8 overflow-hidden"
+          showZoomBtn
+          showFullScreenBtn
+        />
+        <div className="text-center break-words">{post.address}</div>
       </section>
       {!isSeller && sellerPosts.length > 0 && (
         <section className="mb-32 md:col-start-1">

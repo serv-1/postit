@@ -1,4 +1,5 @@
 export type LocationIQAutocompleteGetData = {
+  place_id: string
   lat: string
   lon: string
   display_place: string
@@ -12,3 +13,7 @@ export type LocationIQAutocompleteGetData = {
     country?: string
   }
 }[]
+
+export interface LocationIQAutocompleteGetError {
+  error: string
+}

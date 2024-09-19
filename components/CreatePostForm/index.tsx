@@ -4,7 +4,7 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import type { PostPostError } from 'app/api/post/types'
 import Form from 'components/Form'
 import InputError from 'components/InputError'
-import PostAddressModal from 'components/PostAddressModal'
+import AddressField from 'components/AddressField'
 import WizardNextButton from 'components/WizardNextButton'
 import WizardPrevButton from 'components/WizardPrevButton'
 import WizardProvider from 'components/WizardProvider'
@@ -80,7 +80,11 @@ export default function CreatePostForm() {
         <WizardStep className="flex flex-col gap-y-16 h-full">
           <h2>Meeting place</h2>
           <p>Your address will never be displayed in its entirety.</p>
-          <PostAddressModal latLon={latLon} setLatLon={setLatLon} />
+          <AddressField
+            setLatLon={setLatLon}
+            center={latLon}
+            className="h-full rounded"
+          />
           <WizardNextButton
             className="primary-btn w-full mt-auto"
             isDisabled={!latLon}

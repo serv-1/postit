@@ -6,38 +6,15 @@ import userEvent from '@testing-library/user-event'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import 'cross-fetch/polyfill'
-import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
-import { useEffect as mockUseEffect } from 'react'
-import { useFormContext as mockUseFormContext } from 'react-hook-form'
+import {
+  NEXT_PUBLIC_CSRF_HEADER_NAME,
+  NEXT_PUBLIC_LOCATION_IQ_URL,
+} from 'env/public'
 import type { Post } from 'types'
 
-jest
-  .mock('next-auth/react', () => ({
-    getCsrfToken: () => 'token',
-  }))
-  .mock('components/PostAddressModal', () => ({
-    __esModule: true,
-    default: ({
-      setLatLon,
-    }: {
-      setLatLon: React.Dispatch<
-        React.SetStateAction<[number, number] | undefined>
-      >
-    }) => {
-      const { register } = mockUseFormContext()
-
-      mockUseEffect(() => {
-        setLatLon([1, 2])
-      }, [])
-
-      return (
-        <>
-          <label htmlFor="address">Address</label>
-          <input type="text" id="address" {...register('address')} />
-        </>
-      )
-    },
-  }))
+jest.mock('next-auth/react', () => ({
+  getCsrfToken: () => 'token',
+}))
 
 const server = setupServer()
 
@@ -62,6 +39,10 @@ function Test() {
     </ToastProvider>
   )
 }
+
+beforeEach(() => {
+  window.scrollTo = () => undefined
+})
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
@@ -244,9 +225,23 @@ it('renders an error if the upload of an image fails', async () => {
 
 it("sends the post's latitude and longitude with the post's address", async () => {
   server.use(
+    rest.get(NEXT_PUBLIC_LOCATION_IQ_URL + '/autocomplete', (req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json([
+          {
+            place_id: '0',
+            lat: 1,
+            lon: 2,
+            display_address: 'France',
+            display_place: 'Paris',
+          },
+        ])
+      )
+    }),
     rest.put('http://localhost/api/posts/:id', async (req, res, ctx) => {
       expect(await req.json()).toEqual({
-        address: 'Paris',
+        address: 'Paris, France',
         latLon: [1, 2],
       })
 
@@ -260,9 +255,10 @@ it("sends the post's latitude and longitude with the post's address", async () =
 
   await userEvent.click(addressBtn)
 
-  const addressInput = screen.getByRole('textbox', { name: /address/i })
+  const addressInput = screen.getByRole('combobox')
 
-  await userEvent.type(addressInput, 'Paris')
+  await userEvent.type(addressInput, 'a')
+  await userEvent.tab()
 
   const updateBtn = screen.getByRole('button', { name: /update/i })
 
