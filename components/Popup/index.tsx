@@ -5,10 +5,11 @@ import type { Options as ArrowOptions } from '@popperjs/core/lib/modifiers/arrow
 import type { PreventOverflowModifier } from '@popperjs/core/lib/modifiers/preventOverflow'
 import type { ComputeStylesModifier } from '@popperjs/core/lib/modifiers/computeStyles'
 import type { FlipModifier } from '@popperjs/core/lib/modifiers/flip'
-import { useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import { usePopper } from 'react-popper'
 import type { EventListenersModifier } from '@popperjs/core/lib/modifiers/eventListeners'
 import type { Placement, PositioningStrategy, State } from '@popperjs/core'
+import useEventListener from 'hooks/useEventListener'
 
 type Reference = HTMLButtonElement | null
 type Arrow = HTMLDivElement | null
@@ -56,6 +57,7 @@ export default function Popup({
   const [referenceEl, setReferenceEl] = useState<Reference>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [isHover, setIsHover] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const { styles, attributes } = usePopper(referenceEl, popperEl, {
     placement,
@@ -71,23 +73,15 @@ export default function Popup({
     ],
   })
 
-  useEffect(() => {
-    if (!referenceEl || !popperEl) return
+  useEventListener(document, 'click', (e) => {
+    if (containerRef.current!.contains(e.target as Node)) return
 
-    const onClick = (e: MouseEvent) => {
-      const t = e.target as HTMLElement
-      if (popperEl.contains(t) || referenceEl.contains(t)) return
-      setIsOpen(false)
-      setIsHover(false)
-    }
-
-    document.addEventListener('click', onClick)
-
-    return () => document.removeEventListener('click', onClick)
-  }, [setIsOpen, popperEl, referenceEl])
+    setIsOpen(false)
+    setIsHover(false)
+  })
 
   return (
-    <div className={containerClassName}>
+    <div ref={containerRef} className={containerClassName}>
       <span
         onMouseEnter={() => {
           if (window.innerWidth < 1024) return
