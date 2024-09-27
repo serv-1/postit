@@ -10,8 +10,8 @@ import {
 } from 'env/public'
 import sendImage from 'functions/sendImage'
 import selectEvent from 'react-select-event'
+import Toast from 'components/Toast'
 
-const mockSetToast = jest.fn()
 const mockPush = jest.fn()
 const mockSendImage = sendImage as jest.MockedFunction<typeof sendImage>
 const server = setupServer(
@@ -32,10 +32,6 @@ const server = setupServer(
 )
 
 jest
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ setToast: mockSetToast, toast: {} }),
-  }))
   .mock('next/navigation', () => ({
     useRouter: () => ({ push: mockPush }),
   }))
@@ -136,7 +132,12 @@ it('redirects to the page of the created post', async () => {
 it('renders an error if the server fails to send the images', async () => {
   mockSendImage.mockRejectedValue(new Error('error'))
 
-  render(<CreatePostForm />)
+  render(
+    <>
+      <CreatePostForm />
+      <Toast />
+    </>
+  )
 
   const addressInput = screen.getAllByRole('combobox')[0]
 
@@ -170,10 +171,9 @@ it('renders an error if the server fails to send the images', async () => {
 
   await userEvent.click(submitBtn)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: 'error',
-    error: true,
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })
 
 it('renders an error if the server fails to validate the data', async () => {
@@ -229,7 +229,12 @@ it('renders an error if the server fails to create the post', async () => {
     })
   )
 
-  render(<CreatePostForm />)
+  render(
+    <>
+      <CreatePostForm />
+      <Toast />
+    </>
+  )
 
   const addressInput = screen.getAllByRole('combobox')[0]
 
@@ -263,10 +268,9 @@ it('renders an error if the server fails to create the post', async () => {
 
   await userEvent.click(submitBtn)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: 'error',
-    error: true,
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })
 
 it('gives the focus to the input with the error', async () => {

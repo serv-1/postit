@@ -6,7 +6,7 @@ import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
 import updateUserEmail, { type UpdateUserEmail } from 'schemas/updateUserEmail'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import type { UserPutError } from 'app/api/user/types'
 
@@ -14,8 +14,6 @@ export default function UpdateUserEmailForm() {
   const methods = useForm<UpdateUserEmail>({
     resolver: joiResolver(updateUserEmail),
   })
-
-  const { setToast } = useToast()
 
   const submitHandler: SubmitHandler<UpdateUserEmail> = async (data) => {
     const response = await ajax.put('/user', data, { csrf: true })
@@ -28,7 +26,7 @@ export default function UpdateUserEmailForm() {
       return
     }
 
-    setToast({ message: 'Your email has been updated! 🎉' })
+    showToast({ message: 'Your email has been updated! 🎉' })
   }
 
   return (

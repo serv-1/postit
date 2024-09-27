@@ -4,20 +4,15 @@ import userEvent from '@testing-library/user-event'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import 'cross-fetch/polyfill'
+import Toast from 'components/Toast'
 
-const mockSetToast = jest.fn()
 const mockRouterPush = jest.fn()
 const mockSignIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const server = setupServer()
 
-jest
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ setToast: mockSetToast, toast: {} }),
-  }))
-  .mock('next/navigation', () => ({
-    useRouter: () => ({ push: mockRouterPush }),
-  }))
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockRouterPush }),
+}))
 
 beforeEach(() => {
   mockSignIn.mockResolvedValue({ error: '' })
@@ -86,7 +81,12 @@ it('renders an alert if the server fails to sign the user in', async () => {
 
   mockSignIn.mockResolvedValue({ error: 'Error' })
 
-  render(<SignUpForm />)
+  render(
+    <>
+      <Toast />
+      <SignUpForm />
+    </>
+  )
 
   const nameInput = screen.getByLabelText(/name/i)
 
@@ -106,9 +106,11 @@ it('renders an alert if the server fails to sign the user in', async () => {
 
   await userEvent.click(submitBtn)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: 'Your account has been successfully created. You can now sign in!',
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent(
+    'Your account has been successfully created. You can now sign in!'
+  )
 })
 
 it('renders an error if the server fails to register the user', async () => {
@@ -118,7 +120,12 @@ it('renders an error if the server fails to register the user', async () => {
     })
   )
 
-  render(<SignUpForm />)
+  render(
+    <>
+      <Toast />
+      <SignUpForm />
+    </>
+  )
 
   const nameInput = screen.getByLabelText(/name/i)
 
@@ -136,10 +143,9 @@ it('renders an error if the server fails to register the user', async () => {
 
   await userEvent.click(submitBtn)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: 'error',
-    error: true,
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })
 
 it('renders an error if the server fails to validate the request data', async () => {

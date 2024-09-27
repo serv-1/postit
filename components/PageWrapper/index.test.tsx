@@ -11,10 +11,10 @@ import { rest } from 'msw'
 import 'cross-fetch/polyfill'
 import type { UsersIdGetData } from 'app/api/users/[id]/types'
 import type { User } from 'types'
+import Toast from 'components/Toast'
 
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>
-const mockSetToast = jest.fn()
 const server = setupServer()
 
 const signedInUser: User = {
@@ -33,10 +33,6 @@ jest
   }))
   .mock('next-auth/react', () => ({
     useSession: jest.fn(),
-  }))
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ toast: {}, setToast: mockSetToast }),
   }))
   .mock('hooks/usePusher', () => ({
     __esModule: true,
@@ -239,4 +235,30 @@ it("doesn't fetch the authenticated user if it is given as a prop", () => {
   )
 
   render(<PageWrapper signedInUser={signedInUser}>page</PageWrapper>)
+})
+
+it('renders an error if the server fails to fetch the user', async () => {
+  mockUsePathname.mockReturnValue('/')
+  mockUseSession.mockReturnValue({
+    status: 'authenticated',
+    data: { id: '0', channelName: '', expires: '' },
+    update: async () => null,
+  })
+
+  server.use(
+    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
+      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    })
+  )
+
+  render(
+    <>
+      <PageWrapper>page</PageWrapper>
+      <Toast />
+    </>
+  )
+
+  const toast = await screen.findByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })

@@ -13,8 +13,8 @@ import fetchDiscussion from 'functions/fetchDiscussion'
 import { setupServer } from 'msw/node'
 import 'cross-fetch/polyfill'
 import usersIdHandlers from 'app/api/users/[id]/mock'
+import Toast from 'components/Toast'
 
-const mockSetToast = jest.fn()
 const mockUsePusher = usePusher as jest.MockedFunction<typeof usePusher>
 
 const mockFetchDiscussion = fetchDiscussion as jest.MockedFunction<
@@ -50,10 +50,6 @@ const discussion: Discussion = {
 const server = setupServer(...usersIdHandlers)
 
 jest
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ setToast: mockSetToast, toast: {} }),
-  }))
   .mock('next-auth/react', () => ({
     useSession: () => ({ data: { id: '0' } }),
     getCsrfToken: async () => 'token',
@@ -176,7 +172,12 @@ describe('when the "discussion list" modal opens', () => {
     it('renders an error if the server fails to fetch the discussions', async () => {
       mockFetchDiscussion.mockRejectedValueOnce(new Error('error'))
 
-      render(<HeaderDiscussions signedInUser={signedInUser} />)
+      render(
+        <>
+          <Toast />
+          <HeaderDiscussions signedInUser={signedInUser} />
+        </>
+      )
 
       const openBtn = screen.getByRole('button', {
         name: /open discussion list/i,
@@ -184,10 +185,9 @@ describe('when the "discussion list" modal opens', () => {
 
       await userEvent.click(openBtn)
 
-      expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-        message: 'error',
-        error: true,
-      })
+      const toast = screen.getByRole('alert')
+
+      expect(toast).toHaveTextContent('error')
     })
   })
 
@@ -253,7 +253,12 @@ describe('when the "discussion list" modal opens', () => {
     it('renders an error if the server fails to fetch the discussions', async () => {
       mockFetchDiscussion.mockRejectedValueOnce(new Error('error'))
 
-      render(<HeaderDiscussions signedInUser={signedInUser} />)
+      render(
+        <>
+          <Toast />
+          <HeaderDiscussions signedInUser={signedInUser} />
+        </>
+      )
 
       const openBtn = screen.getByRole('button', {
         name: /open discussion list/i,
@@ -261,10 +266,9 @@ describe('when the "discussion list" modal opens', () => {
 
       await userEvent.click(openBtn)
 
-      expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-        message: 'error',
-        error: true,
-      })
+      const toast = screen.getByRole('alert')
+
+      expect(toast).toHaveTextContent('error')
     })
 
     it("fetches the discussion to open if it isn't in the discussion list", async () => {
@@ -311,9 +315,12 @@ describe('when the "discussion list" modal opens', () => {
       mockFetchDiscussion.mockRejectedValueOnce(new Error('error'))
 
       render(
-        <HeaderDiscussions
-          signedInUser={{ ...signedInUser, discussions: [] }}
-        />
+        <>
+          <Toast />
+          <HeaderDiscussions
+            signedInUser={{ ...signedInUser, discussions: [] }}
+          />
+        </>
       )
 
       act(() => {
@@ -322,12 +329,9 @@ describe('when the "discussion list" modal opens', () => {
         )
       })
 
-      await waitFor(() => {
-        expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-          message: 'error',
-          error: true,
-        })
-      })
+      const toast = await screen.findByRole('alert')
+
+      expect(toast).toHaveTextContent('error')
     })
 
     it('opens the "discussion list" modal and the modal of the discussion to open', async () => {

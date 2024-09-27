@@ -5,16 +5,11 @@ import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import 'cross-fetch/polyfill'
+import Toast from 'components/Toast'
 
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const mockSignOut = jest.spyOn(require('next-auth/react'), 'signOut')
-const mockSetToast = jest.fn()
 const server = setupServer()
-
-jest.mock('hooks/useToast', () => ({
-  __esModule: true,
-  default: () => ({ setToast: mockSetToast, toast: {} }),
-}))
 
 beforeEach(() => {
   mockGetCsrfToken.mockResolvedValue('token')
@@ -81,7 +76,12 @@ it('renders an error if the server fails to delete the user', async () => {
     })
   )
 
-  render(<DeleteAccountModal />)
+  render(
+    <>
+      <DeleteAccountModal />
+      <Toast />
+    </>
+  )
 
   const openModalBtn = screen.getByRole('button')
 
@@ -91,10 +91,7 @@ it('renders an error if the server fails to delete the user', async () => {
 
   await userEvent.click(deleteBtn)
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: 'error',
-      error: true,
-    })
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })

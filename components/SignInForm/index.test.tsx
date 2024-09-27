@@ -1,20 +1,15 @@
 import SignInForm from '.'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import Toast from 'components/Toast'
 import { DATA_INVALID } from 'constants/errors'
 
-const mockSetToast = jest.fn()
 const mockRouterPush = jest.fn()
 const mockSignIn = jest.spyOn(require('next-auth/react'), 'signIn')
 
-jest
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ setToast: mockSetToast, toast: {} }),
-  }))
-  .mock('next/navigation', () => ({
-    useRouter: () => ({ push: mockRouterPush }),
-  }))
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockRouterPush }),
+}))
 
 it('signs the user in and redirects him to its profile', async () => {
   render(<SignInForm />)
@@ -39,7 +34,12 @@ it('signs the user in and redirects him to its profile', async () => {
 it('renders an error if the server fails to sign the user in', async () => {
   mockSignIn.mockResolvedValueOnce({ error: 'error' })
 
-  render(<SignInForm />)
+  render(
+    <>
+      <Toast />
+      <SignInForm />
+    </>
+  )
 
   const emailInput = screen.getByRole('textbox')
 
@@ -53,8 +53,7 @@ it('renders an error if the server fails to sign the user in', async () => {
 
   await userEvent.click(submitBtn)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: DATA_INVALID,
-    error: true,
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent(DATA_INVALID)
 })

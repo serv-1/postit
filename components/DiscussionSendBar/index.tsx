@@ -6,13 +6,13 @@ import updateDiscussion, {
   type UpdateDiscussion,
 } from 'schemas/updateDiscussion'
 import { useEffect } from 'react'
-import useToast from 'hooks/useToast'
 import ajax from 'libs/ajax'
 import type { DiscussionsIdPutError } from 'app/api/discussions/[id]/types'
 import type {
   DiscussionPostData,
   DiscussionPostError,
 } from 'app/api/discussion/types'
+import showToast from 'functions/showToast'
 
 export interface DiscussionSendBarProps {
   onMessageSent?: (id: string) => void
@@ -33,7 +33,6 @@ export default function DiscussionSendBar({
     resolver: joiResolver(updateDiscussion),
   })
 
-  const { setToast } = useToast()
   const { formState, reset } = methods
   const { errors, isSubmitSuccessful } = formState
 
@@ -50,7 +49,7 @@ export default function DiscussionSendBar({
       if (!response.ok) {
         const { message }: DiscussionsIdPutError = await response.json()
 
-        setToast({ message, error: true })
+        showToast({ message, error: true })
 
         return
       }
@@ -64,7 +63,7 @@ export default function DiscussionSendBar({
       if (!response.ok) {
         const { message }: DiscussionPostError = await response.json()
 
-        setToast({ message, error: true })
+        showToast({ message, error: true })
 
         return
       }
@@ -85,9 +84,9 @@ export default function DiscussionSendBar({
 
   useEffect(() => {
     if (errors.message) {
-      setToast({ message: errors.message.message, error: true })
+      showToast({ message: errors.message.message!, error: true })
     }
-  }, [errors.message, setToast])
+  }, [errors.message])
 
   return (
     <Form<UpdateDiscussion>

@@ -1,19 +1,14 @@
 import PostPageFavoriteButton from '.'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import 'cross-fetch/polyfill'
+import Toast from 'components/Toast'
 
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
-const mockSetToast = jest.fn()
 const server = setupServer()
-
-jest.mock('hooks/useToast', () => ({
-  __esModule: true,
-  default: () => ({ setToast: mockSetToast, toast: {} }),
-}))
 
 beforeEach(() => {
   mockGetCsrfToken.mockResolvedValue('token')
@@ -46,7 +41,12 @@ it("adds the post to the user's favorite list", async () => {
     })
   )
 
-  render(<PostPageFavoriteButton postId="0" favPostIds={[]} />)
+  render(
+    <>
+      <Toast />
+      <PostPageFavoriteButton postId="0" favPostIds={[]} />
+    </>
+  )
 
   const heartBtn = screen.getByRole('button', { name: /favorite/i })
 
@@ -59,17 +59,13 @@ it("adds the post to the user's favorite list", async () => {
 
   await userEvent.click(heartBtn)
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message:
-        'This post has been successfully added to your favorite list! 🎉',
-    })
-  })
+  const toast = screen.getByRole('alert')
 
-  await waitFor(() => {
-    expect(heartBtn).toHaveAttribute('title', 'Delete from favorite')
-  })
+  expect(toast).toHaveTextContent(
+    'This post has been successfully added to your favorite list! 🎉'
+  )
 
+  expect(heartBtn).toHaveAttribute('title', 'Delete from favorite')
   expect(heartBtn).toHaveAttribute('aria-label', 'Delete from favorite')
   expect(heartFillIcon.className).not.toContain('animate')
 })
@@ -84,7 +80,12 @@ it("deletes the post from the user's favorite list", async () => {
     })
   )
 
-  render(<PostPageFavoriteButton postId="0" favPostIds={['0']} />)
+  render(
+    <>
+      <Toast />
+      <PostPageFavoriteButton postId="0" favPostIds={['0']} />
+    </>
+  )
 
   const heartBtn = screen.getByRole('button', { name: /favorite/i })
 
@@ -97,17 +98,13 @@ it("deletes the post from the user's favorite list", async () => {
 
   await userEvent.click(heartBtn)
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message:
-        'This post has been successfully deleted from your favorite list! 🎉',
-    })
-  })
+  const toast = screen.getByRole('alert')
 
-  await waitFor(() => {
-    expect(heartBtn).toHaveAttribute('title', 'Add to favorite')
-  })
+  expect(toast).toHaveTextContent(
+    'This post has been successfully deleted from your favorite list! 🎉'
+  )
 
+  expect(heartBtn).toHaveAttribute('title', 'Add to favorite')
   expect(heartBtn).toHaveAttribute('aria-label', 'Add to favorite')
   expect(heartFillIcon.className).toContain('animate')
 })
@@ -119,26 +116,37 @@ it("renders an error if the server fails to update the user's favorite post list
     })
   )
 
-  render(<PostPageFavoriteButton postId="0" favPostIds={['0']} />)
+  render(
+    <>
+      <Toast />
+      <PostPageFavoriteButton postId="0" favPostIds={['0']} />
+    </>
+  )
 
   const heartBtn = screen.getByRole('button', { name: /favorite/i })
 
   await userEvent.click(heartBtn)
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: 'error',
-      error: true,
-    })
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })
 
 it("doesn't update the user's favorite list if he is unauthenticated", async () => {
-  render(<PostPageFavoriteButton postId="0" />)
+  render(
+    <>
+      <Toast />
+      <PostPageFavoriteButton postId="0" />
+    </>
+  )
 
   const heartBtn = screen.getByRole('button', { name: /favorite/i })
 
   await userEvent.click(heartBtn)
 
-  await waitFor(() => expect(mockSetToast).toHaveBeenCalledTimes(1))
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent(
+    'You need to be signed in to add it to your favorite list.'
+  )
 })

@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import UpdatePostForm from '.'
-import ToastProvider from 'components/ToastProvider'
 import Toast from 'components/Toast'
 import userEvent from '@testing-library/user-event'
 import { rest } from 'msw'
@@ -31,15 +30,6 @@ const post: Post = {
   discussionIds: [],
 }
 
-function Test() {
-  return (
-    <ToastProvider>
-      <Toast />
-      <UpdatePostForm post={post} />
-    </ToastProvider>
-  )
-}
-
 beforeEach(() => {
   window.scrollTo = () => undefined
 })
@@ -49,7 +39,7 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 it("renders the actual post's name", async () => {
-  render(<Test />)
+  render(<UpdatePostForm post={post} />)
 
   const nameBtn = screen.getByRole('button', { name: /name/i })
 
@@ -61,7 +51,7 @@ it("renders the actual post's name", async () => {
 })
 
 it("renders the actual post's description", async () => {
-  render(<Test />)
+  render(<UpdatePostForm post={post} />)
 
   const descriptionBtn = screen.getByRole('button', { name: /description/i })
 
@@ -73,7 +63,7 @@ it("renders the actual post's description", async () => {
 })
 
 it("renders the actual post's categories", async () => {
-  render(<Test />)
+  render(<UpdatePostForm post={post} />)
 
   const categoriesBtn = screen.getByRole('button', { name: /categories/i })
 
@@ -85,7 +75,7 @@ it("renders the actual post's categories", async () => {
 })
 
 it("renders the actual post's price", async () => {
-  render(<Test />)
+  render(<UpdatePostForm post={post} />)
 
   const priceBtn = screen.getByRole('button', { name: /price/i })
 
@@ -97,7 +87,7 @@ it("renders the actual post's price", async () => {
 })
 
 it("renders the actual post's images", async () => {
-  render(<Test />)
+  render(<UpdatePostForm post={post} />)
 
   const imagesBtn = screen.getByRole('button', { name: /images/i })
 
@@ -113,7 +103,7 @@ it("renders the actual post's images", async () => {
 })
 
 it("renders the actual post's address", async () => {
-  render(<Test />)
+  render(<UpdatePostForm post={post} />)
 
   const addressBtn = screen.getByRole('button', { name: /address/i })
 
@@ -131,7 +121,12 @@ it('renders an error if the server fails to validate the data', async () => {
     })
   )
 
-  render(<Test />)
+  render(
+    <>
+      <Toast />
+      <UpdatePostForm post={post} />
+    </>
+  )
 
   const nameBtn = screen.getByRole('button', { name: /name/i })
 
@@ -141,9 +136,9 @@ it('renders an error if the server fails to validate the data', async () => {
 
   await userEvent.click(updateBtn)
 
-  const error = await screen.findByText(/error/i)
+  const toast = screen.getByRole('alert')
 
-  expect(error).toBeInTheDocument()
+  expect(toast).toHaveTextContent('error')
 })
 
 it('renders an error if the server fails to update the post', async () => {
@@ -153,15 +148,20 @@ it('renders an error if the server fails to update the post', async () => {
     })
   )
 
-  render(<Test />)
+  render(
+    <>
+      <Toast />
+      <UpdatePostForm post={post} />
+    </>
+  )
 
   const updateBtn = screen.getByRole('button', { name: /update/i })
 
   await userEvent.click(updateBtn)
 
-  const error = await screen.findByText(/error/i)
+  const toast = screen.getByRole('alert')
 
-  expect(error).toBeInTheDocument()
+  expect(toast).toHaveTextContent('error')
 })
 
 it('renders a message if the post has been updated', async () => {
@@ -175,7 +175,12 @@ it('renders a message if the post has been updated', async () => {
     })
   )
 
-  render(<Test />)
+  render(
+    <>
+      <Toast />
+      <UpdatePostForm post={post} />
+    </>
+  )
 
   const nameBtn = screen.getByRole('button', { name: /name/i })
 
@@ -189,9 +194,9 @@ it('renders a message if the post has been updated', async () => {
 
   await userEvent.click(updateBtn)
 
-  const message = await screen.findByText(/the post has been updated/i)
+  const toast = screen.getByRole('alert')
 
-  expect(message).toBeInTheDocument()
+  expect(toast).toHaveTextContent('The post has been updated! 🎉')
 })
 
 it('renders an error if the upload of an image fails', async () => {
@@ -201,7 +206,12 @@ it('renders an error if the upload of an image fails', async () => {
     })
   )
 
-  render(<Test />)
+  render(
+    <>
+      <Toast />
+      <UpdatePostForm post={post} />
+    </>
+  )
 
   const imagesBtn = screen.getByRole('button', { name: /images/i })
 
@@ -218,9 +228,9 @@ it('renders an error if the upload of an image fails', async () => {
 
   await userEvent.click(updateBtn)
 
-  const error = await screen.findByText(/error/i)
+  const toast = screen.getByRole('alert')
 
-  expect(error).toBeInTheDocument()
+  expect(toast).toHaveTextContent('error')
 })
 
 it("sends the post's latitude and longitude with the post's address", async () => {
@@ -249,7 +259,7 @@ it("sends the post's latitude and longitude with the post's address", async () =
     })
   )
 
-  render(<Test />)
+  render(<UpdatePostForm post={post} />)
 
   const addressBtn = screen.getByRole('button', { name: /address/i })
 
@@ -272,7 +282,7 @@ it('gives the focus to the input with an error', async () => {
     })
   )
 
-  render(<Test />)
+  render(<UpdatePostForm post={post} />)
 
   const nameBtn = screen.getByRole('button', { name: /name/i })
 

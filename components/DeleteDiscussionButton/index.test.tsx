@@ -6,18 +6,13 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import discussionsIdHandlers from 'app/api/discussions/[id]/mock'
+import Toast from 'components/Toast'
 
 const server = setupServer()
-const mockSetToast = jest.fn()
 
-jest
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ setToast: mockSetToast, toast: {} }),
-  }))
-  .mock('next-auth/react', () => ({
-    getCsrfToken: async () => 'token',
-  }))
+jest.mock('next-auth/react', () => ({
+  getCsrfToken: async () => 'token',
+}))
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
@@ -49,16 +44,20 @@ describe('when clicked', () => {
         })
       )
 
-      render(<DeleteDiscussionButton discussionId="0" />)
+      render(
+        <>
+          <DeleteDiscussionButton discussionId="0" />
+          <Toast />
+        </>
+      )
 
       const deleteBtn = screen.getByRole('button')
 
       await userEvent.click(deleteBtn)
 
-      expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-        message: 'error',
-        error: true,
-      })
+      const toast = screen.getByRole('alert')
+
+      expect(toast).toHaveTextContent('error')
     })
   })
 
@@ -96,22 +95,24 @@ describe('when clicked', () => {
       )
 
       render(
-        <DeleteDiscussionButton
-          discussionId="0"
-          interlocutorDiscussions={[
-            { _id: '0', id: '0', hidden: true, hasNewMessage: false },
-          ]}
-        />
+        <>
+          <DeleteDiscussionButton
+            discussionId="0"
+            interlocutorDiscussions={[
+              { _id: '0', id: '0', hidden: true, hasNewMessage: false },
+            ]}
+          />
+          <Toast />
+        </>
       )
 
       const deleteBtn = screen.getByRole('button')
 
       await userEvent.click(deleteBtn)
 
-      expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-        message: 'error',
-        error: true,
-      })
+      const toast = screen.getByRole('alert')
+
+      expect(toast).toHaveTextContent('error')
     })
 
     it('hides the unhidden discussions of the interlocutor', async () => {
@@ -147,22 +148,24 @@ describe('when clicked', () => {
       )
 
       render(
-        <DeleteDiscussionButton
-          discussionId="0"
-          interlocutorDiscussions={[
-            { _id: '0', id: '0', hidden: false, hasNewMessage: false },
-          ]}
-        />
+        <>
+          <DeleteDiscussionButton
+            discussionId="0"
+            interlocutorDiscussions={[
+              { _id: '0', id: '0', hidden: false, hasNewMessage: false },
+            ]}
+          />
+          <Toast />
+        </>
       )
 
       const deleteBtn = screen.getByRole('button')
 
       await userEvent.click(deleteBtn)
 
-      expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-        message: 'error',
-        error: true,
-      })
+      const toast = screen.getByRole('alert')
+
+      expect(toast).toHaveTextContent('error')
     })
   })
 

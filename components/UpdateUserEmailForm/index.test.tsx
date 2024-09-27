@@ -5,7 +5,6 @@ import { setupServer } from 'msw/node'
 import { rest } from 'msw'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import userEvent from '@testing-library/user-event'
-import ToastProvider from 'components/ToastProvider'
 import Toast from 'components/Toast'
 
 const server = setupServer()
@@ -29,10 +28,10 @@ it('renders a message if the user email has been updated', async () => {
   )
 
   render(
-    <ToastProvider>
+    <>
       <Toast />
       <UpdateUserEmailForm />
-    </ToastProvider>
+    </>
   )
 
   const emailInput = screen.getByRole('textbox')
@@ -43,9 +42,9 @@ it('renders a message if the user email has been updated', async () => {
 
   await userEvent.click(submitBtn)
 
-  const message = screen.getByText('Your email has been updated! 🎉')
+  const toast = screen.getByRole('alert')
 
-  expect(message).toBeInTheDocument()
+  expect(toast).toHaveTextContent('Your email has been updated! 🎉')
 })
 
 it('renders an error if it fails to update the user email', async () => {
@@ -56,10 +55,10 @@ it('renders an error if it fails to update the user email', async () => {
   )
 
   render(
-    <ToastProvider>
+    <>
       <Toast />
       <UpdateUserEmailForm />
-    </ToastProvider>
+    </>
   )
 
   const emailInput = screen.getByRole('textbox')
@@ -70,9 +69,9 @@ it('renders an error if it fails to update the user email', async () => {
 
   await userEvent.click(submitBtn)
 
-  const error = await screen.findByText('error')
+  const toast = screen.getByRole('alert')
 
-  expect(error).toBeInTheDocument()
+  expect(toast).toHaveTextContent('error')
 })
 
 it('gives the focus to the email input if it fails to update the user email', async () => {
@@ -82,12 +81,7 @@ it('gives the focus to the email input if it fails to update the user email', as
     })
   )
 
-  render(
-    <ToastProvider>
-      <Toast />
-      <UpdateUserEmailForm />
-    </ToastProvider>
-  )
+  render(<UpdateUserEmailForm />)
 
   const emailInput = screen.getByRole('textbox')
 

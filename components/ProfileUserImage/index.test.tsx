@@ -8,21 +8,16 @@ import 'cross-fetch/polyfill'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import { IMAGE_INVALID, IMAGE_TOO_BIG } from 'constants/errors'
 import sendImage from 'functions/sendImage'
+import Toast from 'components/Toast'
 
 const mockSendImage = sendImage as jest.MockedFunction<typeof sendImage>
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
-const mockSetToast = jest.fn()
 const server = setupServer()
 
-jest
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ setToast: mockSetToast, toast: {} }),
-  }))
-  .mock('functions/sendImage', () => ({
-    __esModule: true,
-    default: jest.fn(),
-  }))
+jest.mock('functions/sendImage', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}))
 
 beforeEach(() => {
   mockGetCsrfToken.mockResolvedValue('token')
@@ -58,7 +53,12 @@ it('renders an alert if the user image is updated', async () => {
     })
   )
 
-  render(<ProfileUserImage image="img" />)
+  render(
+    <>
+      <Toast />
+      <ProfileUserImage image="img" />
+    </>
+  )
 
   const image = screen.getByRole('img')
 
@@ -69,10 +69,9 @@ it('renders an alert if the user image is updated', async () => {
 
   await userEvent.upload(input, file)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: 'The image has been updated! 🎉',
-  })
+  const toast = screen.getByRole('alert')
 
+  expect(toast).toHaveTextContent('The image has been updated! 🎉')
   expect(image).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/key')
 })
 
@@ -88,21 +87,30 @@ it('can update the user image by pressing Enter while focusing it', async () => 
 })
 
 it('renders an error if the given file is not an image', async () => {
-  render(<ProfileUserImage image="img" />)
+  render(
+    <>
+      <Toast />
+      <ProfileUserImage image="img" />
+    </>
+  )
 
   const input = screen.getByLabelText(/image/i)
   const textFile = new File(['text'], 'text.txt', { type: 'text/plain' })
 
   await userEvent.upload(input, textFile)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: IMAGE_INVALID,
-    error: true,
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent(IMAGE_INVALID)
 })
 
 it('renders an error if the given image is too big', async () => {
-  render(<ProfileUserImage image="img" />)
+  render(
+    <>
+      <Toast />
+      <ProfileUserImage image="img" />
+    </>
+  )
 
   const input = screen.getByLabelText(/image/i)
   const data = new Uint8Array(1_000_001).toString()
@@ -110,26 +118,29 @@ it('renders an error if the given image is too big', async () => {
 
   await userEvent.upload(input, image)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: IMAGE_TOO_BIG,
-    error: true,
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent(IMAGE_TOO_BIG)
 })
 
 it('renders an error if the server fails to send the image', async () => {
   mockSendImage.mockRejectedValue(new Error('could not send image'))
 
-  render(<ProfileUserImage image="img" />)
+  render(
+    <>
+      <Toast />
+      <ProfileUserImage image="img" />
+    </>
+  )
 
   const input = screen.getByLabelText(/image/i)
   const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
 
   await userEvent.upload(input, file)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: 'could not send image',
-    error: true,
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent('could not send image')
 })
 
 it('renders an error if the server fails to update the user image', async () => {
@@ -140,15 +151,19 @@ it('renders an error if the server fails to update the user image', async () => 
     })
   )
 
-  render(<ProfileUserImage image="img" />)
+  render(
+    <>
+      <Toast />
+      <ProfileUserImage image="img" />
+    </>
+  )
 
   const input = screen.getByLabelText(/image/i)
   const file = new File(['img'], 'img.jpeg', { type: 'image/jpeg' })
 
   await userEvent.upload(input, file)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: 'error',
-    error: true,
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })

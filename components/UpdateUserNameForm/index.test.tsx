@@ -4,7 +4,7 @@ import 'cross-fetch/polyfill'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-import ToastProvider from 'components/ToastProvider'
+import ProfileUserName from 'components/ProfileUserName'
 import Toast from 'components/Toast'
 import userEvent from '@testing-library/user-event'
 
@@ -29,10 +29,10 @@ it('renders a message if the user name has been updated', async () => {
   )
 
   render(
-    <ToastProvider>
+    <>
       <Toast />
       <UpdateUserNameForm />
-    </ToastProvider>
+    </>
   )
 
   const nameInput = screen.getByRole('textbox')
@@ -43,12 +43,12 @@ it('renders a message if the user name has been updated', async () => {
 
   await userEvent.click(submitBtn)
 
-  const message = screen.getByText('Your name has been updated! 🎉')
+  const toast = screen.getByRole('alert')
 
-  expect(message).toBeInTheDocument()
+  expect(toast).toHaveTextContent('Your name has been updated! 🎉')
 })
 
-it('dispatches an event if the user name has been updated', async () => {
+it('updates the username if it has been updated', async () => {
   server.use(
     rest.put('http://localhost/api/user', async (req, res, ctx) => {
       expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
@@ -59,15 +59,11 @@ it('dispatches an event if the user name has been updated', async () => {
   )
 
   render(
-    <ToastProvider>
-      <Toast />
+    <>
+      <ProfileUserName name="bob" />
       <UpdateUserNameForm />
-    </ToastProvider>
+    </>
   )
-
-  document.addEventListener('updateProfileUserName', (e) => {
-    expect(e.detail.name).toBe('john')
-  })
 
   const nameInput = screen.getByRole('textbox')
 
@@ -76,6 +72,10 @@ it('dispatches an event if the user name has been updated', async () => {
   const submitBtn = screen.getByRole('button')
 
   await userEvent.click(submitBtn)
+
+  const username = screen.getByRole('heading')
+
+  expect(username).toHaveTextContent('john')
 })
 
 it('renders an error if it fails to update the user name', async () => {
@@ -86,10 +86,10 @@ it('renders an error if it fails to update the user name', async () => {
   )
 
   render(
-    <ToastProvider>
+    <>
       <Toast />
       <UpdateUserNameForm />
-    </ToastProvider>
+    </>
   )
 
   const nameInput = screen.getByRole('textbox')
@@ -100,9 +100,9 @@ it('renders an error if it fails to update the user name', async () => {
 
   await userEvent.click(submitBtn)
 
-  const error = screen.getByText('error')
+  const toast = screen.getByRole('alert')
 
-  expect(error).toBeInTheDocument()
+  expect(toast).toHaveTextContent('error')
 })
 
 it('gives the focus to the name input if it fails to update the user name', async () => {
@@ -112,12 +112,7 @@ it('gives the focus to the name input if it fails to update the user name', asyn
     })
   )
 
-  render(
-    <ToastProvider>
-      <Toast />
-      <UpdateUserNameForm />
-    </ToastProvider>
-  )
+  render(<UpdateUserNameForm />)
 
   const nameInput = screen.getByRole('textbox')
 

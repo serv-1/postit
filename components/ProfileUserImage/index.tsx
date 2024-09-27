@@ -2,7 +2,7 @@
 
 import { type ChangeEvent, useRef, useState, type KeyboardEvent } from 'react'
 import Image from 'next/image'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import Plus from 'public/static/images/plus.svg'
 import isImage from 'functions/isImage'
 import ajax from 'libs/ajax'
@@ -21,7 +21,6 @@ export default function ProfileUserImage({ image }: ProfileUserImageProps) {
     image ? NEXT_PUBLIC_AWS_URL + '/' + image : NEXT_PUBLIC_DEFAULT_USER_IMAGE
   )
 
-  const { setToast } = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handleKeyDown(e: KeyboardEvent) {
@@ -40,11 +39,11 @@ export default function ProfileUserImage({ image }: ProfileUserImageProps) {
     }
 
     if (!isImage(file)) {
-      return setToast({ message: IMAGE_INVALID, error: true })
+      return showToast({ message: IMAGE_INVALID, error: true })
     }
 
     if (file.size > MAX_IMAGE_SIZE) {
-      return setToast({ message: IMAGE_TOO_BIG, error: true })
+      return showToast({ message: IMAGE_TOO_BIG, error: true })
     }
 
     try {
@@ -54,15 +53,15 @@ export default function ProfileUserImage({ image }: ProfileUserImageProps) {
       if (!response.ok) {
         const { message }: UserPutError = await response.json()
 
-        setToast({ message, error: true })
+        showToast({ message, error: true })
 
         return
       }
 
       setSource(NEXT_PUBLIC_AWS_URL + '/' + key)
-      setToast({ message: 'The image has been updated! 🎉' })
+      showToast({ message: 'The image has been updated! 🎉' })
     } catch (e) {
-      setToast({ message: (e as Error).message, error: true })
+      showToast({ message: (e as Error).message, error: true })
     }
   }
 

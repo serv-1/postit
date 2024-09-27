@@ -1,6 +1,6 @@
 import type { PostsIdDeleteError } from 'app/api/posts/[id]/types'
 import type { UserPutError } from 'app/api/user/types'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import X from 'public/static/images/x.svg'
 import type { Post } from 'types'
@@ -18,8 +18,6 @@ export default function ProfilePostDeleteButton({
   postName,
   setPosts,
 }: ProfilePostDeleteButtonProps) {
-  const { setToast } = useToast()
-
   async function deletePost() {
     let response: Response | null = null
 
@@ -33,12 +31,12 @@ export default function ProfilePostDeleteButton({
       const { message }: UserPutError | PostsIdDeleteError =
         await response.json()
 
-      setToast({ message, error: true })
+      showToast({ message, error: true })
 
       return
     }
 
-    setToast({
+    showToast({
       message:
         postType === 'favorite'
           ? 'The post has been removed from your favorite list.'

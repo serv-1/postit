@@ -5,7 +5,7 @@ import Heart from 'public/static/images/heart.svg'
 import HeartFill from 'public/static/images/heart-fill.svg'
 import ajax from 'libs/ajax'
 import type { UserPutError } from 'app/api/user/types'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 
 interface PostPageFavoriteButtonProps {
   postId: string
@@ -16,7 +16,6 @@ export default function PostPageFavoriteButton({
   postId,
   favPostIds,
 }: PostPageFavoriteButtonProps) {
-  const { setToast } = useToast()
   const [isFavPost, setIsFavPost] = useState(false)
 
   useEffect(() => {
@@ -39,12 +38,12 @@ export default function PostPageFavoriteButton({
         if (!response.ok) {
           const { message }: UserPutError = await response.json()
 
-          setToast({ message, error: true })
+          showToast({ message, error: true })
 
           return
         }
 
-        setToast({
+        showToast({
           message:
             'This post has been successfully ' +
             (isFavPost ? 'deleted from' : 'added to') +
@@ -54,7 +53,7 @@ export default function PostPageFavoriteButton({
         setIsFavPost(!isFavPost)
       }
     : () =>
-        setToast({
+        showToast({
           message: 'You need to be signed in to add it to your favorite list.',
         })
 

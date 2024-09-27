@@ -4,7 +4,7 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { type SubmitHandler, useForm } from 'react-hook-form'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
@@ -17,7 +17,6 @@ export default function SignInForm() {
     resolver: joiResolver(signInSchema),
   })
 
-  const { setToast } = useToast()
   const router = useRouter()
 
   const submitHandler: SubmitHandler<SignIn> = async (data) => {
@@ -27,7 +26,9 @@ export default function SignInForm() {
     })
 
     if (res && res.error) {
-      return setToast({ message: DATA_INVALID, error: true })
+      showToast({ message: DATA_INVALID, error: true })
+
+      return
     }
 
     router.push('/profile')

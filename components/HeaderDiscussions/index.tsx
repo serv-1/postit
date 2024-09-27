@@ -4,7 +4,7 @@ import type { Discussion, User } from 'types'
 import CommentDiscussion from 'public/static/images/comment-discussion.svg'
 import useEventListener from 'hooks/useEventListener'
 import usePusher from 'hooks/usePusher'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import fetchDiscussion from 'functions/fetchDiscussion'
 
 interface HeaderDiscussionsProps {
@@ -29,8 +29,6 @@ export default function HeaderDiscussions({
   const [openedDiscussionId, setOpenedDiscussionId] = useState<string | null>(
     null
   )
-
-  const { setToast } = useToast()
 
   const getUserDiscussions = useCallback(async () => {
     const promises: Promise<Discussion>[] = []
@@ -70,7 +68,7 @@ export default function HeaderDiscussions({
 
           setDiscussions([...userDiscussions, discussion])
         } catch (e) {
-          setToast({ message: (e as Error).message, error: true })
+          showToast({ message: (e as Error).message, error: true })
         }
       }
 
@@ -93,12 +91,12 @@ export default function HeaderDiscussions({
       try {
         setDiscussions(await getUserDiscussions())
       } catch (e) {
-        setToast({ message: (e as Error).message, error: true })
+        showToast({ message: (e as Error).message, error: true })
       }
     }
 
     initDiscussions()
-  }, [isModalHidden, discussions, getUserDiscussions, setToast])
+  }, [isModalHidden, discussions, getUserDiscussions])
 
   useEffect(() => {
     if (
@@ -115,12 +113,12 @@ export default function HeaderDiscussions({
 
         setDiscussions((d) => [...d!, discussion])
       } catch (e) {
-        setToast({ message: (e as Error).message, error: true })
+        showToast({ message: (e as Error).message, error: true })
       }
     }
 
     addDiscussion()
-  }, [openedDiscussionId, discussions, setToast])
+  }, [openedDiscussionId, discussions])
 
   return (
     <>

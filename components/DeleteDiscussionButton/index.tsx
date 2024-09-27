@@ -1,6 +1,6 @@
 import type { DiscussionsIdDeleteError } from 'app/api/discussions/[id]/types'
 import type { UserPutError } from 'app/api/user/types'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import X from 'public/static/images/x.svg'
 import type { User } from 'types'
@@ -14,8 +14,6 @@ export default function DeleteDiscussionButton({
   discussionId,
   interlocutorDiscussions,
 }: DeleteDiscussionButtonProps) {
-  const { setToast } = useToast()
-
   async function deleteDiscussion() {
     let response: Response | null = null
 
@@ -43,7 +41,7 @@ export default function DeleteDiscussionButton({
       const { message }: DiscussionsIdDeleteError | UserPutError =
         await response!.json()
 
-      setToast({ message, error: true })
+      showToast({ message, error: true })
 
       return
     }

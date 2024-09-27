@@ -6,7 +6,7 @@ import Form from 'components/Form'
 import Input from 'components/Input'
 import InputError from 'components/InputError'
 import updateUserName, { type UpdateUserName } from 'schemas/updateUserName'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import type { UserPutError } from 'app/api/user/types'
 
@@ -14,8 +14,6 @@ export default function UpdateUserNameForm() {
   const methods = useForm<UpdateUserName>({
     resolver: joiResolver(updateUserName),
   })
-
-  const { setToast } = useToast()
 
   const submitHandler: SubmitHandler<UpdateUserName> = async (data) => {
     const response = await ajax.put('/user', data, { csrf: true })
@@ -28,7 +26,7 @@ export default function UpdateUserNameForm() {
       return
     }
 
-    setToast({ message: 'Your name has been updated! 🎉' })
+    showToast({ message: 'Your name has been updated! 🎉' })
 
     document.dispatchEvent(
       new CustomEvent('updateProfileUserName', { detail: { name: data.name } })

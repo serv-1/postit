@@ -5,16 +5,12 @@ import { setupServer } from 'msw/node'
 import { rest } from 'msw'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import 'cross-fetch/polyfill'
+import Toast from 'components/Toast'
 
-const mockSetToast = jest.fn()
 const mockPush = jest.fn()
 const server = setupServer()
 
 jest
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ setToast: mockSetToast, toast: {} }),
-  }))
   .mock('next/navigation', () => ({
     useRouter: () => ({ push: mockPush }),
   }))
@@ -70,16 +66,19 @@ it('renders an error if the server fails to delete the post', async () => {
     })
   )
 
-  render(<DeletePostButton postId="0" />)
+  render(
+    <>
+      <DeletePostButton postId="0" />
+      <Toast />
+    </>
+  )
 
   const btn = screen.getByRole('button')
 
   await userEvent.click(btn)
 
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: 'error',
-    error: true,
-  })
+  const toast = screen.getByRole('alert')
 
+  expect(toast).toHaveTextContent('error')
   expect(mockPush).not.toHaveBeenCalled()
 })

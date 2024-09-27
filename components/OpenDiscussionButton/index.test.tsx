@@ -11,8 +11,8 @@ import { setupServer } from 'msw/node'
 import { rest } from 'msw'
 import 'cross-fetch/polyfill'
 import { useSession } from 'next-auth/react'
+import Toast from 'components/Toast'
 
-const mockSetToast = jest.fn()
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>
 const server = setupServer()
 
@@ -39,15 +39,10 @@ const interlocutor: User = {
   discussions: [{ _id: '0', id: '0', hidden: false, hasNewMessage: false }],
 }
 
-jest
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ toast: {}, setToast: mockSetToast }),
-  }))
-  .mock('next-auth/react', () => ({
-    getCsrfToken: async () => 'token',
-    useSession: jest.fn(),
-  }))
+jest.mock('next-auth/react', () => ({
+  getCsrfToken: async () => 'token',
+  useSession: jest.fn(),
+}))
 
 beforeEach(() => {
   mockUseSession.mockReturnValue({
@@ -226,22 +221,24 @@ it('renders an error if the server fails to update the last unseen message', asy
   }
 
   render(
-    <OpenDiscussionButton
-      onOpen={() => null}
-      postName="table"
-      interlocutor={null}
-      discussion={_discussion}
-      setDiscussion={setDiscussion}
-    />
+    <>
+      <OpenDiscussionButton
+        onOpen={() => null}
+        postName="table"
+        interlocutor={null}
+        discussion={_discussion}
+        setDiscussion={setDiscussion}
+      />
+      <Toast />
+    </>
   )
 
   const button = screen.getByRole('button')
 
   await userEvent.click(button)
 
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
   expect(setDiscussion).not.toHaveBeenCalled()
-  expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-    message: 'error',
-    error: true,
-  })
 })

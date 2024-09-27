@@ -9,7 +9,7 @@ import OpenDiscussionButton from 'components/OpenDiscussionButton'
 import type { UnArray, Discussion as IDiscussion, User } from 'types'
 import ajax from 'libs/ajax'
 import type { UsersIdGetError } from 'app/api/users/[id]/types'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import LoadingSpinner from 'components/LoadingSpinner'
 
 export interface DiscussionProps {
@@ -32,7 +32,6 @@ export default function Discussion({
   )
 
   const { data: session } = useSession() as { data: Session }
-  const { setToast } = useToast()
 
   function openModal() {
     setOpenedDiscussionId(discussion._id)
@@ -78,7 +77,7 @@ export default function Discussion({
         if (!response.ok) {
           const { message }: UsersIdGetError = await response.json()
 
-          setToast({ message, error: true })
+          showToast({ message, error: true })
         } else {
           setInterlocutor((await response.json()) as User)
         }
@@ -88,7 +87,7 @@ export default function Discussion({
     }
 
     getInterlocutor()
-  }, [discussion.sellerId, discussion.buyerId, session.id, setToast])
+  }, [discussion.sellerId, discussion.buyerId, session.id])
 
   return interlocutor !== undefined ? (
     <>

@@ -4,7 +4,7 @@ import ChevronRight from 'public/static/images/chevron-right.svg'
 import type { Discussion, User } from 'types'
 import { useSession } from 'next-auth/react'
 import type { Session } from 'next-auth'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import type { DiscussionsIdGetError } from 'app/api/discussions/[id]/types'
 
@@ -24,7 +24,6 @@ export default function OpenDiscussionButton({
   setDiscussion,
 }: OpenDiscussionButton) {
   const { data: session } = useSession() as { data: Session }
-  const { setToast } = useToast()
 
   async function openModal() {
     onOpen()
@@ -42,7 +41,7 @@ export default function OpenDiscussionButton({
         if (!response.ok) {
           const { message }: DiscussionsIdGetError = await response.json()
 
-          setToast({ message, error: true })
+          showToast({ message, error: true })
 
           return
         }

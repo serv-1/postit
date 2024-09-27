@@ -7,15 +7,10 @@ import 'cross-fetch/polyfill'
 import { act } from 'react-dom/test-utils'
 import usePusher from 'hooks/usePusher'
 
-jest
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ setToast: () => null, toast: {} }),
-  }))
-  .mock('hooks/usePusher', () => ({
-    __esModule: true,
-    default: jest.fn(),
-  }))
+jest.mock('hooks/usePusher', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}))
 
 const server = setupServer()
 const mockUseSession = jest.spyOn(require('next-auth/react'), 'useSession')

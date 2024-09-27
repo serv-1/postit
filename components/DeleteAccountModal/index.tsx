@@ -1,16 +1,15 @@
 'use client'
 
 import { signOut } from 'next-auth/react'
-import useToast from 'hooks/useToast'
 import Modal from 'components/Modal'
 import X from 'public/static/images/x.svg'
 import { useState } from 'react'
 import ajax from 'libs/ajax'
 import type { UserDeleteError } from 'app/api/user/types'
+import showToast from 'functions/showToast'
 
 export default function DeleteAccountModal() {
   const [isOpen, setIsOpen] = useState(false)
-  const { setToast } = useToast()
 
   async function deleteUser() {
     const response = await ajax.delete('/user', { csrf: true })
@@ -18,7 +17,7 @@ export default function DeleteAccountModal() {
     if (!response.ok) {
       const { message }: UserDeleteError = await response.json()
 
-      setToast({ message, error: true })
+      showToast({ message, error: true })
 
       return
     }

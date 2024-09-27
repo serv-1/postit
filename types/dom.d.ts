@@ -4,6 +4,7 @@ import type {
   OpenDiscussionEvent,
   DiscussionDeletedEvent,
   NewDiscussionEvent,
+  ShowToastEvent,
 } from './customEvent'
 
 declare global {
@@ -13,5 +14,6 @@ declare global {
     openDiscussion: OpenDiscussionEvent
     discussionDeleted: DiscussionDeletedEvent
     newDiscussion: NewDiscussionEvent
+    showToast: ShowToastEvent
   }
 }

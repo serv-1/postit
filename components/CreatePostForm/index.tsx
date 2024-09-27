@@ -10,7 +10,7 @@ import WizardPrevButton from 'components/WizardPrevButton'
 import WizardProvider from 'components/WizardProvider'
 import WizardStep from 'components/WizardStep'
 import sendImage from 'functions/sendImage'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -29,7 +29,6 @@ const options = CATEGORIES.map((category) => ({
 
 export default function CreatePostForm() {
   const [latLon, setLatLon] = useState<[number, number]>()
-  const { setToast } = useToast()
   const router = useRouter()
   const methods = useForm<CreatePost>({ resolver: joiResolver(createPost) })
 
@@ -39,7 +38,7 @@ export default function CreatePostForm() {
     try {
       images = await Promise.all(data.images.map(sendImage))
     } catch (e) {
-      setToast({ message: (e as Error).message, error: true })
+      showToast({ message: (e as Error).message, error: true })
 
       return
     }
@@ -60,7 +59,7 @@ export default function CreatePostForm() {
           { shouldFocus: true }
         )
       } else {
-        setToast({ message, error: true })
+        showToast({ message, error: true })
       }
 
       return

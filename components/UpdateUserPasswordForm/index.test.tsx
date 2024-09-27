@@ -4,7 +4,6 @@ import 'cross-fetch/polyfill'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-import ToastProvider from 'components/ToastProvider'
 import Toast from 'components/Toast'
 import userEvent from '@testing-library/user-event'
 
@@ -29,10 +28,10 @@ it('renders a message if the user password has been updated', async () => {
   )
 
   render(
-    <ToastProvider>
+    <>
       <Toast />
       <UpdateUserPasswordForm />
-    </ToastProvider>
+    </>
   )
 
   const passwordInput = screen.getByLabelText(/^password$/i)
@@ -43,9 +42,9 @@ it('renders a message if the user password has been updated', async () => {
 
   await userEvent.click(submitBtn)
 
-  const message = screen.getByText('Your password has been updated! 🎉')
+  const toast = screen.getByRole('alert')
 
-  expect(message).toBeInTheDocument()
+  expect(toast).toHaveTextContent('Your password has been updated! 🎉')
 })
 
 it('renders an error if it fails to update the user password', async () => {
@@ -56,10 +55,10 @@ it('renders an error if it fails to update the user password', async () => {
   )
 
   render(
-    <ToastProvider>
+    <>
       <Toast />
       <UpdateUserPasswordForm />
-    </ToastProvider>
+    </>
   )
 
   const passwordInput = screen.getByLabelText(/^password$/i)
@@ -70,9 +69,9 @@ it('renders an error if it fails to update the user password', async () => {
 
   await userEvent.click(submitBtn)
 
-  const error = screen.getByText('error')
+  const toast = screen.getByRole('alert')
 
-  expect(error).toBeInTheDocument()
+  expect(toast).toHaveTextContent('error')
 })
 
 it('gives the focus to the password input if it fails to update the user password', async () => {
@@ -82,12 +81,7 @@ it('gives the focus to the password input if it fails to update the user passwor
     })
   )
 
-  render(
-    <ToastProvider>
-      <Toast />
-      <UpdateUserPasswordForm />
-    </ToastProvider>
-  )
+  render(<UpdateUserPasswordForm />)
 
   const passwordInput = screen.getByLabelText(/^password$/i)
 

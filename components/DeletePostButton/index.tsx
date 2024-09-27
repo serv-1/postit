@@ -1,7 +1,7 @@
 'use client'
 
 import type { PostsIdDeleteError } from 'app/api/posts/[id]/types'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import { useRouter } from 'next/navigation'
 import X from 'public/static/images/x.svg'
@@ -15,7 +15,6 @@ export default function DeletePostButton({
   postId,
   isRound,
 }: DeletePostButtonProps) {
-  const { setToast } = useToast()
   const router = useRouter()
 
   async function deletePost() {
@@ -24,7 +23,7 @@ export default function DeletePostButton({
     if (!response.ok) {
       const { message }: PostsIdDeleteError = await response.json()
 
-      setToast({ message, error: true })
+      showToast({ message, error: true })
 
       return
     }

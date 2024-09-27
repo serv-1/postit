@@ -2,7 +2,6 @@ import Discussion from '.'
 import {
   render,
   screen,
-  waitFor,
   waitForElementToBeRemoved,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -13,20 +12,15 @@ import { setupServer } from 'msw/node'
 import { rest } from 'msw'
 import 'cross-fetch/polyfill'
 import usersIdHandlers from 'app/api/users/[id]/mock'
+import Toast from 'components/Toast'
 
 const mockUseSession = jest.spyOn(require('next-auth/react'), 'useSession')
 const mockUsePusher = usePusher as jest.MockedFunction<typeof usePusher>
-const mockSetToast = jest.fn()
 
-jest
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ toast: {}, setToast: mockSetToast }),
-  }))
-  .mock('hooks/usePusher', () => ({
-    __esModule: true,
-    default: jest.fn(),
-  }))
+jest.mock('hooks/usePusher', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}))
 
 const discussion: IDiscussion = {
   _id: '0',
@@ -425,20 +419,20 @@ it('renders an error if the server fails to fetch the interlocutor as the seller
   )
 
   render(
-    <Discussion
-      discussion={discussion}
-      signedInUser={signedInUser}
-      isModalOpen={false}
-      setOpenedDiscussionId={() => null}
-    />
+    <>
+      <Discussion
+        discussion={discussion}
+        signedInUser={signedInUser}
+        isModalOpen={false}
+        setOpenedDiscussionId={() => null}
+      />
+      <Toast />
+    </>
   )
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: 'error',
-      error: true,
-    })
-  })
+  const toast = await screen.findByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })
 
 it('fetches the interlocutor who is the buyer if the authenticated user is the seller', async () => {
@@ -472,20 +466,20 @@ it('renders an error if the server fails to fetch the interlocutor as the buyer'
   )
 
   render(
-    <Discussion
-      discussion={discussion}
-      signedInUser={signedInUser}
-      isModalOpen={false}
-      setOpenedDiscussionId={() => null}
-    />
+    <>
+      <Discussion
+        discussion={discussion}
+        signedInUser={signedInUser}
+        isModalOpen={false}
+        setOpenedDiscussionId={() => null}
+      />
+      <Toast />
+    </>
   )
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: 'error',
-      error: true,
-    })
-  })
+  const toast = await screen.findByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })
 
 it("doesn't fetch the interlocutor if he has deleted its account", async () => {

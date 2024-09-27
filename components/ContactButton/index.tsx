@@ -1,6 +1,6 @@
 'use client'
 
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import { useSession } from 'next-auth/react'
 import Chat from 'public/static/images/chat.svg'
 
@@ -9,12 +9,11 @@ interface ContactButtonProps {
 }
 
 export default function ContactButton({ onClick }: ContactButtonProps) {
-  const { setToast } = useToast()
   const { status } = useSession()
 
   async function handleClick() {
     if (status !== 'authenticated') {
-      setToast({
+      showToast({
         message: 'You need to be signed in to discuss with the seller.',
       })
 

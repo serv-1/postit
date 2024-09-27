@@ -7,7 +7,7 @@ import InputError from 'components/InputError'
 import updateUserPassword, {
   type UpdateUserPassword,
 } from 'schemas/updateUserPassword'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import type { UserPutError } from 'app/api/user/types'
 import PasswordInput from 'components/PasswordInput'
@@ -16,8 +16,6 @@ export default function UpdateUserPasswordForm() {
   const methods = useForm<UpdateUserPassword>({
     resolver: joiResolver(updateUserPassword),
   })
-
-  const { setToast } = useToast()
 
   const submitHandler: SubmitHandler<UpdateUserPassword> = async (data) => {
     const response = await ajax.put('/user', data, { csrf: true })
@@ -30,7 +28,7 @@ export default function UpdateUserPasswordForm() {
       return
     }
 
-    setToast({ message: 'Your password has been updated! 🎉' })
+    showToast({ message: 'Your password has been updated! 🎉' })
   }
 
   return (

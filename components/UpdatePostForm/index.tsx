@@ -13,7 +13,7 @@ import TextArea from 'components/TextArea'
 import { CATEGORIES } from 'constants/index'
 import addSpacesToNum from 'functions/addSpacesToNum'
 import sendImage from 'functions/sendImage'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import { useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
@@ -36,8 +36,6 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
     resolver: joiResolver(updatePost),
   })
 
-  const { setToast } = useToast()
-
   const submitHandler: SubmitHandler<UpdatePost> = async (data) => {
     let images: string[] | undefined = undefined
 
@@ -46,7 +44,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
         images = await Promise.all(data.images.map(sendImage))
       }
     } catch (e) {
-      setToast({ message: (e as Error).message, error: true })
+      showToast({ message: (e as Error).message, error: true })
 
       return
     }
@@ -67,13 +65,13 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
           { shouldFocus: true }
         )
       } else {
-        setToast({ message, error: true })
+        showToast({ message, error: true })
       }
 
       return
     }
 
-    setToast({ message: 'The post has been updated! 🎉' })
+    showToast({ message: 'The post has been updated! 🎉' })
   }
 
   return (

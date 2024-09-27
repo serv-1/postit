@@ -7,15 +7,10 @@ import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import 'cross-fetch/polyfill'
 import discussionsIdHandlers from 'app/api/discussions/[id]/mock'
 import { MESSAGE_REQUIRED } from 'constants/errors'
+import Toast from 'components/Toast'
 
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
-const mockSetToast = jest.fn()
 const server = setupServer()
-
-jest.mock('hooks/useToast', () => ({
-  __esModule: true,
-  default: () => ({ setToast: mockSetToast, toast: {} }),
-}))
 
 beforeEach(() => {
   mockGetCsrfToken.mockResolvedValue('token')
@@ -58,7 +53,12 @@ it('renders an alert if the server fails to create a discussion', async () => {
     })
   )
 
-  render(<ChatSendBar postId="0" postName="table" sellerId="1" />)
+  render(
+    <>
+      <ChatSendBar postId="0" postName="table" sellerId="1" />
+      <Toast />
+    </>
+  )
 
   const input = screen.getByRole('textbox')
 
@@ -68,12 +68,9 @@ it('renders an alert if the server fails to create a discussion', async () => {
 
   await userEvent.click(submitBtn)
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: 'error',
-      error: true,
-    })
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })
 
 it('updates the discussion with the new message', async () => {
@@ -105,7 +102,12 @@ it('renders an alert if the server fails to update the discussion', async () => 
     })
   )
 
-  render(<ChatSendBar discussionId="0" />)
+  render(
+    <>
+      <ChatSendBar discussionId="0" />
+      <Toast />
+    </>
+  )
 
   const input = screen.getByRole('textbox')
 
@@ -115,27 +117,26 @@ it('renders an alert if the server fails to update the discussion', async () => 
 
   await userEvent.click(submitBtn)
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: 'error',
-      error: true,
-    })
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent('error')
 })
 
 it('renders an alert if the given message is invalid', async () => {
-  render(<ChatSendBar discussionId="0" />)
+  render(
+    <>
+      <ChatSendBar discussionId="0" />
+      <Toast />
+    </>
+  )
 
   const submitBtn = screen.getByRole('button')
 
   await userEvent.click(submitBtn)
 
-  await waitFor(() => {
-    expect(mockSetToast).toHaveBeenNthCalledWith(1, {
-      message: MESSAGE_REQUIRED,
-      error: true,
-    })
-  })
+  const toast = screen.getByRole('alert')
+
+  expect(toast).toHaveTextContent(MESSAGE_REQUIRED)
 })
 
 it('resets the input value after that the form is successfully submitted', async () => {

@@ -8,7 +8,7 @@ import {
   POST_UPDATE_PAGE_REGEX,
   USER_PAGE_REGEX,
 } from 'constants/regex'
-import useToast from 'hooks/useToast'
+import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
@@ -25,7 +25,6 @@ export default function PageWrapper({
   const [signedInUser, setUser] = useState(signedInUserProp)
   const session = useSession()
   const path = usePathname()
-  const { setToast } = useToast()
 
   useEffect(() => {
     if (
@@ -42,7 +41,7 @@ export default function PageWrapper({
       if (!response.ok) {
         const { message }: UsersIdGetError = await response.json()
 
-        setToast({ message, error: true })
+        showToast({ message, error: true })
 
         return
       }
@@ -51,7 +50,7 @@ export default function PageWrapper({
     }
 
     initUser()
-  }, [signedInUser, session, setToast, path])
+  }, [signedInUser, session, path])
 
   const isBgLinear =
     path === '/authentication' ||
