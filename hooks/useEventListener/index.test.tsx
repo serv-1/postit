@@ -6,7 +6,7 @@ it('adds/removes an event listener on the window', () => {
   const mockListener = jest.fn()
 
   function Test({ listener }: { listener: () => void }) {
-    useEventListener(window, 'click', listener)
+    useEventListener('window', 'click', listener)
 
     return null
   }
@@ -28,7 +28,7 @@ it('adds/removes an event listener on the document', () => {
   const mockListener = jest.fn()
 
   function Test({ listener }: { listener: () => void }) {
-    useEventListener(document, 'click', listener)
+    useEventListener('document', 'click', listener)
 
     return null
   }
@@ -76,7 +76,7 @@ it('uses the given options', () => {
   const mockListener = jest.fn()
 
   function Test({ listener }: { listener: () => void }) {
-    useEventListener(document, 'click', listener, {
+    useEventListener('document', 'click', listener, {
       once: true,
     })
 

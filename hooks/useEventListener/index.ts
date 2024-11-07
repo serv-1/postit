@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
 
 export default function useEventListener<T extends keyof DocumentEventMap>(
-  target: Document,
+  target: 'document',
   type: T,
   listener: (this: Document, ev: DocumentEventMap[T]) => void,
   options?: boolean | AddEventListenerOptions
 ): void
 export default function useEventListener<T extends keyof WindowEventMap>(
-  target: Window,
+  target: 'window',
   type: T,
   listener: (this: Window, ev: WindowEventMap[T]) => void,
   options?: boolean | AddEventListenerOptions
@@ -23,7 +23,7 @@ export default function useEventListener<
   TW extends keyof WindowEventMap,
   TH extends keyof HTMLElementEventMap
 >(
-  target: Document | Window | React.RefObject<HTMLElement>,
+  target: 'document' | 'window' | React.RefObject<HTMLElement>,
   type: TD | TW | TH,
   listener: (
     this: Document | Window | HTMLElement,
@@ -36,16 +36,22 @@ export default function useEventListener<
   options?: boolean | AddEventListenerOptions
 ) {
   useEffect(() => {
-    const eventTarget = 'current' in target ? target.current : target
+    let eventTarget: Document | Window | HTMLElement | undefined = undefined
 
-    if (!eventTarget) {
+    if (target === 'document') {
+      eventTarget = document
+    } else if (target === 'window') {
+      eventTarget = window
+    } else if (target.current) {
+      eventTarget = target.current
+    } else {
       return
     }
 
     eventTarget.addEventListener(type, listener, options)
 
     return () => {
-      eventTarget.removeEventListener(type, listener, options)
+      eventTarget!.removeEventListener(type, listener, options)
     }
   }, [target, type, listener, options])
 }

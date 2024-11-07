@@ -1,16 +1,13 @@
-import { render } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import usePusher from '.'
+// @ts-ignore
+import { mockSubscribe } from 'libs/pusher/client'
 
-jest.mock('libs/pusher/client', () => ({
-  subscribe: jest.fn(),
-}))
+const mockBind = jest.fn()
+const mockUnbind = jest.fn()
+const eventHandler = jest.fn()
 
-const channel = {
-  bind: jest.fn(),
-  unbind: jest.fn(),
-}
-
-const mockSubscribe = jest.spyOn(require('libs/pusher/client'), 'subscribe')
+jest.mock('libs/pusher/client')
 
 function Test({ eventHandler }: { eventHandler: () => void }) {
   usePusher('testChannel', 'testEvent', eventHandler)
@@ -18,23 +15,27 @@ function Test({ eventHandler }: { eventHandler: () => void }) {
   return null
 }
 
-beforeEach(() => {
-  mockSubscribe.mockReturnValue(channel)
-})
-
-it('binds an event handler to a channel', () => {
-  const eventHandler = jest.fn()
+it('binds an event handler to a channel', async () => {
+  mockSubscribe.mockReturnValue({ bind: mockBind, unbind: mockUnbind })
 
   render(<Test eventHandler={eventHandler} />)
 
-  expect(mockSubscribe).toHaveBeenNthCalledWith(1, 'testChannel')
-  expect(channel.bind).toHaveBeenNthCalledWith(1, 'testEvent', eventHandler)
+  await waitFor(() => {
+    expect(mockSubscribe).toHaveBeenNthCalledWith(1, 'testChannel')
+    expect(mockBind).toHaveBeenNthCalledWith(1, 'testEvent', eventHandler)
+  })
 })
 
-it('unbinds the event handler from the channel when the component unmounts', () => {
-  const eventHandler = jest.fn()
+it('unbinds the event handler from the channel when the component unmounts', async () => {
+  mockSubscribe.mockReturnValue({ bind: mockBind, unbind: mockUnbind })
 
-  render(<Test eventHandler={eventHandler} />).unmount()
+  const { unmount } = render(<Test eventHandler={eventHandler} />)
 
-  expect(channel.unbind).toHaveBeenNthCalledWith(1, 'testEvent', eventHandler)
+  await waitFor(() => {
+    expect(mockBind).toHaveBeenCalled()
+  })
+
+  unmount()
+
+  expect(mockUnbind).toHaveBeenNthCalledWith(1, 'testEvent', eventHandler)
 })

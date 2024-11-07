@@ -57,3 +57,23 @@ it('renders an error if the server fails to sign the user in', async () => {
 
   expect(toast).toHaveTextContent(DATA_INVALID)
 })
+
+it("renders the forgot password link without the email if it's undefined", () => {
+  render(<SignInForm />)
+
+  const link = screen.getByRole('link')
+
+  expect(link.getAttribute('href')).not.toMatch('email')
+})
+
+it('renders the forgot password link with the email URI encoded', async () => {
+  render(<SignInForm />)
+
+  const emailInput = screen.getByRole('textbox')
+
+  await userEvent.type(emailInput, 'johndoe@test.com')
+
+  const linkUri = screen.getByRole('link').getAttribute('href')!
+
+  expect(linkUri).toMatch('email=johndoe%40test.com')
+})

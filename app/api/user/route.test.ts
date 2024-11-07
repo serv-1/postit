@@ -29,7 +29,7 @@ jest
   .mock('next-auth')
   .mock('functions/verifyCsrfTokens')
   .mock('functions/deleteImage')
-  .mock('functions/hashPassword')
+  .mock('functions/hash')
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
   }))
@@ -320,7 +320,7 @@ describe('PUT', () => {
 
     expect(response).toHaveProperty('status', 204)
     expect(response.body).toBeNull()
-    expect(updatedUser).toHaveProperty('password', 'hashed' + password)
+    expect(updatedUser).toHaveProperty('password', 'salt:' + password)
 
     await resetDb()
   })

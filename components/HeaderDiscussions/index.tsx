@@ -47,12 +47,12 @@ export default function HeaderDiscussions({
     setShowBadge(false)
   }
 
-  useEventListener(document, 'openDiscussion', async (e) => {
+  useEventListener('document', 'openDiscussion', async (e) => {
     openModal()
     setOpenedDiscussionId(e.detail)
   })
 
-  useEventListener(document, 'discussionDeleted', (e) => {
+  useEventListener('document', 'discussionDeleted', (e) => {
     setDiscussions((d) => d?.filter((d) => d._id !== e.detail))
   })
 

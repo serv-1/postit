@@ -10,7 +10,7 @@ import Discussion from 'models/Discussion'
 // @ts-expect-error
 import { mockDeleteImage } from 'functions/deleteImage'
 
-jest.unmock('nanoid').mock('functions/deleteImage')
+jest.unmock('nanoid').mock('functions/deleteImage').mock('libs/pusher/server')
 
 describe('Post model', () => {
   let johnId: Types.ObjectId

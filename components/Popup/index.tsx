@@ -73,7 +73,7 @@ export default function Popup({
     ],
   })
 
-  useEventListener(document, 'click', (e) => {
+  useEventListener('document', 'click', (e) => {
     if (containerRef.current!.contains(e.target as Node)) return
 
     setIsOpen(false)

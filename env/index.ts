@@ -13,21 +13,6 @@ switch (undefined) {
   case process.env.MONGO_URI:
     name = 'MONGO_URI'
     break
-  case process.env.EMAIL_HOST:
-    name = 'EMAIL_HOST'
-    break
-  case process.env.EMAIL_PORT:
-    name = 'EMAIL_PORT'
-    break
-  case process.env.EMAIL_FROM:
-    name = 'EMAIL_FROM'
-    break
-  case process.env.EMAIL_USER:
-    name = 'EMAIL_USER'
-    break
-  case process.env.EMAIL_PASS:
-    name = 'EMAIL_PASS'
-    break
   case process.env.NEXTAUTH_URL:
     name = 'NEXTAUTH_URL'
     break
@@ -55,6 +40,12 @@ switch (undefined) {
   case process.env.AWS_BUCKET_NAME:
     name = 'AWS_BUCKET_NAME'
     break
+	case process.env.MJ_API_PUBLIC_KEY:
+		name = 'MJ_API_PUBLIC_KEY'
+		break
+	case process.env.MJ_API_PRIVATE_KEY:
+		name = 'MJ_API_PRIVATE_KEY'
+		break
 }
 
 if (name) {
@@ -79,3 +70,5 @@ export const AWS_ACCESS_KEY_ID_ = process.env.AWS_ACCESS_KEY_ID_!
 export const AWS_SECRET_ACCESS_KEY_ = process.env.AWS_SECRET_ACCESS_KEY_!
 export const AWS_REGION_ = process.env.AWS_REGION_!
 export const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME!
+export const MJ_API_PUBLIC_KEY = process.env.MJ_API_PUBLIC_KEY!
+export const MJ_API_PRIVATE_KEY = process.env.MJ_API_PRIVATE_KEY!

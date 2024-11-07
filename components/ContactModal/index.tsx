@@ -53,7 +53,7 @@ export default function ContactModal({
     document.dispatchEvent(new CustomEvent('openDiscussion', { detail: id }))
   }
 
-  useEventListener(document, 'discussionDeleted', (e) => {
+  useEventListener('document', 'discussionDeleted', (e) => {
     if (discussionId === e.detail) {
       setIsDiscussionHidden(true)
     }

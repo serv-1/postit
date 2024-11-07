@@ -27,10 +27,6 @@ jest
   .mock('app/api/auth/[...nextauth]/route', () => ({
     nextAuthOptions: {},
   }))
-  .mock('hooks/useToast', () => ({
-    __esModule: true,
-    default: () => ({ toast: {}, setToast() {} }),
-  }))
   .mock('components/Map', () => ({
     __esModule: true,
     default: () => <div></div>,

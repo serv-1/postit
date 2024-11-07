@@ -10,7 +10,7 @@ export default function Toast() {
   const [error, setError] = useState<boolean>()
   const [timeoutId, setTimeoutId] = useState<number>()
 
-  useEventListener(document, 'showToast', (e) => {
+  useEventListener('document', 'showToast', (e) => {
     setMessage(e.detail.message)
     setError(e.detail.error)
     setTimeoutId(window.setTimeout(() => setMessage(null), 5000))

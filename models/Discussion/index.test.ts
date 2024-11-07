@@ -8,7 +8,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import User, { type UserDoc } from 'models/User'
 import Post, { type PostDoc } from 'models/Post'
 
-jest.unmock('nanoid')
+jest.unmock('nanoid').mock('libs/pusher/server')
 
 describe('Discussion model', () => {
   let mongoServer: MongoMemoryServer

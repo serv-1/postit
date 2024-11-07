@@ -1,21 +1,11 @@
 import NextAuth, { type AuthOptions } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
-import EmailProvider from 'next-auth/providers/email'
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import clientPromise from 'libs/mongodb'
 import User from 'models/User'
 import dbConnect from 'functions/dbConnect'
-import {
-  EMAIL_FROM,
-  EMAIL_HOST,
-  EMAIL_PASS,
-  EMAIL_PORT,
-  EMAIL_USER,
-  GOOGLE_ID,
-  GOOGLE_SECRET,
-  SECRET,
-} from 'env'
+import { GOOGLE_ID, GOOGLE_SECRET, SECRET } from 'env'
 import { nanoid } from 'nanoid'
 import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 
@@ -45,20 +35,8 @@ export const nextAuthOptions: AuthOptions = {
       clientId: GOOGLE_ID,
       clientSecret: GOOGLE_SECRET,
     }),
-    EmailProvider({
-      server: {
-        host: EMAIL_HOST,
-        port: Number(EMAIL_PORT),
-        auth: {
-          user: EMAIL_USER,
-          pass: EMAIL_PASS,
-        },
-      },
-      from: EMAIL_FROM,
-      maxAge: 3600,
-    }),
   ],
-  pages: { signIn: '/authentication', verifyRequest: '/mail-sent' },
+  pages: { signIn: '/authentication' },
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {

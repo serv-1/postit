@@ -17,7 +17,7 @@ jest
   .unmock('nanoid')
   .unmock('models/User')
   .mock('functions/deleteImage')
-  .mock('functions/hashPassword')
+  .mock('functions/hash')
   .mock('libs/pusher/server')
 
 describe('User model', () => {
@@ -74,7 +74,7 @@ describe('User model', () => {
     it('encrypts its password', async () => {
       const john = (await User.findById(johnId).lean().exec())!
 
-      expect(john.password).toBe('hashedpassword')
+      expect(john.password).toBe('salt:password')
     })
   })
 

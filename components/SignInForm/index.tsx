@@ -11,6 +11,7 @@ import InputError from 'components/InputError'
 import PasswordInput from 'components/PasswordInput'
 import signInSchema, { type SignIn } from 'schemas/signIn'
 import { DATA_INVALID } from 'constants/errors'
+import Link from 'next/link'
 
 export default function SignInForm() {
   const methods = useForm<SignIn>({
@@ -18,6 +19,7 @@ export default function SignInForm() {
   })
 
   const router = useRouter()
+  const email = methods.watch('email')
 
   const submitHandler: SubmitHandler<SignIn> = async (data) => {
     const res = await signIn<'credentials'>('credentials', {
@@ -52,8 +54,17 @@ export default function SignInForm() {
         />
         <InputError<SignIn> name="email" />
       </div>
-      <div className="mb-16">
+      <div className="mb-16 flex flex-row flex-wrap">
         <label htmlFor="signInPassword">Password</label>
+        <Link
+          href={
+            '/reset-password' +
+            (email ? '?email=' + encodeURIComponent(email) : '')
+          }
+          className="ml-auto"
+        >
+          Forgot password?
+        </Link>
         <PasswordInput<SignIn>
           id="signInPassword"
           className="bg-fuchsia-50 md:bg-fuchsia-100"

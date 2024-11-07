@@ -89,7 +89,7 @@ export default function Autocomplete<O extends Option>({
     [options, activeOptionPosition]
   )
 
-  useEventListener(document, 'click', (e) => {
+  useEventListener('document', 'click', (e) => {
     if (!containerRef.current?.contains(e.target as Node)) {
       setShowOptions(false)
     }

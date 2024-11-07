@@ -10,7 +10,7 @@ interface ProfileUserNameProps {
 export default function ProfileUserName(props: ProfileUserNameProps) {
   const [name, setName] = useState(props.name)
 
-  useEventListener(document, 'updateProfileUserName', (e) => {
+  useEventListener('document', 'updateProfileUserName', (e) => {
     setName(e.detail.name)
   })
 

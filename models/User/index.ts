@@ -5,7 +5,7 @@ import deleteImage from 'functions/deleteImage'
 import Account from 'models/Account'
 import Discussion from 'models/Discussion'
 import Post from 'models/Post'
-import hashPassword from 'functions/hashPassword'
+import hash from 'functions/hash'
 import pusher from 'libs/pusher/server'
 
 export interface UserDiscussionDoc {
@@ -50,7 +50,7 @@ const userSchema = new Schema<UserDoc>({
 })
 
 userSchema.pre('save', function (next) {
-  this.password = hashPassword(this.password!)
+  this.password = hash(this.password!)
   next()
 })
 

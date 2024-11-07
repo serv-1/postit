@@ -13,7 +13,7 @@ interface PublicProfileLinkProps {
 export default function PublicProfileLink(props: PublicProfileLinkProps) {
   const [name, setName] = useState(props.name)
 
-  useEventListener(document, 'updateProfileUserName', (e) => {
+  useEventListener('document', 'updateProfileUserName', (e) => {
     setName(e.detail.name)
   })
 

@@ -7,7 +7,7 @@ import createUser from 'schemas/createUser'
 import updateUser from 'schemas/server/updateUser'
 import dbConnect from 'functions/dbConnect'
 import deleteImage from 'functions/deleteImage'
-import hashPassword from 'functions/hashPassword'
+import hash from 'functions/hash'
 import verifyCsrfTokens from 'functions/verifyCsrfTokens'
 import validate from 'functions/validate'
 import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
@@ -101,7 +101,7 @@ export async function PUT(request: NextRequest) {
     } else if ('email' in data) {
       update.email = data.email
     } else if ('password' in data) {
-      update.password = hashPassword(data.password)
+      update.password = hash(data.password)
     } else {
       const user = (await User.findById(session.id).lean().exec())!
 

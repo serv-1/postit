@@ -38,7 +38,7 @@ export default function Discussion({
     setShowBadge(false)
   }
 
-  useEventListener(document, 'openDiscussion', (e) => {
+  useEventListener('document', 'openDiscussion', (e) => {
     if (e.detail === discussion._id) {
       openModal()
     }

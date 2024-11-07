@@ -1,4 +1,5 @@
 export const ID_INVALID = 'The id is invalid.'
+export const ID_REQUIRED = 'The id is required.'
 export const EMAIL_REQUIRED = 'The email is required.'
 export const EMAIL_INVALID = 'The email is invalid.'
 export const EMAIL_USED = 'The email is already used.'
@@ -62,3 +63,5 @@ export const DISCUSSION_ALREADY_EXISTS = 'You already have started a discussion 
 export const CSRF_TOKEN_INVALID = 'Something weird happened! Try to refresh the page or sign out and sign in again.'
 export const DEFAULT = "Something go wrong! Try your action again or just wait if it still doesn't work."
 export const CANNOT_SEND_MSG = 'Your interlocutor has deleted its account.'
+export const TOKEN_INVALID =  'The token is invalid.'
+export const TOKEN_REQUIRED = 'The token is required.'
