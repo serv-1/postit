@@ -54,8 +54,8 @@ export const nextAuthOptions: AuthOptions = {
             { _id: user.id },
             {
               image: '',
-              postsIds: [],
-              favPostsIds: [],
+              postIds: [],
+              favPostIds: [],
               discussions: [],
               hasUnseenMessages: false,
               channelName: token.channelName,

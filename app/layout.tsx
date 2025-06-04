@@ -10,7 +10,6 @@ import Toast from 'components/Toast'
 
 const quicksand = Quicksand({
   subsets: ['latin'],
-  display: 'swap',
 })
 
 export default async function RootLayout({
