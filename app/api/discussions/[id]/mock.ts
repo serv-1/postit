@@ -1,11 +1,10 @@
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import type { Discussion } from 'types'
 
 const handlers = [
-  rest.get('http://localhost/api/discussions/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json<Discussion>({
+  http.get('http://localhost/api/discussions/:id', () => {
+    return HttpResponse.json<Discussion>(
+      {
         _id: '0',
         postId: '0',
         postName: 'table',
@@ -22,14 +21,15 @@ const handlers = [
         buyerId: '0',
         sellerId: '1',
         hasNewMessage: false,
-      })
+      },
+      { status: 200 }
     )
   }),
-  rest.put('http://localhost/api/discussions/:id', (req, res, ctx) => {
-    return res(ctx.status(204))
+  http.put('http://localhost/api/discussions/:id', () => {
+    return new HttpResponse(null, { status: 204 })
   }),
-  rest.delete('http://localhost/api/discussions/:id', (req, res, ctx) => {
-    return res(ctx.status(204))
+  http.delete('http://localhost/api/discussions/:id', () => {
+    return new HttpResponse(null, { status: 204 })
   }),
 ]
 

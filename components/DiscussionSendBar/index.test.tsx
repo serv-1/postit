@@ -2,9 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ChatSendBar from '.'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
-import 'cross-fetch/polyfill'
 import discussionsIdHandlers from 'app/api/discussions/[id]/mock'
 import { MESSAGE_REQUIRED } from 'constants/errors'
 import Toast from 'components/Toast'
@@ -22,16 +21,16 @@ afterAll(() => server.close())
 
 it('creates a discussion if none exist when the first message is sent', async () => {
   server.use(
-    rest.post('http://localhost/api/discussion', async (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(await req.json()).toEqual({
+    http.post('http://localhost/api/discussion', async ({ request }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(await request.json()).toEqual({
         message: 'hi',
         postId: '0',
         postName: 'table',
         sellerId: '1',
       })
 
-      return res(ctx.status(201), ctx.json({ _id: '0' }))
+      return HttpResponse.json({ _id: '0' }, { status: 201 })
     })
   )
 
@@ -48,8 +47,8 @@ it('creates a discussion if none exist when the first message is sent', async ()
 
 it('renders an alert if the server fails to create a discussion', async () => {
   server.use(
-    rest.post('http://localhost/api/discussion', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.post('http://localhost/api/discussion', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 
@@ -75,13 +74,16 @@ it('renders an alert if the server fails to create a discussion', async () => {
 
 it('updates the discussion with the new message', async () => {
   server.use(
-    rest.put('http://localhost/api/discussions/:id', async (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(req.params.id).toBe('0')
-      expect(await req.json()).toEqual({ message: 'boo' })
+    http.put(
+      'http://localhost/api/discussions/:id',
+      async ({ request, params }) => {
+        expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+        expect(params.id).toBe('0')
+        expect(await request.json()).toEqual({ message: 'boo' })
 
-      return res(ctx.status(204))
-    })
+        return new HttpResponse(null, { status: 204 })
+      }
+    )
   )
 
   render(<ChatSendBar discussionId="0" />)
@@ -97,8 +99,8 @@ it('updates the discussion with the new message', async () => {
 
 it('renders an alert if the server fails to update the discussion', async () => {
   server.use(
-    rest.put('http://localhost/api/discussions/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.put('http://localhost/api/discussions/:id', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

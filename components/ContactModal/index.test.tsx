@@ -2,8 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ContactModal from '.'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
-import 'cross-fetch/polyfill'
+import { http, HttpResponse } from 'msw'
 import { act } from 'react-dom/test-utils'
 import usePusher from 'hooks/usePusher'
 
@@ -96,8 +95,8 @@ it("doesn't open the discussion if it is hidden", async () => {
 
 it('closes the modal and opens the discussion on message sent', async () => {
   server.use(
-    rest.post('http://localhost/api/discussion', (req, res, ctx) => {
-      return res(ctx.status(201), ctx.json({ _id: '0' }))
+    http.post('http://localhost/api/discussion', () => {
+      return HttpResponse.json({ _id: '0' }, { status: 201 })
     })
   )
 

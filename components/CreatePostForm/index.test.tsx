@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import CreatePostForm from '.'
-import 'cross-fetch/polyfill'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import userEvent from '@testing-library/user-event'
 import {
@@ -15,10 +14,9 @@ import Toast from 'components/Toast'
 const mockPush = jest.fn()
 const mockSendImage = sendImage as jest.MockedFunction<typeof sendImage>
 const server = setupServer(
-  rest.get(NEXT_PUBLIC_LOCATION_IQ_URL + '/autocomplete', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json([
+  http.get(NEXT_PUBLIC_LOCATION_IQ_URL + '/autocomplete', () => {
+    return HttpResponse.json(
+      [
         {
           place_id: '0',
           lat: 1,
@@ -26,7 +24,8 @@ const server = setupServer(
           display_address: 'France',
           display_place: 'Paris',
         },
-      ])
+      ],
+      { status: 200 }
     )
   })
 )
@@ -75,8 +74,8 @@ it('enables the next button of the first step if the address is defined', async 
 
 it('redirects to the page of the created post', async () => {
   server.use(
-    rest.post('http://localhost/api/post', async (req, res, ctx) => {
-      expect(await req.json()).toEqual({
+    http.post('http://localhost/api/post', async ({ request }) => {
+      expect(await request.json()).toEqual({
         name: 'table',
         price: 20,
         description: 'magnificent table',
@@ -86,9 +85,12 @@ it('redirects to the page of the created post', async () => {
         address: 'Paris, France',
       })
 
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toEqual('token')
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toEqual('token')
 
-      return res(ctx.status(201), ctx.set('location', '/posts/0/table'))
+      return new HttpResponse(null, {
+        status: 201,
+        headers: { Location: '/posts/0/table' },
+      })
     })
   )
 
@@ -178,8 +180,11 @@ it('renders an error if the server fails to send the images', async () => {
 
 it('renders an error if the server fails to validate the data', async () => {
   server.use(
-    rest.post('http://localhost/api/post', async (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ name: 'name', message: 'error' }))
+    http.post('http://localhost/api/post', async () => {
+      return HttpResponse.json(
+        { name: 'name', message: 'error' },
+        { status: 422 }
+      )
     })
   )
 
@@ -224,8 +229,8 @@ it('renders an error if the server fails to validate the data', async () => {
 
 it('renders an error if the server fails to create the post', async () => {
   server.use(
-    rest.post('http://localhost/api/post', async (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.post('http://localhost/api/post', async () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 
@@ -275,8 +280,11 @@ it('renders an error if the server fails to create the post', async () => {
 
 it('gives the focus to the input with the error', async () => {
   server.use(
-    rest.post('http://localhost/api/post', async (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ name: 'name', message: 'error' }))
+    http.post('http://localhost/api/post', async () => {
+      return HttpResponse.json(
+        { name: 'name', message: 'error' },
+        { status: 422 }
+      )
     })
   )
 

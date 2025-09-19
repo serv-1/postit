@@ -1,14 +1,17 @@
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 
 const handlers = [
-  rest.post('http://localhost/api/user', (req, res, ctx) => {
-    return res(ctx.status(201), ctx.set('Location', '/profile'))
+  http.post('http://localhost/api/user', () => {
+    return new HttpResponse(null, {
+      status: 201,
+      headers: { Location: '/profile' },
+    })
   }),
-  rest.put('http://localhost/api/user', (req, res, ctx) => {
-    return res(ctx.status(204))
+  http.put('http://localhost/api/user', () => {
+    return new HttpResponse(null, { status: 204 })
   }),
-  rest.delete('http://localhost/api/user', (req, res, ctx) => {
-    return res(ctx.status(204))
+  http.delete('http://localhost/api/user', () => {
+    return new HttpResponse(null, { status: 204 })
   }),
 ]
 

@@ -11,7 +11,6 @@ import { act } from 'react-dom/test-utils'
 import usePusher from 'hooks/usePusher'
 import fetchDiscussion from 'functions/fetchDiscussion'
 import { setupServer } from 'msw/node'
-import 'cross-fetch/polyfill'
 import usersIdHandlers from 'app/api/users/[id]/mock'
 import Toast from 'components/Toast'
 

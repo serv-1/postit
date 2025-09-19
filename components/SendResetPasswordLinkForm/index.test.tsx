@@ -1,7 +1,6 @@
 import SendResetPasswordLinkForm from '.'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
-import 'cross-fetch/polyfill'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -29,10 +28,10 @@ it("doesn't render the error message if there is no error", () => {
 
 it('renders the success message if the server successfully sends the email', async () => {
   server.use(
-    rest.post('http://localhost/api/send-email', async (req, res, ctx) => {
-      expect(await req.json()).toEqual({ email: 'testing@test.com' })
+    http.post('http://localhost/api/send-email', async ({ request }) => {
+      expect(await request.json()).toEqual({ email: 'testing@test.com' })
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -49,8 +48,8 @@ it('renders the success message if the server successfully sends the email', asy
 
 it('renders the error message if the server fails to send the email', async () => {
   server.use(
-    rest.post('http://localhost/api/send-email', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.post('http://localhost/api/send-email', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

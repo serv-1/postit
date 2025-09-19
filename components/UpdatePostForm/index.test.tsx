@@ -2,9 +2,8 @@ import { render, screen } from '@testing-library/react'
 import UpdatePostForm from '.'
 import Toast from 'components/Toast'
 import userEvent from '@testing-library/user-event'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
-import 'cross-fetch/polyfill'
 import {
   NEXT_PUBLIC_CSRF_HEADER_NAME,
   NEXT_PUBLIC_LOCATION_IQ_URL,
@@ -116,8 +115,11 @@ it("renders the actual post's address", async () => {
 
 it('renders an error if the server fails to validate the data', async () => {
   server.use(
-    rest.put('http://localhost/api/posts/:id', (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ name: 'name', message: 'error' }))
+    http.put('http://localhost/api/posts/:id', () => {
+      return HttpResponse.json(
+        { name: 'name', message: 'error' },
+        { status: 422 }
+      )
     })
   )
 
@@ -143,8 +145,8 @@ it('renders an error if the server fails to validate the data', async () => {
 
 it('renders an error if the server fails to update the post', async () => {
   server.use(
-    rest.put('http://localhost/api/posts/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.put('http://localhost/api/posts/:id', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 
@@ -166,12 +168,12 @@ it('renders an error if the server fails to update the post', async () => {
 
 it('renders a message if the post has been updated', async () => {
   server.use(
-    rest.put('http://localhost/api/posts/:id', async (req, res, ctx) => {
-      expect(req.params.id).toBe('0')
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(await req.json()).toEqual({ name: 'wooden table' })
+    http.put('http://localhost/api/posts/:id', async ({ request, params }) => {
+      expect(params.id).toBe('0')
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(await request.json()).toEqual({ name: 'wooden table' })
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -201,8 +203,8 @@ it('renders a message if the post has been updated', async () => {
 
 it('renders an error if the upload of an image fails', async () => {
   server.use(
-    rest.get('http://localhost/api/s3', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.get('http://localhost/api/s3', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 
@@ -235,10 +237,9 @@ it('renders an error if the upload of an image fails', async () => {
 
 it("sends the post's latitude and longitude with the post's address", async () => {
   server.use(
-    rest.get(NEXT_PUBLIC_LOCATION_IQ_URL + '/autocomplete', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json([
+    http.get(NEXT_PUBLIC_LOCATION_IQ_URL + '/autocomplete', () => {
+      return HttpResponse.json(
+        [
           {
             place_id: '0',
             lat: 1,
@@ -246,16 +247,17 @@ it("sends the post's latitude and longitude with the post's address", async () =
             display_address: 'France',
             display_place: 'Paris',
           },
-        ])
+        ],
+        { status: 200 }
       )
     }),
-    rest.put('http://localhost/api/posts/:id', async (req, res, ctx) => {
-      expect(await req.json()).toEqual({
+    http.put('http://localhost/api/posts/:id', async ({ request }) => {
+      expect(await request.json()).toEqual({
         address: 'Paris, France',
         latLon: [1, 2],
       })
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -277,8 +279,11 @@ it("sends the post's latitude and longitude with the post's address", async () =
 
 it('gives the focus to the input with an error', async () => {
   server.use(
-    rest.put('http://localhost/api/posts/:id', async (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ name: 'name', message: 'error' }))
+    http.put('http://localhost/api/posts/:id', async () => {
+      return HttpResponse.json(
+        { name: 'name', message: 'error' },
+        { status: 422 }
+      )
     })
   )
 

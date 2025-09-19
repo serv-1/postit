@@ -1,7 +1,6 @@
 import Page from './page'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
-import 'cross-fetch/polyfill'
+import { http, HttpResponse } from 'msw'
 import { render, screen } from '@testing-library/react'
 
 jest
@@ -34,10 +33,10 @@ it('renders "Search something" if no search request have been made', async () =>
 
 it('renders "No posts found" if no posts have been found', async () => {
   server.use(
-    rest.get('http://localhost/api/posts/search', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({ posts: [], totalPosts: 0, totalPages: 0 })
+    http.get('http://localhost/api/posts/search', () => {
+      return HttpResponse.json(
+        { posts: [], totalPosts: 0, totalPages: 0 },
+        { status: 200 }
       )
     })
   )
@@ -51,10 +50,10 @@ it('renders "No posts found" if no posts have been found', async () => {
 
 it('renders the post list if posts have been found', async () => {
   server.use(
-    rest.get('http://localhost/api/posts/search', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({ posts: [{ id: '0' }], totalPosts: 1, totalPages: 1 })
+    http.get('http://localhost/api/posts/search', () => {
+      return HttpResponse.json(
+        { posts: [{ id: '0' }], totalPosts: 1, totalPages: 1 },
+        { status: 200 }
       )
     })
   )
@@ -68,14 +67,14 @@ it('renders the post list if posts have been found', async () => {
 
 it('renders an "s" if more than 1 post has been found', async () => {
   server.use(
-    rest.get('http://localhost/api/posts/search', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
+    http.get('http://localhost/api/posts/search', () => {
+      return HttpResponse.json(
+        {
           posts: [{ id: '0' }, { id: '1' }],
           totalPosts: 2,
           totalPages: 1,
-        })
+        },
+        { status: 200 }
       )
     })
   )
@@ -89,10 +88,10 @@ it('renders an "s" if more than 1 post has been found', async () => {
 
 it('doesn\'t render an "s" if only 1 post has been found', async () => {
   server.use(
-    rest.get('http://localhost/api/posts/search', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({ posts: [{ id: '0' }], totalPosts: 1, totalPages: 1 })
+    http.get('http://localhost/api/posts/search', () => {
+      return HttpResponse.json(
+        { posts: [{ id: '0' }], totalPosts: 1, totalPages: 1 },
+        { status: 200 }
       )
     })
   )

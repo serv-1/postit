@@ -1,6 +1,5 @@
 import sendImage from '.'
-import 'cross-fetch/polyfill'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import { DEFAULT, IMAGE_TOO_BIG } from 'constants/errors'
@@ -17,10 +16,10 @@ afterAll(() => server.close())
 
 it('throws an error if it fails to generate a signed url', async () => {
   server.use(
-    rest.get('http://localhost/api/s3', (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+    http.get('http://localhost/api/s3', ({ request }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
 
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 
@@ -29,18 +28,18 @@ it('throws an error if it fails to generate a signed url', async () => {
 
 it('throws an error if it fails to upload the image', async () => {
   server.use(
-    rest.get('http://localhost/api/s3', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
+    http.get('http://localhost/api/s3', () => {
+      return HttpResponse.json(
+        {
           url: 'http://cloud-storage',
           key: 'key',
           fields: { a: 'a', b: 'b', c: 'c' },
-        })
+        },
+        { status: 200 }
       )
     }),
-    rest.post('http://cloud-storage', (req, res, ctx) => {
-      return res(ctx.status(500))
+    http.post('http://cloud-storage', () => {
+      return new HttpResponse(null, { status: 500 })
     })
   )
 
@@ -49,18 +48,18 @@ it('throws an error if it fails to upload the image', async () => {
 
 it('throws an error if the image is too big to be uploaded', async () => {
   server.use(
-    rest.get('http://localhost/api/s3', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
+    http.get('http://localhost/api/s3', () => {
+      return HttpResponse.json(
+        {
           url: 'http://cloud-storage',
           key: 'key',
           fields: { a: 'a', b: 'b', c: 'c' },
-        })
+        },
+        { status: 200 }
       )
     }),
-    rest.post('http://cloud-storage', (req, res, ctx) => {
-      return res(ctx.status(400))
+    http.post('http://cloud-storage', () => {
+      return new HttpResponse(null, { status: 400 })
     })
   )
 
@@ -71,18 +70,18 @@ it('throws an error if the image is too big to be uploaded', async () => {
 
 it('returns the key of the uploaded image', async () => {
   server.use(
-    rest.get('http://localhost/api/s3', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
+    http.get('http://localhost/api/s3', () => {
+      return HttpResponse.json(
+        {
           url: 'http://cloud-storage',
           key: 'key',
           fields: { a: 'a', b: 'b', c: 'c' },
-        })
+        },
+        { status: 200 }
       )
     }),
-    rest.post('http://cloud-storage', (req, res, ctx) => {
-      return res(ctx.status(201))
+    http.post('http://cloud-storage', () => {
+      return new HttpResponse(null, { status: 201 })
     })
   )
 

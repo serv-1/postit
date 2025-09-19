@@ -7,8 +7,7 @@ import PageWrapper from '.'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
-import 'cross-fetch/polyfill'
+import { http, HttpResponse } from 'msw'
 import type { UsersIdGetData } from 'app/api/users/[id]/types'
 import type { User } from 'types'
 import Toast from 'components/Toast'
@@ -141,10 +140,10 @@ it('fetches the authenticated user if it isn\'t on the "authentication" page', a
   })
 
   server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-      expect(req.params.id).toBe('0')
+    http.get('http://localhost/api/users/:id', ({ params }) => {
+      expect(params.id).toBe('0')
 
-      return res(ctx.status(200), ctx.json<UsersIdGetData>(signedInUser))
+      return HttpResponse.json<UsersIdGetData>(signedInUser, { status: 200 })
     })
   )
 
@@ -164,7 +163,7 @@ it('doesn\'t fetch the user if it is on the "authentication" page', () => {
   })
 
   server.use(
-    rest.get('http://localhost/api/users/:id', () => {
+    http.get('http://localhost/api/users/:id', () => {
       throw new Error('should not be called')
     })
   )
@@ -181,7 +180,7 @@ it("doesn't fetch the user if is unauthenticated", () => {
   })
 
   server.use(
-    rest.get('http://localhost/api/users/:id', () => {
+    http.get('http://localhost/api/users/:id', () => {
       throw new Error('should not be called')
     })
   )
@@ -198,9 +197,9 @@ it("doesn't fetch the authenticated user twice", async () => {
   })
 
   server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) =>
-      res(ctx.status(200), ctx.json<UsersIdGetData>(signedInUser))
-    )
+    http.get('http://localhost/api/users/:id', () => {
+      return HttpResponse.json<UsersIdGetData>(signedInUser, { status: 200 })
+    })
   )
 
   const { rerender } = render(<PageWrapper>page</PageWrapper>)
@@ -210,7 +209,7 @@ it("doesn't fetch the authenticated user twice", async () => {
   )
 
   server.use(
-    rest.get('http://localhost/api/users/:id', () => {
+    http.get('http://localhost/api/users/:id', () => {
       throw new Error('should not be called')
     })
   )
@@ -229,7 +228,7 @@ it("doesn't fetch the authenticated user if it is given as a prop", () => {
   })
 
   server.use(
-    rest.get('http://localhost/api/users/:id', () => {
+    http.get('http://localhost/api/users/:id', () => {
       throw new Error('should not be called')
     })
   )
@@ -246,8 +245,8 @@ it('renders an error if the server fails to fetch the user', async () => {
   })
 
   server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.get('http://localhost/api/users/:id', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

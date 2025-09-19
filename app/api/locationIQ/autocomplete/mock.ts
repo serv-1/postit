@@ -1,10 +1,9 @@
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 
 const handlers = [
-  rest.get('https://api.locationiq.com/v1/autocomplete', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json([
+  http.get('https://api.locationiq.com/v1/autocomplete', () => {
+    return HttpResponse.json(
+      [
         {
           lat: '59',
           lon: '10',
@@ -28,7 +27,8 @@ const handlers = [
             country: 'France',
           },
         },
-      ])
+      ],
+      { status: 200 }
     )
   }),
 ]

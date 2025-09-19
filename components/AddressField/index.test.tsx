@@ -2,8 +2,7 @@ import type { MapProps } from 'components/Map'
 import AddressField, { type AddressFieldProps } from '.'
 import type { Map } from 'leaflet'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
-import 'cross-fetch/polyfill'
+import { http, HttpResponse } from 'msw'
 import {
   NEXT_PUBLIC_LOCATION_IQ_TOKEN,
   NEXT_PUBLIC_LOCATION_IQ_URL,
@@ -65,15 +64,14 @@ afterAll(() => server.close())
 
 it('renders the options correctly', async () => {
   server.use(
-    rest.get(url, (req, res, ctx) => {
-      const { searchParams } = req.url
+    http.get(url, ({ request }) => {
+      const { searchParams } = new URL(request.url)
 
       expect(searchParams.get('key')).toBe(NEXT_PUBLIC_LOCATION_IQ_TOKEN)
       expect(searchParams.get('q')).toBe('a')
 
-      return res(
-        ctx.status(200),
-        ctx.json([
+      return HttpResponse.json(
+        [
           {
             place_id: '0',
             lat: 0,
@@ -95,7 +93,8 @@ it('renders the options correctly', async () => {
             display_address: 'France',
             display_place: 'Nice',
           },
-        ])
+        ],
+        { status: 200 }
       )
     })
   )
@@ -119,10 +118,9 @@ it('renders the options correctly', async () => {
 
 it('clears the options when the input is cleared', async () => {
   server.use(
-    rest.get(url, (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json([
+    http.get(url, () => {
+      return HttpResponse.json(
+        [
           {
             place_id: '0',
             lat: 0,
@@ -130,7 +128,8 @@ it('clears the options when the input is cleared', async () => {
             display_address: 'France',
             display_place: 'Paris',
           },
-        ])
+        ],
+        { status: 200 }
       )
     })
   )
@@ -150,10 +149,9 @@ it('clears the options when the input is cleared', async () => {
 
 it("doesn't fetch the locations if the input value is greater than 200 characters", async () => {
   server.use(
-    rest.get(url, (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json([
+    http.get(url, () => {
+      return HttpResponse.json(
+        [
           {
             place_id: '0',
             lat: 0,
@@ -161,7 +159,8 @@ it("doesn't fetch the locations if the input value is greater than 200 character
             display_address: 'France',
             display_place: 'Paris',
           },
-        ])
+        ],
+        { status: 200 }
       )
     })
   )
@@ -181,10 +180,9 @@ it("doesn't fetch the locations if the input value is greater than 200 character
 
 it('sets the address and the latitude/longitude when an option is clicked', async () => {
   server.use(
-    rest.get(url, (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json([
+    http.get(url, () => {
+      return HttpResponse.json(
+        [
           {
             place_id: '0',
             lat: 12.34,
@@ -192,7 +190,8 @@ it('sets the address and the latitude/longitude when an option is clicked', asyn
             display_address: 'France',
             display_place: 'Paris',
           },
-        ])
+        ],
+        { status: 200 }
       )
     })
   )
@@ -215,10 +214,9 @@ it('sets the address and the latitude/longitude when an option is clicked', asyn
 
 it("flies to the clicked option's latitude and longitude on the map", async () => {
   server.use(
-    rest.get(url, (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json([
+    http.get(url, () => {
+      return HttpResponse.json(
+        [
           {
             place_id: '0',
             lat: 12.34,
@@ -226,7 +224,8 @@ it("flies to the clicked option's latitude and longitude on the map", async () =
             display_address: 'France',
             display_place: 'Paris',
           },
-        ])
+        ],
+        { status: 200 }
       )
     })
   )
@@ -254,10 +253,9 @@ it('renders an error if the address is invalid', async () => {
   })
 
   server.use(
-    rest.get(url, (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json([
+    http.get(url, () => {
+      return HttpResponse.json(
+        [
           {
             place_id: '0',
             lat: 12.34,
@@ -265,7 +263,8 @@ it('renders an error if the address is invalid', async () => {
             display_address: 'France',
             display_place: 'Paris',
           },
-        ])
+        ],
+        { status: 200 }
       )
     })
   )

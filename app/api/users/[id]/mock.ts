@@ -1,10 +1,9 @@
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 
 const handlers = [
-  rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
+  http.get('http://localhost/api/users/:id', () => {
+    return HttpResponse.json(
+      {
         _id: '0',
         name: 'john',
         email: 'john@test.com',
@@ -13,7 +12,8 @@ const handlers = [
         favPostIds: [],
         discussions: [],
         channelName: 'channel name',
-      })
+      },
+      { status: 200 }
     )
   }),
 ]

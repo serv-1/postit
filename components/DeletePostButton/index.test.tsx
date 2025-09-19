@@ -2,9 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DeletePostButton from '.'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
-import 'cross-fetch/polyfill'
 import Toast from 'components/Toast'
 
 const mockPush = jest.fn()
@@ -42,11 +41,11 @@ it('renders a round button', () => {
 
 it('deletes the post and redirects the user to its profile page', async () => {
   server.use(
-    rest.delete('http://localhost/api/posts/:id', (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(req.params.id).toBe('0')
+    http.delete('http://localhost/api/posts/:id', ({ request, params }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(params.id).toBe('0')
 
-      return res(ctx.status(201))
+      return new HttpResponse(null, { status: 201 })
     })
   )
 
@@ -61,8 +60,8 @@ it('deletes the post and redirects the user to its profile page', async () => {
 
 it('renders an error if the server fails to delete the post', async () => {
   server.use(
-    rest.delete('http://localhost/api/posts/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.delete('http://localhost/api/posts/:id', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

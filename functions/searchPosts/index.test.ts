@@ -4,8 +4,7 @@
 
 import searchPosts from '.'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
-import 'cross-fetch/polyfill'
+import { http, HttpResponse } from 'msw'
 
 const server = setupServer()
 
@@ -18,10 +17,12 @@ it('returns the search result', async () => {
   const searchResult = { posts: [], totalPosts: 0, totalPages: 0 }
 
   server.use(
-    rest.get('http://localhost/api/posts/search', (req, res, ctx) => {
-      expect(req.url.searchParams.toString()).toBe(searchParams)
+    http.get('http://localhost/api/posts/search', ({ request }) => {
+      const url = new URL(request.url)
 
-      return res(ctx.status(200), ctx.json(searchResult))
+      expect(url.searchParams.toString()).toBe(searchParams)
+
+      return HttpResponse.json(searchResult, { status: 200 })
     })
   )
 
@@ -30,8 +31,8 @@ it('returns the search result', async () => {
 
 it('returns an error if the request fails', async () => {
   server.use(
-    rest.get('http://localhost/api/posts/search', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.get('http://localhost/api/posts/search', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

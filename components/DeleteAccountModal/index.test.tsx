@@ -1,10 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DeleteAccountModal from '.'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
-import 'cross-fetch/polyfill'
 import Toast from 'components/Toast'
 
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
@@ -21,10 +20,10 @@ afterAll(() => server.close())
 
 it('signs the user out and redirects him to the home page after being deleted', async () => {
   server.use(
-    rest.delete('http://localhost/api/user', (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+    http.delete('http://localhost/api/user', ({ request }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -71,8 +70,8 @@ it('opens/closes', async () => {
 
 it('renders an error if the server fails to delete the user', async () => {
   server.use(
-    rest.delete('http://localhost/api/user', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.delete('http://localhost/api/user', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

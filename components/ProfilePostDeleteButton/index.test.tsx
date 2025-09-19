@@ -2,8 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProfilePostDeleteButton from '.'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
-import 'cross-fetch/polyfill'
+import { http, HttpResponse } from 'msw'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import Toast from 'components/Toast'
 
@@ -34,11 +33,11 @@ it('renders correctly', () => {
 
 it('deletes the post on click', async () => {
   server.use(
-    rest.delete('http://localhost/api/posts/:id', (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(req.params.id).toBe('0')
+    http.delete('http://localhost/api/posts/:id', ({ request, params }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(params.id).toBe('0')
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -72,11 +71,11 @@ it('deletes the post on click', async () => {
 
 it('deletes the favorite post on click', async () => {
   server.use(
-    rest.put('http://localhost/api/user', async (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(await req.json()).toEqual({ favPostId: '0' })
+    http.put('http://localhost/api/user', async ({ request }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(await request.json()).toEqual({ favPostId: '0' })
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -112,8 +111,8 @@ it('deletes the favorite post on click', async () => {
 
 it('renders an error if the server fails to delete the post', async () => {
   server.use(
-    rest.delete('http://localhost/api/posts/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.delete('http://localhost/api/posts/:id', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 
@@ -144,8 +143,8 @@ it('renders an error if the server fails to delete the post', async () => {
 
 it('renders an error if the server fails to delete the favorite post', async () => {
   server.use(
-    rest.put('http://localhost/api/user', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.put('http://localhost/api/user', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

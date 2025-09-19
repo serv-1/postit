@@ -9,8 +9,7 @@ import { act } from 'react-dom/test-utils'
 import usePusher from 'hooks/usePusher'
 import type { Discussion as IDiscussion, User } from 'types'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
-import 'cross-fetch/polyfill'
+import { http, HttpResponse } from 'msw'
 import usersIdHandlers from 'app/api/users/[id]/mock'
 import Toast from 'components/Toast'
 
@@ -394,10 +393,10 @@ describe('when a new message is received in real time', () => {
 
 it('fetches the interlocutor who is the seller if the authenticated user is the buyer', async () => {
   server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-      expect(req.params.id).toBe('2')
+    http.get('http://localhost/api/users/:id', ({ params }) => {
+      expect(params.id).toBe('2')
 
-      return res(ctx.status(200), ctx.json({ ...signedInUser, _id: '2' }))
+      return HttpResponse.json({ ...signedInUser, _id: '2' }, { status: 200 })
     })
   )
 
@@ -413,8 +412,8 @@ it('fetches the interlocutor who is the seller if the authenticated user is the 
 
 it('renders an error if the server fails to fetch the interlocutor as the seller', async () => {
   server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.get('http://localhost/api/users/:id', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 
@@ -439,10 +438,10 @@ it('fetches the interlocutor who is the buyer if the authenticated user is the s
   mockUseSession.mockReturnValue({ data: { id: '2' } })
 
   server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-      expect(req.params.id).toBe('1')
+    http.get('http://localhost/api/users/:id', ({ params }) => {
+      expect(params.id).toBe('1')
 
-      return res(ctx.status(200), ctx.json({ ...signedInUser, _id: '1' }))
+      return HttpResponse.json({ ...signedInUser, _id: '1' }, { status: 200 })
     })
   )
 
@@ -460,8 +459,8 @@ it('renders an error if the server fails to fetch the interlocutor as the buyer'
   mockUseSession.mockReturnValue({ data: { id: '2' } })
 
   server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.get('http://localhost/api/users/:id', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 
@@ -499,10 +498,10 @@ it("doesn't fetch the interlocutor if he has deleted its account", async () => {
 
 it('removes the interlocutor if he has deleted his account', async () => {
   server.use(
-    rest.get('http://localhost/api/users/:id', (req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({ ...signedInUser, _id: '2', name: 'john' })
+    http.get('http://localhost/api/users/:id', () => {
+      return HttpResponse.json(
+        { ...signedInUser, _id: '2', name: 'john' },
+        { status: 200 }
       )
     })
   )

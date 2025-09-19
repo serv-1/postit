@@ -1,19 +1,19 @@
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 
 const presignedUrl = 'https://aws-presigned-url'
 const handlers = [
-  rest.get('http://localhost/api/s3', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
+  http.get('http://localhost/api/s3', () => {
+    return HttpResponse.json(
+      {
         url: presignedUrl,
         fields: { a: 'a', b: 'b', c: 'c' },
         key: 'key',
-      })
+      },
+      { status: 200 }
     )
   }),
-  rest.post(presignedUrl, (req, res, ctx) => {
-    return res(ctx.status(201))
+  http.post(presignedUrl, () => {
+    return new HttpResponse(null, { status: 201 })
   }),
 ]
 

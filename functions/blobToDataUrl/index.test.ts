@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import blobToDataUrl from '.'
 
 it('returns the given blob as a data url', async () => {

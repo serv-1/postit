@@ -1,10 +1,9 @@
 import PostPageFavoriteButton from '.'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
-import 'cross-fetch/polyfill'
 import Toast from 'components/Toast'
 
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
@@ -33,11 +32,11 @@ it('renders', () => {
 
 it("adds the post to the user's favorite list", async () => {
   server.use(
-    rest.put('http://localhost/api/user', async (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(await req.json()).toEqual({ favPostId: '0' })
+    http.put('http://localhost/api/user', async ({ request }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(await request.json()).toEqual({ favPostId: '0' })
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -72,11 +71,11 @@ it("adds the post to the user's favorite list", async () => {
 
 it("deletes the post from the user's favorite list", async () => {
   server.use(
-    rest.put('http://localhost/api/user', async (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(await req.json()).toEqual({ favPostId: '0' })
+    http.put('http://localhost/api/user', async ({ request }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(await request.json()).toEqual({ favPostId: '0' })
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -111,8 +110,8 @@ it("deletes the post from the user's favorite list", async () => {
 
 it("renders an error if the server fails to update the user's favorite post list", async () => {
   server.use(
-    rest.put('http://localhost/api/user', async (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.put('http://localhost/api/user', async () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

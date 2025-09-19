@@ -1,8 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import UpdateUserPasswordForm from '.'
-import 'cross-fetch/polyfill'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import Toast from 'components/Toast'
 import userEvent from '@testing-library/user-event'
@@ -19,11 +18,11 @@ afterAll(() => server.close())
 
 it('renders a message if the user password has been updated', async () => {
   server.use(
-    rest.put('http://localhost/api/user', async (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(await req.json()).toEqual({ password: '0123456789' })
+    http.put('http://localhost/api/user', async ({ request }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(await request.json()).toEqual({ password: '0123456789' })
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -49,8 +48,8 @@ it('renders a message if the user password has been updated', async () => {
 
 it('renders an error if it fails to update the user password', async () => {
   server.use(
-    rest.put('http://localhost/api/user', async (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.put('http://localhost/api/user', async () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 
@@ -76,8 +75,8 @@ it('renders an error if it fails to update the user password', async () => {
 
 it('gives the focus to the password input if it fails to update the user password', async () => {
   server.use(
-    rest.put('http://localhost/api/user', async (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.put('http://localhost/api/user', async () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

@@ -4,8 +4,7 @@
 
 import getPost from '.'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
-import 'cross-fetch/polyfill'
+import { http, HttpResponse } from 'msw'
 
 const server = setupServer()
 
@@ -17,10 +16,10 @@ it('returns the post', async () => {
   const post = { id: '0' }
 
   server.use(
-    rest.get('http://localhost/api/posts/:id', (req, res, ctx) => {
-      expect(req.params.id).toBe('0')
+    http.get('http://localhost/api/posts/:id', ({ params }) => {
+      expect(params.id).toBe('0')
 
-      return res(ctx.status(200), ctx.json(post))
+      return HttpResponse.json(post, { status: 200 })
     })
   )
 
@@ -29,8 +28,8 @@ it('returns the post', async () => {
 
 it('returns an error if the request fails', async () => {
   server.use(
-    rest.get('http://localhost/api/posts/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.get('http://localhost/api/posts/:id', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

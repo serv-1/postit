@@ -3,8 +3,7 @@ import ProfileUserImage from '.'
 import userEvent from '@testing-library/user-event'
 import { setupServer } from 'msw/node'
 import s3Handlers from 'app/api/s3/mock'
-import { rest } from 'msw'
-import 'cross-fetch/polyfill'
+import { http, HttpResponse } from 'msw'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import { IMAGE_INVALID, IMAGE_TOO_BIG } from 'constants/errors'
 import sendImage from 'functions/sendImage'
@@ -30,26 +29,26 @@ afterAll(() => server.close())
 
 it('renders an alert if the user image is updated', async () => {
   server.use(
-    rest.get('http://localhost/api/s3', (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+    http.get('http://localhost/api/s3', ({ request }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
 
-      return res(
-        ctx.status(200),
-        ctx.json({
+      return HttpResponse.json(
+        {
           url: 'http://aws-presigned-url',
           fields: { a: 'a', b: 'b', c: 'c' },
           key: 'key',
-        })
+        },
+        { status: 200 }
       )
     }),
-    rest.post('http://aws-presigned-url', (req, res, ctx) => {
-      return res(ctx.status(201))
+    http.post('http://aws-presigned-url', () => {
+      return new HttpResponse(null, { status: 201 })
     }),
-    rest.put('http://localhost/api/user', async (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(await req.json()).toEqual({ image: 'key' })
+    http.put('http://localhost/api/user', async ({ request }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(await request.json()).toEqual({ image: 'key' })
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -146,8 +145,8 @@ it('renders an error if the server fails to send the image', async () => {
 it('renders an error if the server fails to update the user image', async () => {
   server.use(
     ...s3Handlers,
-    rest.put('http://localhost/api/user', (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ message: 'error' }))
+    http.put('http://localhost/api/user', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 422 })
     })
   )
 

@@ -1,11 +1,11 @@
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 
 const handlers = [
-  rest.put('http://localhost/api/posts/:id', (req, res, ctx) => {
-    return res(ctx.status(204))
+  http.put('http://localhost/api/posts/:id', () => {
+    return new HttpResponse(null, { status: 204 })
   }),
-  rest.delete('http://localhost/api/posts/:id', (req, res, ctx) => {
-    return res(ctx.status(204))
+  http.delete('http://localhost/api/posts/:id', () => {
+    return new HttpResponse(null, { status: 204 })
   }),
 ]
 

@@ -11,7 +11,7 @@ const customJestConfig = {
   moduleDirectories: ['node_modules', '<rootDir>/'],
   moduleNameMapper: { '^.+\\.(svg)$': require.resolve('./__mocks__/svg.tsx') },
   modulePathIgnorePatterns: ['<rootDir>/.*/__mocks__'],
-  testEnvironment: 'jest-environment-jsdom',
+  testEnvironment: 'jest-fixed-jsdom',
   clearMocks: true,
   resetMocks: true,
 }

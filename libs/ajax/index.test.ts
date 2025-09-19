@@ -1,8 +1,8 @@
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import ajax from '.'
 import { setupServer } from 'msw/node'
-import 'cross-fetch/polyfill'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
+import headersToObject from 'functions/headersToObject'
 
 const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const server = setupServer()
@@ -14,10 +14,10 @@ afterAll(() => server.close())
 describe('post', () => {
   it('performs a POST request and returns its response', async () => {
     server.use(
-      rest.post('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({})
+      http.post('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({})
 
-        return res(ctx.status(201))
+        return new HttpResponse(null, { status: 201 })
       })
     )
 
@@ -28,14 +28,14 @@ describe('post', () => {
     const data = { name: 'john' }
 
     server.use(
-      rest.post('http://localhost/api/test', async (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({
+      http.post('http://localhost/api/test', async ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({
           'content-type': 'application/json',
         })
 
-        expect(await req.json()).toEqual(data)
+        expect(await request.json()).toEqual(data)
 
-        return res(ctx.status(201))
+        return new HttpResponse(null, { status: 201 })
       })
     )
 
@@ -46,12 +46,12 @@ describe('post', () => {
     mockGetCsrfToken.mockResolvedValue('token')
 
     server.use(
-      rest.post('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({
+      http.post('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({
           [NEXT_PUBLIC_CSRF_HEADER_NAME]: 'token',
         })
 
-        return res(ctx.status(201))
+        return new HttpResponse(null, { status: 201 })
       })
     )
 
@@ -62,10 +62,10 @@ describe('post', () => {
     mockGetCsrfToken.mockResolvedValue(undefined)
 
     server.use(
-      rest.post('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({})
+      http.post('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({})
 
-        return res(ctx.status(201))
+        return new HttpResponse(null, { status: 201 })
       })
     )
 
@@ -76,10 +76,10 @@ describe('post', () => {
 describe('put', () => {
   it('performs a PUT request and returns its response', async () => {
     server.use(
-      rest.put('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({})
+      http.put('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({})
 
-        return res(ctx.status(204))
+        return new HttpResponse(null, { status: 204 })
       })
     )
 
@@ -90,14 +90,14 @@ describe('put', () => {
     const data = { name: 'john' }
 
     server.use(
-      rest.put('http://localhost/api/test', async (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({
+      http.put('http://localhost/api/test', async ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({
           'content-type': 'application/json',
         })
 
-        expect(await req.json()).toEqual(data)
+        expect(await request.json()).toEqual(data)
 
-        return res(ctx.status(204))
+        return new HttpResponse(null, { status: 204 })
       })
     )
 
@@ -108,12 +108,12 @@ describe('put', () => {
     mockGetCsrfToken.mockResolvedValue('token')
 
     server.use(
-      rest.put('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({
+      http.put('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({
           [NEXT_PUBLIC_CSRF_HEADER_NAME]: 'token',
         })
 
-        return res(ctx.status(204))
+        return new HttpResponse(null, { status: 204 })
       })
     )
 
@@ -124,10 +124,10 @@ describe('put', () => {
     mockGetCsrfToken.mockResolvedValue(undefined)
 
     server.use(
-      rest.put('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({})
+      http.put('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({})
 
-        return res(ctx.status(204))
+        return new HttpResponse(null, { status: 204 })
       })
     )
 
@@ -138,10 +138,10 @@ describe('put', () => {
 describe('get', () => {
   it('performs a GET request and returns its response', async () => {
     server.use(
-      rest.get('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({})
+      http.get('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({})
 
-        return res(ctx.status(200))
+        return new HttpResponse(null, { status: 200 })
       })
     )
 
@@ -152,12 +152,12 @@ describe('get', () => {
     mockGetCsrfToken.mockResolvedValue('token')
 
     server.use(
-      rest.get('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({
+      http.get('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({
           [NEXT_PUBLIC_CSRF_HEADER_NAME]: 'token',
         })
 
-        return res(ctx.status(200))
+        return new HttpResponse(null, { status: 200 })
       })
     )
 
@@ -168,10 +168,10 @@ describe('get', () => {
     mockGetCsrfToken.mockResolvedValue(undefined)
 
     server.use(
-      rest.get('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({})
+      http.get('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({})
 
-        return res(ctx.status(200))
+        return new HttpResponse(null, { status: 200 })
       })
     )
 
@@ -182,10 +182,10 @@ describe('get', () => {
 describe('delete', () => {
   it('performs a DELETE request and returns its response', async () => {
     server.use(
-      rest.delete('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({})
+      http.delete('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({})
 
-        return res(ctx.status(204))
+        return new HttpResponse(null, { status: 204 })
       })
     )
 
@@ -196,12 +196,12 @@ describe('delete', () => {
     mockGetCsrfToken.mockResolvedValue('token')
 
     server.use(
-      rest.delete('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({
+      http.delete('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({
           [NEXT_PUBLIC_CSRF_HEADER_NAME]: 'token',
         })
 
-        return res(ctx.status(204))
+        return new HttpResponse(null, { status: 204 })
       })
     )
 
@@ -212,10 +212,10 @@ describe('delete', () => {
     mockGetCsrfToken.mockResolvedValue(undefined)
 
     server.use(
-      rest.delete('http://localhost/api/test', (req, res, ctx) => {
-        expect(req.headers.all()).toEqual({})
+      http.delete('http://localhost/api/test', ({ request }) => {
+        expect(headersToObject(request.headers)).toEqual({})
 
-        return res(ctx.status(204))
+        return new HttpResponse(null, { status: 204 })
       })
     )
 

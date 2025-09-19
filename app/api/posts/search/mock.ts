@@ -1,10 +1,9 @@
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 
 const handlers = [
-  rest.get('http://localhost/api/posts/search', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
+  http.get('http://localhost/api/posts/search', () => {
+    return HttpResponse.json(
+      {
         posts: [
           {
             id: '0',
@@ -23,7 +22,8 @@ const handlers = [
         ],
         totalPosts: 2,
         totalPages: 1,
-      })
+      },
+      { status: 200 }
     )
   }),
 ]

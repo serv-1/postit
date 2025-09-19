@@ -8,8 +8,7 @@ import {
 import userEvent from '@testing-library/user-event'
 import type { Discussion, User } from 'types'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
-import 'cross-fetch/polyfill'
+import { http, HttpResponse } from 'msw'
 import { useSession } from 'next-auth/react'
 import Toast from 'components/Toast'
 
@@ -166,11 +165,11 @@ it('calls the "onOpen" handler on click', async () => {
 
 it('updates the last unseen message of the discussion when the modal opens', async () => {
   server.use(
-    rest.put('http://localhost/api/discussions/:id', (req, res, ctx) => {
-      expect(req.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
-      expect(req.params.id).toBe('0')
+    http.put('http://localhost/api/discussions/:id', ({ request, params }) => {
+      expect(request.headers.get(NEXT_PUBLIC_CSRF_HEADER_NAME)).toBe('token')
+      expect(params.id).toBe('0')
 
-      return res(ctx.status(204))
+      return new HttpResponse(null, { status: 204 })
     })
   )
 
@@ -206,8 +205,8 @@ it('updates the last unseen message of the discussion when the modal opens', asy
 
 it('renders an error if the server fails to update the last unseen message', async () => {
   server.use(
-    rest.put('http://localhost/api/discussions/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.put('http://localhost/api/discussions/:id', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 

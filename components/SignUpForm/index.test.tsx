@@ -1,9 +1,8 @@
 import SignUpForm from '.'
 import { screen, render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
-import 'cross-fetch/polyfill'
 import Toast from 'components/Toast'
 
 const mockRouterPush = jest.fn()
@@ -24,17 +23,16 @@ afterAll(() => server.close())
 
 it('registers the user, signs him in and redirects him to its profile', async () => {
   server.use(
-    rest.post('http://localhost/api/user', async (req, res, ctx) => {
-      expect(await req.json()).toEqual({
+    http.post('http://localhost/api/user', async ({ request }) => {
+      expect(await request.json()).toEqual({
         name: 'john',
         email: 'john@test.com',
         password: 'my super password',
       })
 
-      return res(
-        ctx.status(201),
-        ctx.json({ id: '0' }),
-        ctx.set('Location', '/profile')
+      return HttpResponse.json(
+        { id: '0' },
+        { status: 201, headers: { Location: '/profile' } }
       )
     })
   )
@@ -64,17 +62,16 @@ it('registers the user, signs him in and redirects him to its profile', async ()
 
 it('renders an alert if the server fails to sign the user in', async () => {
   server.use(
-    rest.post('http://localhost/api/user', async (req, res, ctx) => {
-      expect(await req.json()).toEqual({
+    http.post('http://localhost/api/user', async ({ request }) => {
+      expect(await request.json()).toEqual({
         name: 'john',
         email: 'john@test.com',
         password: 'my super password',
       })
 
-      return res(
-        ctx.status(201),
-        ctx.json({ id: '0' }),
-        ctx.set('Location', '/profile')
+      return HttpResponse.json(
+        { id: '0' },
+        { status: 201, headers: { Location: '/profile' } }
       )
     })
   )
@@ -115,8 +112,8 @@ it('renders an alert if the server fails to sign the user in', async () => {
 
 it('renders an error if the server fails to register the user', async () => {
   server.use(
-    rest.post('http://localhost/api/user', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'error' }))
+    http.post('http://localhost/api/user', () => {
+      return HttpResponse.json({ message: 'error' }, { status: 500 })
     })
   )
 
@@ -150,8 +147,11 @@ it('renders an error if the server fails to register the user', async () => {
 
 it('renders an error if the server fails to validate the request data', async () => {
   server.use(
-    rest.post('http://localhost/api/user', (req, res, ctx) => {
-      return res(ctx.status(422), ctx.json({ name: 'name', message: 'error' }))
+    http.post('http://localhost/api/user', () => {
+      return HttpResponse.json(
+        { name: 'name', message: 'error' },
+        { status: 422 }
+      )
     })
   )
 
