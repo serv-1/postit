@@ -1,4 +1,4 @@
-import type { DeleteResult } from 'mongodb'
+import type { DeleteResult } from 'mongoose/node_modules/mongodb'
 import {
   models,
   model,
@@ -67,11 +67,7 @@ postSchema.pre<Query<DeleteResult, PostDoc>>('deleteOne', async function () {
 
   for (const discussionId of post.discussionIds) {
     promises.push(
-      Discussion.updateOne(
-        { _id: discussionId },
-        { $unset: { postId: '' } },
-        { omitUndefined: true }
-      )
+      Discussion.updateOne({ _id: discussionId }, { $unset: { postId: '' } })
         .lean()
         .exec()
     )

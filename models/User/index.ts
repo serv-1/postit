@@ -1,4 +1,4 @@
-import { type DeleteResult } from 'mongodb'
+import { type DeleteResult } from 'mongoose/node_modules/mongodb'
 import { models, model, Schema, type Model, Types, Query } from 'mongoose'
 import { nanoid } from 'nanoid'
 import deleteImage from 'functions/deleteImage'
@@ -106,8 +106,7 @@ userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
                 : message
             ),
           },
-        },
-        { omitUndefined: true }
+        }
       )
         .lean()
         .exec()

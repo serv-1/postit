@@ -1,5 +1,5 @@
 import User, { type UserDoc } from 'models/User'
-import { MongoServerError } from 'mongodb'
+import { MongoServerError } from 'mongoose/node_modules/mongodb'
 import type { UpdateQuery } from 'mongoose'
 import { getServerSession } from 'next-auth'
 import { type NextRequest, NextResponse } from 'next/server'

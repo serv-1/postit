@@ -1,4 +1,4 @@
-import type { DeleteResult } from 'mongodb'
+import type { DeleteResult } from 'mongoose/node_modules/mongodb'
 import { models, model, Schema, type Model, Types, Query } from 'mongoose'
 import { nanoid } from 'nanoid'
 import Post from 'models/Post'
