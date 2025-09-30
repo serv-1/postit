@@ -32,21 +32,22 @@ describe('Discussion model', () => {
 
   describe('when a discussion is saved', () => {
     it('defines the default values', async () => {
-      const { messages, channelName } = await new Discussion({
-        messages: [
-          { message: 'yo', userId: new mongoose.Types.ObjectId() },
-          { message: 'hi', userId: new mongoose.Types.ObjectId() },
-        ],
+      const d1 = await new Discussion({
+        messages: [{ message: 'yo', userId: new mongoose.Types.ObjectId() }],
         postName: 'table',
       }).save()
 
-      expect(messages[0]).toHaveProperty('seen', false)
-      expect(messages[1]).toHaveProperty('seen', false)
-      expect(messages[0].createdAt.toISOString()).not.toBe(
-        messages[1].createdAt.toISOString()
-      )
+      const d2 = await new Discussion({
+        messages: [{ message: 'yo', userId: new mongoose.Types.ObjectId() }],
+        postName: 'chair',
+      }).save()
 
-      expect(channelName).toContain('private-encrypted-')
+      expect(d1.messages[0]).toHaveProperty('seen', false)
+      expect(d1.messages[0].createdAt).toBeInstanceOf(Date)
+      expect(d1.channelName).toContain('private-encrypted-')
+      expect(d1.messages[0].createdAt.toISOString()).not.toBe(
+        d2.messages[0].createdAt.toISOString()
+      )
     })
 
     it('generates a different channel name for each user', async () => {
