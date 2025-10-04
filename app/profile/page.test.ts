@@ -15,7 +15,7 @@ jest
     __esModule: true,
     default: jest.fn(),
   }))
-  .mock('app/api/auth/[...nextauth]/route', () => ({
+  .mock('libs/nextAuth', () => ({
     nextAuthOptions: {},
   }))
   .mock('next/navigation', () => ({

@@ -24,7 +24,7 @@ jest
     default: jest.fn(),
   }))
   .mock('next-auth')
-  .mock('app/api/auth/[...nextauth]/route', () => ({
+  .mock('libs/nextAuth', () => ({
     nextAuthOptions: {},
   }))
   .mock('components/Map', () => ({

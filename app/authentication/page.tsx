@@ -1,4 +1,4 @@
-import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import { nextAuthOptions } from 'libs/nextAuth'
 import SignUpForm from 'components/SignUpForm'
 import SignInForm from 'components/SignInForm'
 import SignInProviderButton from 'components/SignInProviderButton'

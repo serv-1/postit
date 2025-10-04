@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import { nextAuthOptions } from 'libs/nextAuth'
 import verifyCsrfTokens from 'functions/verifyCsrfTokens'
 import { nanoid } from 'nanoid'
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post'

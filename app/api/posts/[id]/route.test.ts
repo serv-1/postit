@@ -31,7 +31,7 @@ jest
   .mock('functions/dbConnect')
   .mock('functions/deleteImage')
   .mock('functions/verifyCsrfTokens')
-  .mock('app/api/auth/[...nextauth]/route', () => ({
+  .mock('libs/nextAuth', () => ({
     nextAuthOptions: {},
   }))
 

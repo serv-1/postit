@@ -30,7 +30,7 @@ jest
   .mock('functions/verifyCsrfTokens')
   .mock('functions/deleteImage')
   .mock('functions/hash')
-  .mock('app/api/auth/[...nextauth]/route', () => ({
+  .mock('libs/nextAuth', () => ({
     nextAuthOptions: {},
   }))
 

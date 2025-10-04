@@ -1,4 +1,4 @@
-import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import { nextAuthOptions } from 'libs/nextAuth'
 import Discussion from 'models/Discussion'
 import User from 'models/User'
 import { isValidObjectId } from 'mongoose'

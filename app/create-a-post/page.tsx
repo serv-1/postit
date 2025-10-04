@@ -1,4 +1,4 @@
-import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import { nextAuthOptions } from 'libs/nextAuth'
 import CreatePostForm from 'components/CreatePostForm'
 import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'

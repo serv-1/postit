@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import { nextAuthOptions } from 'libs/nextAuth'
 import validate from 'functions/validate'
 import createDiscussion from 'schemas/server/createDiscussion'
 import verifyCsrfTokens from 'functions/verifyCsrfTokens'

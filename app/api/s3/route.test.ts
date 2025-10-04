@@ -20,7 +20,7 @@ jest
   .mock('next-auth')
   .mock('functions/verifyCsrfTokens')
   .mock('@aws-sdk/s3-presigned-post')
-  .mock('app/api/auth/[...nextauth]/route', () => ({
+  .mock('libs/nextAuth', () => ({
     nextAuthOptions: {},
   }))
   .mock('nanoid', () => ({

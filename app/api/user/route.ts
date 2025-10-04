@@ -10,7 +10,7 @@ import deleteImage from 'functions/deleteImage'
 import hash from 'functions/hash'
 import verifyCsrfTokens from 'functions/verifyCsrfTokens'
 import validate from 'functions/validate'
-import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import { nextAuthOptions } from 'libs/nextAuth'
 import {
   DATA_INVALID,
   EMAIL_USED,

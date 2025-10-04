@@ -16,7 +16,7 @@ jest
   .mock('next/navigation', () => ({
     redirect: jest.fn(),
   }))
-  .mock('app/api/auth/[...nextauth]/route', () => ({
+  .mock('libs/nextAuth', () => ({
     nextAuthOptions: {},
   }))
   .mock('next-auth')

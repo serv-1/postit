@@ -7,7 +7,7 @@ import Page from './page'
 import { mockGetServerSession } from '__mocks__/next-auth'
 
 jest
-  .mock('app/api/auth/[...nextauth]/route', () => ({
+  .mock('libs/nextAuth', () => ({
     nextAuthOptions: {},
   }))
   .mock('next/navigation', () => ({

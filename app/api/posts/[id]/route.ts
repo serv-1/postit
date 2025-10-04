@@ -1,4 +1,4 @@
-import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import { nextAuthOptions } from 'libs/nextAuth'
 import Post, { type PostDoc } from 'models/Post'
 import { type UpdateQuery, isValidObjectId } from 'mongoose'
 import { getServerSession } from 'next-auth'

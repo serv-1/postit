@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import getPost from 'functions/getPost'
 import { getServerSession } from 'next-auth'
-import { nextAuthOptions } from 'app/api/auth/[...nextauth]/route'
+import { nextAuthOptions } from 'libs/nextAuth'
 import { redirect } from 'next/navigation'
 import UpdatePostForm from 'components/UpdatePostForm'
 
