@@ -6,7 +6,8 @@ import getPost from 'functions/getPost'
 import Page, { generateMetadata } from './page'
 import { redirect } from 'next/navigation'
 import type { Post } from 'types'
-import { mockGetServerSession } from '__mocks__/next-auth'
+// @ts-expect-error
+import { mockAuth } from 'libs/auth'
 
 jest
   .mock('functions/getPost', () => ({
@@ -16,10 +17,7 @@ jest
   .mock('next/navigation', () => ({
     redirect: jest.fn(),
   }))
-  .mock('libs/nextAuth', () => ({
-    nextAuthOptions: {},
-  }))
-  .mock('next-auth')
+  .mock('libs/auth')
   .mock('components/UpdatePostForm', () => ({
     __esModule: true,
     default: () => <form></form>,
@@ -40,7 +38,7 @@ describe('generateMetadata()', () => {
 
 describe('<Page />', () => {
   it('redirects to /authentication if the user is unauthenticated', async () => {
-    mockGetServerSession.mockResolvedValue(null)
+    mockAuth.mockResolvedValue(null)
     mockRedirect.mockImplementation(() => {
       throw new Error()
     })

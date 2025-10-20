@@ -8,7 +8,7 @@ import { NextRequest } from 'next/server'
 // @ts-expect-error
 import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
-import { mockGetServerSession } from 'next-auth'
+import { mockAuth } from 'libs/auth'
 // @ts-expect-error
 import { mockVerifyCsrfTokens } from 'functions/verifyCsrfTokens'
 // @ts-expect-error
@@ -26,13 +26,10 @@ import User, { type UserDoc } from 'models/User'
 jest
   .mock('libs/pusher/server')
   .mock('functions/dbConnect')
-  .mock('next-auth')
+  .mock('libs/auth')
   .mock('functions/verifyCsrfTokens')
   .mock('functions/deleteImage')
   .mock('functions/hash')
-  .mock('libs/nextAuth', () => ({
-    nextAuthOptions: {},
-  }))
 
 let mongoServer: MongoMemoryServer
 let user: UserDoc
@@ -159,7 +156,7 @@ describe('POST', () => {
 
 describe('PUT', () => {
   test('401 - unauthenticated', async () => {
-    mockGetServerSession.mockResolvedValue(null)
+    mockAuth.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
     const response = await PUT(request)
@@ -170,7 +167,7 @@ describe('PUT', () => {
   })
 
   test('422 - invalid csrf token', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
@@ -182,7 +179,7 @@ describe('PUT', () => {
   })
 
   test('422 - invalid json', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
@@ -194,7 +191,7 @@ describe('PUT', () => {
   })
 
   test('422 - invalid request body', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
 
     const request = new NextRequest('http://-', {
@@ -210,7 +207,7 @@ describe('PUT', () => {
   })
 
   test('500 - database connection failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
 
@@ -229,7 +226,7 @@ describe('PUT', () => {
   test('204 - name updated', async () => {
     const session = { id: user._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -261,7 +258,7 @@ describe('PUT', () => {
 
     const session = { id: signedInUser._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -282,7 +279,7 @@ describe('PUT', () => {
   test('204 - email updated', async () => {
     const session = { id: user._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -305,7 +302,7 @@ describe('PUT', () => {
   test('204 - password updated', async () => {
     const session = { id: user._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -328,7 +325,7 @@ describe('PUT', () => {
   test('204 - image updated', async () => {
     const session = { id: user._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -353,7 +350,7 @@ describe('PUT', () => {
 
     const session = { id: user._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockDeleteImage.mockResolvedValue({})
@@ -375,7 +372,7 @@ describe('PUT', () => {
 
     const session = { id: user._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockDeleteImage.mockRejectedValue({})
@@ -397,7 +394,7 @@ describe('PUT', () => {
   test('204 - add favorite post', async () => {
     const session = { id: user._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -428,7 +425,7 @@ describe('PUT', () => {
       .lean()
       .exec()
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -458,7 +455,7 @@ describe('PUT', () => {
       .lean()
       .exec()
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
@@ -488,7 +485,7 @@ describe('PUT', () => {
       .lean()
       .exec()
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
@@ -510,7 +507,7 @@ describe('PUT', () => {
 
 describe('DELETE', () => {
   test('401 - unauthenticated', async () => {
-    mockGetServerSession.mockResolvedValue(null)
+    mockAuth.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'DELETE' })
     const response = await DELETE(request)
@@ -521,7 +518,7 @@ describe('DELETE', () => {
   })
 
   test('422 - invalid csrf token', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
     const request = new NextRequest('http://-', { method: 'DELETE' })
@@ -533,7 +530,7 @@ describe('DELETE', () => {
   })
 
   test('500 - database connection failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
 
@@ -548,7 +545,7 @@ describe('DELETE', () => {
   test('204 - user deletion succeeded', async () => {
     const session = { id: user._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 

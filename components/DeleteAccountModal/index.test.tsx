@@ -5,9 +5,11 @@ import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import Toast from 'components/Toast'
+// @ts-expect-error
+import { mockSignOut, mockGetCsrfToken } from 'next-auth/react'
 
-const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
-const mockSignOut = jest.spyOn(require('next-auth/react'), 'signOut')
+jest.mock('next-auth/react')
+
 const server = setupServer()
 
 beforeEach(() => {
@@ -38,7 +40,7 @@ it('signs the user out and redirects him to the home page after being deleted', 
   await userEvent.click(deleteBtn)
 
   await waitFor(() => {
-    expect(mockSignOut).toHaveBeenNthCalledWith(1, { callbackUrl: '/' })
+    expect(mockSignOut).toHaveBeenNthCalledWith(1, { redirectTo: '/' })
   })
 })
 

@@ -1,7 +1,6 @@
-import { nextAuthOptions } from 'libs/nextAuth'
+import { auth } from 'libs/auth'
 import Post, { type PostDoc } from 'models/Post'
 import { type UpdateQuery, isValidObjectId } from 'mongoose'
-import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import updatePost from 'schemas/server/updatePost'
 import dbConnect from 'functions/dbConnect'
@@ -56,7 +55,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return NextResponse.json({ message: PARAMS_INVALID }, { status: 422 })
   }
 
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
 
   if (!session) {
     return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
@@ -149,7 +148,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     return NextResponse.json({ message: PARAMS_INVALID }, { status: 422 })
   }
 
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
 
   if (!session) {
     return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })

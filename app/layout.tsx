@@ -1,8 +1,7 @@
 import './global.css'
 import 'leaflet/dist/leaflet.css'
 import { Quicksand } from 'next/font/google'
-import { getServerSession } from 'next-auth'
-import { nextAuthOptions } from 'libs/nextAuth'
+import { auth } from 'libs/auth'
 import Providers from 'components/Providers'
 import getUser from 'functions/getUser'
 import PageWrapper from 'components/PageWrapper'
@@ -17,7 +16,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
   const signedInUser = session ? await getUser(session.id) : undefined
 
   return (

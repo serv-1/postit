@@ -8,7 +8,7 @@ import mongoose from 'mongoose'
 // @ts-expect-error
 import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
-import { mockGetServerSession } from 'next-auth'
+import { mockAuth } from 'libs/auth'
 // @ts-expect-error
 import { mockPusherTrigger } from 'libs/pusher/server'
 // @ts-expect-error
@@ -28,13 +28,10 @@ import {
 import Post from 'models/Post'
 
 jest
-  .mock('next-auth')
+  .mock('libs/auth')
   .mock('functions/dbConnect')
   .mock('libs/pusher/server')
   .mock('functions/verifyCsrfTokens')
-  .mock('libs/nextAuth', () => ({
-    nextAuthOptions: {},
-  }))
 
 let mongoServer: MongoMemoryServer
 
@@ -51,7 +48,7 @@ afterAll(async () => {
 
 describe('POST', () => {
   test('401 - unauthorized', async () => {
-    mockGetServerSession.mockResolvedValue(null)
+    mockAuth.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'POST' })
     const response = await POST(request)
@@ -62,7 +59,7 @@ describe('POST', () => {
   })
 
   test('422 - invalid json', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
 
     const request = new NextRequest('http://-', { method: 'POST' })
     const response = await POST(request)
@@ -73,7 +70,7 @@ describe('POST', () => {
   })
 
   test('422 - invalid request body', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
 
     const request = new NextRequest('http://-', {
       method: 'POST',
@@ -88,7 +85,7 @@ describe('POST', () => {
   })
 
   test('422 - invalid csrf token', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
     const request = new NextRequest('http://-', {
@@ -111,7 +108,7 @@ describe('POST', () => {
   test("422 - the authenticated user can't be the seller", async () => {
     const session = { id: new mongoose.Types.ObjectId().toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
 
     const request = new NextRequest('http://-', {
@@ -132,7 +129,7 @@ describe('POST', () => {
   })
 
   test('500 - database connection failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
 
@@ -166,7 +163,7 @@ describe('POST', () => {
       postId,
     }).save()
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -192,7 +189,7 @@ describe('POST', () => {
   test('404 - seller not found', async () => {
     const session = { id: new mongoose.Types.ObjectId().toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -225,7 +222,7 @@ describe('POST', () => {
 
     const session = { id: new mongoose.Types.ObjectId().toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockPusherTrigger.mockRejectedValue({})
@@ -273,7 +270,7 @@ describe('POST', () => {
 
     const session = { id: new mongoose.Types.ObjectId().toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockPusherTrigger.mockResolvedValue({})

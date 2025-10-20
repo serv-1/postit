@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import getPost from 'functions/getPost'
 import getPosts from 'functions/getPosts'
 import getUser from 'functions/getUser'
-import { nextAuthOptions } from 'libs/nextAuth'
-import { getServerSession } from 'next-auth'
+import { auth } from 'libs/auth'
 import type { User } from 'types'
 import Image from 'next/image'
 import { NEXT_PUBLIC_AWS_URL } from 'env/public'
@@ -36,7 +35,7 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: { params: Params }) {
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
   const post = await getPost(params.id)
   const seller = await getUser(post.userId)
   const sellerPosts = await getPosts(

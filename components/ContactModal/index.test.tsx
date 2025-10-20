@@ -5,15 +5,17 @@ import { setupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
 import { act } from 'react-dom/test-utils'
 import usePusher from 'hooks/usePusher'
+// @ts-expect-error
+import { mockUseSession, mockGetCsrfToken } from 'next-auth/react'
 
-jest.mock('hooks/usePusher', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}))
+jest
+  .mock('hooks/usePusher', () => ({
+    __esModule: true,
+    default: jest.fn(),
+  }))
+  .mock('next-auth/react')
 
 const server = setupServer()
-const mockUseSession = jest.spyOn(require('next-auth/react'), 'useSession')
-const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const mockUsePusher = usePusher as jest.MockedFunction<typeof usePusher>
 
 beforeEach(() => {

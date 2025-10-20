@@ -4,14 +4,17 @@ import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import Toast from 'components/Toast'
+// @ts-expect-error
+import { mockSignIn } from 'next-auth/react'
 
 const mockRouterPush = jest.fn()
-const mockSignIn = jest.spyOn(require('next-auth/react'), 'signIn')
 const server = setupServer()
 
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: mockRouterPush }),
-}))
+jest
+  .mock('next/navigation', () => ({
+    useRouter: () => ({ push: mockRouterPush }),
+  }))
+  .mock('next-auth/react')
 
 beforeEach(() => {
   mockSignIn.mockResolvedValue({ error: '' })

@@ -2,8 +2,10 @@ import ContactButton from '.'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Toast from 'components/Toast'
+// @ts-expect-error
+import { mockUseSession } from 'next-auth/react'
 
-const mockUseSession = jest.spyOn(require('next-auth/react'), 'useSession')
+jest.mock('next-auth/react')
 
 it('renders a message on click if the user is unauthenticated', async () => {
   mockUseSession.mockReturnValue({ status: 'unauthenticated' })

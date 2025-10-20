@@ -1,7 +1,7 @@
 import User, { type UserDoc } from 'models/User'
 import { MongoServerError } from 'mongoose/node_modules/mongodb'
 import type { UpdateQuery } from 'mongoose'
-import { getServerSession } from 'next-auth'
+import { auth } from 'libs/auth'
 import { type NextRequest, NextResponse } from 'next/server'
 import createUser from 'schemas/createUser'
 import updateUser from 'schemas/server/updateUser'
@@ -10,7 +10,6 @@ import deleteImage from 'functions/deleteImage'
 import hash from 'functions/hash'
 import verifyCsrfTokens from 'functions/verifyCsrfTokens'
 import validate from 'functions/validate'
-import { nextAuthOptions } from 'libs/nextAuth'
 import {
   DATA_INVALID,
   EMAIL_USED,
@@ -65,7 +64,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: NextRequest) {
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
 
   if (!session) {
     return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })
@@ -158,7 +157,7 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
 
   if (!session) {
     return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })

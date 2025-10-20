@@ -4,21 +4,17 @@
 
 import { redirect } from 'next/navigation'
 import Page from './page'
-import { mockGetServerSession } from '__mocks__/next-auth'
+// @ts-expect-error
+import { mockAuth } from 'libs/auth'
 
-jest
-  .mock('libs/nextAuth', () => ({
-    nextAuthOptions: {},
-  }))
-  .mock('next/navigation', () => ({
-    redirect: jest.fn(),
-  }))
-  .mock('next-auth')
+jest.mock('libs/auth').mock('next/navigation', () => ({
+  redirect: jest.fn(),
+}))
 
 const mockRedirect = redirect as jest.MockedFunction<typeof redirect>
 
 it('redirects to /profile if the user is already authenticated', async () => {
-  mockGetServerSession.mockResolvedValue({})
+  mockAuth.mockResolvedValue({})
 
   await Page()
 

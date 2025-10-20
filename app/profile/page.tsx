@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import getUser from 'functions/getUser'
 import getPosts from 'functions/getPosts'
-import { nextAuthOptions } from 'libs/nextAuth'
-import { getServerSession } from 'next-auth'
+import { auth } from 'libs/auth'
 import ProfileUserImage from 'components/ProfileUserImage'
 import TabsProvider from 'components/TabsProvider'
 import TabList from 'components/TabList'
@@ -24,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Page() {
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
 
   if (!session) {
     redirect('/authentication')

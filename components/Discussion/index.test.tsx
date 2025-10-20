@@ -12,14 +12,17 @@ import { setupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
 import usersIdHandlers from 'app/api/users/[id]/mock'
 import Toast from 'components/Toast'
+// @ts-expect-error
+import { mockUseSession } from 'next-auth/react'
 
-const mockUseSession = jest.spyOn(require('next-auth/react'), 'useSession')
 const mockUsePusher = usePusher as jest.MockedFunction<typeof usePusher>
 
-jest.mock('hooks/usePusher', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}))
+jest
+  .mock('hooks/usePusher', () => ({
+    __esModule: true,
+    default: jest.fn(),
+  }))
+  .mock('next-auth/react')
 
 const discussion: IDiscussion = {
   _id: '0',

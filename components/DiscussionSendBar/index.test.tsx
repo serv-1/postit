@@ -7,8 +7,9 @@ import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import discussionsIdHandlers from 'app/api/discussions/[id]/mock'
 import { MESSAGE_REQUIRED } from 'constants/errors'
 import Toast from 'components/Toast'
+// @ts-expect-error
+import { mockGetCsrfToken } from 'next-auth/react'
 
-const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const server = setupServer()
 
 beforeEach(() => {

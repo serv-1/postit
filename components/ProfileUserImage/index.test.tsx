@@ -8,15 +8,18 @@ import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import { IMAGE_INVALID, IMAGE_TOO_BIG } from 'constants/errors'
 import sendImage from 'functions/sendImage'
 import Toast from 'components/Toast'
+// @ts-expect-error
+import { mockGetCsrfToken } from 'next-auth/react'
 
 const mockSendImage = sendImage as jest.MockedFunction<typeof sendImage>
-const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
 const server = setupServer()
 
-jest.mock('functions/sendImage', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}))
+jest
+  .mock('functions/sendImage', () => ({
+    __esModule: true,
+    default: jest.fn(),
+  }))
+  .mock('next-auth/react')
 
 beforeEach(() => {
   mockGetCsrfToken.mockResolvedValue('token')

@@ -1,6 +1,5 @@
-import { getServerSession } from 'next-auth'
+import { auth } from 'libs/auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { nextAuthOptions } from 'libs/nextAuth'
 import verifyCsrfTokens from 'functions/verifyCsrfTokens'
 import { nanoid } from 'nanoid'
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
@@ -13,7 +12,7 @@ import {
 } from 'constants/errors'
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
 
   if (!session) {
     return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })

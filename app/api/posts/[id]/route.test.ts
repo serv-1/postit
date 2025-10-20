@@ -6,7 +6,7 @@ import { GET, PUT, DELETE } from './route'
 import mongoose from 'mongoose'
 import { NextRequest } from 'next/server'
 // @ts-expect-error
-import { mockGetServerSession } from 'next-auth'
+import { mockAuth } from 'libs/auth'
 // @ts-expect-error
 import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
@@ -27,13 +27,10 @@ import Post, { type PostDoc } from 'models/Post'
 
 jest
   .mock('libs/pusher/server')
-  .mock('next-auth')
+  .mock('libs/auth')
   .mock('functions/dbConnect')
   .mock('functions/deleteImage')
   .mock('functions/verifyCsrfTokens')
-  .mock('libs/nextAuth', () => ({
-    nextAuthOptions: {},
-  }))
 
 let mongoServer: MongoMemoryServer
 let post: PostDoc
@@ -132,7 +129,7 @@ describe('PUT', () => {
   })
 
   test('401 - unauthorized', async () => {
-    mockGetServerSession.mockResolvedValue(null)
+    mockAuth.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: post._id.toString() } }
@@ -144,7 +141,7 @@ describe('PUT', () => {
   })
 
   test('422 - invalid csrf token', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
     const request = new NextRequest('http://-', {
@@ -161,7 +158,7 @@ describe('PUT', () => {
   })
 
   test('422 - invalid json', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
@@ -174,7 +171,7 @@ describe('PUT', () => {
   })
 
   test('422 - invalid request body', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
 
     const request = new NextRequest('http://-', {
@@ -192,7 +189,7 @@ describe('PUT', () => {
   })
 
   test('500 - database connection failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
 
@@ -212,7 +209,7 @@ describe('PUT', () => {
   test('404 - post not found', async () => {
     await Post.deleteOne({ _id: post._id }).lean().exec()
 
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -234,7 +231,7 @@ describe('PUT', () => {
   test('403 - forbidden', async () => {
     const session = { id: new mongoose.Types.ObjectId().toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -254,7 +251,7 @@ describe('PUT', () => {
   test('500 - deleting old images failed', async () => {
     const session = { id: post.userId.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockDeleteImage.mockRejectedValue({})
@@ -275,7 +272,7 @@ describe('PUT', () => {
   test('204 - images updated', async () => {
     const session = { id: post.userId.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockDeleteImage.mockResolvedValue({})
@@ -304,7 +301,7 @@ describe('PUT', () => {
   test('204 - price updated', async () => {
     const session = { id: post.userId.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockDeleteImage.mockResolvedValue({})
@@ -329,7 +326,7 @@ describe('PUT', () => {
   test('204 - name updated', async () => {
     const session = { id: post.userId.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockDeleteImage.mockResolvedValue({})
@@ -354,7 +351,7 @@ describe('PUT', () => {
   test('204 - description updated', async () => {
     const session = { id: post.userId.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockDeleteImage.mockResolvedValue({})
@@ -379,7 +376,7 @@ describe('PUT', () => {
   test('204 - categories updated', async () => {
     const session = { id: post.userId.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockDeleteImage.mockResolvedValue({})
@@ -404,7 +401,7 @@ describe('PUT', () => {
   test('204 - address updated', async () => {
     const session = { id: post.userId.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
     mockDeleteImage.mockResolvedValue({})
@@ -441,7 +438,7 @@ describe('DELETE', () => {
   })
 
   test('401 - unauthorized', async () => {
-    mockGetServerSession.mockResolvedValue(null)
+    mockAuth.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'DELETE' })
     const params = { params: { id: post._id.toString() } }
@@ -453,7 +450,7 @@ describe('DELETE', () => {
   })
 
   test('422 - invalid csrf token', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
     const request = new NextRequest('http://-', { method: 'DELETE' })
@@ -466,7 +463,7 @@ describe('DELETE', () => {
   })
 
   test('500 - database connection failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue({})
 
@@ -480,7 +477,7 @@ describe('DELETE', () => {
   })
 
   test('404 - post not found', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -496,7 +493,7 @@ describe('DELETE', () => {
   test('403 - forbidden', async () => {
     const session = { id: new mongoose.Types.ObjectId().toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 
@@ -512,7 +509,7 @@ describe('DELETE', () => {
   test('204 - post deleted', async () => {
     const session = { id: post.userId.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({})
 

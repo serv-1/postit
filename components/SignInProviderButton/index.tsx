@@ -1,11 +1,11 @@
 'use client'
 
 import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
-import type { BuiltInProviderType } from 'next-auth/providers'
+import type { ProviderId } from 'next-auth/providers'
 import { signIn } from 'next-auth/react'
 
 interface SignInProviderButtonProps {
-  id: BuiltInProviderType
+  id: ProviderId
   children: React.ReactNode
 }
 
@@ -17,7 +17,7 @@ export default function SignInProviderButton({
     <button
       className="primary-btn w-full"
       onClick={async () => {
-        await signIn(id, { callbackUrl: NEXT_PUBLIC_VERCEL_URL + '/profile' })
+        await signIn(id, { redirectTo: NEXT_PUBLIC_VERCEL_URL + '/profile' })
       }}
     >
       {children}

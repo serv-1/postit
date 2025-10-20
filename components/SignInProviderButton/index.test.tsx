@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import SignInProviderButton from '.'
 import userEvent from '@testing-library/user-event'
+// @ts-expect-error
+import { mockSignIn } from 'next-auth/react'
 
-const mockSignIn = jest.spyOn(require('next-auth/react'), 'signIn')
+jest.mock('next-auth/react')
 
 it('renders its children', () => {
   render(
@@ -15,8 +17,6 @@ it('renders its children', () => {
 })
 
 it('signs the user in using the given provider', async () => {
-  mockSignIn.mockResolvedValueOnce({})
-
   render(
     <SignInProviderButton id="google">Sign in with Google</SignInProviderButton>
   )
@@ -26,6 +26,6 @@ it('signs the user in using the given provider', async () => {
   await userEvent.click(btn)
 
   expect(mockSignIn).toHaveBeenNthCalledWith(1, 'google', {
-    callbackUrl: 'http://localhost/profile',
+    redirectTo: 'http://localhost/profile',
   })
 })

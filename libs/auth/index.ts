@@ -1,15 +1,16 @@
-import { type AuthOptions } from 'next-auth'
+import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
-import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
-import clientPromise from 'libs/mongodb'
+import { MongoDBAdapter } from '@auth/mongodb-adapter'
+import type { Adapter } from '@auth/core/adapters'
+import client from 'libs/mongodb'
 import User from 'models/User'
 import dbConnect from 'functions/dbConnect'
 import { GOOGLE_ID, GOOGLE_SECRET, SECRET } from 'env'
 import { nanoid } from 'nanoid'
 import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 
-export const nextAuthOptions: AuthOptions = {
+export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       credentials: {
@@ -72,8 +73,8 @@ export const nextAuthOptions: AuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        session.id = token.id
-        session.channelName = token.channelName
+        session.id = token.id as string
+        session.channelName = token.channelName as string
       }
 
       return session
@@ -81,5 +82,5 @@ export const nextAuthOptions: AuthOptions = {
   },
   session: { strategy: 'jwt' },
   secret: SECRET,
-  adapter: MongoDBAdapter(clientPromise),
-}
+  adapter: MongoDBAdapter(client) as Adapter,
+})

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import getPost from 'functions/getPost'
-import { getServerSession } from 'next-auth'
-import { nextAuthOptions } from 'libs/nextAuth'
+import { auth } from 'libs/auth'
 import { redirect } from 'next/navigation'
 import UpdatePostForm from 'components/UpdatePostForm'
 
@@ -21,7 +20,7 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: { params: Params }) {
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
 
   if (!session) {
     redirect('/authentication')

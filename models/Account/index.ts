@@ -12,8 +12,6 @@ export interface AccountDoc {
   scope: string
   id_token: string
   userId: Types.ObjectId
-  oauth_token_secret: string
-  oauth_token: string
   session_state: string
 }
 
@@ -28,8 +26,6 @@ const accountSchema = new Schema<AccountDoc>({
   scope: String,
   id_token: String,
   userId: Schema.Types.ObjectId,
-  oauth_token_secret: String,
-  oauth_token: String,
   session_state: String,
 })
 

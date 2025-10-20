@@ -1,6 +1,5 @@
-import { getServerSession } from 'next-auth'
+import { auth } from 'libs/auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { nextAuthOptions } from 'libs/nextAuth'
 import validate from 'functions/validate'
 import createDiscussion from 'schemas/server/createDiscussion'
 import verifyCsrfTokens from 'functions/verifyCsrfTokens'
@@ -19,7 +18,7 @@ import {
 import pusher from 'libs/pusher/server'
 
 export async function POST(request: NextRequest) {
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
 
   if (!session) {
     return NextResponse.json({ message: UNAUTHORIZED }, { status: 401 })

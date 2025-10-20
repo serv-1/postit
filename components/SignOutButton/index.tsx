@@ -14,7 +14,7 @@ export default function SignOutButton({
   return (
     <button
       className={className}
-      onClick={() => signOut({ callbackUrl: '/' })}
+      onClick={() => signOut({ redirectTo: '/' })}
       aria-label="Sign out"
     >
       {children}

@@ -19,7 +19,7 @@ import {
   UNAUTHORIZED,
 } from 'constants/errors'
 // @ts-expect-error
-import { mockGetServerSession } from 'next-auth'
+import { mockAuth } from 'libs/auth'
 // @ts-expect-error
 import { mockDbConnect } from 'functions/dbConnect'
 // @ts-expect-error
@@ -28,13 +28,10 @@ import { mockPusherTrigger } from 'libs/pusher/server'
 import { mockVerifyCsrfTokens } from 'functions/verifyCsrfTokens'
 
 jest
-  .mock('next-auth')
+  .mock('libs/auth')
   .mock('functions/dbConnect')
   .mock('libs/pusher/server')
   .mock('functions/verifyCsrfTokens')
-  .mock('libs/nextAuth', () => ({
-    nextAuthOptions: {},
-  }))
 
 let mongoServer: MongoMemoryServer
 let buyer: UserDoc
@@ -123,7 +120,7 @@ describe('GET', () => {
   })
 
   test('401 - unauthorized', async () => {
-    mockGetServerSession.mockResolvedValue(null)
+    mockAuth.mockResolvedValue(null)
 
     const request = new NextRequest('http://-')
     const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
@@ -135,7 +132,7 @@ describe('GET', () => {
   })
 
   test("422 - invalid search params' csrf token", async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
 
     const request = new NextRequest('http://-')
     const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
@@ -147,7 +144,7 @@ describe('GET', () => {
   })
 
   test('422 - invalid csrf token', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
     const request = new NextRequest('http://-?csrfToken=token')
@@ -160,7 +157,7 @@ describe('GET', () => {
   })
 
   test('500 - database connection failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue()
 
@@ -174,7 +171,7 @@ describe('GET', () => {
   })
 
   test('404 - discussion not found', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
@@ -190,7 +187,7 @@ describe('GET', () => {
   test('403 - forbidden', async () => {
     const session = { id: new mongoose.Types.ObjectId().toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
@@ -213,7 +210,7 @@ describe('GET', () => {
 
     const session = { id: buyer._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
@@ -244,7 +241,7 @@ describe('PUT', () => {
   })
 
   test('401 - unauthorized', async () => {
-    mockGetServerSession.mockResolvedValue(null)
+    mockAuth.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
@@ -256,7 +253,7 @@ describe('PUT', () => {
   })
 
   test('500 - database connection failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockDbConnect.mockRejectedValue()
 
     const request = new NextRequest('http://-', { method: 'PUT' })
@@ -269,7 +266,7 @@ describe('PUT', () => {
   })
 
   test('404 - discussion not found', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockDbConnect.mockResolvedValue()
 
     const request = new NextRequest('http://-', { method: 'PUT' })
@@ -284,7 +281,7 @@ describe('PUT', () => {
   test('403 - forbidden', async () => {
     const session = { id: new mongoose.Types.ObjectId().toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue()
 
     const request = new NextRequest('http://-', { method: 'PUT' })
@@ -303,7 +300,7 @@ describe('PUT', () => {
 
     const session = { id: seller._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue()
 
     const request = new NextRequest('http://-', { method: 'PUT' })
@@ -324,7 +321,7 @@ describe('PUT', () => {
 
     const session = { id: buyer._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue()
 
     const request = new NextRequest('http://-', { method: 'PUT' })
@@ -341,7 +338,7 @@ describe('PUT', () => {
   test('422 - invalid csrf token', async () => {
     const session = { id: buyer._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue()
     mockVerifyCsrfTokens.mockReturnValue(false)
 
@@ -358,7 +355,7 @@ describe('PUT', () => {
     test('422 - invalid json', async () => {
       const session = { id: buyer._id.toString() }
 
-      mockGetServerSession.mockResolvedValue(session)
+      mockAuth.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue()
       mockVerifyCsrfTokens.mockReturnValue(true)
 
@@ -379,7 +376,7 @@ describe('PUT', () => {
     test('422 - invalid request body', async () => {
       const session = { id: buyer._id.toString() }
 
-      mockGetServerSession.mockResolvedValue(session)
+      mockAuth.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue()
       mockVerifyCsrfTokens.mockReturnValue(true)
 
@@ -400,7 +397,7 @@ describe('PUT', () => {
     test('500 - sending the new message to the discussion failed', async () => {
       const session = { id: buyer._id.toString() }
 
-      mockGetServerSession.mockResolvedValue(session)
+      mockAuth.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue()
       mockVerifyCsrfTokens.mockReturnValue(true)
       mockPusherTrigger.mockRejectedValue()
@@ -443,7 +440,7 @@ describe('PUT', () => {
 
         const session = { id: buyer._id.toString() }
 
-        mockGetServerSession.mockResolvedValue(session)
+        mockAuth.mockResolvedValue(session)
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
         mockPusherTrigger.mockRejectedValue().mockResolvedValueOnce()
@@ -486,7 +483,7 @@ describe('PUT', () => {
           .lean()
           .exec()
 
-        mockGetServerSession.mockResolvedValue({ id: buyer._id.toString() })
+        mockAuth.mockResolvedValue({ id: buyer._id.toString() })
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
 
@@ -513,7 +510,7 @@ describe('PUT', () => {
           .lean()
           .exec()
 
-        mockGetServerSession.mockResolvedValue({ id: buyer._id.toString() })
+        mockAuth.mockResolvedValue({ id: buyer._id.toString() })
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
 
@@ -536,7 +533,7 @@ describe('PUT', () => {
       test('500 - notifying the seller about the new message failed', async () => {
         const session = { id: buyer._id.toString() }
 
-        mockGetServerSession.mockResolvedValue(session)
+        mockAuth.mockResolvedValue(session)
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
         mockPusherTrigger.mockRejectedValue().mockResolvedValueOnce()
@@ -576,7 +573,7 @@ describe('PUT', () => {
 
         const session = { id: seller._id.toString() }
 
-        mockGetServerSession.mockResolvedValue(session)
+        mockAuth.mockResolvedValue(session)
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
         mockPusherTrigger.mockRejectedValue().mockResolvedValueOnce()
@@ -616,7 +613,7 @@ describe('PUT', () => {
           .lean()
           .exec()
 
-        mockGetServerSession.mockResolvedValue({ id: seller._id.toString() })
+        mockAuth.mockResolvedValue({ id: seller._id.toString() })
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
 
@@ -643,7 +640,7 @@ describe('PUT', () => {
           .lean()
           .exec()
 
-        mockGetServerSession.mockResolvedValue({ id: seller._id.toString() })
+        mockAuth.mockResolvedValue({ id: seller._id.toString() })
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
 
@@ -666,7 +663,7 @@ describe('PUT', () => {
       test('500 - notifying the seller about the new message failed', async () => {
         const session = { id: seller._id.toString() }
 
-        mockGetServerSession.mockResolvedValue(session)
+        mockAuth.mockResolvedValue(session)
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
         mockPusherTrigger.mockRejectedValue().mockResolvedValueOnce()
@@ -698,7 +695,7 @@ describe('PUT', () => {
     test('204 - new message added to the discussion', async () => {
       const session = { id: buyer._id.toString() }
 
-      mockGetServerSession.mockResolvedValue(session)
+      mockAuth.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue()
       mockVerifyCsrfTokens.mockReturnValue(true)
 
@@ -755,7 +752,7 @@ describe('PUT', () => {
 
       const session = { id: buyer._id.toString() }
 
-      mockGetServerSession.mockResolvedValue(session)
+      mockAuth.mockResolvedValue(session)
       mockDbConnect.mockResolvedValue()
       mockVerifyCsrfTokens.mockReturnValue(true)
 
@@ -793,7 +790,7 @@ describe('DELETE', () => {
   })
 
   test('401 - unauthorized', async () => {
-    mockGetServerSession.mockResolvedValue(null)
+    mockAuth.mockResolvedValue(null)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
     const params = { params: { id: discussion._id.toString() } }
@@ -805,7 +802,7 @@ describe('DELETE', () => {
   })
 
   test('422 - invalid csrf token', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
     const request = new NextRequest('http://-', { method: 'PUT' })
@@ -818,7 +815,7 @@ describe('DELETE', () => {
   })
 
   test('500 - database connection failed', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue()
 
@@ -832,7 +829,7 @@ describe('DELETE', () => {
   })
 
   test('404 - discussion not found', async () => {
-    mockGetServerSession.mockResolvedValue({})
+    mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
@@ -848,7 +845,7 @@ describe('DELETE', () => {
   test('403 - forbidden', async () => {
     const session = { id: new mongoose.Types.ObjectId().toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
@@ -864,7 +861,7 @@ describe('DELETE', () => {
   test('204 - discussion deleted', async () => {
     const session = { id: buyer._id.toString() }
 
-    mockGetServerSession.mockResolvedValue(session)
+    mockAuth.mockResolvedValue(session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 

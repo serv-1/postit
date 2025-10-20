@@ -22,7 +22,7 @@ export default function SignInForm() {
   const email = methods.watch('email')
 
   const submitHandler: SubmitHandler<SignIn> = async (data) => {
-    const res = await signIn<'credentials'>('credentials', {
+    const res = await signIn('credentials', {
       ...data,
       redirect: false,
     })

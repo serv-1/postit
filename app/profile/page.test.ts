@@ -4,7 +4,8 @@
 
 import Page from './page'
 import { redirect } from 'next/navigation'
-import { mockGetServerSession } from '__mocks__/next-auth'
+// @ts-expect-error
+import { mockAuth } from 'libs/auth'
 
 jest
   .mock('functions/getUser', () => ({
@@ -15,9 +16,7 @@ jest
     __esModule: true,
     default: jest.fn(),
   }))
-  .mock('libs/nextAuth', () => ({
-    nextAuthOptions: {},
-  }))
+  .mock('libs/auth')
   .mock('next/navigation', () => ({
     redirect: jest.fn(),
   }))
@@ -25,7 +24,7 @@ jest
 const mockRedirect = redirect as jest.MockedFunction<typeof redirect>
 
 it('redirects to /authentication if the user is unauthenticated', async () => {
-  mockGetServerSession.mockResolvedValue(null)
+  mockAuth.mockResolvedValue(null)
   mockRedirect.mockImplementation(() => {
     throw new Error()
   })

@@ -22,7 +22,7 @@ export default function DeleteAccountModal() {
       return
     }
 
-    await signOut({ callbackUrl: '/' })
+    await signOut({ redirectTo: '/' })
   }
 
   return (

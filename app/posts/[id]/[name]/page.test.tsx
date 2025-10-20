@@ -3,7 +3,8 @@ import getPost from 'functions/getPost'
 import getUser from 'functions/getUser'
 import getPosts from 'functions/getPosts'
 import type { Post, User } from 'types'
-import { mockGetServerSession } from '__mocks__/next-auth'
+// @ts-expect-error
+import { mockAuth } from 'libs/auth'
 import { render, screen } from '@testing-library/react'
 import { NEXT_PUBLIC_AWS_URL } from 'env/public'
 import type { ContactModalProps } from 'components/ContactModal'
@@ -23,10 +24,7 @@ jest
     __esModule: true,
     default: jest.fn(),
   }))
-  .mock('next-auth')
-  .mock('libs/nextAuth', () => ({
-    nextAuthOptions: {},
-  }))
+  .mock('libs/auth')
   .mock('components/Map', () => ({
     __esModule: true,
     default: () => <div></div>,
@@ -101,7 +99,7 @@ describe('<Page />', () => {
     mockGetPost.mockResolvedValue(post)
     mockGetUser.mockResolvedValue(seller)
     mockGetPosts.mockResolvedValue([])
-    mockGetServerSession.mockResolvedValue(null)
+    mockAuth.mockResolvedValue(null)
   })
 
   it("renders the post's first image", async () => {
@@ -192,7 +190,7 @@ describe('<Page />', () => {
 
   describe('if the authenticated user is the seller', () => {
     beforeEach(() => {
-      mockGetServerSession.mockResolvedValue({ id: '0' })
+      mockAuth.mockResolvedValue({ id: '0' })
     })
 
     it('renders the edit link and the delete button', async () => {
@@ -256,7 +254,7 @@ describe('<Page />', () => {
 
   describe("if the authenticated user isn't the seller", () => {
     beforeEach(() => {
-      mockGetServerSession.mockResolvedValue({ id: '1' })
+      mockAuth.mockResolvedValue({ id: '1' })
 
       mockGetUser
         .mockResolvedValueOnce(seller)

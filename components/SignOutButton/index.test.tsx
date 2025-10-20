@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import SignOutButton from '.'
 import userEvent from '@testing-library/user-event'
+// @ts-expect-error
+import { mockSignOut } from 'next-auth/react'
 
-const mockSignOut = jest.spyOn(require('next-auth/react'), 'signOut')
+jest.mock('next-auth/react')
 
 it('renders the given children', () => {
   render(<SignOutButton>Sign out</SignOutButton>)
@@ -27,5 +29,5 @@ it('signs the authenticated user out', async () => {
 
   await userEvent.click(btn)
 
-  expect(mockSignOut).toHaveBeenNthCalledWith(1, { callbackUrl: '/' })
+  expect(mockSignOut).toHaveBeenNthCalledWith(1, { redirectTo: '/' })
 })

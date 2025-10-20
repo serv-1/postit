@@ -1,24 +1,33 @@
 // This approach is taken from https://github.com/vercel/next.js/tree/canary/examples/with-mongodb
-import { MongoClient } from 'mongodb'
+import { MongoClient, ServerApiVersion } from 'mongodb'
 import { MONGO_URI } from 'env'
 
+const options = {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+}
+
 let client: MongoClient
-let clientPromise: Promise<MongoClient>
 
 if (process.env.NODE_ENV === 'development') {
   // In development mode, use a global variable so that the value
   // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  if (!(global as any)._mongoClientPromise) {
-    client = new MongoClient(MONGO_URI)
-    ;(global as any)._mongoClientPromise = client.connect()
+  let globalWithMongo = global as typeof globalThis & {
+    _mongoClient?: MongoClient
   }
-  clientPromise = (global as any)._mongoClientPromise
+
+  if (!globalWithMongo._mongoClient) {
+    globalWithMongo._mongoClient = new MongoClient(MONGO_URI, options)
+  }
+  client = globalWithMongo._mongoClient
 } else {
   // In production mode, it's best to not use a global variable.
-  client = new MongoClient(MONGO_URI)
-  clientPromise = client.connect()
+  client = new MongoClient(MONGO_URI, options)
 }
 
-// Export a module-scoped MongoClient promise. By doing this in a
+// Export a module-scoped MongoClient. By doing this in a
 // separate module, the client can be shared across functions.
-export default clientPromise
+export default client

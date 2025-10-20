@@ -37,7 +37,7 @@ export default function SignUpForm() {
       return
     }
 
-    const signInResponse = await signIn<'credentials'>('credentials', {
+    const signInResponse = await signIn('credentials', {
       email: data.email,
       password: data.password,
       redirect: false,

@@ -1,4 +1,3 @@
-import { nextAuthOptions } from 'libs/nextAuth'
 import SignUpForm from 'components/SignUpForm'
 import SignInForm from 'components/SignInForm'
 import SignInProviderButton from 'components/SignInProviderButton'
@@ -7,7 +6,7 @@ import TabList from 'components/TabList'
 import TabPanel from 'components/TabPanel'
 import TabsProvider from 'components/TabsProvider'
 import type { Metadata } from 'next'
-import { getServerSession } from 'next-auth'
+import { auth } from 'libs/auth'
 import { redirect } from 'next/navigation'
 
 const squareClasses =
@@ -21,7 +20,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Page() {
-  const session = await getServerSession(nextAuthOptions)
+  const session = await auth()
 
   if (session) {
     redirect('/profile')

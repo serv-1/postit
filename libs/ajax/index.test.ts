@@ -3,8 +3,11 @@ import ajax from '.'
 import { setupServer } from 'msw/node'
 import { NEXT_PUBLIC_CSRF_HEADER_NAME } from 'env/public'
 import headersToObject from 'functions/headersToObject'
+// @ts-expect-error
+import { mockGetCsrfToken } from 'next-auth/react'
 
-const mockGetCsrfToken = jest.spyOn(require('next-auth/react'), 'getCsrfToken')
+jest.mock('next-auth/react')
+
 const server = setupServer()
 
 beforeAll(() => server.listen())

@@ -3,13 +3,16 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Toast from 'components/Toast'
 import { DATA_INVALID } from 'constants/errors'
+// @ts-expect-error
+import { mockSignIn } from 'next-auth/react'
 
 const mockRouterPush = jest.fn()
-const mockSignIn = jest.spyOn(require('next-auth/react'), 'signIn')
 
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: mockRouterPush }),
-}))
+jest
+  .mock('next/navigation', () => ({
+    useRouter: () => ({ push: mockRouterPush }),
+  }))
+  .mock('next-auth/react')
 
 it('signs the user in and redirects him to its profile', async () => {
   render(<SignInForm />)
