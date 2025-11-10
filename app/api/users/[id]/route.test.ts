@@ -42,9 +42,9 @@ afterAll(async () => {
 
 describe('GET', () => {
   test('422 - invalid id', async () => {
-    const request = new Request('http://-')
-    const params = { params: { id: 'invalid id' } }
-    const response = await GET(request, params)
+    const response = await GET(new Request('http://-'), {
+      params: Promise.resolve({ id: 'invalid id' }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
@@ -54,9 +54,9 @@ describe('GET', () => {
   test('500 - database connection failed', async () => {
     mockDbConnect.mockRejectedValue({})
 
-    const request = new Request('http://-')
-    const params = { params: { id: user._id.toString() } }
-    const response = await GET(request, params)
+    const response = await GET(new Request('http://-'), {
+      params: Promise.resolve({ id: user._id.toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
@@ -66,9 +66,9 @@ describe('GET', () => {
   test('404 - user not found', async () => {
     mockDbConnect.mockResolvedValue({})
 
-    const request = new Request('http://-')
-    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
-    const response = await GET(request, params)
+    const response = await GET(new Request('http://-'), {
+      params: Promise.resolve({ id: new mongoose.Types.ObjectId().toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 404)
@@ -78,14 +78,15 @@ describe('GET', () => {
   test('200 - get the user', async () => {
     mockDbConnect.mockResolvedValue({})
 
-    const request = new Request('http://-')
-    const params = { params: { id: user._id.toString() } }
-    const response = await GET(request, params)
+    const id = user._id.toString()
+    const response = await GET(new Request('http://-'), {
+      params: Promise.resolve({ id }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 200)
     expect(data).toEqual({
-      _id: params.params.id,
+      _id: id,
       name: user.name,
       email: user.email,
       channelName: user.channelName,

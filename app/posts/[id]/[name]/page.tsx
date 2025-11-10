@@ -19,23 +19,23 @@ import Pencil from 'public/static/images/pencil.svg'
 import DeletePostButton from 'components/DeletePostButton'
 import ContactButton from 'components/ContactButton'
 
-interface Params {
+type Params = Promise<{
   id: string
   name: string
-}
+}>
 
-export async function generateMetadata({
-  params,
-}: {
+export async function generateMetadata(props: {
   params: Params
 }): Promise<Metadata> {
+  const params = await props.params
   const post = await getPost(params.id)
 
   return { title: post!.name + ' - PostIt' }
 }
 
-export default async function Page({ params }: { params: Params }) {
+export default async function Page(props: { params: Params }) {
   const session = await auth()
+  const params = await props.params
   const post = await getPost(params.id)
   const seller = await getUser(post.userId)
   const sellerPosts = await getPosts(

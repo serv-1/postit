@@ -31,8 +31,12 @@ describe('generateMetadata()', () => {
     mockGetPost.mockResolvedValue({ name: 'table' } as Post)
 
     expect(
-      await generateMetadata({ params: { id: '0', name: 'table' } })
-    ).toEqual({ title: 'Update table - PostIt' })
+      await generateMetadata({
+        params: Promise.resolve({ id: '0', name: 'table' }),
+      })
+    ).toEqual({
+      title: 'Update table - PostIt',
+    })
   })
 })
 
@@ -43,7 +47,9 @@ describe('<Page />', () => {
       throw new Error()
     })
 
-    await expect(Page({ params: { id: '0', name: 'table' } })).rejects.toThrow()
+    await expect(
+      Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+    ).rejects.toThrow()
 
     expect(mockRedirect).toHaveBeenNthCalledWith(1, '/authentication')
   })

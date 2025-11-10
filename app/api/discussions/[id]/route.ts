@@ -20,10 +20,11 @@ import {
 import pusher from 'libs/pusher/server'
 
 interface Params {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-export async function GET(request: NextRequest, { params }: Params) {
+export async function GET(request: NextRequest, segmentData: Params) {
+  const params = await segmentData.params
   const discussionId = params.id
 
   if (!isValidObjectId(discussionId)) {
@@ -80,7 +81,8 @@ export async function GET(request: NextRequest, { params }: Params) {
   }
 }
 
-export async function PUT(request: NextRequest, { params }: Params) {
+export async function PUT(request: NextRequest, segmentData: Params) {
+  const params = await segmentData.params
   const discussionId = params.id
 
   if (!isValidObjectId(discussionId)) {
@@ -266,7 +268,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: Params) {
+export async function DELETE(request: NextRequest, segmentData: Params) {
+  const params = await segmentData.params
   const discussionId = params.id
 
   if (!isValidObjectId(discussionId)) {

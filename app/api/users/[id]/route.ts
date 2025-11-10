@@ -9,10 +9,11 @@ import {
 } from 'constants/errors'
 
 interface Params {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: Request, segmentData: Params) {
+  const params = await segmentData.params
   const userId = params.id
 
   if (!isValidObjectId(userId)) {

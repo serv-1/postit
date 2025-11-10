@@ -6,16 +6,15 @@ import PostList from 'components/PostList'
 import Blob from 'public/static/images/blob.svg'
 import getPosts from 'functions/getPosts'
 
-interface Params {
+type Params = Promise<{
   id: string
   name: string
-}
+}>
 
-export async function generateMetadata({
-  params,
-}: {
+export async function generateMetadata(props: {
   params: Params
 }): Promise<Metadata> {
+  const params = await props.params
   const user = await getUser(params.id)
 
   return {
@@ -23,7 +22,8 @@ export async function generateMetadata({
   }
 }
 
-export default async function Page({ params }: { params: Params }) {
+export default async function Page(props: { params: Params }) {
+  const params = await props.params
   const user = await getUser(params.id)
   const posts = await getPosts(user.postIds)
 

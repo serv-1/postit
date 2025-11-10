@@ -18,10 +18,11 @@ import {
 } from 'constants/errors'
 
 interface Params {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: Request, segmentData: Params) {
+  const params = await segmentData.params
   const postId = params.id
 
   if (!isValidObjectId(postId)) {
@@ -48,7 +49,8 @@ export async function GET(request: Request, { params }: Params) {
   }
 }
 
-export async function PUT(request: NextRequest, { params }: Params) {
+export async function PUT(request: NextRequest, segmentData: Params) {
+  const params = await segmentData.params
   const postId = params.id
 
   if (!isValidObjectId(postId)) {
@@ -141,7 +143,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: Params) {
+export async function DELETE(request: NextRequest, segmentData: Params) {
+  const params = await segmentData.params
   const postId = params.id
 
   if (!isValidObjectId(postId)) {

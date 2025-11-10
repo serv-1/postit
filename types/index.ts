@@ -26,6 +26,6 @@ export interface DeferredPromise<T extends unknown> {
   reject: (reason?: any) => void
 }
 
-export interface SearchParams {
+export type SearchParams = Promise<{
   [key: string]: string | string[] | undefined
-}
+}>

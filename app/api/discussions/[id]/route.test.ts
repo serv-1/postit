@@ -110,9 +110,9 @@ afterAll(async () => {
 
 describe('GET', () => {
   test('422 - invalid id', async () => {
-    const request = new NextRequest('http://-')
-    const params = { params: { id: 'invalid id' } }
-    const response = await GET(request, params)
+    const response = await GET(new NextRequest('http://-'), {
+      params: Promise.resolve({ id: 'invalid id' }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
@@ -122,9 +122,9 @@ describe('GET', () => {
   test('401 - unauthorized', async () => {
     mockAuth.mockResolvedValue(null)
 
-    const request = new NextRequest('http://-')
-    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
-    const response = await GET(request, params)
+    const response = await GET(new NextRequest('http://-'), {
+      params: Promise.resolve({ id: new mongoose.Types.ObjectId().toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
@@ -134,9 +134,9 @@ describe('GET', () => {
   test("422 - invalid search params' csrf token", async () => {
     mockAuth.mockResolvedValue({})
 
-    const request = new NextRequest('http://-')
-    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
-    const response = await GET(request, params)
+    const response = await GET(new NextRequest('http://-'), {
+      params: Promise.resolve({ id: new mongoose.Types.ObjectId().toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
@@ -147,9 +147,9 @@ describe('GET', () => {
     mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
-    const request = new NextRequest('http://-?csrfToken=token')
-    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
-    const response = await GET(request, params)
+    const response = await GET(new NextRequest('http://-?csrfToken=token'), {
+      params: Promise.resolve({ id: new mongoose.Types.ObjectId().toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
@@ -161,9 +161,9 @@ describe('GET', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue()
 
-    const request = new NextRequest('http://-')
-    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
-    const response = await GET(request, params)
+    const response = await GET(new NextRequest('http://-'), {
+      params: Promise.resolve({ id: new mongoose.Types.ObjectId().toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
@@ -175,9 +175,9 @@ describe('GET', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
-    const request = new NextRequest('http://-')
-    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
-    const response = await GET(request, params)
+    const response = await GET(new NextRequest('http://-'), {
+      params: Promise.resolve({ id: new mongoose.Types.ObjectId().toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 404)
@@ -191,9 +191,9 @@ describe('GET', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
-    const request = new NextRequest('http://-')
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await GET(request, params)
+    const response = await GET(new NextRequest('http://-'), {
+      params: Promise.resolve({ id: discussion._id.toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 403)
@@ -214,9 +214,9 @@ describe('GET', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
-    const request = new NextRequest('http://-')
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await GET(request, params)
+    const response = await GET(new NextRequest('http://-'), {
+      params: Promise.resolve({ id: discussion._id.toString() }),
+    })
     const data = await response.json()
 
     await resetEntities()
@@ -231,9 +231,9 @@ describe('GET', () => {
 
 describe('PUT', () => {
   test('422 - invalid id', async () => {
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: 'invalid id' } }
-    const response = await PUT(request, params)
+    const response = await PUT(new NextRequest('http://-', { method: 'PUT' }), {
+      params: Promise.resolve({ id: 'invalid id' }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
@@ -243,9 +243,9 @@ describe('PUT', () => {
   test('401 - unauthorized', async () => {
     mockAuth.mockResolvedValue(null)
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
-    const response = await PUT(request, params)
+    const response = await PUT(new NextRequest('http://-', { method: 'PUT' }), {
+      params: Promise.resolve({ id: new mongoose.Types.ObjectId().toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
@@ -256,9 +256,9 @@ describe('PUT', () => {
     mockAuth.mockResolvedValue({})
     mockDbConnect.mockRejectedValue()
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
-    const response = await PUT(request, params)
+    const response = await PUT(new NextRequest('http://-', { method: 'PUT' }), {
+      params: Promise.resolve({ id: new mongoose.Types.ObjectId().toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
@@ -269,9 +269,9 @@ describe('PUT', () => {
     mockAuth.mockResolvedValue({})
     mockDbConnect.mockResolvedValue()
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
-    const response = await PUT(request, params)
+    const response = await PUT(new NextRequest('http://-', { method: 'PUT' }), {
+      params: Promise.resolve({ id: new mongoose.Types.ObjectId().toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 404)
@@ -284,9 +284,9 @@ describe('PUT', () => {
     mockAuth.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue()
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await PUT(request, params)
+    const response = await PUT(new NextRequest('http://-', { method: 'PUT' }), {
+      params: Promise.resolve({ id: discussion._id.toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 403)
@@ -303,9 +303,9 @@ describe('PUT', () => {
     mockAuth.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue()
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await PUT(request, params)
+    const response = await PUT(new NextRequest('http://-', { method: 'PUT' }), {
+      params: Promise.resolve({ id: discussion._id.toString() }),
+    })
     const data = await response.json()
 
     await resetEntities()
@@ -324,9 +324,9 @@ describe('PUT', () => {
     mockAuth.mockResolvedValue(session)
     mockDbConnect.mockResolvedValue()
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await PUT(request, params)
+    const response = await PUT(new NextRequest('http://-', { method: 'PUT' }), {
+      params: Promise.resolve({ id: discussion._id.toString() }),
+    })
     const data = await response.json()
 
     await resetEntities()
@@ -342,9 +342,9 @@ describe('PUT', () => {
     mockDbConnect.mockResolvedValue()
     mockVerifyCsrfTokens.mockReturnValue(false)
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await PUT(request, params)
+    const response = await PUT(new NextRequest('http://-', { method: 'PUT' }), {
+      params: Promise.resolve({ id: discussion._id.toString() }),
+    })
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
@@ -359,14 +359,14 @@ describe('PUT', () => {
       mockDbConnect.mockResolvedValue()
       mockVerifyCsrfTokens.mockReturnValue(true)
 
-      const request = new NextRequest('http://-', {
-        method: 'PUT',
-        body: '',
-        headers: { 'Content-Length': '1' },
-      })
-
-      const params = { params: { id: discussion._id.toString() } }
-      const response = await PUT(request, params)
+      const response = await PUT(
+        new NextRequest('http://-', {
+          method: 'PUT',
+          body: '',
+          headers: { 'Content-Length': '1' },
+        }),
+        { params: Promise.resolve({ id: discussion._id.toString() }) }
+      )
       const data = await response.json()
 
       expect(response).toHaveProperty('status', 422)
@@ -380,14 +380,14 @@ describe('PUT', () => {
       mockDbConnect.mockResolvedValue()
       mockVerifyCsrfTokens.mockReturnValue(true)
 
-      const request = new NextRequest('http://-', {
-        method: 'PUT',
-        body: JSON.stringify({}),
-        headers: { 'Content-Length': '1' },
-      })
-
-      const params = { params: { id: discussion._id.toString() } }
-      const response = await PUT(request, params)
+      const response = await PUT(
+        new NextRequest('http://-', {
+          method: 'PUT',
+          body: JSON.stringify({}),
+          headers: { 'Content-Length': '1' },
+        }),
+        { params: Promise.resolve({ id: discussion._id.toString() }) }
+      )
       const data = await response.json()
 
       expect(response).toHaveProperty('status', 422)
@@ -402,14 +402,14 @@ describe('PUT', () => {
       mockVerifyCsrfTokens.mockReturnValue(true)
       mockPusherTrigger.mockRejectedValue()
 
-      const request = new NextRequest('http://-', {
-        method: 'PUT',
-        body: JSON.stringify({ message: 'hi' }),
-        headers: { 'Content-Length': '1' },
-      })
-
-      const params = { params: { id: discussion._id.toString() } }
-      const response = await PUT(request, params)
+      const response = await PUT(
+        new NextRequest('http://-', {
+          method: 'PUT',
+          body: JSON.stringify({ message: 'hi' }),
+          headers: { 'Content-Length': '1' },
+        }),
+        { params: Promise.resolve({ id: discussion._id.toString() }) }
+      )
       const data = await response.json()
 
       const updatedDiscussion = (await Discussion.findById(discussion._id)
@@ -445,14 +445,14 @@ describe('PUT', () => {
         mockVerifyCsrfTokens.mockReturnValue(true)
         mockPusherTrigger.mockRejectedValue().mockResolvedValueOnce()
 
-        const request = new NextRequest('http://-', {
-          method: 'PUT',
-          body: JSON.stringify({ message: 'hi' }),
-          headers: { 'Content-Length': '1' },
-        })
-
-        const params = { params: { id: discussion._id.toString() } }
-        const response = await PUT(request, params)
+        const response = await PUT(
+          new NextRequest('http://-', {
+            method: 'PUT',
+            body: JSON.stringify({ message: 'hi' }),
+            headers: { 'Content-Length': '1' },
+          }),
+          { params: Promise.resolve({ id: discussion._id.toString() }) }
+        )
         const data = await response.json()
 
         const updatedDiscussion = (await Discussion.findById(discussion._id)
@@ -487,13 +487,14 @@ describe('PUT', () => {
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
 
-        const request = new NextRequest('http://-', {
-          method: 'PUT',
-          body: JSON.stringify({ message: 'yo' }),
-          headers: { 'Content-Length': '1' },
-        })
-
-        await PUT(request, { params: { id: discussion._id.toString() } })
+        await PUT(
+          new NextRequest('http://-', {
+            method: 'PUT',
+            body: JSON.stringify({ message: 'yo' }),
+            headers: { 'Content-Length': '1' },
+          }),
+          { params: Promise.resolve({ id: discussion._id.toString() }) }
+        )
 
         const { discussions } = (await User.findById(buyer._id).lean().exec())!
 
@@ -514,13 +515,14 @@ describe('PUT', () => {
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
 
-        const request = new NextRequest('http://-', {
-          method: 'PUT',
-          body: JSON.stringify({ message: 'yo' }),
-          headers: { 'Content-Length': '1' },
-        })
-
-        await PUT(request, { params: { id: discussion._id.toString() } })
+        await PUT(
+          new NextRequest('http://-', {
+            method: 'PUT',
+            body: JSON.stringify({ message: 'yo' }),
+            headers: { 'Content-Length': '1' },
+          }),
+          { params: Promise.resolve({ id: discussion._id.toString() }) }
+        )
 
         const { discussions } = (await User.findById(seller._id).lean().exec())!
 
@@ -538,14 +540,14 @@ describe('PUT', () => {
         mockVerifyCsrfTokens.mockReturnValue(true)
         mockPusherTrigger.mockRejectedValue().mockResolvedValueOnce()
 
-        const request = new NextRequest('http://-', {
-          method: 'PUT',
-          body: JSON.stringify({ message: 'yo' }),
-          headers: { 'Content-Length': '1' },
-        })
-
-        const params = { params: { id: discussion._id.toString() } }
-        const response = await PUT(request, params)
+        const response = await PUT(
+          new NextRequest('http://-', {
+            method: 'PUT',
+            body: JSON.stringify({ message: 'yo' }),
+            headers: { 'Content-Length': '1' },
+          }),
+          { params: Promise.resolve({ id: discussion._id.toString() }) }
+        )
         const data = await response.json()
 
         await resetEntities()
@@ -578,14 +580,14 @@ describe('PUT', () => {
         mockVerifyCsrfTokens.mockReturnValue(true)
         mockPusherTrigger.mockRejectedValue().mockResolvedValueOnce()
 
-        const request = new NextRequest('http://-', {
-          method: 'PUT',
-          body: JSON.stringify({ message: 'hi' }),
-          headers: { 'Content-Length': '1' },
-        })
-
-        const params = { params: { id: discussion._id.toString() } }
-        const response = await PUT(request, params)
+        const response = await PUT(
+          new NextRequest('http://-', {
+            method: 'PUT',
+            body: JSON.stringify({ message: 'hi' }),
+            headers: { 'Content-Length': '1' },
+          }),
+          { params: Promise.resolve({ id: discussion._id.toString() }) }
+        )
         const data = await response.json()
 
         const updatedDiscussion = (await Discussion.findById(discussion._id)
@@ -617,13 +619,14 @@ describe('PUT', () => {
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
 
-        const request = new NextRequest('http://-', {
-          method: 'PUT',
-          body: JSON.stringify({ message: 'yo' }),
-          headers: { 'Content-Length': '1' },
-        })
-
-        await PUT(request, { params: { id: discussion._id.toString() } })
+        await PUT(
+          new NextRequest('http://-', {
+            method: 'PUT',
+            body: JSON.stringify({ message: 'yo' }),
+            headers: { 'Content-Length': '1' },
+          }),
+          { params: Promise.resolve({ id: discussion._id.toString() }) }
+        )
 
         const { discussions } = (await User.findById(seller._id).lean().exec())!
 
@@ -644,13 +647,14 @@ describe('PUT', () => {
         mockDbConnect.mockResolvedValue()
         mockVerifyCsrfTokens.mockReturnValue(true)
 
-        const request = new NextRequest('http://-', {
-          method: 'PUT',
-          body: JSON.stringify({ message: 'yo' }),
-          headers: { 'Content-Length': '1' },
-        })
-
-        await PUT(request, { params: { id: discussion._id.toString() } })
+        await PUT(
+          new NextRequest('http://-', {
+            method: 'PUT',
+            body: JSON.stringify({ message: 'yo' }),
+            headers: { 'Content-Length': '1' },
+          }),
+          { params: Promise.resolve({ id: discussion._id.toString() }) }
+        )
 
         const { discussions } = (await User.findById(buyer._id).lean().exec())!
 
@@ -668,14 +672,14 @@ describe('PUT', () => {
         mockVerifyCsrfTokens.mockReturnValue(true)
         mockPusherTrigger.mockRejectedValue().mockResolvedValueOnce()
 
-        const request = new NextRequest('http://-', {
-          method: 'PUT',
-          body: JSON.stringify({ message: 'yo' }),
-          headers: { 'Content-Length': '1' },
-        })
-
-        const params = { params: { id: discussion._id.toString() } }
-        const response = await PUT(request, params)
+        const response = await PUT(
+          new NextRequest('http://-', {
+            method: 'PUT',
+            body: JSON.stringify({ message: 'yo' }),
+            headers: { 'Content-Length': '1' },
+          }),
+          { params: Promise.resolve({ id: discussion._id.toString() }) }
+        )
         const data = await response.json()
 
         await resetEntities()
@@ -699,14 +703,14 @@ describe('PUT', () => {
       mockDbConnect.mockResolvedValue()
       mockVerifyCsrfTokens.mockReturnValue(true)
 
-      const request = new NextRequest('http://-', {
-        method: 'PUT',
-        body: JSON.stringify({ message: 'hi' }),
-        headers: { 'Content-Length': '1' },
-      })
-
-      const params = { params: { id: discussion._id.toString() } }
-      const response = await PUT(request, params)
+      const response = await PUT(
+        new NextRequest('http://-', {
+          method: 'PUT',
+          body: JSON.stringify({ message: 'hi' }),
+          headers: { 'Content-Length': '1' },
+        }),
+        { params: Promise.resolve({ id: discussion._id.toString() }) }
+      )
       const { messages } = (await Discussion.findById(discussion._id)
         .lean()
         .exec())!
@@ -756,9 +760,10 @@ describe('PUT', () => {
       mockDbConnect.mockResolvedValue()
       mockVerifyCsrfTokens.mockReturnValue(true)
 
-      const request = new NextRequest('http://-', { method: 'PUT' })
-      const params = { params: { id: discussion._id.toString() } }
-      const response = await PUT(request, params)
+      const response = await PUT(
+        new NextRequest('http://-', { method: 'PUT' }),
+        { params: Promise.resolve({ id: discussion._id.toString() }) }
+      )
 
       const { discussions } = (await User.findById(buyer._id).lean().exec())!
       const { messages } = (await Discussion.findById(discussion._id)
@@ -780,9 +785,10 @@ describe('PUT', () => {
 
 describe('DELETE', () => {
   test('422 - invalid id', async () => {
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: 'invalid id' } }
-    const response = await DELETE(request, params)
+    const response = await DELETE(
+      new NextRequest('http://-', { method: 'DELETE' }),
+      { params: Promise.resolve({ id: 'invalid id' }) }
+    )
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
@@ -792,9 +798,10 @@ describe('DELETE', () => {
   test('401 - unauthorized', async () => {
     mockAuth.mockResolvedValue(null)
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await DELETE(request, params)
+    const response = await DELETE(
+      new NextRequest('http://-', { method: 'DELETE' }),
+      { params: Promise.resolve({ id: discussion._id.toString() }) }
+    )
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 401)
@@ -805,9 +812,10 @@ describe('DELETE', () => {
     mockAuth.mockResolvedValue({})
     mockVerifyCsrfTokens.mockReturnValue(false)
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await DELETE(request, params)
+    const response = await DELETE(
+      new NextRequest('http://-', { method: 'DELETE' }),
+      { params: Promise.resolve({ id: discussion._id.toString() }) }
+    )
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 422)
@@ -819,9 +827,10 @@ describe('DELETE', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockRejectedValue()
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await DELETE(request, params)
+    const response = await DELETE(
+      new NextRequest('http://-', { method: 'DELETE' }),
+      { params: Promise.resolve({ id: discussion._id.toString() }) }
+    )
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 500)
@@ -833,9 +842,14 @@ describe('DELETE', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: new mongoose.Types.ObjectId().toString() } }
-    const response = await DELETE(request, params)
+    const response = await DELETE(
+      new NextRequest('http://-', { method: 'DELETE' }),
+      {
+        params: Promise.resolve({
+          id: new mongoose.Types.ObjectId().toString(),
+        }),
+      }
+    )
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 404)
@@ -849,9 +863,10 @@ describe('DELETE', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await DELETE(request, params)
+    const response = await DELETE(
+      new NextRequest('http://-', { method: 'DELETE' }),
+      { params: Promise.resolve({ id: discussion._id.toString() }) }
+    )
     const data = await response.json()
 
     expect(response).toHaveProperty('status', 403)
@@ -865,9 +880,10 @@ describe('DELETE', () => {
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue()
 
-    const request = new NextRequest('http://-', { method: 'PUT' })
-    const params = { params: { id: discussion._id.toString() } }
-    const response = await DELETE(request, params)
+    const response = await DELETE(
+      new NextRequest('http://-', { method: 'DELETE' }),
+      { params: Promise.resolve({ id: discussion._id.toString() }) }
+    )
 
     await resetEntities()
 

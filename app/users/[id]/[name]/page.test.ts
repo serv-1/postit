@@ -17,7 +17,6 @@ jest
 
 const mockGetUser = getUser as jest.MockedFunction<typeof getUser>
 const mockGetPosts = getPosts as jest.MockedFunction<typeof getPosts>
-const params = { id: '0', name: 'john' }
 
 const user: User = {
   _id: '0',
@@ -47,7 +46,11 @@ describe('generateMetadata()', () => {
   it('generates the metadata', async () => {
     mockGetUser.mockResolvedValue(user)
 
-    expect(await generateMetadata({ params })).toEqual({
+    expect(
+      await generateMetadata({
+        params: Promise.resolve({ id: '0', name: 'john' }),
+      })
+    ).toEqual({
       title: "john's profile - PostIt",
     })
   })
@@ -62,7 +65,7 @@ describe('<Page />', () => {
   it("renders the default user's image", async () => {
     mockGetUser.mockResolvedValue({ ...user, image: undefined })
 
-    render(await Page({ params }))
+    render(await Page({ params: Promise.resolve({ id: '0', name: 'john' }) }))
 
     const image = screen.getByRole('img')
 
@@ -71,7 +74,7 @@ describe('<Page />', () => {
   })
 
   it("renders the user's image", async () => {
-    render(await Page({ params }))
+    render(await Page({ params: Promise.resolve({ id: '0', name: 'john' }) }))
 
     const image = screen.getByRole('img')
 
@@ -90,7 +93,7 @@ describe('<Page />', () => {
       },
     ])
 
-    render(await Page({ params }))
+    render(await Page({ params: Promise.resolve({ id: '0', name: 'john' }) }))
 
     const nbOfPosts = screen.getByRole('heading', { level: 2 })
 
@@ -100,7 +103,7 @@ describe('<Page />', () => {
   it('doesn\'t render an "s" if the user has only one post', async () => {
     mockGetPosts.mockResolvedValue([post])
 
-    render(await Page({ params }))
+    render(await Page({ params: Promise.resolve({ id: '0', name: 'john' }) }))
 
     const nbOfPosts = screen.getByRole('heading', { level: 2 })
 
@@ -108,7 +111,7 @@ describe('<Page />', () => {
   })
 
   it('renders the status text if the user has no posts', async () => {
-    render(await Page({ params }))
+    render(await Page({ params: Promise.resolve({ id: '0', name: 'john' }) }))
 
     const statusText = screen.getByRole('status')
 

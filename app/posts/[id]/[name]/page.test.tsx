@@ -47,7 +47,6 @@ jest
 const mockGetPost = getPost as jest.MockedFunction<typeof getPost>
 const mockGetUser = getUser as jest.MockedFunction<typeof getUser>
 const mockGetPosts = getPosts as jest.MockedFunction<typeof getPosts>
-const params = { id: '0', name: 'table' }
 
 const post: Post = {
   _id: '0',
@@ -86,7 +85,11 @@ describe('generateMetadata()', () => {
   it('generates the metadata', async () => {
     mockGetPost.mockResolvedValue({ name: 'table' } as Post)
 
-    expect(await generateMetadata({ params })).toEqual({
+    expect(
+      await generateMetadata({
+        params: Promise.resolve({ id: '0', name: 'table' }),
+      })
+    ).toEqual({
       title: 'table - PostIt',
     })
 
@@ -103,7 +106,7 @@ describe('<Page />', () => {
   })
 
   it("renders the post's first image", async () => {
-    render(await Page({ params }))
+    render(await Page({ params: Promise.resolve({ id: '0', name: 'table' }) }))
 
     const image = screen.getByRole('img')
 
@@ -112,7 +115,7 @@ describe('<Page />', () => {
   })
 
   it("renders the post's name, price, description and address", async () => {
-    render(await Page({ params }))
+    render(await Page({ params: Promise.resolve({ id: '0', name: 'table' }) }))
 
     const name = screen.getByRole('heading', { level: 1 })
 
@@ -133,7 +136,9 @@ describe('<Page />', () => {
 
   describe('if the user is unauthenticated', () => {
     it('renders the favorite button', async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const favoriteBtn = screen.getByRole('button', { name: /favorite/i })
 
@@ -141,7 +146,9 @@ describe('<Page />', () => {
     })
 
     it("renders the seller's name in a link", async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const links = screen.getAllByRole('link', { name: /john doe/i })
 
@@ -150,7 +157,9 @@ describe('<Page />', () => {
     })
 
     it('renders the contact button', async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const contactBtn = screen.getByRole('button', { name: /contact/i })
 
@@ -160,7 +169,9 @@ describe('<Page />', () => {
     it('renders the other posts of the seller', async () => {
       mockGetPosts.mockResolvedValue([post])
 
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const link = screen.getAllByRole('link', { name: /john doe/i })[2]
 
@@ -168,7 +179,9 @@ describe('<Page />', () => {
     })
 
     it("doesn't render the edit link and the delete button", async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const editLink = screen.queryByRole('link', { name: /edit/i })
 
@@ -180,7 +193,9 @@ describe('<Page />', () => {
     })
 
     it('doesn\'t render "manage your post"', async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const text = screen.queryByText(/manage your post/i)
 
@@ -194,7 +209,9 @@ describe('<Page />', () => {
     })
 
     it('renders the edit link and the delete button', async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const editLinks = screen.getAllByRole('link', { name: /edit/i })
 
@@ -207,7 +224,9 @@ describe('<Page />', () => {
     })
 
     it('renders "manage your post"', async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const text = screen.getByText(/manage your post/i)
 
@@ -215,7 +234,9 @@ describe('<Page />', () => {
     })
 
     it("doesn't render the favorite button", async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const favoriteBtn = screen.queryByRole('button', { name: /favorite/i })
 
@@ -223,7 +244,9 @@ describe('<Page />', () => {
     })
 
     it("doesn't render the seller's name in a link", async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const link = screen.queryByRole('link', { name: /john doe/i })
 
@@ -231,7 +254,9 @@ describe('<Page />', () => {
     })
 
     it("doesn't render the contact modal", async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const contactBtn = screen.queryByRole('button', { name: /contact/i })
 
@@ -241,7 +266,9 @@ describe('<Page />', () => {
     it("doesn't render the other posts of the seller", async () => {
       mockGetPosts.mockResolvedValue([post])
 
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const title = screen.queryByRole('heading', {
         level: 2,
@@ -262,7 +289,9 @@ describe('<Page />', () => {
     })
 
     it('renders the favorite button', async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const favoriteBtn = screen.getByRole('button', { name: /favorite/i })
 
@@ -270,7 +299,9 @@ describe('<Page />', () => {
     })
 
     it("renders the seller's name in a link", async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const links = screen.getAllByRole('link', { name: /john doe/i })
 
@@ -296,7 +327,9 @@ describe('<Page />', () => {
         discussionIds: ['45', '1', '77'],
       })
 
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const contactModal = screen.getByRole('dialog')
       const contactModalProps = mockGetContactModalProps.mock.calls[0][0]
@@ -309,7 +342,9 @@ describe('<Page />', () => {
     it('renders the other posts of the seller', async () => {
       mockGetPosts.mockResolvedValue([post])
 
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const link = screen.getAllByRole('link', { name: /john doe/i })[2]
 
@@ -317,7 +352,9 @@ describe('<Page />', () => {
     })
 
     it("doesn't render the edit link and the delete button", async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const editLink = screen.queryByRole('link', { name: /delete/i })
 
@@ -329,7 +366,9 @@ describe('<Page />', () => {
     })
 
     it('doesn\'t render "manage your post"', async () => {
-      render(await Page({ params }))
+      render(
+        await Page({ params: Promise.resolve({ id: '0', name: 'table' }) })
+      )
 
       const text = screen.queryByText(/manager your post/i)
 

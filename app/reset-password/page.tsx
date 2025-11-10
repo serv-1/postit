@@ -1,13 +1,13 @@
 import ResetPasswordForm from 'components/ResetPasswordForm'
 import SendResetPasswordLinkForm from 'components/SendResetPasswordLinkForm'
 
-interface PageProps {
-  searchParams:
-    | { email?: never; token: string; userId: string }
-    | { email?: string; token?: never; userId?: never }
-}
+type SearchParams = Promise<
+  | { email?: never; token: string; userId: string }
+  | { email?: string; token?: never; userId?: never }
+>
 
-export default function Page({ searchParams }: PageProps) {
+export default async function Page(props: { searchParams: SearchParams }) {
+  const searchParams = await props.searchParams
   const { token, email, userId } = searchParams
 
   return (

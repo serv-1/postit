@@ -16,7 +16,7 @@ export default async function Page({
 }: {
   searchParams: SearchParams
 }) {
-  const str = searchParamsToString(searchParams)
+  const str = searchParamsToString(await searchParams)
   const searchResult = str ? await searchPosts(str) : null
 
   return (

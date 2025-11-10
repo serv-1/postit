@@ -4,22 +4,22 @@ import { auth } from 'libs/auth'
 import { redirect } from 'next/navigation'
 import UpdatePostForm from 'components/UpdatePostForm'
 
-interface Params {
+type Params = Promise<{
   id: string
   name: string
-}
+}>
 
-export async function generateMetadata({
-  params,
-}: {
+export async function generateMetadata(props: {
   params: Params
 }): Promise<Metadata> {
+  const params = await props.params
   const post = await getPost(params.id)
 
   return { title: 'Update ' + post!.name + ' - PostIt' }
 }
 
-export default async function Page({ params }: { params: Params }) {
+export default async function Page(props: { params: Params }) {
+  const params = await props.params
   const session = await auth()
 
   if (!session) {

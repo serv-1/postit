@@ -1,6 +1,8 @@
-import type { SearchParams } from 'types'
+import type { SearchParams, UnPromise } from 'types'
 
-export default function searchParamsToString(searchParams: SearchParams) {
+export default function searchParamsToString(
+  searchParams: UnPromise<SearchParams>
+) {
   let str = ''
 
   for (const name in searchParams) {
