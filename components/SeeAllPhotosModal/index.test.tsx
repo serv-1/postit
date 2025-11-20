@@ -12,13 +12,13 @@ it('renders', async () => {
   const closeBtn = screen.getByRole('button', { name: /close/i })
   expect(closeBtn).toHaveFocus()
 
-  const img = screen.getByRole('img')
+  const img = screen.getByRole('presentation')
   expect(img).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/key')
 
   const expandBtn = screen.getByRole('button', { name: /expand/i })
   await userEvent.click(expandBtn)
 
-  const expandedImage = screen.getAllByRole('img')[1]
+  const expandedImage = screen.getAllByRole('presentation')[1]
   expect(expandedImage).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/key')
 })
 

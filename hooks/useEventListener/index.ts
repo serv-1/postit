@@ -13,7 +13,7 @@ export default function useEventListener<T extends keyof WindowEventMap>(
   options?: boolean | AddEventListenerOptions
 ): void
 export default function useEventListener<T extends keyof HTMLElementEventMap>(
-  target: React.RefObject<HTMLElement>,
+  target: React.RefObject<HTMLElement | null>,
   type: T,
   listener: (this: HTMLElement, ev: HTMLElementEventMap[T]) => void,
   options?: boolean | AddEventListenerOptions
@@ -23,7 +23,7 @@ export default function useEventListener<
   TW extends keyof WindowEventMap,
   TH extends keyof HTMLElementEventMap
 >(
-  target: 'document' | 'window' | React.RefObject<HTMLElement>,
+  target: 'document' | 'window' | React.RefObject<HTMLElement | null>,
   type: TD | TW | TH,
   listener: (
     this: Document | Window | HTMLElement,

@@ -6,7 +6,7 @@ import { NEXT_PUBLIC_AWS_URL } from 'env/public'
 it('renders', async () => {
   render(<ExpandedImageModal src="key" btnClass="red" btnImgClass="blue" />)
 
-  const img = screen.getByRole('img')
+  const img = screen.getByRole('presentation')
   expect(img).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/key')
   expect(img).toHaveClass('blue')
 
@@ -14,7 +14,7 @@ it('renders', async () => {
   expect(openBtn).toHaveClass('red')
   await userEvent.click(openBtn)
 
-  const expandedImg = screen.getAllByRole('img')[1]
+  const expandedImg = screen.getAllByRole('presentation')[1]
   expect(expandedImg).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/key')
 })
 

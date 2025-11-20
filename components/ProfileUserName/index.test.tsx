@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import ProfileUserName from '.'
-import { act } from 'react-dom/test-utils'
+import { act } from 'react'
 
 it('renders the user name', () => {
   render(<ProfileUserName name="john" />)
@@ -10,10 +10,10 @@ it('renders the user name', () => {
   expect(name).toHaveTextContent('john')
 })
 
-it('renders the new user name', () => {
+it('renders the new user name', async () => {
   render(<ProfileUserName name="john" />)
 
-  act(() => {
+  await act(async () => {
     document.dispatchEvent(
       new CustomEvent('updateProfileUserName', {
         detail: { name: 'jane' },

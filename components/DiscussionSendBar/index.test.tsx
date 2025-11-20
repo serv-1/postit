@@ -137,7 +137,7 @@ it('renders an alert if the given message is invalid', async () => {
 
   await userEvent.click(submitBtn)
 
-  const toast = screen.getByRole('alert')
+  const toast = await screen.findByRole('alert')
 
   expect(toast).toHaveTextContent(MESSAGE_REQUIRED)
 })

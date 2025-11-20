@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import ContactModal from '.'
 import { setupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
-import { act } from 'react-dom/test-utils'
+import { act } from 'react'
 import usePusher from 'hooks/usePusher'
 // @ts-expect-error
 import { mockUseSession, mockGetCsrfToken } from 'next-auth/react'
@@ -134,7 +134,7 @@ it("can't open the discussion if it has been deleted", async () => {
     <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />
   )
 
-  act(() => {
+  await act(async () => {
     document.dispatchEvent(
       new CustomEvent('discussionDeleted', { detail: '0' })
     )
@@ -155,7 +155,7 @@ it('still can open the discussion if it is another discussion that has been dele
     <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />
   )
 
-  act(() => {
+  await act(async () => {
     document.dispatchEvent(
       new CustomEvent('discussionDeleted', { detail: '6' })
     )
@@ -176,7 +176,7 @@ it('can open the discussion if it has a new message', async () => {
     <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />
   )
 
-  act(() => {
+  await act(async () => {
     mockUsePusher.mock.calls[0][2]({ discussionId: '0' })
   })
 
@@ -201,7 +201,7 @@ it("still can't open the discussion if it is another discussion that has a new m
     />
   )
 
-  act(() => {
+  await act(async () => {
     mockUsePusher.mock.calls[0][2]({ discussionId: '6' })
   })
 

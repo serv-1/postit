@@ -86,7 +86,7 @@ it('renders a preview of the uploaded images', async () => {
     new File(['2'], '2.jpeg', { type: 'image/jpeg' }),
   ])
 
-  const previews = await screen.findAllByRole('img')
+  const previews = await screen.findAllByRole('presentation')
 
   expect(previews[0].getAttribute('src')).toContain('data:image/jpeg;base64,')
   expect(previews[1].getAttribute('src')).toContain('data:image/jpeg;base64,')
@@ -106,7 +106,7 @@ it('removes all image previews if an invalid image is uploaded', async () => {
     new File(['2'], '2.jpeg', { type: 'image/jpeg' }),
   ])
 
-  const previews = await screen.findAllByRole('img')
+  const previews = await screen.findAllByRole('presentation')
 
   await userEvent.upload(input, new File([''], '_.txt', { type: 'text/plain' }))
 

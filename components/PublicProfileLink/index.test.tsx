@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import ProfilePublicProfileLink from '.'
-import { act } from 'react-dom/test-utils'
+import { act } from 'react'
 
 it('renders the public profile link', () => {
   render(<ProfilePublicProfileLink id="0" name="john doe" />)
@@ -10,10 +10,10 @@ it('renders the public profile link', () => {
   expect(link).toHaveAttribute('href', '/users/0/john-doe')
 })
 
-it('updates the link when the user changes its name', () => {
+it('updates the link when the user changes its name', async () => {
   render(<ProfilePublicProfileLink id="0" name="john doe" />)
 
-  act(() => {
+  await act(async () => {
     document.dispatchEvent(
       new CustomEvent('updateProfileUserName', {
         detail: { name: 'jane doe' },

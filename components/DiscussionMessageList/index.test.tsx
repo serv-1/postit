@@ -117,7 +117,7 @@ it('renders the message with the signed in user as the author', () => {
 
   expect(authorName).toBeInTheDocument()
 
-  const authorImage = screen.getByRole('img')
+  const authorImage = screen.getByRole('presentation')
 
   expect(authorImage).toHaveAttribute('src', signedInUser.image)
 })
@@ -143,7 +143,7 @@ it('renders the message with the interlocutor as the author', () => {
 
   expect(authorName).toBeInTheDocument()
 
-  const authorImage = screen.getByRole('img')
+  const authorImage = screen.getByRole('presentation')
 
   expect(authorImage).toHaveAttribute('src', interlocutor.image)
 })
@@ -169,7 +169,7 @@ it('renders the message with its author deleted', () => {
 
   expect(authorName).toBeInTheDocument()
 
-  const authorImage = screen.getByRole('img')
+  const authorImage = screen.getByRole('presentation')
 
   expect(authorImage).not.toHaveAttribute('src')
 })

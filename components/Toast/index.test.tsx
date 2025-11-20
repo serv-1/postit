@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Toast from '.'
 import showToast from 'functions/showToast'
-import { act } from 'react-dom/test-utils'
+import { act } from 'react'
 
 it("doesn't render if there is no message to display", () => {
   render(<Toast />)
@@ -15,7 +15,7 @@ it("doesn't render if there is no message to display", () => {
 it('renders a default toast', async () => {
   render(<Toast />)
 
-  act(() => {
+  await act(async () => {
     showToast({ message: 'message' })
   })
 
@@ -25,10 +25,10 @@ it('renders a default toast', async () => {
   expect(toast).toHaveClass('bg-fuchsia-600')
 })
 
-it('renders an error toast', () => {
+it('renders an error toast', async () => {
   render(<Toast />)
 
-  act(() => {
+  await act(async () => {
     showToast({ message: 'error', error: true })
   })
 
@@ -41,7 +41,7 @@ it('renders an error toast', () => {
 it('closes after clicking the close button', async () => {
   render(<Toast />)
 
-  act(() => {
+  await act(async () => {
     showToast({ message: 'message' })
   })
 
@@ -56,13 +56,13 @@ it('stops rendering after 5 seconds', async () => {
   jest.useFakeTimers()
   render(<Toast />)
 
-  act(() => {
+  await act(async () => {
     showToast({ message: 'message' })
   })
 
   const toast = screen.getByRole('alert')
 
-  act(() => {
+  await act(async () => {
     jest.advanceTimersByTime(5000)
   })
 

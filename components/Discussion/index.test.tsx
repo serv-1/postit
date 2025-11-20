@@ -5,7 +5,7 @@ import {
   waitForElementToBeRemoved,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { act } from 'react-dom/test-utils'
+import { act } from 'react'
 import usePusher from 'hooks/usePusher'
 import type { Discussion as IDiscussion, User } from 'types'
 import { setupServer } from 'msw/node'
@@ -200,7 +200,7 @@ it('unmounts the notification badge when the modal opens', async () => {
 
 describe('on "openDiscussion" event', () => {
   describe('if the ids match', () => {
-    it('opens the modal', () => {
+    it('opens the modal', async () => {
       const setOpenedDiscussionId = jest.fn()
 
       render(
@@ -212,7 +212,7 @@ describe('on "openDiscussion" event', () => {
         />
       )
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: discussion._id })
         )
@@ -233,7 +233,7 @@ describe('on "openDiscussion" event', () => {
 
       const badge = await screen.findByRole('status', { name: /john/i })
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: discussion._id })
         )
@@ -244,7 +244,7 @@ describe('on "openDiscussion" event', () => {
   })
 
   describe("if the ids don't match", () => {
-    it("doesn't open the modal", () => {
+    it("doesn't open the modal", async () => {
       const setOpenedDiscussionId = jest.fn()
 
       render(
@@ -256,7 +256,7 @@ describe('on "openDiscussion" event', () => {
         />
       )
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: '1' })
         )
@@ -277,7 +277,7 @@ describe('on "openDiscussion" event', () => {
 
       const badge = await screen.findByRole('status', { name: /john/i })
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: '1' })
         )
@@ -299,7 +299,7 @@ describe('when a new message is received in real time', () => {
       />
     )
 
-    act(() => {
+    await act(async () => {
       mockUsePusher.mock.calls[0][2]({
         _id: '1',
         userId: '2',
@@ -309,7 +309,7 @@ describe('when a new message is received in real time', () => {
       })
     })
 
-    const message = await screen.findByText('hello')
+    const message = screen.getByText('hello')
 
     expect(message).toBeInTheDocument()
   })
@@ -324,7 +324,7 @@ describe('when a new message is received in real time', () => {
       />
     )
 
-    act(() => {
+    await act(async () => {
       mockUsePusher.mock.calls[0][2]({
         _id: '1',
         userId: '2',
@@ -334,7 +334,7 @@ describe('when a new message is received in real time', () => {
       })
     })
 
-    const badge = await screen.findByRole('status', { name: /john/i })
+    const badge = screen.getByRole('status', { name: /john/i })
 
     expect(badge).toBeInTheDocument()
   })
@@ -351,7 +351,7 @@ describe('when a new message is received in real time', () => {
 
     await waitForElementToBeRemoved(() => screen.queryByRole('status'))
 
-    act(() => {
+    await act(async () => {
       mockUsePusher.mock.calls[0][2]({
         _id: '1',
         userId: '1',
@@ -378,7 +378,7 @@ describe('when a new message is received in real time', () => {
 
     await waitForElementToBeRemoved(() => screen.queryByRole('status'))
 
-    act(() => {
+    await act(async () => {
       mockUsePusher.mock.calls[0][2]({
         _id: '1',
         userId: '2',
@@ -520,7 +520,7 @@ it('removes the interlocutor if he has deleted his account', async () => {
 
   const interlocutorName = await screen.findByText(/john/i)
 
-  act(() => {
+  await act(async () => {
     mockUsePusher.mock.calls[3][2](null)
   })
 

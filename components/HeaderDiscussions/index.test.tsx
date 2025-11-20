@@ -1,13 +1,8 @@
 import type { Discussion, User } from 'types'
 import HeaderDiscussions from '.'
-import {
-  render,
-  screen,
-  waitFor,
-  waitForElementToBeRemoved,
-} from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { act } from 'react-dom/test-utils'
+import { act } from 'react'
 import usePusher from 'hooks/usePusher'
 import fetchDiscussion from 'functions/fetchDiscussion'
 import { setupServer } from 'msw/node'
@@ -208,15 +203,18 @@ describe('when the "discussion list" modal opens', () => {
         />
       )
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: '1' })
         )
       })
 
-      const discussions = await screen.findAllByRole('listitem')
+      const [discussionListModal, discussionModal, ...otherModals] =
+        screen.getAllByRole('dialog')
 
-      expect(discussions).toHaveLength(1)
+      expect(discussionListModal).toBeInTheDocument()
+      expect(discussionModal).toBeInTheDocument()
+      expect(otherModals).toHaveLength(0)
     })
 
     it("doesn't fetch the discussions if they have already been fetched", async () => {
@@ -226,26 +224,21 @@ describe('when the "discussion list" modal opens', () => {
 
       render(<HeaderDiscussions signedInUser={signedInUser} />)
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: '1' })
         )
       })
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('dialog')).toHaveLength(2)
-      })
+      expect(screen.getAllByRole('dialog')).toHaveLength(2)
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: '1' })
         )
       })
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('dialog')).toHaveLength(2)
-      })
-
+      expect(screen.getAllByRole('dialog')).toHaveLength(2)
       expect(mockFetchDiscussion).toHaveBeenCalledTimes(2)
     })
 
@@ -279,15 +272,13 @@ describe('when the "discussion list" modal opens', () => {
         />
       )
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: '1' })
         )
       })
 
-      await waitFor(() => {
-        expect(mockFetchDiscussion).toHaveBeenCalledTimes(1)
-      })
+      expect(mockFetchDiscussion).toHaveBeenCalledTimes(1)
     })
 
     it("doesn't fetch the discussion to open if it is in the discussion list", async () => {
@@ -297,16 +288,13 @@ describe('when the "discussion list" modal opens', () => {
 
       render(<HeaderDiscussions signedInUser={signedInUser} />)
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: '1' })
         )
       })
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('dialog')).toHaveLength(2)
-      })
-
+      expect(screen.getAllByRole('dialog')).toHaveLength(2)
       expect(mockFetchDiscussion).not.toHaveBeenCalledTimes(3)
     })
 
@@ -322,13 +310,13 @@ describe('when the "discussion list" modal opens', () => {
         </>
       )
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: '1' })
         )
       })
 
-      const toast = await screen.findByRole('alert')
+      const toast = screen.getByRole('alert')
 
       expect(toast).toHaveTextContent('error')
     })
@@ -340,23 +328,15 @@ describe('when the "discussion list" modal opens', () => {
 
       render(<HeaderDiscussions signedInUser={signedInUser} />)
 
-      act(() => {
+      await act(async () => {
         document.dispatchEvent(
           new CustomEvent('openDiscussion', { detail: '1' })
         )
       })
 
-      await screen.findByRole('list')
-
-      const discussionListModal = screen.getByRole('dialog')
-
-      expect(discussionListModal).not.toHaveClass('hidden')
-
-      // discussion loading spinner
-      await waitForElementToBeRemoved(() => screen.getAllByRole('status'))
-
       const discussionModals = screen.getAllByRole('dialog')
 
+      expect(discussionModals[0]).not.toHaveClass('hidden')
       expect(discussionModals[1]).toBeInTheDocument()
       expect(discussionModals[2]).toBeUndefined()
     })
@@ -381,7 +361,7 @@ it('deletes a discussion from the discussion list on "discussionDeleted" event',
 
   expect(discussions).toHaveLength(2)
 
-  act(() => {
+  await act(async () => {
     document.dispatchEvent(
       new CustomEvent('discussionDeleted', { detail: '1' })
     )
@@ -405,7 +385,7 @@ describe('when receiving a new discussion in real time', () => {
 
     await userEvent.click(openBtn)
 
-    act(() => {
+    await act(async () => {
       mockUsePusher.mock.calls[4][2]({ ...discussion, _id: '3' })
     })
 
@@ -421,11 +401,11 @@ describe('when receiving a new discussion in real time', () => {
 
     render(<HeaderDiscussions signedInUser={signedInUser} />)
 
-    act(() => {
+    await act(async () => {
       mockUsePusher.mock.calls[0][2]({ ...discussion, _id: '3' })
     })
 
-    const discussions = await screen.findAllByRole('listitem')
+    const discussions = screen.getAllByRole('listitem')
 
     expect(discussions).toHaveLength(3)
   })
@@ -435,11 +415,11 @@ describe('when receiving a new discussion in real time', () => {
       <HeaderDiscussions signedInUser={{ ...signedInUser, discussions: [] }} />
     )
 
-    act(() => {
+    await act(async () => {
       mockUsePusher.mock.calls[0][2](discussion)
     })
 
-    const badge = await screen.findByRole('status', { name: /new message/i })
+    const badge = screen.getByRole('status', { name: /new message/i })
 
     expect(badge).toBeInTheDocument()
   })
@@ -455,7 +435,7 @@ describe('when receiving a new discussion in real time', () => {
 
     await userEvent.click(openBtn)
 
-    act(() => {
+    await act(async () => {
       mockUsePusher.mock.calls[4][2](discussion)
     })
 
@@ -471,7 +451,7 @@ describe('when receiving a new message in real time', () => {
       <HeaderDiscussions signedInUser={{ ...signedInUser, discussions: [] }} />
     )
 
-    act(() => {
+    await act(async () => {
       mockUsePusher.mock.calls[1][2](null)
     })
 
@@ -491,7 +471,7 @@ describe('when receiving a new message in real time', () => {
 
     await userEvent.click(openBtn)
 
-    act(() => {
+    await act(async () => {
       mockUsePusher.mock.calls[3][2](null)
     })
 

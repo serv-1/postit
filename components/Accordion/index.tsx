@@ -18,7 +18,7 @@ export default function Accordion({
   id,
 }: AccordionProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const Heading = ('h' + headingLevel) as keyof JSX.IntrinsicElements
+  const Heading = ('h' + headingLevel) as keyof React.JSX.IntrinsicElements
 
   return (
     <div className="mb-16 bg-fuchsia-200 rounded-8 md:bg-fuchsia-300">
