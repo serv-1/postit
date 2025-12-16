@@ -24,10 +24,10 @@ module.exports = {
     return config
   },
   images: {
-    domains: [
-      'maps.locationiq.com',
-      'postit-images-bucket.s3.eu-west-3.amazonaws.com',
-      'postit-images-bucket-dev.s3.eu-west-3.amazonaws.com',
+    remotePatterns: [
+      { hostname: 'maps.locationiq.com' },
+      { hostname: 'postit-images-bucket.s3.eu-west-3.amazonaws.com' },
+      { hostname: 'postit-images-bucket-dev.s3.eu-west-3.amazonaws.com' },
     ],
   },
 }

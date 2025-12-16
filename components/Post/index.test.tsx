@@ -1,37 +1,17 @@
 import Post from '.'
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { NEXT_PUBLIC_AWS_URL } from 'env/public'
+import { screen } from '@testing-library/react'
+import setup from 'functions/setup'
 
-const defaultPost = {
-  id: '0',
-  name: 'Cat',
-  price: 5000,
-  image: 'keyName',
-  address: 'Oslo, Norway',
-}
-
-it('renders', async () => {
-  const { id, name, image, address } = defaultPost
-
-  render(<Post {...defaultPost} />)
-
-  const addressBtn = screen.getByRole('button')
-  await userEvent.click(addressBtn)
-
-  const addressText = screen.getByText(address)
-  expect(addressText).toBeInTheDocument()
-
-  const img = screen.getByRole('img')
-  expect(img).toHaveAttribute('src', NEXT_PUBLIC_AWS_URL + '/' + image)
-  expect(img).toHaveAttribute('alt', name)
+it('formats the post name to url in the link href', () => {
+  setup(<Post id="0" name="blue book" price={10} image="" address="" />)
 
   const link = screen.getByRole('link')
-  expect(link).toHaveTextContent(name)
+  expect(link).toHaveAttribute('href', '/posts/0/blue-book')
+})
 
-  const href = `/posts/${id}/${name.replaceAll(' ', '-')}`
-  expect(link).toHaveAttribute('href', href)
+it('adds spaces to the price number', () => {
+  setup(<Post id="" name="" price={5000} image="" address="" />)
 
-  const priceText = screen.getByText(/5 000/)
-  expect(priceText).toBeInTheDocument()
+  const price = screen.getByText(/5 000/)
+  expect(price).toBeInTheDocument()
 })

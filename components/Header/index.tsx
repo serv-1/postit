@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import classNames from 'classnames'
 import type { User } from 'types'
 import HeaderDiscussions from 'components/HeaderDiscussions'
-import HeaderDropdownMenu from 'components/HeaderDropdownMenu'
+import HeaderAccountMenu from 'components/HeaderAccountMenu'
 import PlusCircle from 'public/static/images/plus-circle.svg'
 import { POST_PAGE_REGEX } from 'constants/regex'
 
@@ -57,7 +57,7 @@ export default function Header({ signedInUser }: HeaderProps) {
               </Link>
             </li>
             <li>
-              <HeaderDropdownMenu userImage={signedInUser.image} />
+              <HeaderAccountMenu userImage={signedInUser.image} />
             </li>
           </ul>
         </nav>

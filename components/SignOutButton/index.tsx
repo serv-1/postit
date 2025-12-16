@@ -2,18 +2,13 @@
 
 import { signOut } from 'next-auth/react'
 
-interface SignOutButtonProps {
-  className?: string
-  children: React.ReactNode
-}
-
 export default function SignOutButton({
-  className,
   children,
-}: SignOutButtonProps) {
+  ...props
+}: React.ComponentPropsWithoutRef<'button'>) {
   return (
     <button
-      className={className}
+      {...props}
       onClick={() => signOut({ redirectTo: '/' })}
       aria-label="Sign out"
     >

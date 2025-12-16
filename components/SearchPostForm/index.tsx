@@ -9,7 +9,7 @@ import { type SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import type { Categories } from 'types'
 import searchPost, { type SearchPost } from 'schemas/client/searchPost'
-import Popup from 'components/Popup'
+import PopoverField from 'components/PopoverField'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 const options = CATEGORIES.map((category) => ({
@@ -71,9 +71,9 @@ export default function SearchPostForm() {
       methods={methods}
       submitHandler={submitHandler}
       role="search"
-      className="relative"
+      className="relative flex flex-wrap gap-8"
     >
-      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] md:align-top lg:block lg:w-auto md:mr-8 lg:mr-0">
+      <div className="w-full">
         <Select<SearchPost>
           name="categories"
           options={options}
@@ -82,7 +82,7 @@ export default function SearchPostForm() {
         />
         <InputError<SearchPost> name="categories" />
       </div>
-      <div className="mb-8 md:inline-block md:w-[calc(50%-4px)] md:align-top lg:block lg:w-auto">
+      <div className="w-full">
         <Input<SearchPost>
           name="query"
           type="search"
@@ -91,68 +91,46 @@ export default function SearchPostForm() {
         />
         <InputError<SearchPost> name="query" />
       </div>
-      <Popup
-        placement="bottom-start"
-        offset={[0, 4]}
-        containerClassName="inline-block mr-8"
-        referenceClassName="hover:bg-fuchsia-600 text-fuchsia-600 hover:text-fuchsia-50 border-2 border-fuchsia-600 px-8 py-4 rounded-full transition-colors duration-200 font-bold"
-        referenceContent="Price"
-        popupClassName="bg-fuchsia-200 border-2 border-fuchsia-500 shadow-[0_0_16px_#D946EF] rounded-8 z-50 p-16 w-full max-w-[328px] lg:max-w-none"
-        popupContent={
-          <>
-            <div className="font-bold mb-8">Price</div>
-            <div className="flex flex-row flex-nowrap">
-              <div className="mr-8 w-[calc(50%-4px)]">
-                <label htmlFor="minPrice">Minimum</label>
-                <Input<SearchPost>
-                  id="minPrice"
-                  name="minPrice"
-                  type="number"
-                  addOn={<span className="text-fuchsia-900/50">€</span>}
-                  className="bg-fuchsia-50"
-                  needFocus
-                />
-              </div>
-              <div className="w-[calc(50%-4px)]">
-                <label htmlFor="maxPrice">Maximum</label>
-                <Input<SearchPost>
-                  id="maxPrice"
-                  name="maxPrice"
-                  type="number"
-                  addOn={<span className="text-fuchsia-900/50">€</span>}
-                  className="bg-fuchsia-50"
-                />
-              </div>
-            </div>
-            <InputError<SearchPost> name="minPrice" />
-            <InputError<SearchPost> name="maxPrice" />
-          </>
-        }
-      />
-      <Popup
-        placement="bottom-start"
-        offset={[0, 4]}
-        containerClassName="inline-block"
-        referenceClassName="hover:bg-fuchsia-600 text-fuchsia-600 hover:text-fuchsia-50 border-2 border-fuchsia-600 px-8 py-4 rounded-full transition-colors duration-200 font-bold"
-        referenceContent="Address"
-        popupClassName="bg-fuchsia-200 border-2 border-fuchsia-500 shadow-[0_0_16px_#D946EF] rounded-8 z-50 p-16 w-full max-w-[328px] lg:max-w-none"
-        popupContent={
-          <>
-            <div className="font-bold mb-8">Address</div>
-            <label htmlFor="address">
-              A city, county, state, country or a postal code is expected.
-            </label>
+      <PopoverField label="Price">
+        <div className="flex flex-row flex-nowrap">
+          <div className="mr-8 w-[calc(50%-4px)]">
+            <label htmlFor="minPrice">Minimum</label>
             <Input<SearchPost>
-              id="address"
-              name="address"
-              type="text"
+              id="minPrice"
+              name="minPrice"
+              type="number"
+              addOn={<span className="text-fuchsia-900/50">€</span>}
+              className="bg-fuchsia-50"
               needFocus
+            />
+          </div>
+          <div className="w-[calc(50%-4px)]">
+            <label htmlFor="maxPrice">Maximum</label>
+            <Input<SearchPost>
+              id="maxPrice"
+              name="maxPrice"
+              type="number"
+              addOn={<span className="text-fuchsia-900/50">€</span>}
               className="bg-fuchsia-50"
             />
-            <InputError<SearchPost> name="address" />
-          </>
-        }
-      />
+          </div>
+        </div>
+        <InputError<SearchPost> name="minPrice" />
+        <InputError<SearchPost> name="maxPrice" />
+      </PopoverField>
+      <PopoverField label="Address">
+        <label htmlFor="address">
+          A city, county, state, country or a postal code is expected.
+        </label>
+        <Input<SearchPost>
+          id="address"
+          name="address"
+          type="text"
+          needFocus
+          className="bg-fuchsia-50"
+        />
+        <InputError<SearchPost> name="address" />
+      </PopoverField>
       <div className="absolute right-0 -bottom-[36px] md:left-1/2 md:-translate-x-1/2 md:right-auto lg:right-0 lg:left-auto lg:translate-x-0 z-10">
         <button className="primary-btn">Search</button>
       </div>
