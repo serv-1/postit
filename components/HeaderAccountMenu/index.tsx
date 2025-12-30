@@ -48,6 +48,7 @@ export default function HeaderAccountMenu({
         aria-controls={menuId}
         aria-expanded={isOpen}
         aria-label="Account menu"
+        className="align-top"
       >
         <Image
           src={
