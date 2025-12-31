@@ -68,7 +68,7 @@ export default function HeaderAccountMenu({
           ref={refs.setFloating}
           id={menuId}
           style={floatingStyles}
-          className="p-16 bg-fuchsia-50 rounded-8 font-bold shadow-[-8px_8px_8px_rgba(112,26,117,0.05)]"
+          className="p-16 bg-fuchsia-50 rounded-8 font-bold shadow-[-8px_8px_8px_rgba(112,26,117,0.05)] z-10"
           role="menu"
           aria-labelledby={referenceId}
         >
