@@ -106,13 +106,7 @@ describe('POST', () => {
   })
 
   test('422 - password undefined', async () => {
-    await User.updateOne(
-      { _id: user._id },
-      { password: '' },
-      { omitUndefined: true }
-    )
-      .lean()
-      .exec()
+    await User.updateOne({ _id: user._id }, { password: '' }).lean().exec()
 
     mockDbConnect.mockResolvedValue({})
 
