@@ -40,8 +40,13 @@ jest
     __esModule: true,
     default: () => <button>contact</button>,
   }))
-  .mock('next/navigation', () => ({
-    useRouter: () => ({}),
+  .mock('components/PostFavoriteButton', () => ({
+    __esModule: true,
+    default: () => <button>favorite</button>,
+  }))
+  .mock('components/DeletePostButton', () => ({
+    __esModule: true,
+    default: () => <button>delete</button>,
   }))
 
 const mockGetPost = getPost as jest.MockedFunction<typeof getPost>

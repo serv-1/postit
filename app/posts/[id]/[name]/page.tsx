@@ -6,7 +6,7 @@ import { auth } from 'libs/auth'
 import type { User } from 'types'
 import Image from 'next/image'
 import { NEXT_PUBLIC_AWS_URL } from 'env/public'
-import PostPageFavoriteButton from 'components/PostPageFavoriteButton'
+import PostFavoriteButton from 'components/PostFavoriteButton'
 import SeeAllPhotosModal from 'components/SeeAllPhotosModal'
 import formatToUrl from 'functions/formatToUrl'
 import Link from 'next/link'
@@ -93,9 +93,9 @@ export default async function Page(props: { params: Params }) {
             <DeletePostButton postId={post._id} isRound />
           </div>
         ) : (
-          <PostPageFavoriteButton
+          <PostFavoriteButton
             postId={post._id}
-            favPostIds={user?.favPostIds}
+            isActive={user?.favPostIds?.includes(post._id)}
           />
         )}
         <SeeAllPhotosModal sources={post.images} />

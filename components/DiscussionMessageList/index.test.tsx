@@ -9,7 +9,7 @@ jest.mock('components/DiscussionMessage', () => ({
     <div>
       {message}
       <span>{author?.name}</span>
-      <img src={author?.image} alt="" />
+      <img src={author?.image} alt="" /> {/* eslint-disable-line */}
     </div>
   ),
 }))

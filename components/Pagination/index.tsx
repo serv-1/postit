@@ -1,6 +1,5 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import PaginationLink from 'components/PaginationLink'
 import PaginationActivePageNumber from 'components/PaginationActivePageNumber'
@@ -11,16 +10,9 @@ interface PaginationProps {
 }
 
 export default function Pagination({ totalPages }: PaginationProps) {
-  const [activePage, setActivePage] = useState(1)
   const searchParams = useSearchParams()
-
-  useEffect(() => {
-    const page = searchParams.get('page')
-
-    if (page) {
-      setActivePage(+page)
-    }
-  }, [setActivePage, searchParams])
+  const page = searchParams.get('page')
+  const activePage = page ? +page : 1
 
   return (
     <nav aria-label="Pages" className="flex gap-x-8 justify-center mt-16">

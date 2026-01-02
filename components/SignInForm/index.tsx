@@ -3,7 +3,7 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import { type SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import showToast from 'functions/showToast'
 import Form from 'components/Form'
 import Input from 'components/Input'
@@ -19,7 +19,7 @@ export default function SignInForm() {
   })
 
   const router = useRouter()
-  const email = methods.watch('email')
+  const email = useWatch({ name: 'email', control: methods.control })
 
   const submitHandler: SubmitHandler<SignIn> = async (data) => {
     const res = await signIn('credentials', {

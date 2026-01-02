@@ -11,6 +11,13 @@ const eslintConfig = defineConfig([
     'build/**',
     'next-env.d.ts',
   ]),
+  {
+    rules: {
+      // triggers false-positive errors: to enable when fixed
+      // https://github.com/facebook/react/issues/34775
+      'react-hooks/refs': 'off',
+    },
+  },
 ])
 
 export default eslintConfig
