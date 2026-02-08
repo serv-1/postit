@@ -1,6 +1,6 @@
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 import Image from 'next/image'
-import ChevronRight from 'public/static/images/chevron-right.svg'
+import ChevronRightSvg from 'components/ChevronRightSvg'
 import type { Discussion, User } from 'types'
 import { useSession } from 'next-auth/react'
 import type { Session } from 'next-auth'
@@ -35,7 +35,7 @@ export default function OpenDiscussionButton({
         const response = await ajax.put(
           '/discussions/' + discussion._id,
           null,
-          { csrf: true }
+          { csrf: true },
         )
 
         if (!response.ok) {
@@ -92,7 +92,7 @@ export default function OpenDiscussionButton({
         <span className="block font-bold">{postName}</span>
       </div>
       <div className="w-[20px] h-[20px] text-fuchsia-600 relative left-0 group-hover:left-4 transition-[left] duration-200">
-        <ChevronRight className="w-full h-full" />
+        <ChevronRightSvg className="w-full h-full" />
       </div>
     </button>
   )

@@ -1,5 +1,5 @@
-import CommentDiscussion from 'public/static/images/comment-discussion.svg'
-import X from 'public/static/images/x.svg'
+import CommentDiscussionSvg from 'components/CommentDiscussionSvg'
+import XSvg from 'components/XSvg'
 import Modal from 'components/Modal'
 import Discussion from 'components/Discussion'
 import LoadingSpinner from 'components/LoadingSpinner'
@@ -36,7 +36,7 @@ export default function DiscussionListModal({
           aria-label="Close"
           onClick={onClose}
         >
-          <X className="w-full h-full" />
+          <XSvg className="w-full h-full" />
         </button>
         {discussions ? (
           discussions.length > 0 ? (
@@ -55,7 +55,7 @@ export default function DiscussionListModal({
           ) : (
             <div className="w-full h-full relative p-16 flex flex-row justify-center items-center">
               <div className="w-full h-full max-w-[328px] max-h-[328px] absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 text-fuchsia-100">
-                <CommentDiscussion className="w-full h-full" />
+                <CommentDiscussionSvg className="w-full h-full" />
               </div>
               <p className="z-10">Your discussions will be displayed here.</p>
             </div>

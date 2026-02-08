@@ -1,0 +1,102 @@
+import { GET } from './route'
+import mongoose, { type Connection } from 'mongoose'
+import dbConnect from 'functions/dbConnect'
+import User, { type UserDoc } from 'models/User'
+import {
+  ID_INVALID,
+  INTERNAL_SERVER_ERROR,
+  USER_NOT_FOUND,
+} from 'constants/errors'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+
+vi.mock('libs/pusher/server', () => ({
+  default: {},
+}))
+
+vi.mock('functions/dbConnect', () => ({
+  default: vi.fn(),
+}))
+
+const mockDbConnect = vi.mocked(dbConnect)
+
+let mongoServer: MongoMemoryServer
+let user: UserDoc
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create()
+
+  await mongoose.connect(mongoServer.getUri())
+
+  user = await new User({
+    name: 'john',
+    email: 'john@test.com',
+    password: '0123456789',
+    image: 'john.jpg',
+    postIds: [],
+    favPostIds: [],
+    discussions: [],
+  }).save()
+})
+
+afterAll(async () => {
+  await mongoose.disconnect()
+  await mongoServer.stop()
+})
+
+describe('GET', () => {
+  test('422 - invalid id', async () => {
+    const response = await GET(new Request('http://-'), {
+      params: Promise.resolve({ id: 'invalid id' }),
+    })
+    const data = await response.json()
+
+    expect(response).toHaveProperty('status', 422)
+    expect(data).toEqual({ message: ID_INVALID })
+  })
+
+  test('500 - database connection failed', async () => {
+    mockDbConnect.mockRejectedValue({})
+
+    const response = await GET(new Request('http://-'), {
+      params: Promise.resolve({ id: user._id.toString() }),
+    })
+    const data = await response.json()
+
+    expect(response).toHaveProperty('status', 500)
+    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
+  })
+
+  test('404 - user not found', async () => {
+    mockDbConnect.mockResolvedValue({} as Connection)
+
+    const response = await GET(new Request('http://-'), {
+      params: Promise.resolve({ id: new mongoose.Types.ObjectId().toString() }),
+    })
+    const data = await response.json()
+
+    expect(response).toHaveProperty('status', 404)
+    expect(data).toEqual({ message: USER_NOT_FOUND })
+  })
+
+  test('200 - get the user', async () => {
+    mockDbConnect.mockResolvedValue({} as Connection)
+
+    const id = user._id.toString()
+    const response = await GET(new Request('http://-'), {
+      params: Promise.resolve({ id }),
+    })
+    const data = await response.json()
+
+    expect(response).toHaveProperty('status', 200)
+    expect(data).toEqual({
+      _id: id,
+      name: user.name,
+      email: user.email,
+      channelName: user.channelName,
+      image: user.image,
+      postIds: user.postIds,
+      favPostIds: user.favPostIds,
+      discussions: user.discussions,
+    })
+  })
+})

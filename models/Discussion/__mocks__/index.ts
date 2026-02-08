@@ -1,13 +1,13 @@
 import _Discussion from 'models/Discussion'
 import type { DiscussionDoc } from '..'
 
-export const mockSaveDiscussion = jest.fn()
-export const mockFindOneDiscussion = jest.fn()
-export const mockFindDiscussionById = jest.fn()
-export const mockFindDiscussionByIdAndUpdate = jest.fn()
-export const mockDeleteOneDiscussion = jest.fn()
-export const mockFindDiscussion = jest.fn()
-export const mockUpdateOneDiscussion = jest.fn()
+export const mockSaveDiscussion = vi.fn()
+export const mockFindOneDiscussion = vi.fn()
+export const mockFindDiscussionById = vi.fn()
+export const mockFindDiscussionByIdAndUpdate = vi.fn()
+export const mockDeleteOneDiscussion = vi.fn()
+export const mockFindDiscussion = vi.fn()
+export const mockUpdateOneDiscussion = vi.fn()
 
 export default class Discussion {
   document: Omit<DiscussionDoc, '_id' | 'channelName'>

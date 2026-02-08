@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import Heart from 'public/static/images/heart.svg'
-import HeartFill from 'public/static/images/heart-fill.svg'
+import HeartSvg from 'components/HeartSvg'
+import HeartFillSvg from 'components/HeartFillSvg'
 import ajax from 'libs/ajax'
 import type { UserPutError } from 'app/api/user/types'
 import showToast from 'functions/showToast'
@@ -27,7 +27,7 @@ export default function PostFavoriteButton(props: PostFavoriteButtonProps) {
     const response = await ajax.put(
       '/user',
       { favPostId: props.postId },
-      { csrf: true }
+      { csrf: true },
     )
 
     if (!response.ok) {
@@ -53,8 +53,8 @@ export default function PostFavoriteButton(props: PostFavoriteButtonProps) {
       onClick={handleClick}
       aria-label={(isActive ? 'Delete from' : 'Add to') + ' favorite list'}
     >
-      <HeartFill className="w-full h-full absolute top-0 left-0 p-8 opacity-0 group-hover:opacity-100 group-hover:animate-[heartbeat_1s_linear_infinite] transition-opacity duration-200" />
-      <Heart className="w-full h-full" />
+      <HeartFillSvg className="w-full h-full absolute top-0 left-0 p-8 opacity-0 group-hover:opacity-100 group-hover:animate-[heartbeat_1s_linear_infinite] transition-opacity duration-200" />
+      <HeartSvg className="w-full h-full" />
     </button>
   )
 }

@@ -15,7 +15,7 @@ import addSpacesToNum from 'functions/addSpacesToNum'
 import Map from 'components/Map'
 import PostList from 'components/PostList'
 import PreviousPageButton from 'components/PreviousPageButton'
-import Pencil from 'public/static/images/pencil.svg'
+import PencilSvg from 'components/PencilSvg'
 import DeletePostButton from 'components/DeletePostButton'
 import ContactButton from 'components/ContactButton'
 
@@ -39,7 +39,7 @@ export default async function Page(props: { params: Params }) {
   const post = await getPost(params.id)
   const seller = await getUser(post.userId)
   const sellerPosts = await getPosts(
-    seller.postIds.filter((postId) => postId !== params.id)
+    seller.postIds.filter((postId) => postId !== params.id),
   )
 
   let user: User | undefined = undefined
@@ -88,7 +88,7 @@ export default async function Page(props: { params: Params }) {
               className="mr-8 round-btn"
               aria-label="Edit"
             >
-              <Pencil className="w-full h-full" />
+              <PencilSvg className="w-full h-full" />
             </Link>
             <DeletePostButton postId={post._id} isRound />
           </div>

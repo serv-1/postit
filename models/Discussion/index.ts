@@ -44,21 +44,21 @@ const discussionSchema = new Schema<DiscussionDoc>({
 discussionSchema.pre('save', async function () {
   await Post.updateOne(
     { _id: this.postId },
-    { $push: { discussionIds: this._id } }
+    { $push: { discussionIds: this._id } },
   )
     .lean()
     .exec()
 
   await User.updateOne(
     { _id: this.buyerId },
-    { $push: { discussions: { id: this._id } } }
+    { $push: { discussions: { id: this._id } } },
   )
     .lean()
     .exec()
 
   await User.updateOne(
     { _id: this.sellerId },
-    { $push: { discussions: { id: this._id, hasNewMessage: true } } }
+    { $push: { discussions: { id: this._id, hasNewMessage: true } } },
   )
     .lean()
     .exec()
@@ -72,23 +72,23 @@ discussionSchema.pre<Query<DeleteResult, DiscussionDoc>>(
 
     await Post.updateOne(
       { _id: discussion.postId },
-      { $pull: { discussionIds: discussionId } }
+      { $pull: { discussionIds: discussionId } },
     )
 
     if (discussion.buyerId) {
       await User.updateOne(
         { _id: discussion.buyerId },
-        { $pull: { discussions: { id: discussionId } } }
+        { $pull: { discussions: { id: discussionId } } },
       )
     }
 
     if (discussion.sellerId) {
       await User.updateOne(
         { _id: discussion.sellerId },
-        { $pull: { discussions: { id: discussionId } } }
+        { $pull: { discussions: { id: discussionId } } },
       )
     }
-  }
+  },
 )
 
 const Discussion =

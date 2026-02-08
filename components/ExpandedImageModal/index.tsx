@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Modal from 'components/Modal'
-import X from 'public/static/images/x.svg'
+import XSvg from 'components/XSvg'
 import { useState } from 'react'
 import classNames from 'classnames'
 import { NEXT_PUBLIC_AWS_URL } from 'env/public'
@@ -44,7 +44,7 @@ export default function ExpandedImageModal({
               aria-label="Close"
               onClick={() => setIsOpen(false)}
             >
-              <X className="w-32 h-32" />
+              <XSvg className="w-32 h-32" />
             </button>
             <div className="h-full relative">
               <Image

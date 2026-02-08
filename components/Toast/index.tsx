@@ -2,7 +2,7 @@
 
 import classNames from 'classnames'
 import { useState } from 'react'
-import X from 'public/static/images/x.svg'
+import XSvg from 'components/XSvg'
 import useEventListener from 'hooks/useEventListener'
 
 export default function Toast() {
@@ -23,7 +23,7 @@ export default function Toast() {
           'mx-16 fixed p-8 rounded flex flex-row flex-nowrap gap-x-8 justify-center items-start text-fuchsia-50 font-bold outline outline-4',
           error
             ? 'bg-rose-600 outline-rose-900/75'
-            : 'bg-fuchsia-600 outline-fuchsia-900/75'
+            : 'bg-fuchsia-600 outline-fuchsia-900/75',
         )}
         role="alert"
       >
@@ -36,7 +36,7 @@ export default function Toast() {
           }}
           aria-label="Close"
         >
-          <X className="w-24 h-24" />
+          <XSvg className="w-24 h-24" />
         </button>
       </div>
     </div>

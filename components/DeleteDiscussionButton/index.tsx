@@ -2,7 +2,7 @@ import type { DiscussionsIdDeleteError } from 'app/api/discussions/[id]/types'
 import type { UserPutError } from 'app/api/user/types'
 import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
-import X from 'public/static/images/x.svg'
+import XSvg from 'components/XSvg'
 import type { User } from 'types'
 
 interface DeleteDiscussionButtonProps {
@@ -25,7 +25,7 @@ export default function DeleteDiscussionButton({
             : await ajax.put(
                 '/user',
                 { discussionId: discussionId },
-                { csrf: true }
+                { csrf: true },
               )
 
           break
@@ -47,7 +47,7 @@ export default function DeleteDiscussionButton({
     }
 
     document.dispatchEvent(
-      new CustomEvent('discussionDeleted', { detail: discussionId })
+      new CustomEvent('discussionDeleted', { detail: discussionId }),
     )
   }
 
@@ -57,7 +57,7 @@ export default function DeleteDiscussionButton({
       onClick={deleteDiscussion}
       aria-label="Remove discussion"
     >
-      <X className="w-full h-full" />
+      <XSvg className="w-full h-full" />
     </button>
   )
 }

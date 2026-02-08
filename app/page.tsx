@@ -5,7 +5,7 @@ import searchParamsToString from 'functions/searchParamsToString'
 import SearchPostForm from 'components/SearchPostForm'
 import PostList from 'components/PostList'
 import Pagination from 'components/Pagination'
-import Blob from 'public/static/images/blob.svg'
+import BlobSvg from 'components/BlobSvg'
 
 export const metadata: Metadata = {
   title: 'Home - PostIt',
@@ -36,7 +36,7 @@ export default async function Page({
         </div>
       ) : (
         <div className="grow self-stretch relative" role="status">
-          <Blob className="w-full h-3/4 absolute top-1/2 -translate-y-1/2" />
+          <BlobSvg className="w-full h-3/4 absolute top-1/2 -translate-y-1/2 text-fuchsia-100" />
           <span className="text-m-4xl md:text-t-4xl w-full text-center absolute top-1/2 -translate-y-1/2">
             {searchResult ? 'No posts found' : 'Search something'}
           </span>

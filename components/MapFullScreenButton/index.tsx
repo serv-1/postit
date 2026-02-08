@@ -1,5 +1,5 @@
-import X from 'public/static/images/x.svg'
-import ScreenFull from 'public/static/images/screen-full.svg'
+import XSvg from 'components/XSvg'
+import ScreenFullSvg from 'components/ScreenFullSvg'
 
 interface MapFullScreenButtonProps {
   fullScreen: boolean
@@ -17,7 +17,7 @@ export default function MapFullScreenButton({
       onClick={() => setFullScreen(false)}
       aria-label="Minimize"
     >
-      <X className="w-full h-full" />
+      <XSvg className="w-full h-full" />
     </button>
   ) : (
     <button
@@ -26,7 +26,7 @@ export default function MapFullScreenButton({
       onClick={() => setFullScreen(true)}
       aria-label="Full screen"
     >
-      <ScreenFull className="w-full h-full" />
+      <ScreenFullSvg className="w-full h-full" />
     </button>
   )
 }

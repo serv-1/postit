@@ -2,7 +2,7 @@ import Image from 'next/image'
 import addSpacesToNum from 'functions/addSpacesToNum'
 import formatToUrl from 'functions/formatToUrl'
 import Link from 'next/link'
-import Location from 'public/static/images/location.svg'
+import LocationSvg from 'components/LocationSvg'
 import Tooltip from 'components/Tooltip'
 import { NEXT_PUBLIC_AWS_URL } from 'env/public'
 
@@ -24,7 +24,7 @@ export default function Post({ id, name, price, image, address }: PostProps) {
             aria-label="Location"
             className="absolute top-8 left-8"
           >
-            <Location className="w-24 h-24 text-fuchsia-600" />
+            <LocationSvg className="w-24 h-24 text-fuchsia-600" />
           </button>
         )}
       >

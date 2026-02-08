@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
 const handlers = [
-  http.get('http://localhost/api/users/:id', () => {
+  http.get('api/users/:id', () => {
     return HttpResponse.json(
       {
         _id: '0',
@@ -13,7 +13,7 @@ const handlers = [
         discussions: [],
         channelName: 'channel name',
       },
-      { status: 200 }
+      { status: 200 },
     )
   }),
 ]

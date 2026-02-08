@@ -1,8 +1,8 @@
 'use client'
 
 import Modal from 'components/Modal'
-import X from 'public/static/images/x.svg'
-import Camera from 'public/static/images/camera.svg'
+import XSvg from 'components/XSvg'
+import CameraSvg from 'components/CameraSvg'
 import { useState } from 'react'
 import ExpandedImageModal from 'components/ExpandedImageModal'
 
@@ -21,7 +21,7 @@ export default function SeeAllPhotosModal({ sources }: SeeAllPhotosModalProps) {
           onClick={() => setIsOpen(true)}
           aria-label="See all photos"
         >
-          <Camera className="w-full h-full" />
+          <CameraSvg className="w-full h-full" />
         </button>
       </div>
       {isOpen && (
@@ -35,7 +35,7 @@ export default function SeeAllPhotosModal({ sources }: SeeAllPhotosModalProps) {
               aria-label="Close"
               onClick={() => setIsOpen(false)}
             >
-              <X className="w-32 h-32" />
+              <XSvg className="w-32 h-32" />
             </button>
             <ul className="flex flex-col gap-8 px-8 md:flex-row md:flex-wrap md:justify-center md:content-center md:gap-16 lg:gap-24">
               {sources.map((src) => (

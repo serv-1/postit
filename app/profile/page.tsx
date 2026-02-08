@@ -10,7 +10,7 @@ import Tab from 'components/Tab'
 import TabPanel from 'components/TabPanel'
 import ProfilePostList from 'components/ProfilePostList'
 import DeleteAccountModal from 'components/DeleteAccountModal'
-import SignOut from 'public/static/images/sign-out.svg'
+import SignOutSvg from 'components/SignOutSvg'
 import SignOutButton from 'components/SignOutButton'
 import ProfileUserName from 'components/ProfileUserName'
 import PublicProfileLink from 'components/PublicProfileLink'
@@ -40,7 +40,7 @@ export default async function Page() {
           <ProfileUserImage image={user.image} />
           <ProfileUserName name={user.name} />
           <SignOutButton className="text-fuchsia-600 hover:text-fuchsia-900 transition-colors duration-200">
-            <SignOut className="w-32 h-32" />
+            <SignOutSvg className="w-32 h-32" />
           </SignOutButton>
         </div>
         <PublicProfileLink id={user._id} name={user.name} />

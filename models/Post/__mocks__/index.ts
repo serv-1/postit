@@ -1,10 +1,10 @@
 import _Post, { type PostDoc } from 'models/Post'
 
-export const mockSavePost = jest.fn()
-export const mockFindPostById = jest.fn()
-export const mockUpdateOnePost = jest.fn()
-export const mockDeleteOnePost = jest.fn()
-export const mockAggregate = jest.fn()
+export const mockSavePost = vi.fn()
+export const mockFindPostById = vi.fn()
+export const mockUpdateOnePost = vi.fn()
+export const mockDeleteOnePost = vi.fn()
+export const mockAggregate = vi.fn()
 
 export default class Post {
   document: Omit<PostDoc, '_id' | 'discussionIds'>

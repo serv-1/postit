@@ -1,6 +1,6 @@
 'use client'
 
-import ArrowLeft from 'public/static/images/arrow-left.svg'
+import ArrowLeftSvg from 'components/ArrowLeftSvg'
 
 export default function PreviousPageButton() {
   return (
@@ -9,7 +9,7 @@ export default function PreviousPageButton() {
       onClick={() => window.history.back()}
       aria-label="Go back to the previous page"
     >
-      <ArrowLeft className="w-full h-full" />
+      <ArrowLeftSvg className="w-full h-full" />
     </button>
   )
 }

@@ -1,7 +1,7 @@
 import InputError from 'components/InputError'
 import Image from 'next/image'
 import type { CreatePost } from 'schemas/client/createPost'
-import PlusCircle from 'public/static/images/plus-circle.svg'
+import PlusCircleSvg from 'components/PlusCircleSvg'
 import { useFormContext } from 'react-hook-form'
 import { useRef, useState } from 'react'
 import WizardStep from 'components/WizardStep'
@@ -29,7 +29,7 @@ export default function CreatePostFormImagesStep() {
     }
 
     const imageSources = await Promise.all(
-      Array.from(getValues('images')).map(blobToDataUrl)
+      Array.from(getValues('images')).map(blobToDataUrl),
     )
 
     setImageSources(imageSources)
@@ -56,10 +56,10 @@ export default function CreatePostFormImagesStep() {
           key={i}
           className="w-[calc(50%-4px)] h-[calc((100%/3)-(16px/3))] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-8 flex flex-col justify-center items-center md:bg-fuchsia-100"
         >
-          <PlusCircle className="w-24 h-24 mb-4" />
+          <PlusCircleSvg className="w-24 h-24 mb-4" />
           Photo n°{i + 1}
         </div>
-      )
+      ),
     )
   }
 

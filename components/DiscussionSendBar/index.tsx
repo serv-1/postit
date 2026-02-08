@@ -1,5 +1,5 @@
 import Form from 'components/Form'
-import PaperAirPlane from 'public/static/images/paper-airplane.svg'
+import PaperAirplaneSvg from 'components/PaperAirplaneSvg'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import updateDiscussion, {
@@ -43,7 +43,7 @@ export default function DiscussionSendBar({
       const response = await ajax.put(
         '/discussions/' + id,
         { message: data.message },
-        { csrf: true }
+        { csrf: true },
       )
 
       if (!response.ok) {
@@ -57,7 +57,7 @@ export default function DiscussionSendBar({
       const response = await ajax.post(
         '/discussion',
         { message: data.message, postId, sellerId, postName },
-        { csrf: true }
+        { csrf: true },
       )
 
       if (!response.ok) {
@@ -105,7 +105,7 @@ export default function DiscussionSendBar({
         aria-label="Send"
         className="w-40 h-40 p-8 text-fuchsia-600 ml-8 hover:text-fuchsia-900 duration-200 transition-colors"
       >
-        <PaperAirPlane className="w-24 h-24" />
+        <PaperAirplaneSvg className="w-24 h-24" />
       </button>
     </Form>
   )

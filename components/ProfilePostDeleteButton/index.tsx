@@ -2,7 +2,7 @@ import type { PostsIdDeleteError } from 'app/api/posts/[id]/types'
 import type { UserPutError } from 'app/api/user/types'
 import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
-import X from 'public/static/images/x.svg'
+import XSvg from 'components/XSvg'
 import type { Post } from 'types'
 
 interface ProfilePostDeleteButtonProps {
@@ -53,7 +53,7 @@ export default function ProfilePostDeleteButton({
       title={'Delete ' + postName}
       onClick={deletePost}
     >
-      <X className="w-full h-full" />
+      <XSvg className="w-full h-full" />
     </button>
   )
 }

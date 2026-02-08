@@ -1,7 +1,7 @@
 import { type ChangeEvent, useState } from 'react'
 import { type FieldPath, useFormContext } from 'react-hook-form'
-import Eye from 'public/static/images/eye-fill.svg'
-import EyeSlash from 'public/static/images/eye-slash-fill.svg'
+import EyeFillSvg from 'components/EyeFillSvg'
+import EyeSlashFillSvg from 'components/EyeSlashFillSvg'
 import Input from 'components/Input'
 import zxcvbn from 'zxcvbn'
 
@@ -65,9 +65,13 @@ export default function PasswordInput<FormFields extends { password: string }>({
             aria-label={(showPassword ? 'Hide' : 'Show') + ' password'}
           >
             {showPassword ? (
-              <EyeSlash data-testid="eyeSlashIcon" width="20" height="20" />
+              <EyeSlashFillSvg
+                data-testid="eyeSlashIcon"
+                width="20"
+                height="20"
+              />
             ) : (
-              <Eye data-testid="eyeIcon" width="20" height="20" />
+              <EyeFillSvg data-testid="eyeIcon" width="20" height="20" />
             )}
           </button>
         }

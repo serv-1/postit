@@ -5,7 +5,7 @@ import classNames from 'classnames'
 import type { User } from 'types'
 import HeaderDiscussions from 'components/HeaderDiscussions'
 import HeaderAccountMenu from 'components/HeaderAccountMenu'
-import PlusCircle from 'public/static/images/plus-circle.svg'
+import PlusCircleSvg from 'components/PlusCircleSvg'
 import { POST_PAGE_REGEX } from 'constants/regex'
 
 interface HeaderProps {
@@ -21,7 +21,7 @@ export default function Header({ signedInUser }: HeaderProps) {
       className={classNames(
         path.match(POST_PAGE_REGEX) ? 'hidden md:flex' : 'flex',
         isOnAuthPage ? 'justify-center' : 'justify-between',
-        'items-center p-16 mt-auto'
+        'items-center p-16 mt-auto',
       )}
     >
       <Link
@@ -53,7 +53,7 @@ export default function Header({ signedInUser }: HeaderProps) {
                 className="text-fuchsia-600 w-40 h-40 block hover:text-fuchsia-900 transition-colors duration-200"
                 aria-label="Create a post"
               >
-                <PlusCircle className="w-full h-full" />
+                <PlusCircleSvg className="w-full h-full" />
               </Link>
             </li>
             <li>

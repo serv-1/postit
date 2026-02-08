@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import ChevronUp from 'public/static/images/chevron-up.svg'
-import ChevronDown from 'public/static/images/chevron-down.svg'
+import ChevronUpSvg from 'components/ChevronUpSvg'
+import ChevronDownSvg from 'components/ChevronDownSvg'
 import classNames from 'classnames'
 
-interface AccordionProps
-  extends Omit<React.ComponentPropsWithoutRef<'div'>, 'tabIndex'> {
+interface AccordionProps extends Omit<
+  React.ComponentPropsWithoutRef<'div'>,
+  'tabIndex'
+> {
   title: string
   headingLevel: 1 | 2 | 3 | 4 | 5 | 6
   children: React.ReactNode
@@ -26,7 +28,7 @@ export default function Accordion({
         <button
           className={classNames(
             'w-full flex flex-row flex-nowrap justify-between items-center bg-fuchsia-200 p-8 rounded-8 md:bg-fuchsia-300',
-            { 'shadow-[0_4px_4px_rgba(112,26,117,0.1)]': isOpen }
+            { 'shadow-[0_4px_4px_rgba(112,26,117,0.1)]': isOpen },
           )}
           type="button"
           onClick={() => setIsOpen(!isOpen)}
@@ -41,12 +43,12 @@ export default function Accordion({
         >
           <span className="text-base">{title}</span>
           {isOpen ? (
-            <ChevronUp
+            <ChevronUpSvg
               className="w-24 h-24 text-fuchsia-600"
               data-testid="chevronUp"
             />
           ) : (
-            <ChevronDown
+            <ChevronDownSvg
               className="w-24 h-24 text-fuchsia-600"
               data-testid="chevronDown"
             />

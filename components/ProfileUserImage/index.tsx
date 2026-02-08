@@ -3,7 +3,7 @@
 import { type ChangeEvent, useRef, useState, type KeyboardEvent } from 'react'
 import Image from 'next/image'
 import showToast from 'functions/showToast'
-import Plus from 'public/static/images/plus.svg'
+import PlusSvg from 'components/PlusSvg'
 import isImage from 'functions/isImage'
 import ajax from 'libs/ajax'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
@@ -18,7 +18,7 @@ interface ProfileUserImageProps {
 
 export default function ProfileUserImage({ image }: ProfileUserImageProps) {
   const [source, setSource] = useState(
-    image ? NEXT_PUBLIC_AWS_URL + '/' + image : NEXT_PUBLIC_DEFAULT_USER_IMAGE
+    image ? NEXT_PUBLIC_AWS_URL + '/' + image : NEXT_PUBLIC_DEFAULT_USER_IMAGE,
   )
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -81,7 +81,7 @@ export default function ProfileUserImage({ image }: ProfileUserImageProps) {
           title="Click to change your profile image"
           className="rounded-full group-hover:grayscale transition-[filter] duration-200 object-cover"
         />
-        <Plus className="w-[20px] h-[20px] rounded-full bg-fuchsia-50 text-fuchsia-600 absolute bottom-0 right-0 group-hover:bg-fuchsia-900 group-hover:text-fuchsia-50 transition-colors duration-200 md:w-24 md:h-24" />
+        <PlusSvg className="w-[20px] h-[20px] rounded-full bg-fuchsia-50 text-fuchsia-600 absolute bottom-0 right-0 group-hover:bg-fuchsia-900 group-hover:text-fuchsia-50 transition-colors duration-200 md:w-24 md:h-24" />
       </label>
       <input
         ref={inputRef}

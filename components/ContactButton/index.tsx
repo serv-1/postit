@@ -2,7 +2,7 @@
 
 import showToast from 'functions/showToast'
 import { useSession } from 'next-auth/react'
-import Chat from 'public/static/images/chat.svg'
+import ChatSvg from 'components/ChatSvg'
 
 interface ContactButtonProps {
   onClick?: () => void
@@ -29,7 +29,7 @@ export default function ContactButton({ onClick }: ContactButtonProps) {
       aria-label="Contact"
       onClick={handleClick}
     >
-      <Chat className="w-full h-full md:hidden" />
+      <ChatSvg className="w-full h-full md:hidden" />
       <span className="hidden md:inline">Contact</span>
     </button>
   )

@@ -1,5 +1,6 @@
 import { defineConfig, globalIgnores } from 'eslint/config'
 import nextVitals from 'eslint-config-next/core-web-vitals'
+import eslintPluginJestDom from 'eslint-plugin-jest-dom'
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -17,6 +18,11 @@ const eslintConfig = defineConfig([
       // https://github.com/facebook/react/issues/34775
       'react-hooks/refs': 'off',
     },
+  },
+  {
+    files: ['**/*.tsx'],
+    plugins: { 'plugin-jest-dom': eslintPluginJestDom },
+    extends: [eslintPluginJestDom.configs['flat/recommended']],
   },
 ])
 

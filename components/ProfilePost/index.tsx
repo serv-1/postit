@@ -3,7 +3,7 @@ import { NEXT_PUBLIC_AWS_URL } from 'env/public'
 import formatToUrl from 'functions/formatToUrl'
 import Image from 'next/image'
 import Link from 'next/link'
-import ChevronRight from 'public/static/images/chevron-right.svg'
+import ChevronRightSvg from 'components/ChevronRightSvg'
 import type { Post } from 'types'
 
 interface ProfilePostProps {
@@ -46,7 +46,7 @@ export default function ProfilePost({
         <div className="flex flex-row flex-nowrap min-w-0 w-full p-8 justify-between items-center text-fuchsia-600 md:p-16">
           <div className="font-bold truncate mr-8 md:mr-16">{name}</div>
           <div>
-            <ChevronRight className="w-24 h-24 relative left-0 group-hover:left-8 transition-[left] duration-200" />
+            <ChevronRightSvg className="w-24 h-24 relative left-0 group-hover:left-8 transition-[left] duration-200" />
           </div>
         </div>
       </Link>

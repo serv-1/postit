@@ -1,12 +1,12 @@
 import _User from 'models/User'
 import type { CreateUser } from 'schemas/createUser'
 
-export const mockSaveUser = jest.fn()
-export const mockUpdateOneUser = jest.fn()
-export const mockFindUserById = jest.fn()
-export const mockFindUserByIdAndUpdate = jest.fn()
-export const mockDeleteOneUser = jest.fn()
-export const mockFindOneUser = jest.fn()
+export const mockSaveUser = vi.fn()
+export const mockUpdateOneUser = vi.fn()
+export const mockFindUserById = vi.fn()
+export const mockFindUserByIdAndUpdate = vi.fn()
+export const mockDeleteOneUser = vi.fn()
+export const mockFindOneUser = vi.fn()
 
 export default class User {
   document: CreateUser

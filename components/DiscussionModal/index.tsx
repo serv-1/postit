@@ -1,31 +1,30 @@
 import DiscussionSendBar from 'components/DiscussionSendBar'
 import Modal from 'components/Modal'
-import X from 'public/static/images/x.svg'
+import XSvg from 'components/XSvg'
 import DiscussionMessageList from 'components/DiscussionMessageList'
 import type { DiscussionsIdGetData } from 'app/api/discussions/[id]/types'
 import type { User } from 'types'
 
-type DiscussionModalProps =
-  | (
-      | {
-          discussionId: string
-          messages: DiscussionsIdGetData['messages']
-          signedInUser: User
-          interlocutor: User | null
-          postName?: never
-          postId?: never
-          sellerId?: never
-        }
-      | {
-          discussionId?: never
-          messages?: never
-          signedInUser?: never
-          interlocutor?: never
-          postName: string
-          postId: string
-          sellerId: string
-        }
-    ) & { onMessageSent?: (id: string) => void; onClose: () => void }
+type DiscussionModalProps = (
+  | {
+      discussionId: string
+      messages: DiscussionsIdGetData['messages']
+      signedInUser: User
+      interlocutor: User | null
+      postName?: never
+      postId?: never
+      sellerId?: never
+    }
+  | {
+      discussionId?: never
+      messages?: never
+      signedInUser?: never
+      interlocutor?: never
+      postName: string
+      postId: string
+      sellerId: string
+    }
+) & { onMessageSent?: (id: string) => void; onClose: () => void }
 
 export default function DiscussionModal({
   onMessageSent,
@@ -49,7 +48,7 @@ export default function DiscussionModal({
           aria-label="Close"
           onClick={onClose}
         >
-          <X className="w-full h-full" />
+          <XSvg className="w-full h-full" />
         </button>
         {discussionId ? (
           <>

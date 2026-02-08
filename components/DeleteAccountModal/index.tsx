@@ -2,7 +2,7 @@
 
 import { signOut } from 'next-auth/react'
 import Modal from 'components/Modal'
-import X from 'public/static/images/x.svg'
+import XSvg from 'components/XSvg'
 import { useState } from 'react'
 import ajax from 'libs/ajax'
 import type { UserDeleteError } from 'app/api/user/types'
@@ -41,7 +41,7 @@ export default function DeleteAccountModal() {
               aria-label="Close"
               onClick={() => setIsOpen(false)}
             >
-              <X className="w-full h-full" />
+              <XSvg className="w-full h-full" />
             </button>
             <div className="flex-grow">
               <h2>Do you really want to delete your account?</h2>

@@ -1,14 +1,6 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
   transpilePackages: ['mongodb', 'mongoose'],
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
-  },
   images: {
     remotePatterns: [
       { hostname: 'maps.locationiq.com' },

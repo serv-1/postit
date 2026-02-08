@@ -4,7 +4,7 @@ import type { PostsIdDeleteError } from 'app/api/posts/[id]/types'
 import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import { useRouter } from 'next/navigation'
-import X from 'public/static/images/x.svg'
+import XSvg from 'components/XSvg'
 
 interface DeletePostButtonProps {
   postId: string
@@ -37,7 +37,7 @@ export default function DeletePostButton({
       onClick={deletePost}
       aria-label="Delete"
     >
-      {isRound ? <X className="w-full h-full" /> : 'Delete'}
+      {isRound ? <XSvg className="w-full h-full" /> : 'Delete'}
     </button>
   )
 }

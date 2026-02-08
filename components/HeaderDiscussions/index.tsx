@@ -1,7 +1,7 @@
 import DiscussionListModal from 'components/DiscussionListModal'
 import { useCallback, useEffect, useState } from 'react'
 import type { Discussion, User } from 'types'
-import CommentDiscussion from 'public/static/images/comment-discussion.svg'
+import CommentDiscussionSvg from 'components/CommentDiscussionSvg'
 import useEventListener from 'hooks/useEventListener'
 import usePusher from 'hooks/usePusher'
 import showToast from 'functions/showToast'
@@ -27,7 +27,7 @@ export default function HeaderDiscussions({
   const [isModalHidden, setIsModalHidden] = useState(true)
   const [discussions, setDiscussions] = useState<Discussion[]>()
   const [openedDiscussionId, setOpenedDiscussionId] = useState<string | null>(
-    null
+    null,
   )
 
   const getUserDiscussions = useCallback(async () => {
@@ -75,7 +75,7 @@ export default function HeaderDiscussions({
       if (isModalHidden) {
         setShowBadge(true)
       }
-    }
+    },
   )
 
   usePusher(signedInUser.channelName, 'message:new', () => {
@@ -139,7 +139,7 @@ export default function HeaderDiscussions({
             className="w-full h-full absolute top-0 left-0 bg-red-100 rounded-full animate-ping"
           ></div>
         )}
-        <CommentDiscussion className="relative w-full h-full" />
+        <CommentDiscussionSvg className="relative w-full h-full" />
       </button>
       <DiscussionListModal
         isHidden={isModalHidden}

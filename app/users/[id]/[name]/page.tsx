@@ -3,7 +3,7 @@ import getUser from 'functions/getUser'
 import Image from 'next/image'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
 import PostList from 'components/PostList'
-import Blob from 'public/static/images/blob.svg'
+import BlobSvg from 'components/BlobSvg'
 import getPosts from 'functions/getPosts'
 
 type Params = Promise<{
@@ -57,7 +57,7 @@ export default async function Page(props: { params: Params }) {
           className="grow self-stretch relative flex justify-center items-center"
           role="status"
         >
-          <Blob className="w-full h-3/4 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2" />
+          <BlobSvg className="w-full h-3/4 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 text-fuchsia-100" />
           <span className="text-m-4xl md:text-t-4xl text-center z-10">
             {user.name} hasn&apos;t created any posts yet.
           </span>
