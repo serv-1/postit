@@ -4,7 +4,7 @@ import {
   type FieldValues,
   type FieldPath,
 } from 'react-hook-form'
-import type { StateManagerProps } from 'react-select/dist/declarations/src/useStateManager'
+import type { StateManagerProps } from 'node_modules/react-select/dist/declarations/src/useStateManager'
 import type { Categories } from 'types'
 
 export interface Option {
@@ -12,8 +12,9 @@ export interface Option {
   value: Categories
 }
 
-export interface SelectProps<FormFields extends FieldValues = FieldValues>
-  extends StateManagerProps<Option, true> {
+export interface SelectProps<
+  FormFields extends FieldValues = FieldValues,
+> extends StateManagerProps<Option, true> {
   name: FieldPath<FormFields>
   options: Option[]
 }
