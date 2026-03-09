@@ -1,33 +1,33 @@
 # PostIt
 
-## Summary
-
-It is a web application where you can search objects or animals to buy them or create your own post.
+PostIt is a web application to post ads to sell something.
+Inspired by [Leboncoin](https://www.leboncoin.fr), made for practice.
 
 ## Features
 
-As an unauthenticated user you can only search posts and create an account (or sign in with Google).
+- Search for something to buy
+- Create, update or delete your account
+- Create, update or delete your ads
+- Add ads to your favorite list
+- Discuss with other users about their ads (define trade place, negociate the price, etc...)
 
-As an authenticated user you can:
+## Technologies Used
 
-- create, update and delete your posts
-- add posts to your favorite post list
-- discuss with other users about their posts
-- update or delete your account
+Next.js, TypeScript, MongoDB (with Mongoose), TailwindCSS
 
-## Development
+- For authentication: NextAuth.js
+- For real-time messaging in secure e2e encrypted channels: Pusher
+- For storing images: AWS S3
 
-It is mainly built with Next.js and TypeScript.
-I have used MongoDB for the database, tailwindcss for the CSS and [Pusher](https://pusher.com/) for the communications in real time between users.
+Tested with Vitest and React Testing Library.
 
-The authentication is done with NextAuth.js.
+## Getting Started
 
-The API is tested with [Postman](https://www.postman.com/serv-1/workspace/ce865b5f-f710-4be2-bd31-c9b7418d2f5f/collection/17584909-58b49bb0-3d94-4dd8-aa6f-2d8a75ca5f9c).
+The app is deployed on Vercel: [https://postit-site.vercel.app](https://postit-site.vercel.app). You can search for fridge, table or chair to see how it looks.
 
-## Deployment
+Or you can run it locally:
 
-It is deployed on Vercel. Open [https://postit-site.vercel.app](https://postit-site.vercel.app) to play with.
-
-## Note
-
-You can search for fridge, table or chair to see how it looks with some data or create them yourself.
+1. Clone the repository
+2. Install dependencies using `npm install`
+3. Create a .env.local file in the root directory and add your environment variables
+4. Run `npm run dev` to start the development server
