@@ -1,6 +1,6 @@
 # PostIt
 
-PostIt is a web application to post ads to sell something.
+PostIt is a web application to post ads to sell something.  
 Inspired by [Leboncoin](https://www.leboncoin.fr), made for practice.
 
 ## Features
@@ -9,7 +9,7 @@ Inspired by [Leboncoin](https://www.leboncoin.fr), made for practice.
 - Create, update or delete your account
 - Create, update or delete your ads
 - Add ads to your favorite list
-- Discuss with other users about their ads (define trade place, negociate the price, etc...)
+- Discuss with other users about their ads (define trading places, negociate prices, etc...)
 
 ## Technologies Used
 
