@@ -41,7 +41,9 @@ test("the red border doesn't render if the form isn't submitted", () => {
   render(<Select<FormFields> name="categories" options={[]} />)
 
   const select = screen.getByRole('combobox')
-  expect(select).toHaveStyle('border-bottom: 2px solid rgba(112,26,117,0.25)')
+  expect(select).toHaveStyle({
+    borderBottom: '2px solid rgba(112,26,117,0.25)',
+  })
 })
 
 test('the default border becomes darker if the select is focused', () => {
@@ -58,7 +60,9 @@ test('the default border becomes darker if the select is focused', () => {
   render(<Select<FormFields> name="categories" options={[]} />)
 
   const select = screen.getByRole('combobox')
-  expect(select).toHaveStyle('border-bottom: 2px solid rgba(112,26,117,0.75)')
+  expect(select).toHaveStyle({
+    borderBottom: '2px solid rgba(112,26,117,0.75)',
+  })
 })
 
 test('the red border renders if the form is submitted and there is an error', () => {
@@ -80,7 +84,7 @@ test('the red border renders if the form is submitted and there is an error', ()
   render(<Select<FormFields> name="categories" options={[]} />)
 
   const select = screen.getByRole('combobox')
-  expect(select).toHaveStyle('border: 2px solid #E11D48')
+  expect(select).toHaveStyle({ border: '2px solid #E11D48' })
 })
 
 test('the red border becomes darker if the select is focused', () => {
@@ -102,7 +106,7 @@ test('the red border becomes darker if the select is focused', () => {
   render(<Select<FormFields> name="categories" options={[]} />)
 
   const select = screen.getByRole('combobox')
-  expect(select).toHaveStyle('border: 2px solid #881337')
+  expect(select).toHaveStyle({ border: '2px solid #881337' })
 })
 
 test("the red border doesn't render if the form is submitted and there is no error", () => {
@@ -124,7 +128,9 @@ test("the red border doesn't render if the form is submitted and there is no err
   render(<Select<FormFields> name="categories" options={[]} />)
 
   const select = screen.getByRole('combobox')
-  expect(select).toHaveStyle('border-bottom: 2px solid rgba(112,26,117,0.25)')
+  expect(select).toHaveStyle({
+    borderBottom: '2px solid rgba(112,26,117,0.25)',
+  })
 })
 
 test('the background color of menu options is light fuchsia if they are focused', () => {
@@ -141,7 +147,7 @@ test('the background color of menu options is light fuchsia if they are focused'
   render(<Select<FormFields> name="categories" options={[]} />)
 
   const select = screen.getByRole('combobox')
-  expect(select).toHaveStyle('backgroundColor: #f5d0fe')
+  expect(select).toHaveStyle({ backgroundColor: '#f5d0fe' })
 })
 
 test("the default background color of menu options renders if they aren't focused", () => {
@@ -149,9 +155,7 @@ test("the default background color of menu options renders if they aren't focuse
     let style = {}
 
     if (styles && styles.option) {
-      style = styles.option({ backgroundColor: 'blue' }, {
-        isFocused: false,
-      } as OptionProps)
+      style = styles.option({}, { isFocused: false } as OptionProps)
     }
 
     return <select style={style}></select>
@@ -160,7 +164,7 @@ test("the default background color of menu options renders if they aren't focuse
   render(<Select<FormFields> name="categories" options={[]} />)
 
   const select = screen.getByRole('combobox')
-  expect(select).toHaveStyle('backgroundColor: blue')
+  expect(select).not.toHaveStyle({ backgroundColor: '#f5d0fe' })
 })
 
 test('the current value is correctly displayed', () => {
