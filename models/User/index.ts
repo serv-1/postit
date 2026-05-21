@@ -49,9 +49,8 @@ const userSchema = new Schema<UserDoc>({
   },
 })
 
-userSchema.pre('save', function (next) {
+userSchema.pre('save', async function () {
   this.password = hash(this.password!)
-  next()
 })
 
 userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
@@ -83,13 +82,13 @@ userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
     const isBuyer = userId === discussion.buyerId.toString()
 
     const interlocutor = (await User.findById(
-      isBuyer ? discussion.sellerId : discussion.buyerId
+      isBuyer ? discussion.sellerId : discussion.buyerId,
     )
       .lean()
       .exec())!
 
     const { hidden } = interlocutor.discussions.find(
-      (d) => d.id.toString() === discussion._id.toString()
+      (d) => d.id.toString() === discussion._id.toString(),
     )!
 
     if (hidden) {
@@ -103,10 +102,10 @@ userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
             messages: discussion.messages.map((message) =>
               message.userId!.toString() === userId
                 ? { ...message, userId: undefined }
-                : message
+                : message,
             ),
           },
-        }
+        },
       )
         .lean()
         .exec()

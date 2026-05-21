@@ -49,7 +49,7 @@ export async function GET(request: NextRequest, segmentData: Params) {
     if (!discussion) {
       return NextResponse.json(
         { message: DISCUSSION_NOT_FOUND },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest, segmentData: Params) {
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
     if (!discussion) {
       return NextResponse.json(
         { message: DISCUSSION_NOT_FOUND },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -149,7 +149,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
             messages: [{ message: result.value.message, userId: session.id }],
           },
         },
-        { new: true }
+        { returnDocument: 'after' },
       )
         .lean()
         .exec())!
@@ -157,17 +157,17 @@ export async function PUT(request: NextRequest, segmentData: Params) {
       await pusher.trigger(
         discussion.channelName,
         'message:new',
-        discussion.messages[discussion.messages.length - 1]
+        discussion.messages[discussion.messages.length - 1],
       )
 
       const isBuyer = session.id === buyer._id.toString()
 
       const sellerDiscussion = seller.discussions.find(
-        (discussion) => discussion.id.toString() === discussionId
+        (discussion) => discussion.id.toString() === discussionId,
       )!
 
       const buyerDiscussion = buyer.discussions.find(
-        (discussion) => discussion.id.toString() === discussionId
+        (discussion) => discussion.id.toString() === discussionId,
       )!
 
       if (isBuyer) {
@@ -181,7 +181,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
         if (buyerDiscussion.hidden) {
           await User.updateOne(
             { _id: buyer._id, 'discussions.id': discussionId },
-            { $set: { 'discussions.$.hidden': false } }
+            { $set: { 'discussions.$.hidden': false } },
           )
             .lean()
             .exec()
@@ -194,7 +194,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
               'discussions.$.hidden': false,
               'discussions.$.hasNewMessage': true,
             },
-          }
+          },
         )
           .lean()
           .exec()
@@ -211,7 +211,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
         if (sellerDiscussion.hidden) {
           await User.updateOne(
             { _id: seller._id, 'discussions.id': discussionId },
-            { $set: { 'discussions.$.hidden': false } }
+            { $set: { 'discussions.$.hidden': false } },
           )
             .lean()
             .exec()
@@ -224,7 +224,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
               'discussions.$.hidden': false,
               'discussions.$.hasNewMessage': true,
             },
-          }
+          },
         )
           .lean()
           .exec()
@@ -246,14 +246,14 @@ export async function PUT(request: NextRequest, segmentData: Params) {
 
       await Discussion.updateOne(
         { _id: discussionId },
-        { $set: { messages: discussion.messages } }
+        { $set: { messages: discussion.messages } },
       )
         .lean()
         .exec()
 
       await User.updateOne(
         { _id: session.id, 'discussions.id': discussionId },
-        { $set: { 'discussions.$.hasNewMessage': false } }
+        { $set: { 'discussions.$.hasNewMessage': false } },
       )
         .lean()
         .exec()
@@ -263,7 +263,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -294,7 +294,7 @@ export async function DELETE(request: NextRequest, segmentData: Params) {
     if (!discussion) {
       return NextResponse.json(
         { message: DISCUSSION_NOT_FOUND },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -311,7 +311,7 @@ export async function DELETE(request: NextRequest, segmentData: Params) {
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
