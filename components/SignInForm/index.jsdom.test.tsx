@@ -1,5 +1,5 @@
 import SignInForm from '.'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Toast from 'components/Toast'
 import { DATA_INVALID } from 'constants/errors'
@@ -21,7 +21,9 @@ it('signs the user in and redirects him to its profile', async () => {
 
   const emailInput = screen.getByRole('textbox')
 
-  expect(emailInput).toHaveFocus()
+  await waitFor(() => {
+    expect(emailInput).toHaveFocus()
+  })
 
   await userEvent.type(emailInput, 'johndoe@test.com')
 

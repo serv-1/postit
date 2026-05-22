@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Input from '.'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -16,7 +16,7 @@ function TestForm({ children }: { children: React.ReactNode }) {
   )
 }
 
-it('takes the focus', () => {
+it('takes the focus', async () => {
   render(
     <TestForm>
       <Input needFocus name="city" type="text" />
@@ -25,7 +25,9 @@ it('takes the focus', () => {
 
   const input = screen.getByRole('textbox')
 
-  expect(input).toHaveFocus()
+  await waitFor(() => {
+    expect(input).toHaveFocus()
+  })
 })
 
 it("doesn't take the focus", () => {

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import PasswordInput from '.'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -18,7 +18,7 @@ it('uses the given id', () => {
     <TestForm>
       <label htmlFor="test">Password</label>
       <PasswordInput id="test" />
-    </TestForm>
+    </TestForm>,
   )
 
   const input = screen.getByLabelText(/^password$/i)
@@ -31,7 +31,7 @@ it('uses the given class names', () => {
     <TestForm>
       <label htmlFor="password">Password</label>
       <PasswordInput className="blue-password" />
-    </TestForm>
+    </TestForm>,
   )
 
   const container = screen.getByLabelText(/^password$/i).parentElement!
@@ -39,17 +39,19 @@ it('uses the given class names', () => {
   expect(container).toHaveClass('blue-password')
 })
 
-it('takes the focus', () => {
+it('takes the focus', async () => {
   render(
     <TestForm>
       <label htmlFor="password">Password</label>
       <PasswordInput needFocus />
-    </TestForm>
+    </TestForm>,
   )
 
   const input = screen.getByLabelText(/^password$/i)
 
-  expect(input).toHaveFocus()
+  await waitFor(() => {
+    expect(input).toHaveFocus()
+  })
 })
 
 it("doesn't take the focus", () => {
@@ -57,7 +59,7 @@ it("doesn't take the focus", () => {
     <TestForm>
       <label htmlFor="password">Password</label>
       <PasswordInput />
-    </TestForm>
+    </TestForm>,
   )
 
   const input = screen.getByLabelText(/^password$/i)
@@ -70,7 +72,7 @@ it('shows/hides the password', async () => {
     <TestForm>
       <label htmlFor="password">Password</label>
       <PasswordInput />
-    </TestForm>
+    </TestForm>,
   )
 
   const input = screen.getByLabelText(/^password$/i)
@@ -109,7 +111,7 @@ it('renders the password strength', async () => {
     <TestForm>
       <label htmlFor="password">Password</label>
       <PasswordInput showStrength />
-    </TestForm>
+    </TestForm>,
   )
 
   const input = screen.getByLabelText(/^password$/i)
@@ -130,7 +132,7 @@ it("doesn't render the password strength", async () => {
     <TestForm>
       <label htmlFor="password">Password</label>
       <PasswordInput />
-    </TestForm>
+    </TestForm>,
   )
 
   const input = screen.getByLabelText(/^password$/i)

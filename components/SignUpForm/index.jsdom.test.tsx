@@ -1,5 +1,5 @@
 import SignUpForm from '.'
-import { screen, render } from '@testing-library/react'
+import { screen, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
@@ -46,7 +46,9 @@ it('registers the user, signs him in and redirects him to its profile', async ()
 
   const nameInput = screen.getByLabelText(/name/i)
 
-  expect(nameInput).toHaveFocus()
+  await waitFor(() => {
+    expect(nameInput).toHaveFocus()
+  })
 
   await userEvent.type(nameInput, 'john')
 
@@ -92,7 +94,9 @@ it('renders an alert if the server fails to sign the user in', async () => {
 
   const nameInput = screen.getByLabelText(/name/i)
 
-  expect(nameInput).toHaveFocus()
+  await waitFor(() => {
+    expect(nameInput).toHaveFocus()
+  })
 
   await userEvent.type(nameInput, 'john')
 
