@@ -55,7 +55,7 @@ export default function AddressField({
     })
 
     const response = await fetch(
-      NEXT_PUBLIC_LOCATION_IQ_URL + '/autocomplete?' + searchParams
+      NEXT_PUBLIC_LOCATION_IQ_URL + '/autocomplete?' + searchParams,
     )
 
     if (response.ok) {
@@ -89,7 +89,7 @@ export default function AddressField({
       center={center}
       renderContent={(map) => (
         <Autocomplete
-          className="absolute z-[9999] w-full p-4 md:p-8"
+          className="absolute z-9999 w-full p-4 md:p-8"
           options={options}
           error={errors.address?.message as string}
           renderInput={(props) => (

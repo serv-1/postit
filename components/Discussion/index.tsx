@@ -28,7 +28,7 @@ export default function Discussion({
   const [discussion, setDiscussion] = useState(discussionProp)
   const [interlocutor, setInterlocutor] = useState<User | null>()
   const [showBadge, setShowBadge] = useState(
-    discussionProp.hasNewMessage && !isModalOpen
+    discussionProp.hasNewMessage && !isModalOpen,
   )
 
   const { data: session } = useSession() as { data: Session }
@@ -56,7 +56,7 @@ export default function Discussion({
         ...discussion,
         messages: [...discussion.messages, message],
       }))
-    }
+    },
   )
 
   usePusher(discussion.channelName, 'interlocutor:deleted', () => {
@@ -102,7 +102,7 @@ export default function Discussion({
             aria-label={interlocutor.name + ' has responded'}
             className="absolute -top-2 -right-2 z-10"
           >
-            <div className="w-[12px] h-[12px] rounded-full bg-red-600">
+            <div className="w-12 h-12 rounded-full bg-red-600">
               <div className="h-full rounded-full bg-inherit animate-ping"></div>
             </div>
           </div>

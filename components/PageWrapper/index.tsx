@@ -64,11 +64,17 @@ export default function PageWrapper({
       path !== '/')
 
   return (
-    <div className={classNames('px-16', isBgLinear && 'bg-linear-page')}>
+    <div
+      className={classNames(
+        'px-16',
+        isBgLinear &&
+          'bg-linear-[160deg,var(--color-fuchsia-100)34.9%,var(--color-fuchsia-200)35%,var(--color-fuchsia-200)49.9%,var(--color-fuchsia-500)50%]',
+      )}
+    >
       <div
         className={classNames(
-          'flex flex-col min-h-screen md:max-w-[1200px] xl:m-auto',
-          isBgLinear && 'mx-auto max-w-[450px]'
+          'flex flex-col min-h-screen md:max-w-1200 xl:m-auto',
+          isBgLinear && 'mx-auto max-w-450',
         )}
       >
         <Header signedInUser={signedInUser} />

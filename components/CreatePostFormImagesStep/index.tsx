@@ -42,7 +42,7 @@ export default function CreatePostFormImagesStep() {
       imageSources[i] ? (
         <div
           key={i}
-          className="relative w-[calc(50%-4px)] h-[calc((100%/3)-(16px/3))]"
+          className="relative w-[calc(50%-4px)] h-[calc(33.3%-5.3px)]"
         >
           <Image
             src={imageSources[i]}
@@ -54,7 +54,7 @@ export default function CreatePostFormImagesStep() {
       ) : (
         <div
           key={i}
-          className="w-[calc(50%-4px)] h-[calc((100%/3)-(16px/3))] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-8 flex flex-col justify-center items-center md:bg-fuchsia-100"
+          className="w-[calc(50%-4px)] h-[calc(33.3%-5.3px)] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-8 flex flex-col justify-center items-center md:bg-fuchsia-100"
         >
           <PlusCircleSvg className="w-24 h-24 mb-4" />
           Photo n°{i + 1}
@@ -90,11 +90,11 @@ export default function CreatePostFormImagesStep() {
       />
       <InputError<CreatePost> name="images" />
       <div className="flex gap-x-16">
-        <WizardPrevButton className="secondary-btn w-full">
+        <WizardPrevButton className="btn-secondary w-full">
           ← Back
         </WizardPrevButton>
         <WizardNextButton
-          className="primary-btn w-full"
+          className="btn-primary w-full"
           isDisabled={!imageSources.length}
         >
           Next →

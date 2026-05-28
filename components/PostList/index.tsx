@@ -7,7 +7,7 @@ interface PostListProps {
 
 export default function PostList({ posts }: PostListProps) {
   return (
-    <ul className="grid grid-cols-[repeat(6,1fr)] gap-x-16 gap-y-8">
+    <ul className="grid grid-cols-6 gap-x-16 gap-y-8">
       {posts.map((post) => (
         <li className="col-span-3 sm:col-span-2" key={post._id}>
           <Post

@@ -25,7 +25,7 @@ export default function ContactButton({ onClick }: ContactButtonProps) {
 
   return (
     <button
-      className="round-btn p-[10px] bg-fuchsia-600 text-fuchsia-50 fixed bottom-8 right-8 z-[1001] md:primary-btn md:w-full md:static md:h-auto md:shadow-none"
+      className="btn-round p-10 bg-fuchsia-600 text-fuchsia-50 fixed bottom-8 right-8 z-1001 md:btn-primary md:w-full md:static md:h-auto md:shadow-none"
       aria-label="Contact"
       onClick={handleClick}
     >

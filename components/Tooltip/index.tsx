@@ -62,7 +62,7 @@ export default function Tooltip({
           id={tooltipId}
           role="tooltip"
           style={floatingStyles}
-          className="bg-fuchsia-900 text-fuchsia-50 rounded py-4 px-8 break-words"
+          className="bg-fuchsia-900 text-fuchsia-50 rounded py-4 px-8 wrap-break-words"
         >
           <FloatingArrow
             ref={arrowRef}

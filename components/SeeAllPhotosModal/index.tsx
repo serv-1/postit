@@ -17,7 +17,7 @@ export default function SeeAllPhotosModal({ sources }: SeeAllPhotosModalProps) {
     <>
       <div className="absolute bottom-8 right-8">
         <button
-          className="round-btn"
+          className="btn-round"
           onClick={() => setIsOpen(true)}
           aria-label="See all photos"
         >
@@ -27,9 +27,9 @@ export default function SeeAllPhotosModal({ sources }: SeeAllPhotosModalProps) {
       {isOpen && (
         <Modal
           onClose={() => setIsOpen(false)}
-          className="fixed top-0 left-0 w-screen h-screen bg-fuchsia-50 z-[9999]"
+          className="fixed top-0 left-0 w-screen h-screen bg-fuchsia-50 z-9999"
         >
-          <div className="h-full overflow-y-auto flex flex-col lg:max-w-[1200px] lg:mx-auto pb-8 md:pb-16">
+          <div className="h-full overflow-y-auto flex flex-col lg:max-w-1200 lg:mx-auto pb-8 md:pb-16">
             <button
               className="text-fuchsia-600 self-end p-8 md:p-16 hover:text-fuchsia-900 transition-colors duration-200"
               aria-label="Close"
@@ -45,7 +45,7 @@ export default function SeeAllPhotosModal({ sources }: SeeAllPhotosModalProps) {
                 >
                   <ExpandedImageModal
                     src={src}
-                    btnClass="w-full h-[300px] focus:border-4 focus:border-dashed focus:border-fuchsia-600"
+                    btnClass="w-full h-300 focus:border-4 focus:border-dashed focus:border-fuchsia-600"
                     btnImgClass="rounded-8 md:rounded-16"
                   />
                 </li>

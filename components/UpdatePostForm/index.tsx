@@ -52,7 +52,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
     const response = await ajax.put(
       '/posts/' + post._id,
       { ...data, images, latLon },
-      { csrf: true }
+      { csrf: true },
     )
 
     if (!response.ok) {
@@ -62,7 +62,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
         methods.setError(
           name as keyof UpdatePost,
           { message },
-          { shouldFocus: true }
+          { shouldFocus: true },
         )
       } else {
         showToast({ message, error: true })
@@ -84,7 +84,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       <Accordion title="Name" id="name" headingLevel={2}>
         <div className="mb-16">
           Actual name
-          <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
+          <div className="bg-fuchsia-100 rounded-8 p-8 wrap-break-words">
             {post.name}
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       <Accordion title="Description" id="description" headingLevel={2}>
         <div className="mb-16">
           Actual description
-          <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
+          <div className="bg-fuchsia-100 rounded-8 p-8 wrap-break-words">
             {post.description}
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       <Accordion title="Categories" id="categories" headingLevel={2}>
         <div className="mb-16">
           Actual categories
-          <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
+          <div className="bg-fuchsia-100 rounded-8 p-8 wrap-break-words">
             {post.categories.join(', ')}
           </div>
         </div>
@@ -155,7 +155,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
                   key={i}
                   className="w-full rounded-8 aspect-square bg-fuchsia-100"
                 ></div>
-              )
+              ),
             )}
           </div>
         </div>
@@ -168,7 +168,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       <Accordion title="Address" id="address" headingLevel={2}>
         <div className="mb-16">
           Actual address
-          <div className="bg-fuchsia-100 rounded-8 p-8 break-words">
+          <div className="bg-fuchsia-100 rounded-8 p-8 wrap-break-words">
             {post.address}
           </div>
         </div>
@@ -177,11 +177,11 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
           <AddressField
             setLatLon={setLatLon}
             center={latLon}
-            className="h-[250px] rounded"
+            className="h-250 rounded"
           />
         </div>
       </Accordion>
-      <button className="primary-btn block ml-auto">Update</button>
+      <button className="btn-primary block ml-auto">Update</button>
     </Form>
   )
 }

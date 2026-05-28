@@ -11,19 +11,17 @@ export default async function Page(props: { searchParams: SearchParams }) {
   const { token, email, userId } = searchParams
 
   return (
-    <main className="md:h-[486px] mb-auto md:shadow-wrapper md:flex">
-      <div className="flex flex-col gap-y-16 rounded-16 bg-fuchsia-50/60 backdrop-blur-[4px] shadow-glass p-32 md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-none md:w-1/2 md:rounded-r-none md:items-center">
-        <h1 className="md:w-[350px]">Reset Password</h1>
+    <main className="md:h-486 mb-auto md:shadow-wrapper md:flex">
+      <div className="flex flex-col gap-y-16 rounded-16 bg-fuchsia-50/60 backdrop-blur-xs shadow-glass p-32 md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-none md:w-1/2 md:rounded-r-none md:items-center">
+        <h1 className="md:w-350">Reset Password</h1>
         {token ? (
           <>
-            <p className="md:w-[350px] mb-16">
-              You can now change your password.
-            </p>
+            <p className="md:w-350 mb-16">You can now change your password.</p>
             <ResetPasswordForm userId={userId} token={token} />
           </>
         ) : (
           <>
-            <p className="md:w-[350px] mb-16">
+            <p className="md:w-350 mb-16">
               Please check your email inbox for a link to reset your password.
             </p>
             <SendResetPasswordLinkForm email={email} />

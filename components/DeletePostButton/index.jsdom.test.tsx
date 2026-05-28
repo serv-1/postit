@@ -26,7 +26,7 @@ it('renders a danger button', () => {
 
   const btn = screen.getByRole('button')
 
-  expect(btn).toHaveClass('danger-btn')
+  expect(btn).toHaveClass('btn-danger')
   expect(btn).toHaveTextContent(/delete/i)
 })
 
@@ -35,7 +35,7 @@ it('renders a round button', () => {
 
   const btn = screen.getByRole('button')
 
-  expect(btn).toHaveClass('round-btn')
+  expect(btn).toHaveClass('btn-round')
   expect(btn).not.toHaveTextContent(/delete/i)
 })
 

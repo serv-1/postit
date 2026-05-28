@@ -48,7 +48,7 @@ export default function ProfilePostDeleteButton({
 
   return (
     <button
-      className="sm-round-btn"
+      className="btn-round-sm"
       aria-label={'Delete ' + postName}
       title={'Delete ' + postName}
       onClick={deletePost}

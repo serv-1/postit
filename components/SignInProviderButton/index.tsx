@@ -15,7 +15,7 @@ export default function SignInProviderButton({
 }: SignInProviderButtonProps) {
   return (
     <button
-      className="primary-btn w-full"
+      className="btn-primary w-full"
       onClick={async () => {
         await signIn(id, { redirectTo: NEXT_PUBLIC_VERCEL_URL + '/profile' })
       }}

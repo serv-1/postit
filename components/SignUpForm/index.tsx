@@ -91,7 +91,7 @@ export default function SignUpForm() {
         />
         <InputError<CreateUser> name="password" />
       </div>
-      <button className="primary-btn block ml-auto">Register</button>
+      <button className="btn-primary block ml-auto">Register</button>
     </Form>
   )
 }

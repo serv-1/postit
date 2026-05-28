@@ -42,7 +42,7 @@ export default function UpdateUserEmailForm() {
           name="email"
           className="bg-fuchsia-100 rounded-r-none"
         />
-        <button className="primary-btn rounded-l-none">Change</button>
+        <button className="btn-primary rounded-l-none">Change</button>
       </div>
       <InputError<UpdateUserEmail> name="email" />
     </Form>

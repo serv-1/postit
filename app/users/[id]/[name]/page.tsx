@@ -29,8 +29,8 @@ export default async function Page(props: { params: Params }) {
 
   return (
     <main className="grow flex flex-col lg:flex-row lg:items-start lg:gap-x-24">
-      <section className="mb-32 bg-fuchsia-100 rounded-16 p-16 lg:sticky lg:top-16 lg:w-[384px] lg:shrink-0">
-        <div className="w-[100px] h-[100px] mx-auto mb-8 md:w-[125px] md:h-[125px]">
+      <section className="mb-32 bg-fuchsia-100 rounded-16 p-16 lg:sticky lg:top-16 lg:w-sm lg:shrink-0">
+        <div className="w-100 h-100 mx-auto mb-8 md:w-125 md:h-125">
           <Image
             src={
               user.image
@@ -43,7 +43,7 @@ export default async function Page(props: { params: Params }) {
             className="w-full h-full rounded-full object-cover"
           />
         </div>
-        <h1 className="text-center break-words">{user.name}</h1>
+        <h1 className="text-center wrap-break-words">{user.name}</h1>
       </section>
       {posts.length > 0 ? (
         <section className="mb-32">
@@ -59,7 +59,7 @@ export default async function Page(props: { params: Params }) {
         >
           <BlobSvg className="w-full h-3/4 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 text-fuchsia-100" />
           <span className="text-m-4xl md:text-t-4xl text-center z-10">
-            {user.name} hasn&apos;t created any posts yet.
+            {user.name}&nbsp;hasn&apos;t created any posts yet.
           </span>
         </div>
       )}

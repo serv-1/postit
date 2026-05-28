@@ -68,8 +68,8 @@ export default async function Page(props: { params: Params }) {
   }
 
   return (
-    <main className="grow md:grid md:grid-cols-[calc((100%/3*2)-12px)_calc((100%/3)-12px)] md:gap-x-24 md:items-start md:content-start">
-      <div className="relative h-[360px] -ml-16 w-[calc(100%+32px)] md:ml-0 md:w-auto">
+    <main className="grow md:grid md:grid-cols-[calc(66.6%-12px)_calc(33.3%-12px)] md:gap-x-24 md:items-start md:content-start">
+      <div className="relative h-360 -ml-16 w-[calc(100%+32px)] md:ml-0 md:w-auto">
         <Image
           src={NEXT_PUBLIC_AWS_URL + '/' + post.images[0]}
           alt={post.name}
@@ -85,7 +85,7 @@ export default async function Page(props: { params: Params }) {
           <div className="absolute top-8 right-8 md:hidden flex">
             <Link
               href={`/posts/${post._id}/${formatToUrl(post.name)}/update`}
-              className="mr-8 round-btn"
+              className="mr-8 btn-round"
               aria-label="Edit"
             >
               <PencilSvg className="w-full h-full" />
@@ -111,7 +111,7 @@ export default async function Page(props: { params: Params }) {
           </Link>
         </div>
       )}
-      <div className="fixed bottom-8 right-8 z-[1001] md:sticky md:top-16 md:z-auto md:bg-fuchsia-100 md:rounded-16 md:p-16">
+      <div className="fixed bottom-8 right-8 z-1001 md:sticky md:top-16 md:z-auto md:bg-fuchsia-100 md:rounded-16 md:p-16">
         <div className="hidden md:block mb-16 text-t-xl font-bold">
           {isSeller ? (
             'Manage your post'
@@ -131,7 +131,7 @@ export default async function Page(props: { params: Params }) {
           <div className="hidden md:flex md:flex-row md:flex-nowrap">
             <Link
               href={`/posts/${post._id}/${formatToUrl(post.name)}/update`}
-              className="w-full text-center mr-8 primary-btn"
+              className="w-full text-center mr-8 btn-primary"
             >
               Edit
             </Link>
@@ -150,26 +150,26 @@ export default async function Page(props: { params: Params }) {
         )}
       </div>
       <section className="my-32">
-        <h1 className="mb-8 break-words">{post.name}</h1>
+        <h1 className="mb-8 wrap-break-words">{post.name}</h1>
         <span className="text-m-2xl font-bold md:text-t-2xl">
           {addSpacesToNum(post.price)}€
         </span>
-        <p className="my-16 break-words">{post.description}</p>
+        <p className="my-16 wrap-break-words">{post.description}</p>
         <Map
           zoom={11}
           center={post.latLon}
-          className="w-full h-[200px] lg:h-[250px] rounded-8 overflow-hidden"
+          className="w-full h-200 lg:h-250 rounded-8 overflow-hidden"
           showZoomBtn
           showFullScreenBtn
         />
-        <div className="text-center break-words">{post.address}</div>
+        <div className="text-center wrap-break-words">{post.address}</div>
       </section>
       {!isSeller && sellerPosts.length > 0 && (
         <section className="mb-32 md:col-start-1">
           <h2 className="mb-16">
             <Link
               href={`/users/${seller._id}/${formatToUrl(seller.name)}`}
-              className="text-fuchsia-600 hover:underline break-words"
+              className="text-fuchsia-600 hover:underline wrap-break-words"
             >
               {seller.name}
             </Link>

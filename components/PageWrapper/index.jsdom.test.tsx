@@ -55,7 +55,7 @@ describe('render a linear-gradient background if the user is on', () => {
 
     const { container } = render(<PageWrapper>page</PageWrapper>)
 
-    expect(container.children[0]).toHaveClass('bg-linear-page')
+    expect(container.children[0]).toHaveClass(/bg-linear/)
     expect(container.children[0].children[0]).toHaveClass('mx-auto')
   })
 
@@ -69,7 +69,7 @@ describe('render a linear-gradient background if the user is on', () => {
 
     const { container } = render(<PageWrapper>page</PageWrapper>)
 
-    expect(container.children[0]).toHaveClass('bg-linear-page')
+    expect(container.children[0]).toHaveClass(/bg-linear/)
     expect(container.children[0].children[0]).toHaveClass('mx-auto')
   })
 
@@ -83,7 +83,7 @@ describe('render a linear-gradient background if the user is on', () => {
 
     const { container } = render(<PageWrapper>page</PageWrapper>)
 
-    expect(container.children[0]).toHaveClass('bg-linear-page')
+    expect(container.children[0]).toHaveClass(/bg-linear/)
     expect(container.children[0].children[0]).toHaveClass('mx-auto')
   })
 
@@ -100,7 +100,7 @@ describe('render a linear-gradient background if the user is on', () => {
 
     const { container } = render(<PageWrapper>page</PageWrapper>)
 
-    expect(container.children[0]).toHaveClass('bg-linear-page')
+    expect(container.children[0]).toHaveClass(/bg-linear/)
     expect(container.children[0].children[0]).toHaveClass('mx-auto')
   })
 
@@ -114,7 +114,7 @@ describe('render a linear-gradient background if the user is on', () => {
 
     const { container } = render(<PageWrapper>page</PageWrapper>)
 
-    expect(container.children[0]).toHaveClass('bg-linear-page')
+    expect(container.children[0]).toHaveClass(/bg-linear/)
     expect(container.children[0].children[0]).toHaveClass('mx-auto')
   })
 })
@@ -129,7 +129,7 @@ it("doesn't render the linear-gradient background", () => {
 
   const { container } = render(<PageWrapper>page</PageWrapper>)
 
-  expect(container.children[0]).not.toHaveClass('bg-linear-page')
+  expect(container.children[0]).not.toHaveClass(/bg-linear/)
   expect(container.children[0].children[0]).not.toHaveClass('mx-auto')
 })
 

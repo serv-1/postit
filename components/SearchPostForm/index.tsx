@@ -131,8 +131,8 @@ export default function SearchPostForm() {
         />
         <InputError<SearchPost> name="address" />
       </PopoverField>
-      <div className="absolute right-0 -bottom-[36px] md:left-1/2 md:-translate-x-1/2 md:right-auto lg:right-0 lg:left-auto lg:translate-x-0 z-10">
-        <button className="primary-btn">Search</button>
+      <div className="absolute right-0 -bottom-36 md:left-1/2 md:-translate-x-1/2 md:right-auto lg:right-0 lg:left-auto lg:translate-x-0 z-10">
+        <button className="btn-primary">Search</button>
       </div>
     </Form>
   )

@@ -33,7 +33,7 @@ export default function DeletePostButton({
 
   return (
     <button
-      className={isRound ? 'round-btn' : 'danger-btn w-full'}
+      className={isRound ? 'btn-round' : 'btn-danger w-full'}
       onClick={deletePost}
       aria-label="Delete"
     >

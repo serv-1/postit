@@ -29,7 +29,7 @@ export default function UpdateUserNameForm() {
     showToast({ message: 'Your name has been updated! 🎉' })
 
     document.dispatchEvent(
-      new CustomEvent('updateProfileUserName', { detail: { name: data.name } })
+      new CustomEvent('updateProfileUserName', { detail: { name: data.name } }),
     )
   }
 
@@ -46,7 +46,7 @@ export default function UpdateUserNameForm() {
           name="name"
           className="bg-fuchsia-100 rounded-r-none"
         />
-        <button className="primary-btn rounded-l-none">Change</button>
+        <button className="btn-primary rounded-l-none">Change</button>
       </div>
       <InputError<UpdateUserName> name="name" />
     </Form>

@@ -28,7 +28,7 @@ export default function DiscussionMessageList({
   return (
     <ul
       ref={msgListRef}
-      className="flex flex-col h-full overflow-y-auto px-8 md:px-[12px] md:mx-4 chatScrollbar"
+      className="flex flex-col h-full overflow-y-auto px-8 md:px-12 md:mx-4 scrollbar-thumb-fuchsia-200 scrollbar-track-transparent scrollbar-thin hover:scrollbar-thumb-fuchsia-300"
     >
       {messages.map((message, i) => {
         let author: DiscussionMessageProps['author'] = undefined

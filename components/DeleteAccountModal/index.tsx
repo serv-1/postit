@@ -27,7 +27,7 @@ export default function DeleteAccountModal() {
 
   return (
     <>
-      <button className="danger-btn w-full" onClick={() => setIsOpen(true)}>
+      <button className="btn-danger w-full" onClick={() => setIsOpen(true)}>
         Delete account
       </button>
       {isOpen && (
@@ -35,7 +35,7 @@ export default function DeleteAccountModal() {
           onClose={() => setIsOpen(false)}
           className="absolute top-0 left-0 w-screen h-screen md:bg-[rgba(112,26,117,0.25)] md:flex md:justify-center md:items-center"
         >
-          <div className="h-full bg-fuchsia-100 flex flex-col p-16 md:bg-fuchsia-50 md:rounded-16 md:shadow-[0_0_32px_rgba(112,26,117,0.25)] md:w-[450px] md:h-auto">
+          <div className="h-full bg-fuchsia-100 flex flex-col p-16 md:bg-fuchsia-50 md:rounded-16 md:shadow-[0_0_32px_rgba(112,26,117,0.25)] md:w-450 md:h-auto">
             <button
               className="w-32 h-32 text-fuchsia-600 self-end mb-16 hover:text-fuchsia-900 transition-colors duration-200 md:mb-0"
               aria-label="Close"
@@ -43,7 +43,7 @@ export default function DeleteAccountModal() {
             >
               <XSvg className="w-full h-full" />
             </button>
-            <div className="flex-grow">
+            <div className="grow">
               <h2>Do you really want to delete your account?</h2>
               <p className="my-16 md:my-32">
                 Your account and all the posts created will be deleted
@@ -53,12 +53,12 @@ export default function DeleteAccountModal() {
             </div>
             <div className="flex flex-row flew-nowrap gap-x-24">
               <button
-                className="primary-btn w-full"
+                className="btn-primary w-full"
                 onClick={() => setIsOpen(false)}
               >
                 Cancel
               </button>
-              <button className="danger-btn w-full" onClick={deleteUser}>
+              <button className="btn-danger w-full" onClick={deleteUser}>
                 Delete
               </button>
             </div>

@@ -45,7 +45,7 @@ export default function UpdateUserPasswordForm() {
           showStrength
           className="bg-fuchsia-100 rounded-r-none"
         />
-        <button className="primary-btn rounded-l-none">Change</button>
+        <button className="btn-primary rounded-l-none">Change</button>
       </div>
       <InputError<UpdateUserPassword> name="password" />
     </Form>

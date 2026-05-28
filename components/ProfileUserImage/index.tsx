@@ -72,7 +72,7 @@ export default function ProfileUserImage({ image }: ProfileUserImageProps) {
         onKeyDown={handleKeyDown}
         htmlFor="userImage"
         aria-label="Change your profile image"
-        className="block relative group cursor-pointer w-[60px] h-[60px] md:w-[80px] md:h-[80px]"
+        className="block relative group cursor-pointer w-60 h-60 md:w-80 md:h-80"
       >
         <Image
           src={source}
@@ -81,7 +81,7 @@ export default function ProfileUserImage({ image }: ProfileUserImageProps) {
           title="Click to change your profile image"
           className="rounded-full group-hover:grayscale transition-[filter] duration-200 object-cover"
         />
-        <PlusSvg className="w-[20px] h-[20px] rounded-full bg-fuchsia-50 text-fuchsia-600 absolute bottom-0 right-0 group-hover:bg-fuchsia-900 group-hover:text-fuchsia-50 transition-colors duration-200 md:w-24 md:h-24" />
+        <PlusSvg className="w-20 h-20 rounded-full bg-fuchsia-50 text-fuchsia-600 absolute bottom-0 right-0 group-hover:bg-fuchsia-900 group-hover:text-fuchsia-50 transition-colors duration-200 md:w-24 md:h-24" />
       </label>
       <input
         ref={inputRef}

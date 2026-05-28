@@ -49,11 +49,11 @@ export default function PostFavoriteButton(props: PostFavoriteButtonProps) {
 
   return (
     <button
-      className="group absolute top-8 right-8 round-btn hover:bg-fuchsia-50 hover:text-fuchsia-600"
+      className="group absolute top-8 right-8 btn-round hover:bg-fuchsia-50 hover:text-fuchsia-600"
       onClick={handleClick}
       aria-label={(isActive ? 'Delete from' : 'Add to') + ' favorite list'}
     >
-      <HeartFillSvg className="w-full h-full absolute top-0 left-0 p-8 opacity-0 group-hover:opacity-100 group-hover:animate-[heartbeat_1s_linear_infinite] transition-opacity duration-200" />
+      <HeartFillSvg className="w-full h-full absolute top-0 left-0 p-8 opacity-0 group-hover:opacity-100 group-hover:animate-heartbeat transition-opacity duration-200" />
       <HeartSvg className="w-full h-full" />
     </button>
   )

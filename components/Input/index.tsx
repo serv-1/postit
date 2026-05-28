@@ -46,7 +46,7 @@ export default function Input<FormFields extends FieldValues>({
         className,
         errors[name]
           ? 'border-2 border-rose-600 focus-within:border-rose-900'
-          : 'border-fuchsia-900/25 focus-within:border-fuchsia-900/75'
+          : 'border-fuchsia-900/25 focus-within:border-fuchsia-900/75',
       )}
     >
       <input
@@ -59,7 +59,7 @@ export default function Input<FormFields extends FieldValues>({
         className={
           type === 'file'
             ? 'file:border-none file:text-fuchsia-900 file:bg-fuchsia-100 hover:file:bg-fuchsia-600 hover:file:text-fuchsia-50 file:transition-colors file:duration-200 cursor-pointer file:cursor-pointer file:rounded w-full'
-            : 'outline-none placeholder:text-fuchsia-900/50 bg-transparent w-full'
+            : 'outline-hidden placeholder:text-fuchsia-900/50 bg-transparent w-full'
         }
       />
       {addOn}

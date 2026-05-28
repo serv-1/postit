@@ -35,7 +35,7 @@ export default function Post({ id, name, price, image, address }: PostProps) {
         alt={name}
         width="328"
         height="328"
-        className="rounded-8 z-[-1] aspect-square object-cover"
+        className="rounded-8 -z-1 aspect-square object-cover"
       />
       <figcaption className="px-8 py-4 text-center">
         <Link

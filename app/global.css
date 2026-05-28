@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
 @layer base {
   html {
@@ -24,7 +22,12 @@
     @apply text-m-l font-bold;
   }
 
-  @media screen(md) {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  @media (width >= theme(--breakpoint-md)) {
     h1 {
       @apply text-t-4xl font-bold;
     }
@@ -43,58 +46,103 @@
   }
 }
 
-@layer components {
-  .btn {
-    @apply rounded px-16 py-8 font-bold transition-colors duration-200;
+@utility btn-primary {
+  @apply rounded px-16 py-8 font-bold transition-colors duration-200 bg-fuchsia-600 text-fuchsia-50 hover:bg-fuchsia-300 focus:bg-fuchsia-300 hover:text-fuchsia-900 focus:text-fuchsia-900 disabled:bg-fuchsia-800/70 disabled:text-fuchsia-50/80;
+}
+
+@utility btn-secondary {
+  @apply rounded px-16 py-8 font-bold transition-colors duration-200 bg-fuchsia-300 text-fuchsia-900 hover:bg-fuchsia-400 focus:bg-fuchsia-400;
+}
+
+@utility btn-danger {
+  @apply rounded px-16 py-8 font-bold transition-colors duration-200 bg-rose-600 text-rose-50 hover:bg-rose-700 focus:bg-rose-700;
+}
+
+@utility btn-round {
+  box-shadow: 0 2px 8px rgba(112, 26, 117, 0.25);
+  @apply bg-fuchsia-50 text-fuchsia-600 rounded-full transition-colors duration-200 hover:bg-fuchsia-900 hover:text-fuchsia-50 p-8 w-48 h-48;
+}
+
+@utility btn-round-sm {
+  box-shadow: 0 2px 8px rgba(112, 26, 117, 0.25);
+  @apply bg-fuchsia-50 text-fuchsia-600 rounded-full transition-colors duration-200 hover:bg-fuchsia-900 hover:text-fuchsia-50 p-4 w-32 h-32;
+}
+
+@utility bg-wrapper {
+  background-image: linear-gradient(
+    210deg,
+    var(--color-fuchsia-300) 12.5%,
+    var(--color-fuchsia-400) 54%
+  );
+}
+
+@theme {
+  --spacing: 1px;
+
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-s: 14px;
+  --text-s--line-height: 16px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --text-m-l: 18px;
+  --text-m-l--line-height: 24px;
+  --text-m-xl: 20.25px;
+  --text-m-xl--line-height: 24px;
+  --text-m-2xl: 22.78px;
+  --text-m-2xl--line-height: 24px;
+  --text-m-3xl: 25.63px;
+  --text-m-3xl--line-height: 32px;
+  --text-m-4xl: 28.83px;
+  --text-m-4xl--line-height: 32px;
+  --text-t-l: 19.2px;
+  --text-t-l--line-height: 24px;
+  --text-t-xl: 23.04px;
+  --text-t-xl--line-height: 32px;
+  --text-t-2xl: 27.65px;
+  --text-t-2xl--line-height: 32px;
+  --text-t-3xl: 33.18px;
+  --text-t-3xl--line-height: 40px;
+  --text-t-4xl: 39.81px;
+  --text-t-4xl--line-height: 48px;
+
+  --radius: 4px;
+
+  --breakpoint-xl: 1200px;
+
+  --shadow-wrapper: -8px 8px 8px rgba(112, 26, 117, 0.05);
+  --shadow-glass:
+    -8px 8px 8px rgba(112, 26, 117, 0.05),
+    inset 4px -4px 8px rgba(253, 244, 255, 0.1),
+    inset -4px 4px 8px rgba(253, 244, 255, 0.2);
+  --shadow-shape:
+    -8px 8px 0 rgba(217, 70, 239, 0.75), -16px 16px 0 rgba(112, 26, 117, 0.75),
+    inset -4px 4px 8px rgba(250, 232, 255, 0.5),
+    inset 8px -8px 16px rgba(112, 26, 117, 0.5);
+
+  --animate-heartbeat: heartbeat 1s linear infinite;
+  --animate-fadeInDown: fadeInDown 0.3s ease-out;
+
+  @keyframes heartbeat {
+    0%,
+    50%,
+    100% {
+      transform: scale(1);
+    }
+    33%,
+    66% {
+      transform: scale(1.25);
+    }
   }
 
-  .primary-btn {
-    @apply btn bg-fuchsia-600 text-fuchsia-50 hover:bg-fuchsia-300 focus:bg-fuchsia-300 hover:text-fuchsia-900 focus:text-fuchsia-900 disabled:bg-fuchsia-800/70 disabled:text-fuchsia-50/80;
-  }
-
-  .secondary-btn {
-    @apply btn bg-fuchsia-300 text-fuchsia-900 hover:bg-fuchsia-400 focus:bg-fuchsia-400;
-  }
-
-  .danger-btn {
-    @apply btn bg-rose-600 text-rose-50 hover:bg-rose-700 focus:bg-rose-700;
-  }
-
-  .round-btn {
-    box-shadow: 0 2px 8px rgba(112, 26, 117, 0.25);
-    @apply bg-fuchsia-50 text-fuchsia-600 rounded-full transition-colors duration-200 hover:bg-fuchsia-900 hover:text-fuchsia-50 p-8 w-48 h-48;
-  }
-
-  .sm-round-btn {
-    @apply round-btn p-4 w-32 h-32;
-  }
-
-  .chatScrollbar {
-    scrollbar-color: #f5d0fe transparent;
-    scrollbar-width: thin;
-  }
-
-  .chatScrollbar::-webkit-scrollbar {
-    background-color: transparent;
-    width: 6px;
-  }
-
-  .chatScrollbar:hover::-webkit-scrollbar-thumb {
-    background-color: #f0abfc;
-  }
-
-  .chatScrollbar::-webkit-scrollbar-thumb {
-    background-color: #f5d0fe;
-    border-radius: 50px;
-    padding: 8px;
-  }
-
-  .invisibleScrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .invisibleScrollbar::-webkit-scrollbar {
-    display: none;
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      top: 0;
+    }
+    to {
+      opacity: 1;
+      top: 16;
+    }
   }
 }

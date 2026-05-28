@@ -5,7 +5,7 @@ import ArrowLeftSvg from 'components/ArrowLeftSvg'
 export default function PreviousPageButton() {
   return (
     <button
-      className="round-btn"
+      className="btn-round"
       onClick={() => window.history.back()}
       aria-label="Go back to the previous page"
     >

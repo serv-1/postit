@@ -21,7 +21,7 @@ export default async function Page({
 
   return (
     <main className="grow flex flex-col mb-32 lg:flex-row lg:items-start lg:gap-x-24">
-      <div className="bg-linear-search p-16 rounded-16 shadow-[-4px_4px_8px_#F5D0FE] lg:sticky lg:top-16 mb-32 lg:w-[384px] lg:shrink-0">
+      <div className="bg-linear-72 from-fuchsia-300 to-fuchsia-200 p-16 rounded-16 shadow-[-4px_4px_8px_#F5D0FE] lg:sticky lg:top-16 mb-32 lg:w-sm lg:shrink-0">
         <h1 className="mb-16">Search</h1>
         <SearchPostForm />
       </div>

@@ -71,7 +71,7 @@ export default function SignInForm() {
         />
         <InputError<SignIn> name="password" />
       </div>
-      <button className="primary-btn block ml-auto">Sign in</button>
+      <button className="btn-primary block ml-auto">Sign in</button>
     </Form>
   )
 }

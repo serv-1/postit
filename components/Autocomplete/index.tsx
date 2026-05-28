@@ -86,7 +86,7 @@ export default function Autocomplete<O extends Option>({
           break
       }
     },
-    [options, activeOptionPosition]
+    [options, activeOptionPosition],
   )
 
   useEventListener('document', 'click', (e) => {
@@ -115,7 +115,7 @@ export default function Autocomplete<O extends Option>({
         'aria-controls': 'optionList',
         'aria-activedescendant': options[activeOptionPosition]?.id || '',
         className:
-          'p-8 border-b-2 transition-colors duration-200 rounded outline-none bg-fuchsia-50 placeholder:text-fuchsia-900/50 w-full border-fuchsia-900/25 focus-within:border-fuchsia-900/75 text-base',
+          'p-8 border-b-2 transition-colors duration-200 rounded outline-hidden bg-fuchsia-50 placeholder:text-fuchsia-900/50 w-full border-fuchsia-900/25 focus-within:border-fuchsia-900/75 text-base',
       })}
       {error && (
         <div
@@ -131,7 +131,7 @@ export default function Autocomplete<O extends Option>({
           id="optionList"
           role="listbox"
           aria-label="Options"
-          className="my-4 shadow-[0_4px_4px_rgba(112,26,117,0.35)] rounded max-h-[192px] overflow-auto"
+          className="my-4 shadow-[0_4px_4px_rgba(112,26,117,0.35)] rounded max-h-192 overflow-auto"
         >
           {options.map((option, i) =>
             renderOption(
@@ -147,11 +147,11 @@ export default function Autocomplete<O extends Option>({
                   'py-4 px-4 cursor-pointer',
                   activeOptionPosition === i
                     ? 'bg-fuchsia-200'
-                    : 'bg-fuchsia-100'
+                    : 'bg-fuchsia-100',
                 ),
               },
-              option
-            )
+              option,
+            ),
           )}
         </ul>
       )}

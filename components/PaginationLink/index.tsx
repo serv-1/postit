@@ -20,7 +20,7 @@ export default function PaginationLink({
   return (
     <Link
       href={'?' + newSearchParams.toString()}
-      className="flex justify-center items-center rounded w-[28px] h-[28px] md:w-32 md:h-32 bg-fuchsia-100 hover:bg-fuchsia-300 transition-colors duration-200"
+      className="flex justify-center items-center rounded w-28 h-28 md:w-32 md:h-32 bg-fuchsia-100 hover:bg-fuchsia-300 transition-colors duration-200"
       aria-label={ariaLabel}
     >
       {children}

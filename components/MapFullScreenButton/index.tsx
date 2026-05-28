@@ -12,7 +12,7 @@ export default function MapFullScreenButton({
 }: MapFullScreenButtonProps) {
   return fullScreen ? (
     <button
-      className="round-btn absolute top-8 right-8 z-[501]"
+      className="btn-round absolute top-8 right-8 z-501"
       type="button"
       onClick={() => setFullScreen(false)}
       aria-label="Minimize"
@@ -21,7 +21,7 @@ export default function MapFullScreenButton({
     </button>
   ) : (
     <button
-      className="sm-round-btn absolute top-8 right-8 z-[501]"
+      className="btn-round-sm absolute top-8 right-8 z-501"
       type="button"
       onClick={() => setFullScreen(true)}
       aria-label="Full screen"

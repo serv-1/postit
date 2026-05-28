@@ -28,7 +28,7 @@ export default function Map({
     <div
       className={
         fullScreen
-          ? 'absolute top-0 left-0 z-[9999] w-screen h-screen'
+          ? 'absolute top-0 left-0 z-9999 w-screen h-screen'
           : className
       }
     >

@@ -46,7 +46,7 @@ export default function CreatePostForm() {
     const response = await ajax.post(
       '/post',
       { ...data, images, latLon },
-      { csrf: true }
+      { csrf: true },
     )
 
     if (!response.ok) {
@@ -56,7 +56,7 @@ export default function CreatePostForm() {
         methods.setError(
           name as keyof CreatePost,
           { message },
-          { shouldFocus: true }
+          { shouldFocus: true },
         )
       } else {
         showToast({ message, error: true })
@@ -85,7 +85,7 @@ export default function CreatePostForm() {
             className="h-full rounded"
           />
           <WizardNextButton
-            className="primary-btn w-full mt-auto"
+            className="btn-primary w-full mt-auto"
             isDisabled={!latLon}
           >
             Next →
@@ -125,10 +125,10 @@ export default function CreatePostForm() {
             <InputError name="description" />
           </div>
           <div className="flex gap-x-16 mt-auto">
-            <WizardPrevButton className="secondary-btn w-full">
+            <WizardPrevButton className="btn-secondary w-full">
               ← Back
             </WizardPrevButton>
-            <button className="primary-btn w-full">Post</button>
+            <button className="btn-primary w-full">Post</button>
           </div>
         </WizardStep>
       </WizardProvider>

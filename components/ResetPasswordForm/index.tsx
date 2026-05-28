@@ -55,7 +55,7 @@ export default function ResetPasswordForm({
       methods={methods}
       submitHandler={submitHandler}
       method="post"
-      className="md:w-[350px]"
+      className="md:w-350"
     >
       <label htmlFor="password">Password</label>
       <PasswordInput
@@ -64,7 +64,7 @@ export default function ResetPasswordForm({
         showStrength
       />
       <InputError name="password" />
-      <button className="primary-btn block ml-auto mt-16">Confirm</button>
+      <button className="btn-primary block ml-auto mt-16">Confirm</button>
       {error && (
         <div role="alert" className="mt-16 font-bold text-rose-600">
           {error}

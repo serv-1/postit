@@ -27,10 +27,10 @@ export default function WizardProvider({ children }: WizardProviderProps) {
     (id: string) => {
       setStepIds((ids) => ids.filter((_id) => _id !== id))
       setActiveStepPosition((pos) =>
-        pos === stepIds.length - 1 ? pos - 1 : pos
+        pos === stepIds.length - 1 ? pos - 1 : pos,
       )
     },
-    [stepIds.length]
+    [stepIds.length],
   )
 
   return (

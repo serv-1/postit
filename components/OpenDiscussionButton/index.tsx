@@ -81,9 +81,9 @@ export default function OpenDiscussionButton({
         }
         width={64}
         height={64}
-        className="rounded-r-full w-[52px] h-64 object-cover"
+        className="rounded-r-full w-52 h-64 object-cover"
       />
-      <div className="flex-grow text-left">
+      <div className="grow text-left">
         {interlocutor ? (
           <span className="block text-fuchsia-600">{interlocutor.name}</span>
         ) : (
@@ -91,7 +91,7 @@ export default function OpenDiscussionButton({
         )}
         <span className="block font-bold">{postName}</span>
       </div>
-      <div className="w-[20px] h-[20px] text-fuchsia-600 relative left-0 group-hover:left-4 transition-[left] duration-200">
+      <div className="w-20 h-20 text-fuchsia-600 relative left-0 group-hover:left-4 transition-[left] duration-200">
         <ChevronRightSvg className="w-full h-full" />
       </div>
     </button>

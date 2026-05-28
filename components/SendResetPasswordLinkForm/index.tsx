@@ -45,7 +45,7 @@ export default function SendResetPasswordLinkForm({
       methods={methods}
       submitHandler={submitHandler}
       method="post"
-      className="md:w-[350px]"
+      className="md:w-350"
     >
       <label htmlFor="email">Email</label>
       <Input
@@ -55,7 +55,7 @@ export default function SendResetPasswordLinkForm({
         className="bg-fuchsia-50 md:bg-fuchsia-100"
       />
       <InputError name="email" />
-      <button type="submit" className="primary-btn block ml-auto mt-16">
+      <button type="submit" className="btn-primary block ml-auto mt-16">
         Send link
       </button>
       {message && (

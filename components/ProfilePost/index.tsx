@@ -22,7 +22,7 @@ export default function ProfilePost({
   setPosts,
 }: ProfilePostProps) {
   return (
-    <div className="relative md:max-w-[700px] md:mx-auto">
+    <div className="relative md:max-w-700 md:mx-auto">
       <div className="absolute -top-4 -left-4 z-20">
         <ProfilePostDeleteButton
           postType={type}
@@ -35,7 +35,7 @@ export default function ProfilePost({
         href={`/posts/${id}/${formatToUrl(name)}`}
         className="flex flex-row flex-nowrap bg-fuchsia-200 rounded-8 hover:bg-fuchsia-300 transition-colors duration-200 group"
       >
-        <div className="relative flex-shrink-0 w-[100px] h-[100px] md:w-[150px] md:h-[150px]">
+        <div className="relative shrink-0 w-100 h-100 md:w-150 md:h-150">
           <Image
             src={NEXT_PUBLIC_AWS_URL + '/' + image}
             alt={name}
