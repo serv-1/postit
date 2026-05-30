@@ -48,13 +48,13 @@ export default function CreatePostFormImagesStep() {
             src={imageSources[i]}
             alt=""
             fill
-            className="rounded-8 object-cover"
+            className="rounded-lg object-cover"
           />
         </div>
       ) : (
         <div
           key={i}
-          className="w-[calc(50%-4px)] h-[calc(33.3%-5.3px)] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-8 flex flex-col justify-center items-center md:bg-fuchsia-100"
+          className="w-[calc(50%-4px)] h-[calc(33.3%-5.3px)] bg-fuchsia-200 text-fuchsia-900 font-bold rounded-lg flex flex-col justify-center items-center md:bg-fuchsia-100"
         >
           <PlusCircleSvg className="w-24 h-24 mb-4" />
           Photo n°{i + 1}

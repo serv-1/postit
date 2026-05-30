@@ -59,7 +59,7 @@ export default function PopoverField({ label, children }: PopoverFieldProps) {
           role="dialog"
           aria-labelledby={referenceId}
           style={floatingStyles}
-          className="bg-fuchsia-200 border-2 border-fuchsia-500 shadow-[0_0_16px_#D946EF] rounded-8 z-20 p-16 w-full max-w-328 lg:max-w-none"
+          className="bg-fuchsia-200 border-2 border-fuchsia-500 shadow-[0_0_16px_#D946EF] rounded-lg z-20 p-16 w-full max-w-328 lg:max-w-none"
         >
           {children}
         </div>

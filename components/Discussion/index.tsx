@@ -126,7 +126,7 @@ export default function Discussion({
       )}
     </>
   ) : (
-    <div className="bg-fuchsia-200 rounded-8 h-56 flex justify-center items-center">
+    <div className="bg-fuchsia-200 rounded-lg h-56 flex justify-center items-center">
       <LoadingSpinner />
     </div>
   )

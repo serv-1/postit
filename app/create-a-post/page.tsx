@@ -15,8 +15,8 @@ export default async function Page() {
   }
 
   return (
-    <main className="mb-auto md:bg-wrapper md:rounded-16 md:shadow-wrapper md:p-32">
-      <div className="flex flex-col h-518 p-32 max-w-450 rounded-16 bg-fuchsia-50/60 backdrop-blur-xs shadow-glass mx-auto md:backdrop-blur-none md:shadow-shape md:bg-fuchsia-200 overflow-y-auto scrollbar-none">
+    <main className="mb-auto md:bg-wrapper md:rounded-2xl md:shadow-wrapper md:p-32">
+      <div className="flex flex-col h-518 p-32 max-w-450 rounded-2xl bg-fuchsia-50/60 backdrop-blur-xs shadow-glass mx-auto md:backdrop-blur-none md:shadow-shape md:bg-fuchsia-200 overflow-y-auto scrollbar-none">
         <CreatePostForm />
       </div>
     </main>

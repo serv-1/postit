@@ -64,7 +64,7 @@ export default function OpenDiscussionButton({
 
   return (
     <button
-      className="relative w-full flex flex-row flex-nowrap items-center gap-x-4 pr-4 bg-fuchsia-200 rounded-8 hover:bg-fuchsia-300 transition-colors duration-200 group overflow-hidden h-56"
+      className="relative w-full flex flex-row flex-nowrap items-center gap-x-4 pr-4 bg-fuchsia-200 rounded-lg hover:bg-fuchsia-300 transition-colors duration-200 group overflow-hidden h-56"
       onClick={openModal}
       aria-label="Open discussion"
     >

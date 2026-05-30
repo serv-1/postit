@@ -29,7 +29,7 @@ export default async function Page(props: { params: Params }) {
 
   return (
     <main className="grow flex flex-col lg:flex-row lg:items-start lg:gap-x-24">
-      <section className="mb-32 bg-fuchsia-100 rounded-16 p-16 lg:sticky lg:top-16 lg:w-sm lg:shrink-0">
+      <section className="mb-32 bg-fuchsia-100 rounded-2xl p-16 lg:sticky lg:top-16 lg:w-sm lg:shrink-0">
         <div className="w-100 h-100 mx-auto mb-8 md:w-125 md:h-125">
           <Image
             src={

@@ -35,7 +35,7 @@ export default function DeleteAccountModal() {
           onClose={() => setIsOpen(false)}
           className="absolute top-0 left-0 w-screen h-screen md:bg-[rgba(112,26,117,0.25)] md:flex md:justify-center md:items-center"
         >
-          <div className="h-full bg-fuchsia-100 flex flex-col p-16 md:bg-fuchsia-50 md:rounded-16 md:shadow-[0_0_32px_rgba(112,26,117,0.25)] md:w-450 md:h-auto">
+          <div className="h-full bg-fuchsia-100 flex flex-col p-16 md:bg-fuchsia-50 md:rounded-2xl md:shadow-[0_0_32px_rgba(112,26,117,0.25)] md:w-450 md:h-auto">
             <button
               className="w-32 h-32 text-fuchsia-600 self-end mb-16 hover:text-fuchsia-900 transition-colors duration-200 md:mb-0"
               aria-label="Close"

@@ -42,7 +42,7 @@ export default function Input<FormFields extends FieldValues>({
   return (
     <div
       className={classNames(
-        'p-8 border-b-2 transition-colors duration-200 rounded w-full flex flex-row flex-nowrap items-center',
+        'p-8 border-b-2 transition-colors duration-200 rounded-sm w-full flex flex-row flex-nowrap items-center',
         className,
         errors[name]
           ? 'border-2 border-rose-600 focus-within:border-rose-900'
@@ -58,7 +58,7 @@ export default function Input<FormFields extends FieldValues>({
         aria-describedby={classNames(name + 'Feedback', ariaDescribedBy)}
         className={
           type === 'file'
-            ? 'file:border-none file:text-fuchsia-900 file:bg-fuchsia-100 hover:file:bg-fuchsia-600 hover:file:text-fuchsia-50 file:transition-colors file:duration-200 cursor-pointer file:cursor-pointer file:rounded w-full'
+            ? 'file:border-none file:text-fuchsia-900 file:bg-fuchsia-100 hover:file:bg-fuchsia-600 hover:file:text-fuchsia-50 file:transition-colors file:duration-200 cursor-pointer file:cursor-pointer file:rounded-sm w-full'
             : 'outline-hidden placeholder:text-fuchsia-900/50 bg-transparent w-full'
         }
       />

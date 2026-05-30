@@ -115,12 +115,12 @@ export default function Autocomplete<O extends Option>({
         'aria-controls': 'optionList',
         'aria-activedescendant': options[activeOptionPosition]?.id || '',
         className:
-          'p-8 border-b-2 transition-colors duration-200 rounded outline-hidden bg-fuchsia-50 placeholder:text-fuchsia-900/50 w-full border-fuchsia-900/25 focus-within:border-fuchsia-900/75 text-base',
+          'p-8 border-b-2 transition-colors duration-200 rounded-sm outline-hidden bg-fuchsia-50 placeholder:text-fuchsia-900/50 w-full border-fuchsia-900/25 focus-within:border-fuchsia-900/75 text-base',
       })}
       {error && (
         <div
           role="alert"
-          className="text-rose-600 text-base font-bold bg-rose-50/75 rounded p-4 my-2"
+          className="text-rose-600 text-base font-bold bg-rose-50/75 rounded-sm p-4 my-2"
         >
           {error}
         </div>
@@ -131,7 +131,7 @@ export default function Autocomplete<O extends Option>({
           id="optionList"
           role="listbox"
           aria-label="Options"
-          className="my-4 shadow-[0_4px_4px_rgba(112,26,117,0.35)] rounded max-h-192 overflow-auto"
+          className="my-4 shadow-[0_4px_4px_rgba(112,26,117,0.35)] rounded-sm max-h-192 overflow-auto"
         >
           {options.map((option, i) =>
             renderOption(

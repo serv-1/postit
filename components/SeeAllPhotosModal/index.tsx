@@ -46,7 +46,7 @@ export default function SeeAllPhotosModal({ sources }: SeeAllPhotosModalProps) {
                   <ExpandedImageModal
                     src={src}
                     btnClass="w-full h-300 focus:border-4 focus:border-dashed focus:border-fuchsia-600"
-                    btnImgClass="rounded-8 md:rounded-16"
+                    btnImgClass="rounded-lg md:rounded-2xl"
                   />
                 </li>
               ))}

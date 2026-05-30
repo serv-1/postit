@@ -47,15 +47,15 @@
 }
 
 @utility btn-primary {
-  @apply rounded px-16 py-8 font-bold transition-colors duration-200 bg-fuchsia-600 text-fuchsia-50 hover:bg-fuchsia-300 focus:bg-fuchsia-300 hover:text-fuchsia-900 focus:text-fuchsia-900 disabled:bg-fuchsia-800/70 disabled:text-fuchsia-50/80;
+  @apply rounded-sm px-16 py-8 font-bold transition-colors duration-200 bg-fuchsia-600 text-fuchsia-50 hover:bg-fuchsia-300 focus:bg-fuchsia-300 hover:text-fuchsia-900 focus:text-fuchsia-900 disabled:bg-fuchsia-800/70 disabled:text-fuchsia-50/80;
 }
 
 @utility btn-secondary {
-  @apply rounded px-16 py-8 font-bold transition-colors duration-200 bg-fuchsia-300 text-fuchsia-900 hover:bg-fuchsia-400 focus:bg-fuchsia-400;
+  @apply rounded-sm px-16 py-8 font-bold transition-colors duration-200 bg-fuchsia-300 text-fuchsia-900 hover:bg-fuchsia-400 focus:bg-fuchsia-400;
 }
 
 @utility btn-danger {
-  @apply rounded px-16 py-8 font-bold transition-colors duration-200 bg-rose-600 text-rose-50 hover:bg-rose-700 focus:bg-rose-700;
+  @apply rounded-sm px-16 py-8 font-bold transition-colors duration-200 bg-rose-600 text-rose-50 hover:bg-rose-700 focus:bg-rose-700;
 }
 
 @utility btn-round {
@@ -105,8 +105,6 @@
   --text-t-3xl--line-height: 40px;
   --text-t-4xl: 39.81px;
   --text-t-4xl--line-height: 48px;
-
-  --radius: 4px;
 
   --breakpoint-xl: 1200px;
 

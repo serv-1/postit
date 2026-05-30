@@ -75,7 +75,7 @@ export default async function Page(props: { params: Params }) {
           alt={post.name}
           width="340"
           height="360"
-          className="w-full h-full object-cover md:rounded-16"
+          className="w-full h-full object-cover md:rounded-2xl"
           priority
         />
         <div className="absolute top-8 left-8 md:hidden">
@@ -111,7 +111,7 @@ export default async function Page(props: { params: Params }) {
           </Link>
         </div>
       )}
-      <div className="fixed bottom-8 right-8 z-1001 md:sticky md:top-16 md:z-auto md:bg-fuchsia-100 md:rounded-16 md:p-16">
+      <div className="fixed bottom-8 right-8 z-1001 md:sticky md:top-16 md:z-auto md:bg-fuchsia-100 md:rounded-2xl md:p-16">
         <div className="hidden md:block mb-16 text-t-xl font-bold">
           {isSeller ? (
             'Manage your post'
@@ -158,7 +158,7 @@ export default async function Page(props: { params: Params }) {
         <Map
           zoom={11}
           center={post.latLon}
-          className="w-full h-200 lg:h-250 rounded-8 overflow-hidden"
+          className="w-full h-200 lg:h-250 rounded-lg overflow-hidden"
           showZoomBtn
           showFullScreenBtn
         />

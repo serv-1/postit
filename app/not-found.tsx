@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <main className="md:flex md:h-486 md:shadow-wrapper mb-auto">
-      <div className="rounded-16 bg-fuchsia-50/60 backdrop-blur-xs shadow-glass p-32 md:pr-8 md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-none md:rounded-r-none md:w-1/2">
+      <div className="rounded-2xl bg-fuchsia-50/60 backdrop-blur-xs shadow-glass p-32 md:pr-8 md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-none md:rounded-r-none md:w-1/2">
         <div className="text-[128px] font-bold leading-104 mb-8 tracking-widest text-center [text-shadow:2px_2px_0_#E879F9,4px_4px_0_#701A75] md:text-[64px] md:leading-64 md:mb-0 md:tracking-normal md:text-right md:[text-shadow:-2px_2px_0_#FDF4FF,-4px_4px_0_#A21CAF] md:relative md:top-1/2 md:-translate-y-1/2">
           404
         </div>
@@ -15,7 +15,7 @@ export default function NotFound() {
           Not Found
         </div>
       </div>
-      <div className="hidden md:flex items-center bg-fuchsia-900 w-1/2 pl-8 rounded-r-16">
+      <div className="hidden md:flex items-center bg-fuchsia-900 w-1/2 pl-8 rounded-r-2xl">
         <div className="text-[64px] leading-64 text-fuchsia-50 font-bold [text-shadow:2px_2px_0_#701A75,4px_4px_0_#F0ABFC]">
           Not Found
         </div>

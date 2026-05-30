@@ -23,11 +23,11 @@ export default function Accordion({
   const Heading = ('h' + headingLevel) as keyof React.JSX.IntrinsicElements
 
   return (
-    <div className="mb-16 bg-fuchsia-200 rounded-8 md:bg-fuchsia-300">
+    <div className="mb-16 bg-fuchsia-200 rounded-lg md:bg-fuchsia-300">
       <Heading id={id + '-accordionHeader'}>
         <button
           className={classNames(
-            'w-full flex flex-row flex-nowrap justify-between items-center bg-fuchsia-200 p-8 rounded-8 md:bg-fuchsia-300',
+            'w-full flex flex-row flex-nowrap justify-between items-center bg-fuchsia-200 p-8 rounded-lg md:bg-fuchsia-300',
             { 'shadow-[0_4px_4px_rgba(112,26,117,0.1)]': isOpen },
           )}
           type="button"
@@ -60,7 +60,7 @@ export default function Accordion({
           role="region"
           aria-labelledby={id + '-accordionHeader'}
           id={id + '-accordionPanel'}
-          className="rounded-b-8 p-16"
+          className="rounded-b-lg p-16"
         >
           {children}
         </div>

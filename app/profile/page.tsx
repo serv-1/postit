@@ -35,7 +35,7 @@ export default async function Page() {
 
   return (
     <main className="grow flex flex-col gap-x-24">
-      <div className="mb-32 p-8 md:flex md:flex-row md:flex-nowrap md:items-center md:bg-fuchsia-100 md:rounded-16 md:p-16">
+      <div className="mb-32 p-8 md:flex md:flex-row md:flex-nowrap md:items-center md:bg-fuchsia-100 md:rounded-2xl md:p-16">
         <div className="grow flex flex-row flex-nowrap items-center min-w-0 mb-8 md:mb-0 md:mr-16">
           <ProfileUserImage image={user.image} />
           <ProfileUserName name={user.name} />
@@ -45,12 +45,12 @@ export default async function Page() {
         </div>
         <PublicProfileLink id={user._id} name={user.name} />
       </div>
-      <div className="mb-32 md:bg-fuchsia-100 md:p-32 md:rounded-16">
+      <div className="mb-32 md:bg-fuchsia-100 md:p-32 md:rounded-2xl">
         <TabsProvider defaultValue="post">
           <TabList className="flex flex-row flew-nowrap gap-x-8 mb-16 md:gap-x-16 md:justify-center md:mb-32">
             <Tab
               value="post"
-              baseClass="p-8 w-full md:w-125 rounded-8"
+              baseClass="p-8 w-full md:w-125 rounded-lg"
               activeClass="bg-fuchsia-200 text-fuchsia-900 font-bold"
               inactiveClass="bg-transparent text-fuchsia-600 hover:bg-fuchsia-50 transition-colors duration-200"
             >
@@ -58,7 +58,7 @@ export default async function Page() {
             </Tab>
             <Tab
               value="favorite"
-              baseClass="p-8 w-full md:w-125 rounded-8"
+              baseClass="p-8 w-full md:w-125 rounded-lg"
               activeClass="bg-fuchsia-200 text-fuchsia-900 font-bold"
               inactiveClass="bg-transparent text-fuchsia-600 hover:bg-fuchsia-50 transition-colors duration-200"
             >
@@ -66,7 +66,7 @@ export default async function Page() {
             </Tab>
             <Tab
               value="account"
-              baseClass="p-8 w-full md:w-125 rounded-8"
+              baseClass="p-8 w-full md:w-125 rounded-lg"
               activeClass="bg-fuchsia-200 text-fuchsia-900 font-bold"
               inactiveClass="bg-transparent text-fuchsia-600 hover:bg-fuchsia-50 transition-colors duration-200"
             >
@@ -89,7 +89,7 @@ export default async function Page() {
           </TabPanel>
           <TabPanel
             value="account"
-            className="md:w-450 md:bg-fuchsia-200 md:rounded-16 md:p-32 md:mx-auto"
+            className="md:w-450 md:bg-fuchsia-200 md:rounded-2xl md:p-32 md:mx-auto"
           >
             <UpdateUserNameForm />
             <UpdateUserEmailForm />

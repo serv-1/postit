@@ -12,7 +12,7 @@ export default async function Page(props: { searchParams: SearchParams }) {
 
   return (
     <main className="md:h-486 mb-auto md:shadow-wrapper md:flex">
-      <div className="flex flex-col gap-y-16 rounded-16 bg-fuchsia-50/60 backdrop-blur-xs shadow-glass p-32 md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-none md:w-1/2 md:rounded-r-none md:items-center">
+      <div className="flex flex-col gap-y-16 rounded-2xl bg-fuchsia-50/60 backdrop-blur-xs shadow-glass p-32 md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-none md:w-1/2 md:rounded-r-none md:items-center">
         <h1 className="md:w-350">Reset Password</h1>
         {token ? (
           <>
@@ -29,7 +29,7 @@ export default async function Page(props: { searchParams: SearchParams }) {
         )}
       </div>
       <div
-        className="hidden md:block w-1/2 rounded-r-16"
+        className="hidden md:block w-1/2 rounded-r-2xl"
         style={{
           backgroundImage:
             'linear-gradient(135deg, #f0abfc 25%, transparent 25%), linear-gradient(225deg, #f0abfc 25%, transparent 25%), linear-gradient(45deg, #f0abfc 25%, transparent 25%), linear-gradient(315deg, #f0abfc 25%, #E879F9 25%)',

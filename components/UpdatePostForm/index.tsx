@@ -84,7 +84,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       <Accordion title="Name" id="name" headingLevel={2}>
         <div className="mb-16">
           Actual name
-          <div className="bg-fuchsia-100 rounded-8 p-8 wrap-break-words">
+          <div className="bg-fuchsia-100 rounded-lg p-8 wrap-break-words">
             {post.name}
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       <Accordion title="Description" id="description" headingLevel={2}>
         <div className="mb-16">
           Actual description
-          <div className="bg-fuchsia-100 rounded-8 p-8 wrap-break-words">
+          <div className="bg-fuchsia-100 rounded-lg p-8 wrap-break-words">
             {post.description}
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       <Accordion title="Categories" id="categories" headingLevel={2}>
         <div className="mb-16">
           Actual categories
-          <div className="bg-fuchsia-100 rounded-8 p-8 wrap-break-words">
+          <div className="bg-fuchsia-100 rounded-lg p-8 wrap-break-words">
             {post.categories.join(', ')}
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       <Accordion title="Price" id="price" headingLevel={2}>
         <div className="mb-16">
           Actual price
-          <div className="bg-fuchsia-100 rounded-8 p-8">
+          <div className="bg-fuchsia-100 rounded-lg p-8">
             {addSpacesToNum(post.price)}€
           </div>
         </div>
@@ -147,13 +147,13 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
                 <ExpandedImageModal
                   key={post.images[i]}
                   src={post.images[i]}
-                  btnClass="w-full aspect-square focus:outline-4 focus:outline-dashed focus:outline-fuchsia-600 rounded-8"
-                  btnImgClass="rounded-8"
+                  btnClass="w-full aspect-square focus:outline-4 focus:outline-dashed focus:outline-fuchsia-600 rounded-lg"
+                  btnImgClass="rounded-lg"
                 />
               ) : (
                 <div
                   key={i}
-                  className="w-full rounded-8 aspect-square bg-fuchsia-100"
+                  className="w-full rounded-lg aspect-square bg-fuchsia-100"
                 ></div>
               ),
             )}
@@ -168,7 +168,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       <Accordion title="Address" id="address" headingLevel={2}>
         <div className="mb-16">
           Actual address
-          <div className="bg-fuchsia-100 rounded-8 p-8 wrap-break-words">
+          <div className="bg-fuchsia-100 rounded-lg p-8 wrap-break-words">
             {post.address}
           </div>
         </div>
@@ -177,7 +177,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
           <AddressField
             setLatLon={setLatLon}
             center={latLon}
-            className="h-250 rounded"
+            className="h-250 rounded-sm"
           />
         </div>
       </Accordion>

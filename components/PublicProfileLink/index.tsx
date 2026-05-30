@@ -20,7 +20,7 @@ export default function PublicProfileLink(props: PublicProfileLinkProps) {
   return (
     <Link
       href={`/users/${props.id}/${formatToUrl(name)}`}
-      className="bg-fuchsia-200 text-fuchsia-600 py-8 px-16 block shrink-0 text-center font-bold rounded hover:bg-fuchsia-300 transition-colors duration-200 md:h-40"
+      className="bg-fuchsia-200 text-fuchsia-600 py-8 px-16 block shrink-0 text-center font-bold rounded-sm hover:bg-fuchsia-300 transition-colors duration-200 md:h-40"
     >
       See my public profile
     </Link>

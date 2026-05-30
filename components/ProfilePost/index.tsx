@@ -33,14 +33,14 @@ export default function ProfilePost({
       </div>
       <Link
         href={`/posts/${id}/${formatToUrl(name)}`}
-        className="flex flex-row flex-nowrap bg-fuchsia-200 rounded-8 hover:bg-fuchsia-300 transition-colors duration-200 group"
+        className="flex flex-row flex-nowrap bg-fuchsia-200 rounded-lg hover:bg-fuchsia-300 transition-colors duration-200 group"
       >
         <div className="relative shrink-0 w-100 h-100 md:w-150 md:h-150">
           <Image
             src={NEXT_PUBLIC_AWS_URL + '/' + image}
             alt={name}
             fill
-            className="rounded-l-8 object-cover"
+            className="rounded-l-lg object-cover"
           />
         </div>
         <div className="flex flex-row flex-nowrap min-w-0 w-full p-8 justify-between items-center text-fuchsia-600 md:p-16">

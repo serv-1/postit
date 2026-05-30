@@ -29,8 +29,8 @@ export default async function Page(props: { params: Params }) {
   const post = await getPost(params.id)
 
   return (
-    <main className="mb-auto md:bg-wrapper md:rounded-16 md:shadow-wrapper md:p-32">
-      <div className="flex flex-col p-32 max-w-450 rounded-16 bg-fuchsia-50/60 backdrop-blur-xs shadow-glass mx-auto md:backdrop-blur-none md:shadow-shape md:bg-fuchsia-200">
+    <main className="mb-auto md:bg-wrapper md:rounded-2xl md:shadow-wrapper md:p-32">
+      <div className="flex flex-col p-32 max-w-450 rounded-2xl bg-fuchsia-50/60 backdrop-blur-xs shadow-glass mx-auto md:backdrop-blur-none md:shadow-shape md:bg-fuchsia-200">
         <h1>Update the post</h1>
         <p className="my-16">Only fill the inputs you want to update.</p>
         <UpdatePostForm post={post} />

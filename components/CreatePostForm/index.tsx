@@ -82,7 +82,7 @@ export default function CreatePostForm() {
           <AddressField
             setLatLon={setLatLon}
             center={latLon}
-            className="h-full rounded"
+            className="h-full rounded-sm"
           />
           <WizardNextButton
             className="btn-primary w-full mt-auto"

@@ -20,7 +20,7 @@ export default function Toast() {
     <div className="w-full z-9999 absolute top-16 animate-fadeInDown flex flex-row flex-nowrap justify-center">
       <div
         className={classNames(
-          'mx-16 fixed p-8 rounded flex flex-row flex-nowrap gap-x-8 justify-center items-start text-fuchsia-50 font-bold outline-4',
+          'mx-16 fixed p-8 rounded-sm flex flex-row flex-nowrap gap-x-8 justify-center items-start text-fuchsia-50 font-bold outline-4',
           error
             ? 'bg-rose-600 outline-rose-900/75'
             : 'bg-fuchsia-600 outline-fuchsia-900/75',
@@ -29,7 +29,7 @@ export default function Toast() {
       >
         <span>{message}</span>
         <button
-          className="text-fuchsia-200 bg-fuchsia-50/15 rounded hover:text-fuchsia-50 hover:bg-fuchsia-50/50 transition-colors duration-200"
+          className="text-fuchsia-200 bg-fuchsia-50/15 rounded-sm hover:text-fuchsia-50 hover:bg-fuchsia-50/50 transition-colors duration-200"
           onClick={() => {
             setMessage(null)
             clearTimeout(timeoutId)

@@ -10,7 +10,7 @@ import { auth } from 'libs/auth'
 import { redirect } from 'next/navigation'
 
 const squareClasses =
-  'rounded-16 w-120 h-120 bg-fuchsia-200 shadow-shape relative top-0 left-0 hover:top-16 hover:-left-16 hover:shadow-none transition-[top,left,box-shadow] duration-500 lg:w-140 lg:h-140 lg:shadow-[-12px_12px_0_rgba(217,70,239,0.75),_-24px_24px_0_rgba(112,26,117,0.75),inset_-4px_4px_8px_rgba(250,232,255,0.3),inset_8px_-8px_16px_rgba(112,26,117,0.3)] lg:hover:top-24 lg:hover:-left-24'
+  'rounded-2xl w-120 h-120 bg-fuchsia-200 shadow-shape relative top-0 left-0 hover:top-16 hover:-left-16 hover:shadow-none transition-[top,left,box-shadow] duration-500 lg:w-140 lg:h-140 lg:shadow-[-12px_12px_0_rgba(217,70,239,0.75),_-24px_24px_0_rgba(112,26,117,0.75),inset_-4px_4px_8px_rgba(250,232,255,0.3),inset_8px_-8px_16px_rgba(112,26,117,0.3)] lg:hover:top-24 lg:hover:-left-24'
 
 const roundClasses =
   'rounded-full w-120 h-120 bg-fuchsia-200 shadow-shape relative top-0 left-0 hover:top-16 hover:-left-16 hover:shadow-none transition-[top,left,box-shadow] duration-500 lg:w-140 lg:h-140 lg:shadow-[-12px_12px_0_rgba(217,70,239,0.75),_-24px_24px_0_rgba(112,26,117,0.75),inset_-4px_4px_8px_rgba(250,232,255,0.3),inset_8px_-8px_16px_rgba(112,26,117,0.3)] lg:hover:top-24 lg:hover:-left-24'
@@ -28,7 +28,7 @@ export default async function Page() {
 
   return (
     <main className="h-470 md:h-486 mb-auto md:shadow-wrapper md:flex">
-      <div className="h-full flex flex-col rounded-16 bg-fuchsia-50/60 backdrop-blur-xs shadow-glass p-32 md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-none md:w-1/2 md:rounded-r-none md:items-center">
+      <div className="h-full flex flex-col rounded-2xl bg-fuchsia-50/60 backdrop-blur-xs shadow-glass p-32 md:backdrop-blur-none md:bg-fuchsia-50 md:shadow-none md:w-1/2 md:rounded-r-none md:items-center">
         <h1 className="md:w-350">Authentication</h1>
         <TabsProvider defaultValue="signIn">
           <TabList className="mt-16 mb-32 text-fuchsia-600 flex flex-row flex-nowrap gap-x-16 md:w-350">
@@ -59,7 +59,7 @@ export default async function Page() {
           </TabPanel>
         </TabsProvider>
       </div>
-      <div className="hidden md:flex justify-center items-center w-1/2 bg-wrapper rounded-r-16">
+      <div className="hidden md:flex justify-center items-center w-1/2 bg-wrapper rounded-r-2xl">
         <div className="w-300 lg:w-360 aspect-square flex flex-wrap justify-between content-between">
           <div className={squareClasses}></div>
           <div className={roundClasses}></div>

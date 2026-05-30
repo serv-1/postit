@@ -52,7 +52,7 @@ export default function DiscussionMessage({
       />
       <div
         className={classNames(
-          'max-w-[calc(100%-48px)] p-8 rounded-8 wrap-break-words',
+          'max-w-[calc(100%-48px)] p-8 rounded-lg wrap-break-words',
           isAuthor ? 'bg-fuchsia-200' : 'bg-fuchsia-300',
         )}
       >
