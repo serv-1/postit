@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image'
 import addSpacesToNum from 'functions/addSpacesToNum'
 import formatToUrl from 'functions/formatToUrl'
