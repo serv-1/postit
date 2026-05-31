@@ -408,7 +408,9 @@ describe('PUT', () => {
     const response = await PUT(
       new NextRequest('http://-', {
         method: 'PUT',
-        body: JSON.stringify({ address: newAddress, latLon: newLatLon }),
+        body: JSON.stringify({
+          location: { address: newAddress, latLon: newLatLon },
+        }),
       }),
       { params: Promise.resolve({ id: post._id.toString() }) },
     )

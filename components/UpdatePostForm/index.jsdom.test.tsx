@@ -253,8 +253,7 @@ it("sends the post's latitude and longitude with the post's address", async () =
     }),
     http.put('api/posts/:id', async ({ request }) => {
       expect(await request.json()).toEqual({
-        address: 'Paris, France',
-        latLon: [1, 2],
+        location: { address: 'Paris, France', latLon: [1, 2] },
       })
 
       return new HttpResponse(null, { status: 204 })

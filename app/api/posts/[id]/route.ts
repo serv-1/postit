@@ -44,7 +44,7 @@ export async function GET(request: Request, segmentData: Params) {
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -80,7 +80,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
   if ('message' in result) {
     return NextResponse.json(
       { name: result.name, message: result.message },
-      { status: 422 }
+      { status: 422 },
     )
   }
 
@@ -105,7 +105,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
       await Promise.all(
         post.images.map(async (image) => {
           return deleteImage(image)
-        })
+        }),
       )
 
       update.images = data.images
@@ -127,9 +127,9 @@ export async function PUT(request: NextRequest, segmentData: Params) {
       update.categories = data.categories
     }
 
-    if (data.address) {
-      update.address = data.address
-      update.latLon = data.latLon
+    if (data.location) {
+      update.address = data.location.address
+      update.latLon = data.location.latLon
     }
 
     await Post.updateOne({ _id: postId }, update).lean().exec()
@@ -138,7 +138,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -180,7 +180,7 @@ export async function DELETE(request: NextRequest, segmentData: Params) {
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

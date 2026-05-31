@@ -51,7 +51,14 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
 
     const response = await ajax.put(
       '/posts/' + post._id,
-      { ...data, images, latLon },
+      {
+        name: data.name,
+        description: data.description,
+        categories: data.categories,
+        price: data.price,
+        images,
+        location: data.address ? { address: data.address, latLon } : undefined,
+      },
       { csrf: true },
     )
 
