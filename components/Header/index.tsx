@@ -7,6 +7,7 @@ import HeaderDiscussions from 'components/HeaderDiscussions'
 import HeaderAccountMenu from 'components/HeaderAccountMenu'
 import PlusCircleSvg from 'components/PlusCircleSvg'
 import { POST_PAGE_REGEX } from 'constants/regex'
+import HeaderLogo from 'components/HeaderLogo'
 
 interface HeaderProps {
   signedInUser?: User
@@ -20,16 +21,10 @@ export default function Header({ signedInUser }: HeaderProps) {
     <header
       className={classNames(
         path.match(POST_PAGE_REGEX) ? 'hidden md:flex' : 'flex',
-        isOnAuthPage ? 'justify-center' : 'justify-between',
         'items-center p-16 mt-auto',
       )}
     >
-      <Link
-        href="/"
-        className="font-bold text-m-xl md:text-t-xl hover:text-fuchsia-600 transition-colors duration-200"
-      >
-        PostIt
-      </Link>
+      <HeaderLogo />
       {!signedInUser && !isOnAuthPage ? (
         <Link
           href="/authentication"
