@@ -33,7 +33,7 @@ it('fails if the value contain an emoji', () => {
 })
 
 it('fails if the value is too long', () => {
-  const { error } = searchPostQuery.validate(new Uint8Array(91).toString())
+  const { error } = searchPostQuery.validate('a'.repeat(91))
 
   expect(error?.details[0].message).toBe(QUERY_MAX)
 })

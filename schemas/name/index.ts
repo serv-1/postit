@@ -2,7 +2,7 @@ import { NAME_INVALID, NAME_REQUIRED, NAME_MAX } from 'constants/errors'
 import Joi from 'joi'
 
 const name = Joi.string()
-  .pattern(/\p{Extended_Pictographic}/u, { invert: true })
+  .pattern(/[\p{Emoji}\p{EComp}]/u, { invert: true })
   .max(90)
   .trim()
   .messages({

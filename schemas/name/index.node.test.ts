@@ -33,7 +33,7 @@ it('fails if the value contain an emoji', () => {
 })
 
 it('fails if the value is too long', () => {
-  const { error } = name.validate(new Uint8Array(91).toString())
+  const { error } = name.validate('a'.repeat(91))
 
   expect(error?.details[0].message).toBe(NAME_MAX)
 })
