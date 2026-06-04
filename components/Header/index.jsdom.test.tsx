@@ -45,20 +45,6 @@ it('renders the menu if the user is authenticated', () => {
   expect(link).toBeInTheDocument()
 })
 
-it('renders without the sign in link if the user is on the authentication page', () => {
-  mockUsePathname.mockReturnValue('/authentication')
-
-  render(<Header />)
-
-  const header = screen.getByRole('banner')
-
-  expect(header).toHaveClass('justify-center')
-
-  const link = screen.queryByRole('link', { name: /sign in/i })
-
-  expect(link).not.toBeInTheDocument()
-})
-
 it("isn't displayed on mobile screen if the user is on a post page", () => {
   mockUsePathname.mockReturnValue('/posts/000000000000000000000000/table')
 

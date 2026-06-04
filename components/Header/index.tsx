@@ -1,4 +1,3 @@
-import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import classNames from 'classnames'
@@ -8,6 +7,7 @@ import HeaderAccountMenu from 'components/HeaderAccountMenu'
 import PlusCircleSvg from 'components/PlusCircleSvg'
 import { POST_PAGE_REGEX } from 'constants/regex'
 import HeaderLogo from 'components/HeaderLogo'
+import HeaderSignInLink from 'components/HeaderSignInLink'
 
 interface HeaderProps {
   signedInUser?: User
@@ -15,7 +15,6 @@ interface HeaderProps {
 
 export default function Header({ signedInUser }: HeaderProps) {
   const path = usePathname()
-  const isOnAuthPage = path === '/authentication'
 
   return (
     <header
@@ -25,18 +24,7 @@ export default function Header({ signedInUser }: HeaderProps) {
       )}
     >
       <HeaderLogo />
-      {!signedInUser && !isOnAuthPage ? (
-        <Link
-          href="/authentication"
-          className="block bg-fuchsia-600 text-fuchsia-50 hover:text-fuchsia-900 hover:bg-fuchsia-300 active:text-fuchsia-300 active:bg-fuchsia-900 transition-colors duration-200 px-16 py-8 rounded-sm font-bold"
-          onClick={(e) => {
-            e.preventDefault()
-            signIn()
-          }}
-        >
-          Sign in
-        </Link>
-      ) : signedInUser ? (
+      {signedInUser ? (
         <nav>
           <ul className="flex flex-row flew-nowrap gap-x-8 items-center">
             <li>
@@ -56,7 +44,9 @@ export default function Header({ signedInUser }: HeaderProps) {
             </li>
           </ul>
         </nav>
-      ) : null}
+      ) : (
+        <HeaderSignInLink />
+      )}
     </header>
   )
 }
