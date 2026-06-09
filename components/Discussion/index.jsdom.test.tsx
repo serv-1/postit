@@ -150,8 +150,7 @@ it('renders the notification badge if there is a new message and if the modal is
     />,
   )
 
-  const badge = await screen.findByRole('status', { name: /john/i })
-
+  const badge = await screen.findByRole('status', { name: /new message/i })
   expect(badge).toBeInTheDocument()
 })
 
@@ -167,8 +166,7 @@ it("doesn't render the notification badge if there isn't a new message even if t
 
   await waitForElementToBeRemoved(() => screen.getByRole('status'))
 
-  const badge = screen.queryByRole('status')
-
+  const badge = screen.queryByRole('status', { name: /new message/i })
   expect(badge).not.toBeInTheDocument()
 })
 
@@ -184,8 +182,7 @@ it("doesn't render the notification badge if the modal is open even if there is 
 
   await waitForElementToBeRemoved(() => screen.getByRole('status'))
 
-  const badge = screen.queryByRole('status')
-
+  const badge = screen.queryByRole('status', { name: /new message/i })
   expect(badge).not.toBeInTheDocument()
 })
 
@@ -199,7 +196,7 @@ it('unmounts the notification badge when the modal opens', async () => {
     />,
   )
 
-  const badge = await screen.findByRole('status', { name: /john/i })
+  const badge = await screen.findByRole('status', { name: /new message/i })
   const openBtn = screen.getByRole('button', { name: /open/i })
 
   await userEvent.click(openBtn)
@@ -240,7 +237,7 @@ describe('on "openDiscussion" event', () => {
         />,
       )
 
-      const badge = await screen.findByRole('status', { name: /john/i })
+      const badge = await screen.findByRole('status', { name: /new message/i })
 
       await act(async () => {
         document.dispatchEvent(
@@ -284,7 +281,7 @@ describe('on "openDiscussion" event', () => {
         />,
       )
 
-      const badge = await screen.findByRole('status', { name: /john/i })
+      const badge = await screen.findByRole('status', { name: /new message/i })
 
       await act(async () => {
         document.dispatchEvent(
@@ -343,7 +340,7 @@ describe('when a new message is received in real time', () => {
       })
     })
 
-    const badge = screen.getByRole('status', { name: /john/i })
+    const badge = screen.getByRole('status', { name: /new message/i })
 
     expect(badge).toBeInTheDocument()
   })

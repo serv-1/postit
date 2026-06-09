@@ -11,6 +11,7 @@ import ajax from 'libs/ajax'
 import type { UsersIdGetError } from 'app/api/users/[id]/types'
 import showToast from 'functions/showToast'
 import LoadingSpinner from 'components/LoadingSpinner'
+import DiscussionBadge from 'components/DiscussionBadge'
 
 export interface DiscussionProps {
   discussion: IDiscussion
@@ -20,22 +21,21 @@ export interface DiscussionProps {
 }
 
 export default function Discussion({
-  discussion: discussionProp,
+  discussion: propDiscussion,
   isModalOpen,
   setOpenedDiscussionId,
   signedInUser,
 }: DiscussionProps) {
-  const [discussion, setDiscussion] = useState(discussionProp)
+  const [discussion, setDiscussion] = useState({
+    ...propDiscussion,
+    hasNewMessage: isModalOpen ? false : propDiscussion.hasNewMessage,
+  })
   const [interlocutor, setInterlocutor] = useState<User | null>()
-  const [showBadge, setShowBadge] = useState(
-    discussionProp.hasNewMessage && !isModalOpen,
-  )
-
   const { data: session } = useSession() as { data: Session }
 
   function openModal() {
     setOpenedDiscussionId(discussion._id)
-    setShowBadge(false)
+    setDiscussion((d) => (d.hasNewMessage ? { ...d, hasNewMessage: false } : d))
   }
 
   useEventListener('document', 'openDiscussion', (e) => {
@@ -48,12 +48,9 @@ export default function Discussion({
     discussion.channelName,
     'message:new',
     (message) => {
-      if (message.userId !== session.id && !isModalOpen) {
-        setShowBadge(true)
-      }
-
       setDiscussion((discussion) => ({
         ...discussion,
+        hasNewMessage: message.userId !== session.id && !isModalOpen,
         messages: [...discussion.messages, message],
       }))
     },
@@ -96,17 +93,7 @@ export default function Discussion({
           discussionId={discussion._id}
           interlocutorDiscussions={interlocutor?.discussions}
         />
-        {interlocutor && showBadge && (
-          <div
-            role="status"
-            aria-label={interlocutor.name + ' has responded'}
-            className="absolute -top-2 -right-2 z-10"
-          >
-            <div className="w-12 h-12 rounded-full bg-red-600">
-              <div className="h-full rounded-full bg-inherit animate-ping"></div>
-            </div>
-          </div>
-        )}
+        <DiscussionBadge isShown={discussion.hasNewMessage} />
         <OpenDiscussionButton
           onOpen={openModal}
           postName={discussion.postName}
