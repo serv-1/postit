@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import classNames from 'classnames'
 import type { User } from 'types'
-import HeaderDiscussions from 'components/HeaderDiscussions'
+import HeaderDiscussionListModal from 'components/HeaderDiscussionListModal'
 import HeaderAccountMenu from 'components/HeaderAccountMenu'
 import PlusCircleSvg from 'components/PlusCircleSvg'
 import { POST_PAGE_REGEX } from 'constants/regex'
@@ -28,7 +28,7 @@ export default function Header({ signedInUser }: HeaderProps) {
         <nav>
           <ul className="flex flex-row flew-nowrap gap-x-8 items-center">
             <li>
-              <HeaderDiscussions signedInUser={signedInUser} />
+              <HeaderDiscussionListModal signedInUser={signedInUser} />
             </li>
             <li>
               <Link

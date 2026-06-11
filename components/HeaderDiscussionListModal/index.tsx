@@ -1,19 +1,22 @@
-import DiscussionListModal from 'components/DiscussionListModal'
 import { useCallback, useEffect, useState } from 'react'
-import type { Discussion, User } from 'types'
+import type { Discussion as IDiscussion, User } from 'types'
 import CommentDiscussionSvg from 'components/CommentDiscussionSvg'
 import useEventListener from 'hooks/useEventListener'
 import usePusher from 'hooks/usePusher'
 import showToast from 'functions/showToast'
 import fetchDiscussion from 'functions/fetchDiscussion'
+import Modal from 'components/Modal'
+import Discussion from 'components/Discussion'
+import LoadingSpinner from 'components/LoadingSpinner'
+import XSvg from 'components/XSvg'
 
-interface HeaderDiscussionsProps {
+interface HeaderDiscussionListModalProps {
   signedInUser: User
 }
 
-export default function HeaderDiscussions({
+export default function HeaderDiscussionListModal({
   signedInUser,
-}: HeaderDiscussionsProps) {
+}: HeaderDiscussionListModalProps) {
   let hasNewMessage = false
 
   for (const discussion of signedInUser.discussions) {
@@ -24,14 +27,14 @@ export default function HeaderDiscussions({
   }
 
   const [showBadge, setShowBadge] = useState(hasNewMessage)
-  const [isModalHidden, setIsModalHidden] = useState(true)
-  const [discussions, setDiscussions] = useState<Discussion[]>()
+  const [isHidden, setIsHidden] = useState(true)
+  const [discussions, setDiscussions] = useState<IDiscussion[]>()
   const [openedDiscussionId, setOpenedDiscussionId] = useState<string | null>(
     null,
   )
 
   const getUserDiscussions = useCallback(async () => {
-    const promises: Promise<Discussion>[] = []
+    const promises: Promise<IDiscussion>[] = []
 
     for (const { id, hidden } of signedInUser.discussions) {
       if (hidden) continue
@@ -42,13 +45,17 @@ export default function HeaderDiscussions({
     return Promise.all(promises)
   }, [signedInUser.discussions])
 
-  function openModal() {
-    setIsModalHidden(false)
+  function open() {
+    setIsHidden(false)
     setShowBadge(false)
   }
 
+  function close() {
+    setIsHidden(true)
+  }
+
   useEventListener('document', 'openDiscussion', async (e) => {
-    openModal()
+    open()
     setOpenedDiscussionId(e.detail)
   })
 
@@ -56,7 +63,7 @@ export default function HeaderDiscussions({
     setDiscussions((d) => d?.filter((d) => d._id !== e.detail))
   })
 
-  usePusher<Discussion>(
+  usePusher<IDiscussion>(
     signedInUser.channelName,
     'discussion:new',
     async (discussion) => {
@@ -72,20 +79,20 @@ export default function HeaderDiscussions({
         }
       }
 
-      if (isModalHidden) {
+      if (isHidden) {
         setShowBadge(true)
       }
     },
   )
 
   usePusher(signedInUser.channelName, 'message:new', () => {
-    if (isModalHidden) {
+    if (isHidden) {
       setShowBadge(true)
     }
   })
 
   useEffect(() => {
-    if (isModalHidden || discussions) return
+    if (isHidden || discussions) return
 
     async function initDiscussions() {
       try {
@@ -96,7 +103,7 @@ export default function HeaderDiscussions({
     }
 
     initDiscussions()
-  }, [isModalHidden, discussions, getUserDiscussions])
+  }, [isHidden, discussions, getUserDiscussions])
 
   useEffect(() => {
     if (
@@ -123,7 +130,7 @@ export default function HeaderDiscussions({
   return (
     <>
       <button
-        onClick={openModal}
+        onClick={open}
         className={
           'relative w-40 h-40 align-bottom transition-colors duration-200 ' +
           (showBadge
@@ -141,14 +148,48 @@ export default function HeaderDiscussions({
         )}
         <CommentDiscussionSvg className="relative w-full h-full" />
       </button>
-      <DiscussionListModal
-        isHidden={isModalHidden}
-        onClose={() => setIsModalHidden(true)}
-        discussions={discussions}
-        openedDiscussionId={openedDiscussionId}
-        setOpenedDiscussionId={setOpenedDiscussionId}
-        signedInUser={signedInUser}
-      />
+      <Modal
+        isHidden={isHidden}
+        onClose={close}
+        className="fixed top-0 left-0 w-screen h-screen z-1001 md:flex md:justify-center md:items-center md:bg-fuchsia-900/25"
+      >
+        <div className="bg-fuchsia-50 z-1001 flex flex-col h-full md:w-full md:max-w-450 md:max-h-800 md:rounded-2xl md:shadow-[0_0_32px_rgba(112,26,117,0.25)]">
+          <button
+            className="w-32 h-32 mt-16 mx-16 text-fuchsia-600 self-end hover:text-fuchsia-900 transition-colors duration-200"
+            aria-label="Close"
+            onClick={close}
+          >
+            <XSvg className="w-full h-full" />
+          </button>
+          {discussions ? (
+            discussions.length > 0 ? (
+              <ul className="overflow-y-auto px-12 py-16 mx-4 scrollbar-thumb-fuchsia-200 scrollbar-track-transparent scrollbar-thin hover:scrollbar-thumb-fuchsia-300">
+                {discussions.map((discussion) => (
+                  <li className="mb-8 last:mb-0" key={discussion._id}>
+                    <Discussion
+                      discussion={discussion}
+                      isModalOpen={discussion._id === openedDiscussionId}
+                      setOpenedDiscussionId={setOpenedDiscussionId}
+                      signedInUser={signedInUser}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="w-full h-full relative p-16 flex flex-row justify-center items-center">
+                <div className="w-full h-full max-w-328 max-h-328 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 text-fuchsia-100">
+                  <CommentDiscussionSvg className="w-full h-full" />
+                </div>
+                <p className="z-10">Your discussions will be displayed here.</p>
+              </div>
+            )
+          ) : (
+            <div className="flex justify-center items-center h-full">
+              <LoadingSpinner />
+            </div>
+          )}
+        </div>
+      </Modal>
     </>
   )
 }
