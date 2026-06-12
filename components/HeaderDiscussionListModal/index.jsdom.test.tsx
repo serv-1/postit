@@ -8,7 +8,7 @@ import { setupServer } from 'msw/node'
 import usersIdHandlers from 'app/api/users/[id]/mock'
 import Toast from 'components/Toast'
 import setup from 'functions/setup'
-import type { DiscussionProps } from 'components/Discussion'
+import type { DiscussionModalProps } from 'components/DiscussionModal'
 
 const mockUsePusher = vi.mocked(usePusher)
 const mockFetchDiscussion = vi.mocked(fetchDiscussion)
@@ -61,9 +61,9 @@ vi.mock('functions/fetchDiscussion', () => ({
 
 vi.mock('next/image')
 
-vi.mock('components/Discussion', () => ({
-  default: ({ isModalOpen }: DiscussionProps) => (
-    <div role="dialog">{isModalOpen ? 'open' : 'closed'}</div>
+vi.mock('components/DiscussionModal', () => ({
+  default: ({ isOpen }: DiscussionModalProps) => (
+    <div role="dialog">{isOpen ? 'open' : 'closed'}</div>
   ),
 }))
 

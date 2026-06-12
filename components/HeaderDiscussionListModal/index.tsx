@@ -6,7 +6,7 @@ import usePusher from 'hooks/usePusher'
 import showToast from 'functions/showToast'
 import fetchDiscussion from 'functions/fetchDiscussion'
 import Modal from 'components/Modal'
-import Discussion from 'components/Discussion'
+import DiscussionModal from 'components/DiscussionModal'
 import LoadingSpinner from 'components/LoadingSpinner'
 import XSvg from 'components/XSvg'
 
@@ -166,9 +166,9 @@ export default function HeaderDiscussionListModal({
               <ul className="overflow-y-auto px-12 py-16 mx-4 scrollbar-thumb-fuchsia-200 scrollbar-track-transparent scrollbar-thin hover:scrollbar-thumb-fuchsia-300">
                 {discussions.map((discussion) => (
                   <li className="mb-8 last:mb-0" key={discussion._id}>
-                    <Discussion
+                    <DiscussionModal
                       discussion={discussion}
-                      isModalOpen={discussion._id === openedDiscussionId}
+                      isOpen={discussion._id === openedDiscussionId}
                       setOpenedDiscussionId={setOpenedDiscussionId}
                       signedInUser={signedInUser}
                     />

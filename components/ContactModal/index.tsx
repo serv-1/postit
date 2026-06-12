@@ -7,7 +7,9 @@ import type { Session } from 'next-auth'
 import ContactButton from 'components/ContactButton'
 import useEventListener from 'hooks/useEventListener'
 import usePusher from 'hooks/usePusher'
-import DiscussionModal from 'components/DiscussionModal'
+import Modal from 'components/Modal'
+import XSvg from 'components/XSvg'
+import DiscussionSendBar from 'components/DiscussionSendBar'
 
 export interface ContactModalProps {
   discussionId?: string
@@ -27,29 +29,29 @@ export default function ContactModal({
   const [isOpen, setIsOpen] = useState(false)
   const [discussionId, setDiscussionId] = useState(discussionIdProp)
   const [isDiscussionHidden, setIsDiscussionHidden] = useState(
-    isDiscussionHiddenProp
+    isDiscussionHiddenProp,
   )
 
   const { data: session } = useSession() as { data: Session }
 
-  function openModal() {
+  function open() {
     if (discussionId && !isDiscussionHidden) {
       document.dispatchEvent(
-        new CustomEvent('openDiscussion', { detail: discussionId })
+        new CustomEvent('openDiscussion', { detail: discussionId }),
       )
     } else {
       setIsOpen(true)
     }
   }
 
-  function closeModal() {
+  function close() {
     setIsOpen(false)
   }
 
   function onMessageSent(id: string) {
     setDiscussionId(id)
     setIsDiscussionHidden(false)
-    closeModal()
+    close()
     document.dispatchEvent(new CustomEvent('openDiscussion', { detail: id }))
   }
 
@@ -67,15 +69,28 @@ export default function ContactModal({
 
   return (
     <>
-      <ContactButton onClick={openModal} />
+      <ContactButton onClick={open} />
       {isOpen && (
-        <DiscussionModal
-          onMessageSent={onMessageSent}
-          onClose={closeModal}
-          postName={postName}
-          postId={postId}
-          sellerId={sellerId}
-        />
+        <Modal
+          className="fixed top-0 left-0 w-screen h-screen z-1001 md:flex md:justify-center md:items-center md:bg-fuchsia-900/25"
+          onClose={close}
+        >
+          <div className="bg-fuchsia-50 z-1001 flex flex-col h-full md:w-full md:max-w-450 md:max-h-800 md:rounded-2xl md:shadow-[0_0_32px_rgba(112,26,117,0.25)]">
+            <button
+              className="w-32 h-32 m-8 md:m-16 text-fuchsia-600 self-end hover:text-fuchsia-900 transition-colors duration-200"
+              aria-label="Close"
+              onClick={close}
+            >
+              <XSvg className="w-full h-full" />
+            </button>
+            <DiscussionSendBar
+              onMessageSent={onMessageSent}
+              sellerId={sellerId}
+              postName={postName}
+              postId={postId}
+            />
+          </div>
+        </Modal>
       )}
     </>
   )
