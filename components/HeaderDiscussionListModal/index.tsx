@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
-import type { Discussion as IDiscussion, User } from 'types'
+import { useState } from 'react'
+import type { Discussion, User } from 'types'
 import CommentDiscussionSvg from 'components/CommentDiscussionSvg'
 import useEventListener from 'hooks/useEventListener'
 import usePusher from 'hooks/usePusher'
@@ -26,111 +26,83 @@ export default function HeaderDiscussionListModal({
     }
   }
 
+  const [shouldFetchDiscussions, setShouldFetchDiscussions] = useState(true)
   const [showBadge, setShowBadge] = useState(hasNewMessage)
   const [isHidden, setIsHidden] = useState(true)
-  const [discussions, setDiscussions] = useState<IDiscussion[]>()
+  const [discussions, setDiscussions] = useState<Discussion[]>()
   const [openedDiscussionId, setOpenedDiscussionId] = useState<string | null>(
     null,
   )
 
-  const getUserDiscussions = useCallback(async () => {
-    const promises: Promise<IDiscussion>[] = []
+  async function initDiscussions() {
+    if (!shouldFetchDiscussions) return
+    setShouldFetchDiscussions(false)
 
-    for (const { id, hidden } of signedInUser.discussions) {
-      if (hidden) continue
+    try {
+      const promises: Promise<Discussion>[] = []
 
-      promises.push(fetchDiscussion(id))
+      for (const { id, hidden } of signedInUser.discussions) {
+        if (hidden) continue
+
+        promises.push(fetchDiscussion(id))
+      }
+
+      const discussions = await Promise.all(promises)
+      setDiscussions((d) => (d ? [...d, ...discussions] : discussions))
+
+      return discussions
+    } catch (e) {
+      showToast({ message: (e as Error).message, error: true })
     }
-
-    return Promise.all(promises)
-  }, [signedInUser.discussions])
-
-  function open() {
-    setIsHidden(false)
-    setShowBadge(false)
   }
 
-  function close() {
+  async function handleOpen() {
+    setIsHidden(false)
+    setShowBadge(false)
+    await initDiscussions()
+  }
+
+  function handleClose() {
     setIsHidden(true)
   }
 
   useEventListener('document', 'openDiscussion', async (e) => {
-    open()
     setOpenedDiscussionId(e.detail)
+    setIsHidden(false)
+    setShowBadge(false)
+
+    const _discussions = discussions ?? (await initDiscussions())
+    if (!_discussions || _discussions.find((d) => d._id === e.detail)) return
+
+    try {
+      const discussion = await fetchDiscussion(e.detail)
+      setDiscussions((d) => [...d!, discussion])
+    } catch (e) {
+      showToast({ message: (e as Error).message, error: true })
+    }
   })
 
   useEventListener('document', 'discussionDeleted', (e) => {
     setDiscussions((d) => d?.filter((d) => d._id !== e.detail))
   })
 
-  usePusher<IDiscussion>(
+  usePusher<Discussion>(
     signedInUser.channelName,
     'discussion:new',
     async (discussion) => {
-      if (discussions) {
-        setDiscussions((d) => [...d!, discussion])
-      } else {
-        try {
-          const userDiscussions = await getUserDiscussions()
-
-          setDiscussions([...userDiscussions, discussion])
-        } catch (e) {
-          showToast({ message: (e as Error).message, error: true })
-        }
-      }
-
-      if (isHidden) {
-        setShowBadge(true)
-      }
+      setDiscussions((d) => (d ? [...d, discussion] : [discussion]))
+      setShowBadge(isHidden)
     },
   )
 
   usePusher(signedInUser.channelName, 'message:new', () => {
-    if (isHidden) {
-      setShowBadge(true)
-    }
+    setShowBadge(isHidden)
   })
-
-  useEffect(() => {
-    if (isHidden || discussions) return
-
-    async function initDiscussions() {
-      try {
-        setDiscussions(await getUserDiscussions())
-      } catch (e) {
-        showToast({ message: (e as Error).message, error: true })
-      }
-    }
-
-    initDiscussions()
-  }, [isHidden, discussions, getUserDiscussions])
-
-  useEffect(() => {
-    if (
-      !openedDiscussionId ||
-      !discussions ||
-      discussions.find((d) => d._id === openedDiscussionId)
-    ) {
-      return
-    }
-
-    async function addDiscussion() {
-      try {
-        const discussion = await fetchDiscussion(openedDiscussionId!)
-
-        setDiscussions((d) => [...d!, discussion])
-      } catch (e) {
-        showToast({ message: (e as Error).message, error: true })
-      }
-    }
-
-    addDiscussion()
-  }, [openedDiscussionId, discussions])
 
   return (
     <>
       <button
-        onClick={open}
+        onClick={handleOpen}
         className={
           'relative w-40 h-40 align-bottom transition-colors duration-200 ' +
           (showBadge
@@ -150,14 +122,14 @@ export default function HeaderDiscussionListModal({
       </button>
       <Modal
         isHidden={isHidden}
-        onClose={close}
+        onClose={handleClose}
         className="fixed top-0 left-0 w-screen h-screen z-1001 md:flex md:justify-center md:items-center md:bg-fuchsia-900/25"
       >
         <div className="bg-fuchsia-50 z-1001 flex flex-col h-full md:w-full md:max-w-450 md:max-h-800 md:rounded-2xl md:shadow-[0_0_32px_rgba(112,26,117,0.25)]">
           <button
             className="w-32 h-32 mt-16 mx-16 text-fuchsia-600 self-end hover:text-fuchsia-900 transition-colors duration-200"
             aria-label="Close"
-            onClick={close}
+            onClick={handleClose}
           >
             <XSvg className="w-full h-full" />
           </button>
