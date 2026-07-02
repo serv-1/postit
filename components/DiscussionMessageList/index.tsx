@@ -1,21 +1,24 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import DiscussionMessage, {
   type DiscussionMessageProps,
 } from 'components/DiscussionMessage'
-import type { DiscussionsIdGetData } from 'app/api/discussions/[id]/types'
-import type { User } from 'types'
+import type { Discussion, UnArray, User } from 'types'
+import usePusher from 'hooks/usePusher'
 
 export interface DiscussionMessageListProps {
   signedInUser: User
   interlocutor: User | null
-  messages: DiscussionsIdGetData['messages']
+  messages: Discussion['messages']
+  discussionChannelName: string
 }
 
 export default function DiscussionMessageList({
   signedInUser,
   interlocutor,
-  messages,
+  messages: propMessages,
+  discussionChannelName,
 }: DiscussionMessageListProps) {
+  const [messages, setMessages] = useState(propMessages)
   const msgListRef = useRef<HTMLUListElement>(null)
 
   useEffect(() => {
@@ -25,6 +28,14 @@ export default function DiscussionMessageList({
     })
   }, [])
 
+  usePusher<UnArray<Discussion['messages']>>(
+    discussionChannelName,
+    'message:new',
+    (message) => {
+      setMessages((m) => [...m, message])
+    },
+  )
+
   return (
     <ul
       ref={msgListRef}
@@ -32,6 +43,7 @@ export default function DiscussionMessageList({
     >
       {messages.map((message, i) => {
         let author: DiscussionMessageProps['author'] = undefined
+        let position: DiscussionMessageProps['position'] = 'left'
 
         if (message.userId) {
           let name = 'deleted'
@@ -40,17 +52,19 @@ export default function DiscussionMessageList({
           if (message.userId === signedInUser._id) {
             name = signedInUser.name
             image = signedInUser.image
+            position = 'right'
           } else if (interlocutor) {
             name = interlocutor.name
             image = interlocutor.image
           }
 
-          author = { id: message.userId, name, image }
+          author = { name, image }
         }
 
         return (
           <li key={i}>
             <DiscussionMessage
+              position={position}
               message={message.message}
               createdAt={message.createdAt}
               author={author}

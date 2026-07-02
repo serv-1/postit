@@ -6,8 +6,10 @@ import type { DiscussionsIdGetData } from 'app/api/discussions/[id]/types'
 export type Post = PostsIdGetData
 
 export type User = UsersIdGetData
+export type UserDiscussion = UnArray<User['discussions']>
 
 export type Discussion = DiscussionsIdGetData
+export type Message = UnArray<Discussion['messages']>
 
 export type Categories = UnArray<typeof CATEGORIES>
 

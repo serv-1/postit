@@ -140,7 +140,7 @@ export default function HeaderDiscussionListModal({
                   <li className="mb-8 last:mb-0" key={discussion._id}>
                     <DiscussionModal
                       discussion={discussion}
-                      isOpen={discussion._id === openedDiscussionId}
+                      isHidden={discussion._id !== openedDiscussionId}
                       setOpenedDiscussionId={setOpenedDiscussionId}
                       signedInUser={signedInUser}
                     />

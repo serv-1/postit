@@ -60,19 +60,7 @@ export async function GET(request: NextRequest, segmentData: Params) {
       return NextResponse.json({ message: FORBIDDEN }, { status: 403 })
     }
 
-    const signedInUser = (await User.findById(session.id).lean().exec())!
-
-    let hasNewMessage = false
-
-    for (const discussion of signedInUser.discussions) {
-      if (discussion.id.toString() === discussionId) {
-        hasNewMessage = discussion.hasNewMessage
-
-        break
-      }
-    }
-
-    return NextResponse.json({ ...discussion, hasNewMessage }, { status: 200 })
+    return NextResponse.json(discussion, { status: 200 })
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },

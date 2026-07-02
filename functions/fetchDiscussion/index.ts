@@ -5,7 +5,7 @@ import type {
 import ajax from 'libs/ajax'
 
 export default async function fetchDiscussion(
-  id: string
+  id: string,
 ): Promise<DiscussionsIdGetData> {
   const response = await ajax.get('/discussions/' + id, { csrf: true })
 

@@ -208,13 +208,6 @@ describe('GET', () => {
   })
 
   test('200 - get the discussion', async () => {
-    await User.updateOne(
-      { _id: buyer._id, 'discussions.id': discussion._id },
-      { $set: { 'discussions.$.hasNewMessage': true } },
-    )
-      .lean()
-      .exec()
-
     mockAuth.mockResolvedValue({ id: buyer._id.toString() } as Session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({} as Connection)
@@ -227,10 +220,7 @@ describe('GET', () => {
     await resetEntities()
 
     expect(response).toHaveProperty('status', 200)
-    expect(data).toEqual({
-      ...JSON.parse(JSON.stringify(discussion)),
-      hasNewMessage: true,
-    })
+    expect(data).toEqual({ ...JSON.parse(JSON.stringify(discussion)) })
   })
 })
 

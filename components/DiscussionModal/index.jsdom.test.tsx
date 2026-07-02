@@ -1,4 +1,4 @@
-import Discussion from '.'
+import DiscussionModal from '.'
 import {
   render,
   screen,
@@ -7,67 +7,28 @@ import {
 import userEvent from '@testing-library/user-event'
 import { act } from 'react'
 import usePusher from 'hooks/usePusher'
-import type { Discussion as IDiscussion, User } from 'types'
 import { setupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
 import usersIdHandlers from 'app/api/users/[id]/mock'
 import Toast from 'components/Toast'
-import { useSession } from 'next-auth/react'
+import { buildDiscussion, buildMessage, buildUser } from 'test-utils/factories'
 
 const mockUsePusher = vi.mocked(usePusher)
-const mockUseSession = vi.mocked(useSession)
 
 vi.mock('hooks/usePusher', () => ({
   default: vi.fn(),
 }))
 
 vi.mock('next-auth/react', () => ({
-  useSession: vi.fn(),
+  getCsrfToken: vi.fn(),
 }))
 
 vi.mock('next/image')
-
-const discussion: IDiscussion = {
-  _id: '0',
-  buyerId: '1',
-  sellerId: '2',
-  channelName: 'discussion channel name',
-  postName: 'table',
-  postId: '3',
-  hasNewMessage: false,
-  messages: [
-    {
-      _id: '0',
-      userId: '1',
-      seen: true,
-      message: 'yo',
-      createdAt: new Date().toString(),
-    },
-  ],
-}
-
-const signedInUser: User = {
-  _id: '0',
-  name: 'jane',
-  email: 'jane@test.com',
-  channelName: '',
-  postIds: [],
-  favPostIds: [],
-  discussions: [],
-}
 
 const server = setupServer(...usersIdHandlers)
 
 beforeEach(() => {
   Element.prototype.scroll = () => null
-
-  const session = { id: '1', channelName: 'chan0', expires: '' }
-
-  mockUseSession.mockReturnValue({
-    update: async () => session,
-    data: session,
-    status: 'authenticated',
-  })
 })
 
 beforeAll(() => server.listen())
@@ -76,76 +37,73 @@ afterAll(() => server.close())
 
 it("renders the loading spinner if the interlocutor hasn't been fetched yet", () => {
   render(
-    <Discussion
-      discussion={discussion}
-      signedInUser={signedInUser}
-      isOpen={false}
+    <DiscussionModal
+      discussion={buildDiscussion()}
+      signedInUser={buildUser()}
+      isHidden
       setOpenedDiscussionId={() => null}
     />,
   )
 
   const loadingSpinner = screen.getByRole('status')
-
   expect(loadingSpinner).toBeInTheDocument()
 })
 
-it('renders the modal opened', async () => {
+it('renders open', async () => {
   render(
-    <Discussion
-      discussion={discussion}
-      signedInUser={signedInUser}
-      isOpen
+    <DiscussionModal
+      discussion={buildDiscussion()}
+      signedInUser={buildUser()}
+      isHidden={false}
       setOpenedDiscussionId={() => null}
     />,
   )
 
   const modal = await screen.findByRole('dialog')
-
-  expect(modal).toBeInTheDocument()
+  expect(modal).not.toHaveClass('hidden')
 })
 
-it('renders the modal closed', async () => {
+it('renders closed', async () => {
   render(
-    <Discussion
-      discussion={discussion}
-      signedInUser={signedInUser}
-      isOpen={false}
+    <DiscussionModal
+      discussion={buildDiscussion()}
+      signedInUser={buildUser()}
+      isHidden
       setOpenedDiscussionId={() => null}
     />,
   )
 
-  await waitForElementToBeRemoved(() => screen.getByRole('status'))
-
-  const modal = screen.queryByRole('dialog')
-
-  expect(modal).not.toBeInTheDocument()
+  const modal = await screen.findByRole('dialog')
+  expect(modal).toHaveClass('hidden')
 })
 
-it('opens the modal by clicking on the "open discussion" button', async () => {
+it('opens by clicking on the open button', async () => {
   const setOpenedDiscussionId = vi.fn()
+  const discussion = buildDiscussion()
 
   render(
-    <Discussion
+    <DiscussionModal
       discussion={discussion}
-      signedInUser={signedInUser}
-      isOpen={false}
+      signedInUser={buildUser()}
+      isHidden
       setOpenedDiscussionId={setOpenedDiscussionId}
     />,
   )
 
   const openBtn = await screen.findByRole('button', { name: /open/i })
-
   await userEvent.click(openBtn)
 
   expect(setOpenedDiscussionId).toHaveBeenNthCalledWith(1, discussion._id)
 })
 
-it('renders the notification badge if there is a new message and if the modal is closed', async () => {
+it('renders the notification badge if there is a new message while being closed', async () => {
   render(
-    <Discussion
-      discussion={{ ...discussion, hasNewMessage: true }}
-      signedInUser={signedInUser}
-      isOpen={false}
+    <DiscussionModal
+      discussion={buildDiscussion({
+        messages: [buildMessage({ seen: false })],
+      })}
+      signedInUser={buildUser()}
+      isHidden
       setOpenedDiscussionId={() => null}
     />,
   )
@@ -154,12 +112,12 @@ it('renders the notification badge if there is a new message and if the modal is
   expect(badge).toBeInTheDocument()
 })
 
-it("doesn't render the notification badge if there isn't a new message even if the modal is closed", async () => {
+it("doesn't render the notification badge if there is no new message", async () => {
   render(
-    <Discussion
-      discussion={discussion}
-      signedInUser={signedInUser}
-      isOpen={false}
+    <DiscussionModal
+      discussion={buildDiscussion()}
+      signedInUser={buildUser()}
+      isHidden
       setOpenedDiscussionId={() => null}
     />,
   )
@@ -170,12 +128,14 @@ it("doesn't render the notification badge if there isn't a new message even if t
   expect(badge).not.toBeInTheDocument()
 })
 
-it("doesn't render the notification badge if the modal is open even if there is a new message", async () => {
+it("doesn't render the notification badge while being open", async () => {
   render(
-    <Discussion
-      discussion={{ ...discussion, hasNewMessage: true }}
-      signedInUser={signedInUser}
-      isOpen
+    <DiscussionModal
+      discussion={buildDiscussion({
+        messages: [buildMessage({ seen: false })],
+      })}
+      signedInUser={buildUser()}
+      isHidden={false}
       setOpenedDiscussionId={() => null}
     />,
   )
@@ -187,33 +147,42 @@ it("doesn't render the notification badge if the modal is open even if there is 
 })
 
 it('unmounts the notification badge when the modal opens', async () => {
+  server.use(
+    http.put('api/discussions/:id', () => {
+      return new HttpResponse(null, { status: 204 })
+    }),
+  )
+
   render(
-    <Discussion
-      discussion={{ ...discussion, hasNewMessage: true }}
-      signedInUser={signedInUser}
-      isOpen={false}
+    <DiscussionModal
+      discussion={buildDiscussion({
+        messages: [buildMessage({ seen: false })],
+      })}
+      signedInUser={buildUser()}
+      isHidden
       setOpenedDiscussionId={() => null}
     />,
   )
 
   const badge = await screen.findByRole('status', { name: /new message/i })
-  const openBtn = screen.getByRole('button', { name: /open/i })
 
+  const openBtn = screen.getByRole('button', { name: /open/i })
   await userEvent.click(openBtn)
 
   expect(badge).not.toBeInTheDocument()
 })
 
 describe('on "openDiscussion" event', () => {
-  describe('if the ids match', () => {
-    it('opens the modal', async () => {
+  describe('if the discussion ids match', () => {
+    it('opens', async () => {
       const setOpenedDiscussionId = vi.fn()
+      const discussion = buildDiscussion()
 
       render(
-        <Discussion
+        <DiscussionModal
           discussion={discussion}
-          signedInUser={signedInUser}
-          isOpen={false}
+          signedInUser={buildUser()}
+          isHidden
           setOpenedDiscussionId={setOpenedDiscussionId}
         />,
       )
@@ -228,11 +197,21 @@ describe('on "openDiscussion" event', () => {
     })
 
     it('unmounts the notification badge', async () => {
+      const discussion = buildDiscussion({
+        messages: [buildMessage({ seen: false })],
+      })
+
+      server.use(
+        http.put('api/discussions/:id', () => {
+          return new HttpResponse(null, { status: 204 })
+        }),
+      )
+
       render(
-        <Discussion
-          discussion={{ ...discussion, hasNewMessage: true }}
-          signedInUser={signedInUser}
-          isOpen={false}
+        <DiscussionModal
+          discussion={discussion}
+          signedInUser={buildUser()}
+          isHidden
           setOpenedDiscussionId={() => null}
         />,
       )
@@ -249,15 +228,15 @@ describe('on "openDiscussion" event', () => {
     })
   })
 
-  describe("if the ids don't match", () => {
-    it("doesn't open the modal", async () => {
+  describe("if the discussion ids don't match", () => {
+    it("doesn't open", async () => {
       const setOpenedDiscussionId = vi.fn()
 
       render(
-        <Discussion
-          discussion={discussion}
-          signedInUser={signedInUser}
-          isOpen={false}
+        <DiscussionModal
+          discussion={buildDiscussion()}
+          signedInUser={buildUser()}
+          isHidden
           setOpenedDiscussionId={setOpenedDiscussionId}
         />,
       )
@@ -273,10 +252,12 @@ describe('on "openDiscussion" event', () => {
 
     it("doesn't unmount the notification badge", async () => {
       render(
-        <Discussion
-          discussion={{ ...discussion, hasNewMessage: true }}
-          signedInUser={signedInUser}
-          isOpen={false}
+        <DiscussionModal
+          discussion={buildDiscussion({
+            messages: [buildMessage({ seen: false })],
+          })}
+          signedInUser={buildUser()}
+          isHidden
           setOpenedDiscussionId={() => null}
         />,
       )
@@ -294,63 +275,33 @@ describe('on "openDiscussion" event', () => {
   })
 })
 
-describe('when a new message is received in real time', () => {
-  it('renders the new message', async () => {
+describe('when a new message is received', () => {
+  it("renders the notification badge if the author of the message isn't the authenticated user while being closed", async () => {
     render(
-      <Discussion
-        discussion={discussion}
-        signedInUser={signedInUser}
-        isOpen
+      <DiscussionModal
+        discussion={buildDiscussion()}
+        signedInUser={buildUser()}
+        isHidden
         setOpenedDiscussionId={() => null}
       />,
     )
 
     await act(async () => {
-      mockUsePusher.mock.calls[0][2]({
-        _id: '1',
-        userId: '2',
-        seen: true,
-        message: 'hello',
-        createdAt: new Date().toString(),
-      })
-    })
-
-    const message = screen.getByText('hello')
-
-    expect(message).toBeInTheDocument()
-  })
-
-  it("renders the notification badge if the author of the message isn't the authenticated user and if the modal is closed", async () => {
-    render(
-      <Discussion
-        discussion={discussion}
-        signedInUser={signedInUser}
-        isOpen={false}
-        setOpenedDiscussionId={() => null}
-      />,
-    )
-
-    await act(async () => {
-      mockUsePusher.mock.calls[0][2]({
-        _id: '1',
-        userId: '2',
-        seen: true,
-        message: 'hello',
-        createdAt: new Date().toString(),
-      })
+      mockUsePusher.mock.calls[0][2](buildMessage())
     })
 
     const badge = screen.getByRole('status', { name: /new message/i })
-
     expect(badge).toBeInTheDocument()
   })
 
-  it("doesn't render the notification badge if the author of the message is the authenticated user even if the modal is closed", async () => {
+  it("doesn't render the notification badge if the author of the message is the authenticated user while being closed", async () => {
+    const signedInUser = buildUser()
+
     render(
-      <Discussion
-        discussion={discussion}
+      <DiscussionModal
+        discussion={buildDiscussion()}
         signedInUser={signedInUser}
-        isOpen={false}
+        isHidden
         setOpenedDiscussionId={() => null}
       />,
     )
@@ -358,26 +309,19 @@ describe('when a new message is received in real time', () => {
     await waitForElementToBeRemoved(() => screen.queryByRole('status'))
 
     await act(async () => {
-      mockUsePusher.mock.calls[0][2]({
-        _id: '1',
-        userId: '1',
-        seen: true,
-        message: 'hello',
-        createdAt: new Date().toString(),
-      })
+      mockUsePusher.mock.calls[0][2](buildMessage({ userId: signedInUser._id }))
     })
 
     const badge = screen.queryByRole('status')
-
     expect(badge).not.toBeInTheDocument()
   })
 
-  it("doesn't render the notification badge if the author of the message isn't the authenticated user but the modal is open", async () => {
+  it("doesn't render the notification badge if the author of the message isn't the authenticated user while being open", async () => {
     render(
-      <Discussion
-        discussion={discussion}
-        signedInUser={signedInUser}
-        isOpen
+      <DiscussionModal
+        discussion={buildDiscussion()}
+        signedInUser={buildUser()}
+        isHidden={false}
         setOpenedDiscussionId={() => null}
       />,
     )
@@ -385,41 +329,39 @@ describe('when a new message is received in real time', () => {
     await waitForElementToBeRemoved(() => screen.queryByRole('status'))
 
     await act(async () => {
-      mockUsePusher.mock.calls[0][2]({
-        _id: '1',
-        userId: '2',
-        seen: true,
-        message: 'hello',
-        createdAt: new Date().toString(),
-      })
+      mockUsePusher.mock.calls[0][2](buildMessage())
     })
 
     const badge = screen.queryByRole('status')
-
     expect(badge).not.toBeInTheDocument()
   })
 })
 
-it('fetches the interlocutor who is the seller if the authenticated user is the buyer', async () => {
+it('fetches the interlocutor (seller) if the authenticated user is the buyer', async () => {
+  const signedInUser = buildUser()
+  const discussion = buildDiscussion({ buyerId: signedInUser._id })
+
   server.use(
     http.get('api/users/:id', ({ params }) => {
-      expect(params.id).toBe('2')
+      expect(params.id).toBe(discussion.sellerId)
 
-      return HttpResponse.json({ ...signedInUser, _id: '2' }, { status: 200 })
+      return HttpResponse.json(buildUser({ _id: discussion.sellerId }), {
+        status: 200,
+      })
     }),
   )
 
   render(
-    <Discussion
+    <DiscussionModal
       discussion={discussion}
       signedInUser={signedInUser}
-      isOpen={false}
+      isHidden
       setOpenedDiscussionId={() => null}
     />,
   )
 })
 
-it('renders an error if the server fails to fetch the interlocutor as the seller', async () => {
+it('renders an error if the server fails to fetch the interlocutor (seller)', async () => {
   server.use(
     http.get('api/users/:id', () => {
       return HttpResponse.json({ message: 'error' }, { status: 500 })
@@ -428,10 +370,10 @@ it('renders an error if the server fails to fetch the interlocutor as the seller
 
   render(
     <>
-      <Discussion
-        discussion={discussion}
-        signedInUser={signedInUser}
-        isOpen={false}
+      <DiscussionModal
+        discussion={buildDiscussion()}
+        signedInUser={buildUser()}
+        isHidden
         setOpenedDiscussionId={() => null}
       />
       <Toast />
@@ -439,46 +381,34 @@ it('renders an error if the server fails to fetch the interlocutor as the seller
   )
 
   const toast = await screen.findByRole('alert')
-
   expect(toast).toHaveTextContent('error')
 })
 
-it('fetches the interlocutor who is the buyer if the authenticated user is the seller', async () => {
-  const session = { id: '2', channelName: 'chan1', expires: '' }
-
-  mockUseSession.mockReturnValue({
-    update: async () => session,
-    data: session,
-    status: 'authenticated',
-  })
+it('fetches the interlocutor (buyer) if the authenticated user is the seller', async () => {
+  const signedInUser = buildUser()
+  const discussion = buildDiscussion({ sellerId: signedInUser._id })
 
   server.use(
     http.get('api/users/:id', ({ params }) => {
-      expect(params.id).toBe('1')
+      expect(params.id).toBe(discussion.buyerId)
 
-      return HttpResponse.json({ ...signedInUser, _id: '1' }, { status: 200 })
+      return HttpResponse.json(buildUser({ _id: discussion.buyerId }), {
+        status: 200,
+      })
     }),
   )
 
   render(
-    <Discussion
+    <DiscussionModal
       discussion={discussion}
       signedInUser={signedInUser}
-      isOpen={false}
+      isHidden
       setOpenedDiscussionId={() => null}
     />,
   )
 })
 
-it('renders an error if the server fails to fetch the interlocutor as the buyer', async () => {
-  const session = { id: '2', channelName: 'chan1', expires: '' }
-
-  mockUseSession.mockReturnValue({
-    update: async () => session,
-    data: session,
-    status: 'authenticated',
-  })
-
+it('renders an error if the server fails to fetch the interlocutor (buyer)', async () => {
   server.use(
     http.get('api/users/:id', () => {
       return HttpResponse.json({ message: 'error' }, { status: 500 })
@@ -487,10 +417,10 @@ it('renders an error if the server fails to fetch the interlocutor as the buyer'
 
   render(
     <>
-      <Discussion
-        discussion={discussion}
-        signedInUser={signedInUser}
-        isOpen={false}
+      <DiscussionModal
+        discussion={buildDiscussion()}
+        signedInUser={buildUser()}
+        isHidden
         setOpenedDiscussionId={() => null}
       />
       <Toast />
@@ -498,40 +428,35 @@ it('renders an error if the server fails to fetch the interlocutor as the buyer'
   )
 
   const toast = await screen.findByRole('alert')
-
   expect(toast).toHaveTextContent('error')
 })
 
 it("doesn't fetch the interlocutor if he has deleted its account", async () => {
   render(
-    <Discussion
-      discussion={{ ...discussion, sellerId: undefined }}
-      signedInUser={signedInUser}
-      isOpen={false}
+    <DiscussionModal
+      discussion={buildDiscussion({ sellerId: undefined })}
+      signedInUser={buildUser()}
+      isHidden
       setOpenedDiscussionId={() => null}
     />,
   )
 
   const interlocutorName = await screen.findByText(/deleted/i)
-
   expect(interlocutorName).toBeInTheDocument()
 })
 
 it('removes the interlocutor if he has deleted his account', async () => {
   server.use(
     http.get('api/users/:id', () => {
-      return HttpResponse.json(
-        { ...signedInUser, _id: '2', name: 'john' },
-        { status: 200 },
-      )
+      return HttpResponse.json(buildUser(), { status: 200 })
     }),
   )
 
   render(
-    <Discussion
-      discussion={discussion}
-      signedInUser={signedInUser}
-      isOpen={false}
+    <DiscussionModal
+      discussion={buildDiscussion()}
+      signedInUser={buildUser()}
+      isHidden
       setOpenedDiscussionId={() => null}
     />,
   )

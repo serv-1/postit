@@ -1,4 +1,3 @@
-import type { Discussion, User } from 'types'
 import HeaderDiscussionListModal from '.'
 import { screen } from '@testing-library/react'
 import { act } from 'react'
@@ -9,45 +8,18 @@ import usersIdHandlers from 'app/api/users/[id]/mock'
 import Toast from 'components/Toast'
 import setup from 'functions/setup'
 import type { DiscussionModalProps } from 'components/DiscussionModal'
+import {
+  buildDiscussion,
+  buildUser,
+  buildUserDiscussion,
+} from 'test-utils/factories'
 
 const mockUsePusher = vi.mocked(usePusher)
 const mockFetchDiscussion = vi.mocked(fetchDiscussion)
 
-const signedInUser: User = {
-  _id: '0',
-  name: 'john',
-  email: 'john@test.com',
-  discussions: [
-    { _id: '0', id: '1', hidden: false, hasNewMessage: false },
-    { _id: '1', id: '2', hidden: false, hasNewMessage: false },
-  ],
-  postIds: [],
-  favPostIds: [],
-  channelName: 'channelName',
-}
-
-const discussion: Discussion = {
-  _id: '1',
-  postId: '0',
-  postName: 'postName',
-  channelName: 'channelName',
-  messages: [
-    { _id: '0', message: 'yo', createdAt: '', userId: '0', seen: true },
-  ],
-  buyerId: '0',
-  sellerId: '1',
-  hasNewMessage: false,
-}
-
 const server = setupServer(...usersIdHandlers)
-const session = { id: '0', channelName: 'chan0', expires: '' }
 
 vi.mock(import('next-auth/react'), () => ({
-  useSession: () => ({
-    data: session,
-    update: async () => session,
-    status: 'authenticated',
-  }),
   getCsrfToken: async () => 'token',
 }))
 
@@ -62,8 +34,8 @@ vi.mock('functions/fetchDiscussion', () => ({
 vi.mock('next/image')
 
 vi.mock('components/DiscussionModal', () => ({
-  default: ({ isOpen }: DiscussionModalProps) => (
-    <div role="dialog">{isOpen ? 'open' : 'closed'}</div>
+  default: ({ isHidden }: DiscussionModalProps) => (
+    <div role="dialog">{isHidden ? 'closed' : 'open'}</div>
   ),
 }))
 
@@ -76,7 +48,7 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 it("doesn't render the notification badge", () => {
-  setup(<HeaderDiscussionListModal signedInUser={signedInUser} />)
+  setup(<HeaderDiscussionListModal signedInUser={buildUser()} />)
 
   const badge = screen.queryByRole('status', { name: /new message/i })
   expect(badge).not.toBeInTheDocument()
@@ -84,9 +56,7 @@ it("doesn't render the notification badge", () => {
 
 it('opens by clicking on its open button', async () => {
   const { user } = setup(
-    <HeaderDiscussionListModal
-      signedInUser={{ ...signedInUser, discussions: [] }}
-    />,
+    <HeaderDiscussionListModal signedInUser={buildUser()} />,
   )
 
   const openBtn = screen.getByRole('button', {
@@ -103,9 +73,7 @@ it('opens by clicking on its open button', async () => {
 
 it('closes', async () => {
   const { user } = setup(
-    <HeaderDiscussionListModal
-      signedInUser={{ ...signedInUser, discussions: [] }}
-    />,
+    <HeaderDiscussionListModal signedInUser={buildUser()} />,
   )
 
   const openBtn = screen.getByRole('button', {
@@ -121,7 +89,7 @@ it('closes', async () => {
 })
 
 it('renders a loading indicator while fetching the discussions', () => {
-  setup(<HeaderDiscussionListModal signedInUser={signedInUser} />)
+  setup(<HeaderDiscussionListModal signedInUser={buildUser()} />)
 
   const loadingIndicator = screen.getByText(/loading/i)
   expect(loadingIndicator).toBeInTheDocument()
@@ -129,9 +97,7 @@ it('renders a loading indicator while fetching the discussions', () => {
 
 it('renders an informative text if there is no discussion', async () => {
   const { user } = setup(
-    <HeaderDiscussionListModal
-      signedInUser={{ ...signedInUser, discussions: [] }}
-    />,
+    <HeaderDiscussionListModal signedInUser={buildUser()} />,
   )
 
   const openBtn = screen.getByRole('button', { name: /open/i })
@@ -144,19 +110,11 @@ it('renders an informative text if there is no discussion', async () => {
 describe('when it opens', () => {
   describe('by clicking on its open button', () => {
     it('unmounts the notification badge', async () => {
-      mockFetchDiscussion.mockResolvedValueOnce({
-        ...discussion,
-        hasNewMessage: true,
-      })
+      mockFetchDiscussion.mockResolvedValueOnce(buildDiscussion())
 
       const { user } = setup(
         <HeaderDiscussionListModal
-          signedInUser={{
-            ...signedInUser,
-            discussions: [
-              { _id: '0', id: '1', hidden: false, hasNewMessage: true },
-            ],
-          }}
+          signedInUser={buildUser({ discussions: [buildUserDiscussion()] })}
         />,
       )
 
@@ -171,18 +129,17 @@ describe('when it opens', () => {
 
     it('fetches the discussions not hidden', async () => {
       mockFetchDiscussion
-        .mockResolvedValueOnce(discussion)
-        .mockResolvedValueOnce({ ...discussion, _id: '2' })
+        .mockResolvedValueOnce(buildDiscussion())
+        .mockResolvedValueOnce(buildDiscussion())
 
       const { user } = setup(
         <HeaderDiscussionListModal
-          signedInUser={{
-            ...signedInUser,
+          signedInUser={buildUser({
             discussions: [
-              { _id: '0', id: '1', hidden: false, hasNewMessage: false },
-              { _id: '1', id: '2', hidden: true, hasNewMessage: false },
+              buildUserDiscussion(),
+              buildUserDiscussion({ hidden: true }),
             ],
-          }}
+          })}
         />,
       )
 
@@ -197,11 +154,15 @@ describe('when it opens', () => {
 
     it("doesn't re-fetch the discussions", async () => {
       mockFetchDiscussion
-        .mockResolvedValueOnce(discussion)
-        .mockResolvedValueOnce({ ...discussion, _id: '2' })
+        .mockResolvedValueOnce(buildDiscussion())
+        .mockResolvedValueOnce(buildDiscussion())
 
       const { user } = setup(
-        <HeaderDiscussionListModal signedInUser={signedInUser} />,
+        <HeaderDiscussionListModal
+          signedInUser={buildUser({
+            discussions: [buildUserDiscussion(), buildUserDiscussion()],
+          })}
+        />,
       )
 
       const openBtn = screen.getByRole('button', {
@@ -225,7 +186,9 @@ describe('when it opens', () => {
       const { user } = setup(
         <>
           <Toast />
-          <HeaderDiscussionListModal signedInUser={signedInUser} />
+          <HeaderDiscussionListModal
+            signedInUser={buildUser({ discussions: [buildUserDiscussion()] })}
+          />
         </>,
       )
 
@@ -241,25 +204,20 @@ describe('when it opens', () => {
 
   describe('on "openDiscussion" event', () => {
     it('unmounts the notification badge', async () => {
-      mockFetchDiscussion.mockResolvedValueOnce({
-        ...discussion,
-        hasNewMessage: true,
-      })
+      const discussion = buildDiscussion()
+      mockFetchDiscussion.mockResolvedValueOnce(discussion)
 
       setup(
         <HeaderDiscussionListModal
-          signedInUser={{
-            ...signedInUser,
-            discussions: [
-              { _id: '0', id: '1', hidden: false, hasNewMessage: true },
-            ],
-          }}
+          signedInUser={buildUser({
+            discussions: [buildUserDiscussion({ hasNewMessage: true })],
+          })}
         />,
       )
 
       await act(async () => {
         document.dispatchEvent(
-          new CustomEvent('openDiscussion', { detail: '1' }),
+          new CustomEvent('openDiscussion', { detail: discussion._id }),
         )
       })
 
@@ -268,25 +226,25 @@ describe('when it opens', () => {
     })
 
     it('fetches the discussions not hidden', async () => {
+      const discussion = buildDiscussion()
       mockFetchDiscussion
         .mockResolvedValueOnce(discussion)
-        .mockResolvedValueOnce({ ...discussion, _id: '2' })
+        .mockResolvedValueOnce(buildDiscussion())
 
       setup(
         <HeaderDiscussionListModal
-          signedInUser={{
-            ...signedInUser,
+          signedInUser={buildUser({
             discussions: [
-              { _id: '0', id: '1', hidden: false, hasNewMessage: false },
-              { _id: '1', id: '2', hidden: true, hasNewMessage: false },
+              buildUserDiscussion(),
+              buildUserDiscussion({ hidden: true }),
             ],
-          }}
+          })}
         />,
       )
 
       await act(async () => {
         document.dispatchEvent(
-          new CustomEvent('openDiscussion', { detail: '1' }),
+          new CustomEvent('openDiscussion', { detail: discussion._id }),
         )
       })
 
@@ -295,15 +253,22 @@ describe('when it opens', () => {
     })
 
     it("doesn't re-fetch the discussions", async () => {
+      const discussion = buildDiscussion()
       mockFetchDiscussion
-        .mockResolvedValueOnce({ ...discussion, _id: '2' })
-        .mockResolvedValueOnce({ ...discussion, _id: '1' })
+        .mockResolvedValueOnce(discussion)
+        .mockResolvedValueOnce(buildDiscussion())
 
-      setup(<HeaderDiscussionListModal signedInUser={signedInUser} />)
+      setup(
+        <HeaderDiscussionListModal
+          signedInUser={buildUser({
+            discussions: [buildUserDiscussion(), buildUserDiscussion()],
+          })}
+        />,
+      )
 
       await act(async () => {
         document.dispatchEvent(
-          new CustomEvent('openDiscussion', { detail: '1' }),
+          new CustomEvent('openDiscussion', { detail: discussion._id }),
         )
       })
 
@@ -312,7 +277,7 @@ describe('when it opens', () => {
 
       await act(async () => {
         document.dispatchEvent(
-          new CustomEvent('openDiscussion', { detail: '1' }),
+          new CustomEvent('openDiscussion', { detail: discussion._id }),
         )
       })
 
@@ -326,7 +291,9 @@ describe('when it opens', () => {
       const { user } = setup(
         <>
           <Toast />
-          <HeaderDiscussionListModal signedInUser={signedInUser} />
+          <HeaderDiscussionListModal
+            signedInUser={buildUser({ discussions: [buildUserDiscussion()] })}
+          />
         </>,
       )
 
@@ -340,17 +307,14 @@ describe('when it opens', () => {
     })
 
     it("fetches the discussion to open if it isn't in the discussion list", async () => {
+      const discussion = buildDiscussion()
       mockFetchDiscussion.mockResolvedValueOnce(discussion)
 
-      setup(
-        <HeaderDiscussionListModal
-          signedInUser={{ ...signedInUser, discussions: [] }}
-        />,
-      )
+      setup(<HeaderDiscussionListModal signedInUser={buildUser()} />)
 
       await act(async () => {
         document.dispatchEvent(
-          new CustomEvent('openDiscussion', { detail: '1' }),
+          new CustomEvent('openDiscussion', { detail: discussion._id }),
         )
       })
 
@@ -359,15 +323,22 @@ describe('when it opens', () => {
     })
 
     it("doesn't fetch the discussion to open if it is in the discussion list", async () => {
+      const discussion = buildDiscussion()
       mockFetchDiscussion
-        .mockResolvedValueOnce({ ...discussion, _id: '2' })
-        .mockResolvedValueOnce({ ...discussion, _id: '1' })
+        .mockResolvedValueOnce(discussion)
+        .mockResolvedValueOnce(buildDiscussion())
 
-      setup(<HeaderDiscussionListModal signedInUser={signedInUser} />)
+      setup(
+        <HeaderDiscussionListModal
+          signedInUser={buildUser({
+            discussions: [buildUserDiscussion(), buildUserDiscussion()],
+          })}
+        />,
+      )
 
       await act(async () => {
         document.dispatchEvent(
-          new CustomEvent('openDiscussion', { detail: '1' }),
+          new CustomEvent('openDiscussion', { detail: discussion._id }),
         )
       })
 
@@ -380,9 +351,7 @@ describe('when it opens', () => {
       setup(
         <>
           <Toast />
-          <HeaderDiscussionListModal
-            signedInUser={{ ...signedInUser, discussions: [] }}
-          />
+          <HeaderDiscussionListModal signedInUser={buildUser()} />
         </>,
       )
 
@@ -397,20 +366,26 @@ describe('when it opens', () => {
     })
 
     it('opens the discussion modal', async () => {
+      const discussion = buildDiscussion()
       mockFetchDiscussion
         .mockResolvedValueOnce(discussion)
-        .mockResolvedValueOnce({ ...discussion, _id: '2' })
+        .mockResolvedValueOnce(buildDiscussion())
 
-      setup(<HeaderDiscussionListModal signedInUser={signedInUser} />)
+      setup(
+        <HeaderDiscussionListModal
+          signedInUser={buildUser({
+            discussions: [buildUserDiscussion(), buildUserDiscussion()],
+          })}
+        />,
+      )
 
       await act(async () => {
         document.dispatchEvent(
-          new CustomEvent('openDiscussion', { detail: '1' }),
+          new CustomEvent('openDiscussion', { detail: discussion._id }),
         )
       })
 
       const discussionModals = screen.getAllByRole('dialog')
-
       expect(discussionModals[0]).not.toHaveClass('hidden')
       expect(discussionModals[1]).toHaveTextContent('open')
       expect(discussionModals[2]).toHaveTextContent('closed')
@@ -419,12 +394,17 @@ describe('when it opens', () => {
 })
 
 it('deletes a discussion from the discussion list on "discussionDeleted" event', async () => {
+  const discussion = buildDiscussion()
   mockFetchDiscussion
     .mockResolvedValueOnce(discussion)
-    .mockResolvedValueOnce({ ...discussion, _id: '2' })
+    .mockResolvedValueOnce(buildDiscussion())
 
   const { user } = setup(
-    <HeaderDiscussionListModal signedInUser={signedInUser} />,
+    <HeaderDiscussionListModal
+      signedInUser={buildUser({
+        discussions: [buildUserDiscussion(), buildUserDiscussion()],
+      })}
+    />,
   )
 
   const openBtn = screen.getByRole('button', {
@@ -439,7 +419,7 @@ it('deletes a discussion from the discussion list on "discussionDeleted" event',
 
   await act(async () => {
     document.dispatchEvent(
-      new CustomEvent('discussionDeleted', { detail: '1' }),
+      new CustomEvent('discussionDeleted', { detail: discussion._id }),
     )
   })
 
@@ -450,9 +430,7 @@ it('deletes a discussion from the discussion list on "discussionDeleted" event',
 describe('when receiving a new discussion in real time', () => {
   it('initializes the discussion list with the new discussion', async () => {
     const { user } = setup(
-      <HeaderDiscussionListModal
-        signedInUser={{ ...signedInUser, discussions: [] }}
-      />,
+      <HeaderDiscussionListModal signedInUser={buildUser()} />,
     )
 
     const openBtn = screen.getByRole('button', {
@@ -461,7 +439,7 @@ describe('when receiving a new discussion in real time', () => {
     await user.click(openBtn)
 
     await act(async () => {
-      mockUsePusher.mock.calls[4][2]({ ...discussion, _id: '0' })
+      mockUsePusher.mock.calls[4][2](buildDiscussion())
     })
 
     const discussions = screen.getAllByRole('listitem')
@@ -470,11 +448,15 @@ describe('when receiving a new discussion in real time', () => {
 
   it('adds the new discussion to the discussion list', async () => {
     mockFetchDiscussion
-      .mockResolvedValueOnce(discussion)
-      .mockResolvedValueOnce({ ...discussion, _id: '2' })
+      .mockResolvedValueOnce(buildDiscussion())
+      .mockResolvedValueOnce(buildDiscussion())
 
     const { user } = setup(
-      <HeaderDiscussionListModal signedInUser={{ ...signedInUser }} />,
+      <HeaderDiscussionListModal
+        signedInUser={buildUser({
+          discussions: [buildUserDiscussion(), buildUserDiscussion()],
+        })}
+      />,
     )
 
     const openBtn = screen.getByRole('button', {
@@ -483,7 +465,7 @@ describe('when receiving a new discussion in real time', () => {
     await user.click(openBtn)
 
     await act(async () => {
-      mockUsePusher.mock.calls[4][2]({ ...discussion, _id: '3' })
+      mockUsePusher.mock.calls[4][2](buildDiscussion())
     })
 
     const discussions = screen.getAllByRole('listitem')
@@ -491,14 +473,10 @@ describe('when receiving a new discussion in real time', () => {
   })
 
   it('renders the notification badge if the modal is hidden', async () => {
-    setup(
-      <HeaderDiscussionListModal
-        signedInUser={{ ...signedInUser, discussions: [] }}
-      />,
-    )
+    setup(<HeaderDiscussionListModal signedInUser={buildUser()} />)
 
     await act(async () => {
-      mockUsePusher.mock.calls[0][2](discussion)
+      mockUsePusher.mock.calls[0][2](buildDiscussion())
     })
 
     const badge = screen.getByRole('status', { name: /new message/i })
@@ -507,9 +485,7 @@ describe('when receiving a new discussion in real time', () => {
 
   it("doesn't render the notification badge if the modal isn't hidden", async () => {
     const { user } = setup(
-      <HeaderDiscussionListModal
-        signedInUser={{ ...signedInUser, discussions: [] }}
-      />,
+      <HeaderDiscussionListModal signedInUser={buildUser()} />,
     )
 
     const openBtn = screen.getByRole('button', {
@@ -518,7 +494,7 @@ describe('when receiving a new discussion in real time', () => {
     await user.click(openBtn)
 
     await act(async () => {
-      mockUsePusher.mock.calls[4][2](discussion)
+      mockUsePusher.mock.calls[4][2](buildDiscussion())
     })
 
     const badge = screen.queryByRole('status', { name: /new message/i })
@@ -528,11 +504,7 @@ describe('when receiving a new discussion in real time', () => {
 
 describe('when receiving a new message in real time', () => {
   it('renders the notification badge if the modal is hidden', async () => {
-    setup(
-      <HeaderDiscussionListModal
-        signedInUser={{ ...signedInUser, discussions: [] }}
-      />,
-    )
+    setup(<HeaderDiscussionListModal signedInUser={buildUser()} />)
 
     await act(async () => {
       mockUsePusher.mock.calls[1][2](null)
@@ -544,9 +516,7 @@ describe('when receiving a new message in real time', () => {
 
   it("doesn't render the notification badge if the modal isn't hidden", async () => {
     const { user } = setup(
-      <HeaderDiscussionListModal
-        signedInUser={{ ...signedInUser, discussions: [] }}
-      />,
+      <HeaderDiscussionListModal signedInUser={buildUser()} />,
     )
 
     const openBtn = screen.getByRole('button', {

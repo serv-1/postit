@@ -1,20 +1,18 @@
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { screen } from '@testing-library/react'
 import DiscussionMessage from '.'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
-
-vi.mock('next-auth/react', () => ({
-  useSession: () => ({
-    data: { id: '1', channelName: '', expires: '' },
-    update: async () => null,
-    status: 'authenticated',
-  }),
-}))
+import setup from 'functions/setup'
 
 vi.mock('next/image')
 
 it('renders the message', () => {
-  render(<DiscussionMessage message="hi" createdAt={new Date().toString()} />)
+  setup(
+    <DiscussionMessage
+      position="left"
+      message="hi"
+      createdAt={new Date().toString()}
+    />,
+  )
 
   const message = screen.getByText(/hi/i)
 
@@ -22,7 +20,13 @@ it('renders the message', () => {
 })
 
 it('renders the default user image if there is no author', () => {
-  render(<DiscussionMessage message="hi" createdAt={new Date().toString()} />)
+  setup(
+    <DiscussionMessage
+      position="left"
+      message="hi"
+      createdAt={new Date().toString()}
+    />,
+  )
 
   const image = screen.getByRole('img')
 
@@ -31,11 +35,12 @@ it('renders the default user image if there is no author', () => {
 })
 
 it("renders the default user image if the author doesn't have one", () => {
-  render(
+  setup(
     <DiscussionMessage
+      position="left"
       message="hi"
       createdAt={new Date().toString()}
-      author={{ id: '0', name: 'john' }}
+      author={{ name: 'john' }}
     />,
   )
 
@@ -46,11 +51,12 @@ it("renders the default user image if the author doesn't have one", () => {
 })
 
 it("renders the author's image", () => {
-  render(
+  setup(
     <DiscussionMessage
+      position="left"
       message="hi"
       createdAt={new Date().toString()}
-      author={{ id: '0', name: 'john', image: 'john.jpg' }}
+      author={{ name: 'john', image: 'john.jpg' }}
     />,
   )
 
@@ -63,8 +69,8 @@ it("renders the author's image", () => {
 it('shows/hides the creation date on click', async () => {
   const dateStr = new Date().toString()
 
-  const { container } = render(
-    <DiscussionMessage message="hi" createdAt={dateStr} />,
+  const { user, container } = setup(
+    <DiscussionMessage position="left" message="hi" createdAt={dateStr} />,
   )
 
   const message = container.firstElementChild!
@@ -77,11 +83,11 @@ it('shows/hides the creation date on click', async () => {
 
   expect(date).toHaveClass('hidden')
 
-  await userEvent.click(message)
+  await user.click(message)
 
   expect(date).toHaveClass('block')
 
-  await userEvent.click(message)
+  await user.click(message)
 
   expect(date).toHaveClass('hidden')
 })
@@ -89,8 +95,8 @@ it('shows/hides the creation date on click', async () => {
 it('renders the message aligned to the left', () => {
   const dateStr = new Date().toString()
 
-  const { container } = render(
-    <DiscussionMessage message="hi" createdAt={dateStr} />,
+  const { container } = setup(
+    <DiscussionMessage position="left" message="hi" createdAt={dateStr} />,
   )
 
   const messageText = screen.getByText(/hi/i)
@@ -108,11 +114,12 @@ it('renders the message aligned to the left', () => {
 it('renders the message aligned to the right', () => {
   const dateStr = new Date().toString()
 
-  const { container } = render(
+  const { container } = setup(
     <DiscussionMessage
+      position="right"
       message="hi"
       createdAt={dateStr}
-      author={{ id: '1', name: 'john' }}
+      author={{ name: 'john' }}
     />,
   )
 

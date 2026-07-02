@@ -1,7 +1,13 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import DiscussionMessageList from '.'
-import type { User } from 'types'
+import { act } from 'react'
+import usePusher from 'hooks/usePusher'
 import type { DiscussionMessageProps } from 'components/DiscussionMessage'
+import { buildMessage, buildUser } from 'test-utils/factories'
+
+vi.mock('hooks/usePusher', () => ({
+  default: vi.fn(),
+}))
 
 vi.mock('components/DiscussionMessage', () => ({
   default: ({ message, author }: DiscussionMessageProps) => (
@@ -17,71 +23,37 @@ beforeEach(() => {
   Element.prototype.scroll = vi.fn()
 })
 
-const signedInUser: User = {
-  _id: '1',
-  name: 'john',
-  image: 'john.jpg',
-  email: 'john@test.com',
-  channelName: '',
-  postIds: [],
-  favPostIds: [],
-  discussions: [],
-}
-
-const interlocutor: User = {
-  _id: '2',
-  name: 'jane',
-  image: 'jane.jpg',
-  email: 'jane@test.com',
-  channelName: '',
-  postIds: [],
-  favPostIds: [],
-  discussions: [],
-}
+const mockUsePusher = vi.mocked(usePusher)
 
 it('renders the messages', async () => {
+  const signedInUser = buildUser()
+  const interlocutor = buildUser()
+
   render(
     <DiscussionMessageList
       signedInUser={signedInUser}
-      interlocutor={null}
+      interlocutor={interlocutor}
       messages={[
-        {
-          _id: '0',
-          message: 'yo',
-          createdAt: new Date().toString(),
-          seen: true,
-          userId: signedInUser._id,
-        },
-        {
-          _id: '1',
-          message: 'hi',
-          createdAt: new Date().toString(),
-          seen: true,
-          userId: interlocutor._id,
-        },
+        buildMessage({ userId: signedInUser._id }),
+        buildMessage({ userId: interlocutor._id }),
       ]}
+      discussionChannelName="chanName"
     />,
   )
 
   const messages = screen.getAllByRole('listitem')
-
   expect(messages).toHaveLength(2)
 })
 
 it('scrolls until the last message of the discussion is visible', async () => {
+  const signedInUser = buildUser()
+
   const { container } = render(
     <DiscussionMessageList
       signedInUser={signedInUser}
-      interlocutor={null}
-      messages={[
-        {
-          _id: '0',
-          message: 'hi',
-          createdAt: new Date().toString(),
-          userId: '0',
-          seen: true,
-        },
-      ]}
+      interlocutor={buildUser()}
+      messages={[buildMessage({ userId: signedInUser._id })]}
+      discussionChannelName="chanName"
     />,
   )
 
@@ -96,79 +68,82 @@ it('scrolls until the last message of the discussion is visible', async () => {
 })
 
 it('renders the message with the signed in user as the author', () => {
+  const signedInUser = buildUser()
+
   render(
     <DiscussionMessageList
       signedInUser={signedInUser}
-      interlocutor={null}
-      messages={[
-        {
-          _id: '0',
-          message: 'yo',
-          createdAt: new Date().toString(),
-          userId: signedInUser._id,
-          seen: true,
-        },
-      ]}
+      interlocutor={buildUser()}
+      messages={[buildMessage({ userId: signedInUser._id })]}
+      discussionChannelName="chanName"
     />,
   )
 
   const authorName = screen.getByText(signedInUser.name)
-
   expect(authorName).toBeInTheDocument()
 
   const authorImage = screen.getByRole('presentation')
-
   expect(authorImage).toHaveAttribute('src', signedInUser.image)
 })
 
 it('renders the message with the interlocutor as the author', () => {
+  const interlocutor = buildUser()
+
   render(
     <DiscussionMessageList
-      signedInUser={signedInUser}
+      signedInUser={buildUser()}
       interlocutor={interlocutor}
-      messages={[
-        {
-          _id: '0',
-          message: 'yo',
-          createdAt: new Date().toString(),
-          userId: interlocutor._id,
-          seen: true,
-        },
-      ]}
+      messages={[buildMessage({ userId: interlocutor._id })]}
+      discussionChannelName="chanName"
     />,
   )
 
   const authorName = screen.getByText(interlocutor.name)
-
   expect(authorName).toBeInTheDocument()
 
   const authorImage = screen.getByRole('presentation')
-
   expect(authorImage).toHaveAttribute('src', interlocutor.image)
 })
 
 it('renders the message with its author deleted', () => {
+  const interlocutor = buildUser()
+
   render(
     <DiscussionMessageList
-      signedInUser={signedInUser}
+      signedInUser={buildUser()}
       interlocutor={null}
-      messages={[
-        {
-          _id: '0',
-          message: 'yo',
-          createdAt: new Date().toString(),
-          userId: '3',
-          seen: true,
-        },
-      ]}
+      messages={[buildMessage({ userId: interlocutor._id })]}
+      discussionChannelName="chanName"
     />,
   )
 
   const authorName = screen.getByText('deleted')
-
   expect(authorName).toBeInTheDocument()
 
   const authorImage = screen.getByRole('presentation')
-
   expect(authorImage).not.toHaveAttribute('src')
+})
+
+it('receives a new message in real-time', async () => {
+  const signedInUser = buildUser()
+  const interlocutor = buildUser()
+
+  render(
+    <DiscussionMessageList
+      signedInUser={signedInUser}
+      interlocutor={interlocutor}
+      messages={[buildMessage({ userId: signedInUser._id })]}
+      discussionChannelName="chanName"
+    />,
+  )
+
+  await act(async () => {
+    mockUsePusher.mock.calls[0][2](
+      buildMessage({ userId: interlocutor._id, seen: false }),
+    )
+  })
+
+  const messages = screen.getAllByRole('listitem')
+  expect(messages).toHaveLength(2)
+  expect(messages[1]).toHaveTextContent('yo')
 })

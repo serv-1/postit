@@ -12,7 +12,6 @@ export interface DiscussionsIdGetData {
   }[]
   buyerId?: string
   sellerId?: string
-  hasNewMessage: boolean
 }
 
 export interface DiscussionsIdGetError {

@@ -1,27 +1,25 @@
 import classNames from 'classnames'
 import { NEXT_PUBLIC_AWS_URL, NEXT_PUBLIC_DEFAULT_USER_IMAGE } from 'env/public'
-import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useState } from 'react'
 
 export interface DiscussionMessageProps {
+  position: 'left' | 'right'
   message: string
   createdAt: string
   author?: {
-    id: string
     name: string
     image?: string
   }
 }
 
 export default function DiscussionMessage({
+  position,
   message,
   createdAt,
   author,
 }: DiscussionMessageProps) {
   const [showDate, setShowDate] = useState(false)
-  const session = useSession()
-  const isAuthor = session.data!.id === author?.id
   const date = new Date(createdAt)
 
   let imgSrc = NEXT_PUBLIC_DEFAULT_USER_IMAGE
@@ -39,7 +37,7 @@ export default function DiscussionMessage({
     <div
       className={classNames(
         'relative flex flex-nowrap gap-x-8 mb-32 cursor-pointer',
-        isAuthor ? 'flex-row-reverse' : 'flex-row',
+        position === 'right' ? 'flex-row-reverse' : 'flex-row',
       )}
       onClick={() => setShowDate(!showDate)}
     >
@@ -53,7 +51,7 @@ export default function DiscussionMessage({
       <div
         className={classNames(
           'max-w-[calc(100%-48px)] p-8 rounded-lg wrap-break-words',
-          isAuthor ? 'bg-fuchsia-200' : 'bg-fuchsia-300',
+          position === 'right' ? 'bg-fuchsia-200' : 'bg-fuchsia-300',
         )}
       >
         {message}
@@ -62,7 +60,7 @@ export default function DiscussionMessage({
         className={classNames(
           'absolute -bottom-16 text-xs',
           showDate ? 'block' : 'hidden',
-          isAuthor ? 'right-48' : 'left-48',
+          position === 'right' ? 'right-48' : 'left-48',
         )}
       >
         {date.toLocaleDateString()}, {date.toLocaleTimeString()}
