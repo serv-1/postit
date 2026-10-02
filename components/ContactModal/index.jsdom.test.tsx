@@ -22,7 +22,7 @@ const mockUseSession = vi.mocked(useSession)
 const mockGetCsrfToken = vi.mocked(getCsrfToken)
 
 beforeEach(() => {
-  const session = { id: '0', channelName: 'test', expires: '' }
+  const session = { id: '0', expires: '' }
 
   mockUseSession.mockReturnValue({
     status: 'authenticated',

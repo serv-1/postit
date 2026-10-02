@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     if (discussion) {
       return NextResponse.json(
         { message: DISCUSSION_ALREADY_EXISTS },
-        { status: 409 }
+        { status: 409 },
       )
     }
 
@@ -78,16 +78,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: USER_NOT_FOUND }, { status: 404 })
     }
 
-    await pusher.trigger(seller.channelName, 'discussion:new', {
-      ...savedDiscussion,
-      hasNewMessage: true,
-    })
+    await pusher.trigger(
+      'private-encrypted-' + seller._id,
+      'discussion:new',
+      savedDiscussion,
+    )
 
     return NextResponse.json({ _id: savedDiscussion._id }, { status: 201 })
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

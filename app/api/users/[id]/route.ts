@@ -34,18 +34,17 @@ export async function GET(request: Request, segmentData: Params) {
         _id: userId,
         name: user.name,
         email: user.email,
-        channelName: user.channelName,
         image: user.image,
         postIds: user.postIds,
         favPostIds: user.favPostIds,
         discussions: user.discussions,
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

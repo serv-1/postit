@@ -20,7 +20,6 @@ const signedInUser: User = {
   _id: '0',
   name: 'john',
   email: 'john@test.com',
-  channelName: 'channelName',
   discussions: [],
   postIds: [],
   favPostIds: [],
@@ -137,7 +136,7 @@ it('fetches the authenticated user if it isn\'t on the "authentication" page', a
   mockUsePathname.mockReturnValue('/')
   mockUseSession.mockReturnValue({
     status: 'authenticated',
-    data: { id: '0', channelName: '', expires: '' },
+    data: { id: '0', expires: '' },
     update: async () => null,
   })
 
@@ -160,7 +159,7 @@ it('doesn\'t fetch the user if it is on the "authentication" page', () => {
   mockUsePathname.mockReturnValue('/authentication')
   mockUseSession.mockReturnValue({
     status: 'authenticated',
-    data: { id: '0', channelName: '', expires: '' },
+    data: { id: '0', expires: '' },
     update: async () => null,
   })
 
@@ -194,7 +193,7 @@ it("doesn't fetch the authenticated user twice", async () => {
   mockUsePathname.mockReturnValue('/')
   mockUseSession.mockReturnValue({
     status: 'authenticated',
-    data: { id: '0', channelName: '', expires: '' },
+    data: { id: '0', expires: '' },
     update: async () => null,
   })
 
@@ -225,7 +224,7 @@ it("doesn't fetch the authenticated user if it is given as a prop", () => {
   mockUsePathname.mockReturnValue('/')
   mockUseSession.mockReturnValue({
     status: 'authenticated',
-    data: { id: '0', channelName: '', expires: '' },
+    data: { id: '0', expires: '' },
     update: async () => null,
   })
 
@@ -242,7 +241,7 @@ it('renders an error if the server fails to fetch the user', async () => {
   mockUsePathname.mockReturnValue('/')
   mockUseSession.mockReturnValue({
     status: 'authenticated',
-    data: { id: '0', channelName: '', expires: '' },
+    data: { id: '0', expires: '' },
     update: async () => null,
   })
 

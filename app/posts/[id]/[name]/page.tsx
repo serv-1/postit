@@ -54,10 +54,10 @@ export default async function Page(props: { params: Params }) {
     } else {
       user = await getUser(session.id)
 
-      const postSet = new Set(post.discussionIds)
+      const postDiscussionIds = new Set(post.discussionIds)
 
       for (const discussion of user.discussions) {
-        if (postSet.has(discussion.id)) {
+        if (postDiscussionIds.has(discussion.id)) {
           discussionId = discussion.id
           isDiscussionHidden = discussion.hidden
 

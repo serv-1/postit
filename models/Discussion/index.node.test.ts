@@ -42,23 +42,9 @@ describe('Discussion model', () => {
 
       expect(d1.messages[0]).toHaveProperty('seen', false)
       expect(d1.messages[0].createdAt).toBeInstanceOf(Date)
-      expect(d1.channelName).toContain('private-encrypted-')
       expect(d1.messages[0].createdAt.toISOString()).not.toBe(
         d2.messages[0].createdAt.toISOString(),
       )
-    })
-
-    it('generates a different channel name for each user', async () => {
-      const d1 = await new Discussion({
-        messages: [],
-        postName: 'table',
-      }).save()
-      const d2 = await new Discussion({
-        messages: [],
-        postName: 'chair',
-      }).save()
-
-      expect(d1.channelName).not.toBe(d2.channelName)
     })
 
     it('adds itself to the post, the buyer and the seller', async () => {

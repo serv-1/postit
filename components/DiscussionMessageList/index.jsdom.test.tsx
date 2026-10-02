@@ -37,7 +37,7 @@ it('renders the messages', async () => {
         buildMessage({ userId: signedInUser._id }),
         buildMessage({ userId: interlocutor._id }),
       ]}
-      discussionChannelName="chanName"
+      discussionId=""
     />,
   )
 
@@ -53,7 +53,7 @@ it('scrolls until the last message of the discussion is visible', async () => {
       signedInUser={signedInUser}
       interlocutor={buildUser()}
       messages={[buildMessage({ userId: signedInUser._id })]}
-      discussionChannelName="chanName"
+      discussionId=""
     />,
   )
 
@@ -75,7 +75,7 @@ it('renders the message with the signed in user as the author', () => {
       signedInUser={signedInUser}
       interlocutor={buildUser()}
       messages={[buildMessage({ userId: signedInUser._id })]}
-      discussionChannelName="chanName"
+      discussionId=""
     />,
   )
 
@@ -94,7 +94,7 @@ it('renders the message with the interlocutor as the author', () => {
       signedInUser={buildUser()}
       interlocutor={interlocutor}
       messages={[buildMessage({ userId: interlocutor._id })]}
-      discussionChannelName="chanName"
+      discussionId=""
     />,
   )
 
@@ -113,7 +113,7 @@ it('renders the message with its author deleted', () => {
       signedInUser={buildUser()}
       interlocutor={null}
       messages={[buildMessage({ userId: interlocutor._id })]}
-      discussionChannelName="chanName"
+      discussionId=""
     />,
   )
 
@@ -133,7 +133,7 @@ it('receives a new message in real-time', async () => {
       signedInUser={signedInUser}
       interlocutor={interlocutor}
       messages={[buildMessage({ userId: signedInUser._id })]}
-      discussionChannelName="chanName"
+      discussionId=""
     />,
   )
 

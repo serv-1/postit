@@ -7,7 +7,6 @@ import client from 'libs/mongodb'
 import User from 'models/User'
 import dbConnect from 'functions/dbConnect'
 import { GOOGLE_ID, GOOGLE_SECRET, SECRET } from 'env'
-import { nanoid } from 'nanoid'
 import { NEXT_PUBLIC_VERCEL_URL } from 'env/public'
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
@@ -49,8 +48,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         ) {
           await dbConnect()
 
-          token.channelName = nanoid()
-
           await User.updateOne(
             { _id: user.id },
             {
@@ -58,14 +55,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               postIds: [],
               favPostIds: [],
               discussions: [],
-              hasUnseenMessages: false,
-              channelName: token.channelName,
-            }
+            },
           ).exec()
-        } else {
-          const { channelName } = (await User.findById(user.id).lean().exec())!
-
-          token.channelName = channelName
         }
       }
 
@@ -74,7 +65,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (token) {
         session.id = token.id as string
-        session.channelName = token.channelName as string
       }
 
       return session

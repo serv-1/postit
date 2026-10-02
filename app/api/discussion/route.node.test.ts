@@ -304,9 +304,9 @@ describe('POST', () => {
 
     expect(mockPusherTrigger).toHaveBeenNthCalledWith(
       1,
-      seller.channelName,
+      'private-encrypted-' + seller._id,
       'discussion:new',
-      { ...discussion, hasNewMessage: true },
+      discussion,
     )
 
     expect(response).toHaveProperty('status', 201)

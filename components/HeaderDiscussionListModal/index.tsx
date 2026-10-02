@@ -87,7 +87,7 @@ export default function HeaderDiscussionListModal({
   })
 
   usePusher<Discussion>(
-    signedInUser.channelName,
+    'private-encrypted-' + signedInUser._id,
     'discussion:new',
     async (discussion) => {
       setDiscussions((d) => (d ? [...d, discussion] : [discussion]))
@@ -95,7 +95,7 @@ export default function HeaderDiscussionListModal({
     },
   )
 
-  usePusher(signedInUser.channelName, 'message:new', () => {
+  usePusher('private-encrypted-' + signedInUser._id, 'message:new', () => {
     setShowBadge(isHidden)
   })
 

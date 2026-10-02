@@ -403,7 +403,7 @@ describe('PUT', () => {
 
       expect(mockPusherTrigger).toHaveBeenNthCalledWith(
         1,
-        discussion.channelName,
+        'private-encrypted-' + discussion._id,
         'message:new',
         updatedDiscussion.messages.at(-1),
       )
@@ -444,12 +444,9 @@ describe('PUT', () => {
 
         expect(mockPusherTrigger).toHaveBeenNthCalledWith(
           2,
-          seller.channelName,
+          'private-encrypted-' + seller._id,
           'discussion:new',
-          {
-            ...updatedDiscussion,
-            hasNewMessage: true,
-          },
+          updatedDiscussion,
         )
 
         expect(response).toHaveProperty('status', 500)
@@ -533,7 +530,7 @@ describe('PUT', () => {
 
         expect(mockPusherTrigger).toHaveBeenNthCalledWith(
           2,
-          seller.channelName,
+          'private-encrypted-' + seller._id,
           'message:new',
           '',
         )
@@ -575,9 +572,9 @@ describe('PUT', () => {
 
         expect(mockPusherTrigger).toHaveBeenNthCalledWith(
           2,
-          buyer.channelName,
+          'private-encrypted-' + buyer._id,
           'discussion:new',
-          { ...updatedDiscussion, hasNewMessage: true },
+          updatedDiscussion,
         )
 
         expect(response).toHaveProperty('status', 500)
@@ -661,7 +658,7 @@ describe('PUT', () => {
 
         expect(mockPusherTrigger).toHaveBeenNthCalledWith(
           2,
-          buyer.channelName,
+          'private-encrypted-' + buyer._id,
           'message:new',
           '',
         )

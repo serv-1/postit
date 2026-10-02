@@ -61,11 +61,15 @@ export default function ContactModal({
     }
   })
 
-  usePusher<Discussion>(session.channelName, 'discussion:new', (discussion) => {
-    if (discussion._id === discussionId) {
-      setIsDiscussionHidden(false)
-    }
-  })
+  usePusher<Discussion>(
+    'private-encrypted-' + session.id,
+    'discussion:new',
+    (discussion) => {
+      if (discussion._id === discussionId) {
+        setIsDiscussionHidden(false)
+      }
+    },
+  )
 
   return (
     <>

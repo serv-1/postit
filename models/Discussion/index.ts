@@ -1,6 +1,5 @@
 import type { DeleteResult } from 'mongoose/node_modules/mongodb'
 import { models, model, Schema, type Model, Types, Query } from 'mongoose'
-import { nanoid } from 'nanoid'
 import Post from 'models/Post'
 import User from 'models/User'
 
@@ -26,7 +25,6 @@ export interface DiscussionDoc {
   buyerId?: Types.ObjectId
   sellerId?: Types.ObjectId
   postName: string
-  channelName: string
 }
 
 const discussionSchema = new Schema<DiscussionDoc>({
@@ -35,10 +33,6 @@ const discussionSchema = new Schema<DiscussionDoc>({
   buyerId: Schema.Types.ObjectId,
   sellerId: Schema.Types.ObjectId,
   postName: String,
-  channelName: {
-    type: String,
-    default: () => 'private-encrypted-' + nanoid(),
-  },
 })
 
 discussionSchema.pre('save', async function () {

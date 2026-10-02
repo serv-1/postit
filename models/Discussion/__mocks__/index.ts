@@ -10,7 +10,7 @@ export const mockFindDiscussion = vi.fn()
 export const mockUpdateOneDiscussion = vi.fn()
 
 export default class Discussion {
-  document: Omit<DiscussionDoc, '_id' | 'channelName'>
+  document: Omit<DiscussionDoc, '_id'>
 
   constructor(document: Discussion['document']) {
     this.document = document

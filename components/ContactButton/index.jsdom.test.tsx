@@ -40,7 +40,7 @@ it('renders a message on click if the user is unauthenticated', async () => {
 })
 
 it('calls the onClick handler on click if the user is authenticated', async () => {
-  const session = { id: '0', channelName: 'chan0', expires: '' }
+  const session = { id: '0', expires: '' }
 
   mockUseSession.mockReturnValue({
     update: async () => session,

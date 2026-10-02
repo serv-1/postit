@@ -2,7 +2,6 @@ export interface DiscussionsIdGetData {
   _id: string
   postId: string
   postName: string
-  channelName: string
   messages: {
     _id: string
     message: string

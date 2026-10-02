@@ -11,7 +11,6 @@ const handlers = [
         postIds: [],
         favPostIds: [],
         discussions: [],
-        channelName: 'channel name',
       },
       { status: 200 },
     )

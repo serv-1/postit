@@ -48,7 +48,7 @@ it('renders a message if the user is unauthenticated on click', async () => {
 })
 
 it('adds the post to the authenticated user favorite list on click', async () => {
-  const session = { id: '0', channelName: 'chan0', expires: '' }
+  const session = { id: '0', expires: '' }
 
   mockPut.mockResolvedValue(new Response(null, { status: 204 }))
   mockUseSession.mockReturnValue({
@@ -74,7 +74,7 @@ it('adds the post to the authenticated user favorite list on click', async () =>
 })
 
 it('deletes the post from the authenticated user favorite list on click', async () => {
-  const session = { id: '0', channelName: 'chan0', expires: '' }
+  const session = { id: '0', expires: '' }
 
   mockPut.mockResolvedValue(new Response(null, { status: 204 }))
   mockUseSession.mockReturnValue({
@@ -101,7 +101,7 @@ it('deletes the post from the authenticated user favorite list on click', async 
 })
 
 it('renders the server error when the request fails', async () => {
-  const session = { id: '0', channelName: 'chan0', expires: '' }
+  const session = { id: '0', expires: '' }
 
   mockPut.mockResolvedValue(
     new Response(JSON.stringify({ message: 'error' }), { status: 422 }),

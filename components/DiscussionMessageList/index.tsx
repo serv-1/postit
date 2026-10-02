@@ -9,14 +9,14 @@ export interface DiscussionMessageListProps {
   signedInUser: User
   interlocutor: User | null
   messages: Discussion['messages']
-  discussionChannelName: string
+  discussionId: string
 }
 
 export default function DiscussionMessageList({
   signedInUser,
   interlocutor,
   messages: propMessages,
-  discussionChannelName,
+  discussionId,
 }: DiscussionMessageListProps) {
   const [messages, setMessages] = useState(propMessages)
   const msgListRef = useRef<HTMLUListElement>(null)
@@ -29,7 +29,7 @@ export default function DiscussionMessageList({
   }, [])
 
   usePusher<UnArray<Discussion['messages']>>(
-    discussionChannelName,
+    'private-encrypted-' + discussionId,
     'message:new',
     (message) => {
       setMessages((m) => [...m, message])

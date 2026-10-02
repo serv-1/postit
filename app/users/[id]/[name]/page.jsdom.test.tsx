@@ -23,7 +23,6 @@ const user: User = {
   name: 'john',
   email: 'john@test.com',
   image: 'john.jpeg',
-  channelName: 'test',
   postIds: [],
   favPostIds: [],
   discussions: [],

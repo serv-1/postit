@@ -19,7 +19,6 @@ const signedInUser: User = {
   _id: '0',
   name: 'john',
   email: 'john@test.com',
-  channelName: '',
   postIds: [],
   favPostIds: [],
   discussions: [],

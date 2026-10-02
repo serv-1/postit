@@ -65,16 +65,20 @@ export default function DiscussionModal({
   })
 
   usePusher<UnArray<Discussion['messages']>>(
-    discussion.channelName,
+    'private-encrypted-' + discussion._id,
     'message:new',
     (message) => {
       setHasNewMessage(isHidden && message.userId !== signedInUser._id)
     },
   )
 
-  usePusher(discussion.channelName, 'interlocutor:deleted', () => {
-    setInterlocutor(null)
-  })
+  usePusher(
+    'private-encrypted-' + discussion._id,
+    'interlocutor:deleted',
+    () => {
+      setInterlocutor(null)
+    },
+  )
 
   useEffect(() => {
     async function getInterlocutor() {
@@ -137,7 +141,7 @@ export default function DiscussionModal({
             signedInUser={signedInUser}
             interlocutor={interlocutor}
             messages={discussion.messages}
-            discussionChannelName={discussion.channelName}
+            discussionId={discussion._id}
           />
           <DiscussionSendBar discussionId={discussion._id} />
         </div>

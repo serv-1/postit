@@ -143,7 +143,7 @@ export async function PUT(request: NextRequest, segmentData: Params) {
         .exec())!
 
       await pusher.trigger(
-        discussion.channelName,
+        'private-encrypted-' + discussion._id,
         'message:new',
         discussion.messages[discussion.messages.length - 1],
       )
@@ -160,10 +160,11 @@ export async function PUT(request: NextRequest, segmentData: Params) {
 
       if (isBuyer) {
         if (sellerDiscussion.hidden) {
-          await pusher.trigger(seller.channelName, 'discussion:new', {
-            ...discussion,
-            hasNewMessage: true,
-          })
+          await pusher.trigger(
+            'private-encrypted-' + seller._id,
+            'discussion:new',
+            discussion,
+          )
         }
 
         if (buyerDiscussion.hidden) {
@@ -187,13 +188,18 @@ export async function PUT(request: NextRequest, segmentData: Params) {
           .lean()
           .exec()
 
-        await pusher.trigger(seller.channelName, 'message:new', '')
+        await pusher.trigger(
+          'private-encrypted-' + seller._id,
+          'message:new',
+          '',
+        )
       } else {
         if (buyerDiscussion.hidden) {
-          await pusher.trigger(buyer.channelName, 'discussion:new', {
-            ...discussion,
-            hasNewMessage: true,
-          })
+          await pusher.trigger(
+            'private-encrypted-' + buyer._id,
+            'discussion:new',
+            discussion,
+          )
         }
 
         if (sellerDiscussion.hidden) {
@@ -217,7 +223,11 @@ export async function PUT(request: NextRequest, segmentData: Params) {
           .lean()
           .exec()
 
-        await pusher.trigger(buyer.channelName, 'message:new', '')
+        await pusher.trigger(
+          'private-encrypted-' + buyer._id,
+          'message:new',
+          '',
+        )
       }
     } else {
       for (let i = discussion.messages.length - 1; i >= 0; i--) {

@@ -1,6 +1,5 @@
 import { type DeleteResult } from 'mongoose/node_modules/mongodb'
 import { models, model, Schema, type Model, Types, Query } from 'mongoose'
-import { nanoid } from 'nanoid'
 import deleteImage from 'functions/deleteImage'
 import Account from 'models/Account'
 import Discussion from 'models/Discussion'
@@ -25,7 +24,6 @@ export interface UserDoc {
   postIds: Types.ObjectId[]
   favPostIds: Types.ObjectId[]
   discussions: UserDiscussionDoc[]
-  channelName: string
 }
 
 const userDiscussionSchema = new Schema<UserDiscussionDoc>({
@@ -43,10 +41,6 @@ const userSchema = new Schema<UserDoc>({
   postIds: [Schema.Types.ObjectId],
   favPostIds: [Schema.Types.ObjectId],
   discussions: [userDiscussionSchema],
-  channelName: {
-    type: String,
-    default: () => 'private-encrypted-' + nanoid(),
-  },
 })
 
 userSchema.pre('save', async function () {
@@ -110,7 +104,11 @@ userSchema.pre<Query<DeleteResult, UserDoc>>('deleteOne', async function () {
         .lean()
         .exec()
 
-      await pusher.trigger(discussion.channelName, 'interlocutor:deleted', null)
+      await pusher.trigger(
+        'private-encrypted-' + discussion._id,
+        'interlocutor:deleted',
+        null,
+      )
     }
   }
 })

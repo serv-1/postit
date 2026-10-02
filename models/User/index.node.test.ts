@@ -54,24 +54,6 @@ describe('User model', () => {
   })
 
   describe('when a user is saved', () => {
-    it('defines the default values', async () => {
-      const john = (await User.findById(johnId).lean().exec())!
-
-      expect(john.channelName).toContain('private-encrypted-')
-    })
-
-    it('generates a different channel name for each one of them', async () => {
-      const bob = await new User({
-        name: 'bob',
-        email: 'bob@test.com',
-        password: 'bob password',
-      }).save()
-
-      const john = (await User.findById(johnId).lean().exec())!
-
-      expect(john.channelName).not.toBe(bob.channelName)
-    })
-
     it('encrypts its password', async () => {
       const john = (await User.findById(johnId).lean().exec())!
 
@@ -400,7 +382,7 @@ describe('User model', () => {
 
       expect(mockPusherTrigger).toHaveBeenNthCalledWith(
         1,
-        discussion.channelName,
+        'private-encrypted-' + discussion._id,
         'interlocutor:deleted',
         null,
       )

@@ -92,7 +92,6 @@ describe('GET', () => {
       _id: id,
       name: user.name,
       email: user.email,
-      channelName: user.channelName,
       image: user.image,
       postIds: user.postIds,
       favPostIds: user.favPostIds,
