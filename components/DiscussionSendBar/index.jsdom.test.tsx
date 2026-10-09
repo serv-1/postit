@@ -25,7 +25,6 @@ it('creates a discussion if none exist when the first message is sent', async ()
       expect(await request.json()).toEqual({
         message: 'hi',
         postId: '0',
-        postName: 'table',
         sellerId: '1',
       })
 
@@ -33,7 +32,7 @@ it('creates a discussion if none exist when the first message is sent', async ()
     }),
   )
 
-  render(<ChatSendBar postId="0" postName="table" sellerId="1" />)
+  render(<ChatSendBar postId="0" sellerId="1" />)
 
   const input = screen.getByRole('textbox')
 
@@ -53,7 +52,7 @@ it('renders an alert if the server fails to create a discussion', async () => {
 
   render(
     <>
-      <ChatSendBar postId="0" postName="table" sellerId="1" />
+      <ChatSendBar postId="0" sellerId="1" />
       <Toast />
     </>,
   )

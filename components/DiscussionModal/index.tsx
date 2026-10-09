@@ -115,7 +115,7 @@ export default function DiscussionModal({
         <DiscussionBadge isShown={hasNewMessage} />
         <OpenDiscussionModalButton
           onClick={handleOpen}
-          postName={discussion.postName}
+          postName={discussion.post.name}
           interlocutor={
             interlocutor && {
               name: interlocutor.name,

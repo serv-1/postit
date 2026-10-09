@@ -6,9 +6,10 @@ const handlers = [
     return HttpResponse.json<Discussion>(
       {
         _id: '0',
-        postId: '0',
-        postName: 'table',
-        channelName: 'channel name',
+        post: {
+          id: '0',
+          name: 'table',
+        },
         messages: [
           {
             _id: '0',
@@ -20,7 +21,6 @@ const handlers = [
         ],
         buyerId: '0',
         sellerId: '1',
-        hasNewMessage: false,
       },
       { status: 200 },
     )

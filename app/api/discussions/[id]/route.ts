@@ -18,6 +18,8 @@ import {
   DATA_INVALID,
 } from 'constants/errors'
 import pusher from 'libs/pusher/server'
+import type { DiscussionsIdGetData } from './types'
+import getDiscussion from 'functions/getDiscussion'
 
 interface Params {
   params: Promise<{ id: string }>
@@ -44,7 +46,28 @@ export async function GET(request: NextRequest, segmentData: Params) {
   try {
     await dbConnect()
 
-    const discussion = await Discussion.findById(discussionId).lean().exec()
+    const discussion = (
+      await Discussion.aggregate<DiscussionsIdGetData>([
+        { $match: { $expr: { $eq: ['$_id', { $toObjectId: discussionId }] } } },
+        {
+          $lookup: {
+            from: 'posts',
+            localField: 'postId',
+            foreignField: '_id',
+            as: 'posts',
+          },
+        },
+        {
+          $addFields: {
+            post: {
+              id: { $arrayElemAt: ['$posts._id', 0] },
+              name: { $arrayElemAt: ['$posts.name', 0] },
+            },
+          },
+        },
+        { $unset: ['postId', 'posts'] },
+      ])
+    )[0]
 
     if (!discussion) {
       return NextResponse.json(
@@ -130,17 +153,16 @@ export async function PUT(request: NextRequest, segmentData: Params) {
         return NextResponse.json({ message: result.message }, { status: 422 })
       }
 
-      const discussion = (await Discussion.findByIdAndUpdate(
-        discussionId,
+      await Discussion.updateOne(
+        { _id: discussionId },
         {
           $push: {
             messages: [{ message: result.value.message, userId: session.id }],
           },
         },
-        { returnDocument: 'after' },
-      )
-        .lean()
-        .exec())!
+      ).exec()
+
+      const discussion = await getDiscussion(discussionId)
 
       await pusher.trigger(
         'private-encrypted-' + discussion._id,

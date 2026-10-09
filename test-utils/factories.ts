@@ -34,8 +34,10 @@ export function buildDiscussion(
   const buyerId = nanoid()
   return {
     _id,
-    postId: nanoid(),
-    postName: 'table',
+    post: {
+      id: nanoid(),
+      name: 'table',
+    },
     buyerId,
     sellerId: nanoid(),
     messages: [buildMessage({ userId: buyerId })],

@@ -24,7 +24,6 @@ export interface DiscussionDoc {
   postId?: Types.ObjectId
   buyerId?: Types.ObjectId
   sellerId?: Types.ObjectId
-  postName: string
 }
 
 const discussionSchema = new Schema<DiscussionDoc>({
@@ -32,7 +31,6 @@ const discussionSchema = new Schema<DiscussionDoc>({
   postId: Schema.Types.ObjectId,
   buyerId: Schema.Types.ObjectId,
   sellerId: Schema.Types.ObjectId,
-  postName: String,
 })
 
 discussionSchema.pre('save', async function () {

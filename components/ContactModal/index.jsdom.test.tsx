@@ -38,7 +38,7 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 it('opens/closes', async () => {
-  render(<ContactModal postId="0" postName="table" sellerId="0" />)
+  render(<ContactModal postId="0" sellerId="0" />)
 
   let modal = screen.queryByRole('dialog')
 
@@ -60,9 +60,7 @@ it('opens/closes', async () => {
 })
 
 it("opens the discussion if it isn't hidden", async () => {
-  render(
-    <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />,
-  )
+  render(<ContactModal discussionId="0" postId="1" sellerId="2" />)
 
   const openBtn = screen.getByRole('button')
   const openDiscussionHandler = vi.fn()
@@ -82,7 +80,6 @@ it("doesn't open the discussion if it is hidden", async () => {
     <ContactModal
       discussionId="0"
       postId="1"
-      postName="table"
       sellerId="2"
       isDiscussionHidden
     />,
@@ -108,7 +105,7 @@ it('closes the modal and opens the discussion on message sent', async () => {
     }),
   )
 
-  render(<ContactModal postId="0" postName="table" sellerId="0" />)
+  render(<ContactModal postId="0" sellerId="0" />)
 
   const openBtn = screen.getByRole('button')
 
@@ -136,9 +133,7 @@ it('closes the modal and opens the discussion on message sent', async () => {
 })
 
 it("can't open the discussion if it has been deleted", async () => {
-  render(
-    <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />,
-  )
+  render(<ContactModal discussionId="0" postId="1" sellerId="2" />)
 
   await act(async () => {
     document.dispatchEvent(
@@ -157,9 +152,7 @@ it("can't open the discussion if it has been deleted", async () => {
 })
 
 it('still can open the discussion if it is another discussion that has been deleted', async () => {
-  render(
-    <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />,
-  )
+  render(<ContactModal discussionId="0" postId="1" sellerId="2" />)
 
   await act(async () => {
     document.dispatchEvent(
@@ -178,9 +171,7 @@ it('still can open the discussion if it is another discussion that has been dele
 })
 
 it('can open the discussion if it has a new message', async () => {
-  render(
-    <ContactModal discussionId="0" postId="1" postName="table" sellerId="2" />,
-  )
+  render(<ContactModal discussionId="0" postId="1" sellerId="2" />)
 
   await act(async () => {
     mockUsePusher.mock.calls[0][2]({ discussionId: '0' })
@@ -201,7 +192,6 @@ it("still can't open the discussion if it is another discussion that has a new m
     <ContactModal
       discussionId="0"
       postId="1"
-      postName="table"
       sellerId="2"
       isDiscussionHidden
     />,

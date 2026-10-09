@@ -101,7 +101,6 @@ describe('POST', () => {
         message: 'yo',
         postId: new mongoose.Types.ObjectId().toString(),
         sellerId: new mongoose.Types.ObjectId().toString(),
-        postName: 'table',
       }),
     })
 
@@ -124,7 +123,6 @@ describe('POST', () => {
         message: 'yo',
         postId: new mongoose.Types.ObjectId().toString(),
         sellerId: session.id,
-        postName: 'table',
       }),
     })
 
@@ -146,7 +144,6 @@ describe('POST', () => {
         message: 'yo',
         postId: new mongoose.Types.ObjectId().toString(),
         sellerId: new mongoose.Types.ObjectId().toString(),
-        postName: 'table',
       }),
     })
 
@@ -166,7 +163,6 @@ describe('POST', () => {
       messages: [],
       buyerId: session.id,
       sellerId,
-      postName: 'table',
       postId,
     }).save()
 
@@ -180,7 +176,6 @@ describe('POST', () => {
         message: 'yo',
         postId,
         sellerId,
-        postName: 'table',
       }),
     })
 
@@ -206,7 +201,6 @@ describe('POST', () => {
         message: 'yo',
         postId: new mongoose.Types.ObjectId().toString(),
         sellerId: new mongoose.Types.ObjectId().toString(),
-        postName: 'table',
       }),
     })
 
@@ -240,7 +234,6 @@ describe('POST', () => {
         message: 'yo',
         postId: new mongoose.Types.ObjectId().toString(),
         sellerId: seller._id.toString(),
-        postName: 'table',
       }),
     })
 
@@ -288,7 +281,6 @@ describe('POST', () => {
         message: 'yo',
         postId: post._id.toString(),
         sellerId: seller._id.toString(),
-        postName: 'table',
       }),
     })
 
@@ -306,7 +298,11 @@ describe('POST', () => {
       1,
       'private-encrypted-' + seller._id,
       'discussion:new',
-      discussion,
+      {
+        ...discussion,
+        postId: undefined,
+        post: { id: post._id, name: post.name },
+      },
     )
 
     expect(response).toHaveProperty('status', 201)

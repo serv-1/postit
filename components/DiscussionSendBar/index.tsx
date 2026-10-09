@@ -18,7 +18,6 @@ export interface DiscussionSendBarProps {
   onMessageSent?: (id: string) => void
   discussionId?: string
   postId?: string
-  postName?: string
   sellerId?: string
 }
 
@@ -26,7 +25,6 @@ export default function DiscussionSendBar({
   onMessageSent,
   discussionId,
   postId,
-  postName,
   sellerId,
 }: DiscussionSendBarProps) {
   const methods = useForm<UpdateDiscussion>({
@@ -56,7 +54,7 @@ export default function DiscussionSendBar({
     } else {
       const response = await ajax.post(
         '/discussion',
-        { message: data.message, postId, sellerId, postName },
+        { message: data.message, postId, sellerId },
         { csrf: true },
       )
 

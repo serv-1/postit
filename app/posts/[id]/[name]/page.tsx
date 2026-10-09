@@ -140,7 +140,6 @@ export default async function Page(props: { params: Params }) {
         ) : user ? (
           <ContactModal
             postId={post._id}
-            postName={post.name}
             sellerId={seller._id}
             discussionId={discussionId}
             isDiscussionHidden={isDiscussionHidden}

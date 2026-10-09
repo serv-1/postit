@@ -16,14 +16,12 @@ export interface ContactModalProps {
   isDiscussionHidden?: boolean
   postId: string
   sellerId: string
-  postName: string
 }
 
 export default function ContactModal({
   discussionId: discussionIdProp,
   isDiscussionHidden: isDiscussionHiddenProp,
   postId,
-  postName,
   sellerId,
 }: ContactModalProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -90,7 +88,6 @@ export default function ContactModal({
             <DiscussionSendBar
               onMessageSent={onMessageSent}
               sellerId={sellerId}
-              postName={postName}
               postId={postId}
             />
           </div>

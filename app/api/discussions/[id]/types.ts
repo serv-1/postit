@@ -1,7 +1,9 @@
 export interface DiscussionsIdGetData {
   _id: string
-  postId: string
-  postName: string
+  post: {
+    id: string
+    name: string
+  }
   messages: {
     _id: string
     message: string

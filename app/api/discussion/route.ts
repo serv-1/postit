@@ -16,6 +16,7 @@ import {
   USER_NOT_FOUND,
 } from 'constants/errors'
 import pusher from 'libs/pusher/server'
+import getDiscussion from 'functions/getDiscussion'
 
 export async function POST(request: NextRequest) {
   const session = await auth()
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: result.message }, { status: 422 })
   }
 
-  const { sellerId, postId, message, postName } = result.value
+  const { sellerId, postId, message } = result.value
 
   if (!verifyCsrfTokens(request)) {
     return NextResponse.json({ message: CSRF_TOKEN_INVALID }, { status: 422 })
@@ -62,21 +63,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const savedDiscussion = (
-      await new Discussion({
-        messages: [{ message, userId: session.id }],
-        buyerId: session.id,
-        sellerId,
-        postName,
-        postId,
-      }).save()
-    ).toObject()
-
     const seller = await User.findById(sellerId).lean().exec()
 
     if (!seller) {
       return NextResponse.json({ message: USER_NOT_FOUND }, { status: 404 })
     }
+
+    const { _id } = await new Discussion({
+      messages: [{ message, userId: session.id }],
+      buyerId: session.id,
+      sellerId,
+      postId,
+    }).save()
+
+    const savedDiscussion = await getDiscussion(_id)
 
     await pusher.trigger(
       'private-encrypted-' + seller._id,

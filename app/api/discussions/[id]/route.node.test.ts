@@ -1,5 +1,6 @@
 import Discussion, { type DiscussionDoc } from 'models/Discussion'
 import User, { type UserDoc } from 'models/User'
+import Post, { type PostDoc } from 'models/Post'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
 import { NextRequest } from 'next/server'
@@ -41,9 +42,10 @@ const mockAuth = vi.mocked<() => Promise<Session | null>>(auth)
 const mockDbConnect = vi.mocked(dbConnect)
 const mockVerifyCsrfTokens = vi.mocked(verifyCsrfTokens)
 let mongoServer: MongoMemoryServer
-let buyer: UserDoc
-let seller: UserDoc
-let discussion: DiscussionDoc
+let buyer: mongoose.HydratedDocument<UserDoc>
+let seller: mongoose.HydratedDocument<UserDoc>
+let discussion: mongoose.HydratedDocument<DiscussionDoc>
+let post: mongoose.HydratedDocument<PostDoc>
 
 async function resetEntities() {
   await User.updateOne(
@@ -101,11 +103,21 @@ beforeAll(async () => {
     password: 'password',
   }).save()
 
+  post = await new Post({
+    name: 'table',
+    description: 'magnificent table',
+    categories: ['furniture'],
+    images: [''],
+    address: 'Paris, France',
+    latLon: [0, 1],
+    price: 40 * 100,
+    userId: seller._id,
+  }).save()
+
   discussion = await new Discussion({
     buyerId: buyer._id,
     sellerId: seller._id,
-    postId: new mongoose.Types.ObjectId(),
-    postName: 'postName',
+    postId: post._id,
     messages: [{ message: 'yo', userId: buyer._id }],
   }).save()
 })
@@ -220,7 +232,15 @@ describe('GET', () => {
     await resetEntities()
 
     expect(response).toHaveProperty('status', 200)
-    expect(data).toEqual({ ...JSON.parse(JSON.stringify(discussion)) })
+    expect(data).toEqual(
+      JSON.parse(
+        JSON.stringify({
+          ...discussion.toObject(),
+          postId: undefined,
+          post: { id: post._id, name: post.name },
+        }),
+      ),
+    )
   })
 })
 
@@ -446,7 +466,11 @@ describe('PUT', () => {
           2,
           'private-encrypted-' + seller._id,
           'discussion:new',
-          updatedDiscussion,
+          {
+            ...updatedDiscussion,
+            postId: undefined,
+            post: { id: post._id, name: post.name },
+          },
         )
 
         expect(response).toHaveProperty('status', 500)
@@ -574,7 +598,11 @@ describe('PUT', () => {
           2,
           'private-encrypted-' + buyer._id,
           'discussion:new',
-          updatedDiscussion,
+          {
+            ...updatedDiscussion,
+            postId: undefined,
+            post: { id: post._id, name: post.name },
+          },
         )
 
         expect(response).toHaveProperty('status', 500)
