@@ -142,6 +142,7 @@ export default function DiscussionModal({
             interlocutor={interlocutor}
             messages={discussion.messages}
             discussionId={discussion._id}
+            isModalOpen={!isHidden}
           />
           <DiscussionSendBar discussionId={discussion._id} />
         </div>

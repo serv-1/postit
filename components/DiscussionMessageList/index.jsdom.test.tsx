@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import DiscussionMessageList from '.'
 import { act } from 'react'
 import usePusher from 'hooks/usePusher'
@@ -45,7 +45,24 @@ it('renders the messages', async () => {
   expect(messages).toHaveLength(2)
 })
 
-it('scrolls until the last message of the discussion is visible', async () => {
+it('scrolls to the bottom when the modal is open', async () => {
+  const signedInUser = buildUser()
+
+  const { container } = render(
+    <DiscussionMessageList
+      signedInUser={signedInUser}
+      interlocutor={buildUser()}
+      messages={[buildMessage({ userId: signedInUser._id })]}
+      discussionId=""
+      isModalOpen
+    />,
+  )
+
+  const msgList = container.firstElementChild!
+  expect(msgList.scroll).toHaveBeenCalledTimes(1)
+})
+
+it("doesn't scroll to the bottom when the modal is closed", async () => {
   const signedInUser = buildUser()
 
   const { container } = render(
@@ -58,13 +75,7 @@ it('scrolls until the last message of the discussion is visible', async () => {
   )
 
   const msgList = container.firstElementChild!
-
-  await waitFor(() => {
-    expect(msgList.scroll).toHaveBeenNthCalledWith(1, {
-      top: msgList.scrollHeight,
-      behavior: 'smooth',
-    })
-  })
+  expect(msgList.scroll).not.toHaveBeenCalled()
 })
 
 it('renders the message with the signed in user as the author', () => {
@@ -146,4 +157,36 @@ it('receives a new message in real-time', async () => {
   const messages = screen.getAllByRole('listitem')
   expect(messages).toHaveLength(2)
   expect(messages[1]).toHaveTextContent('yo')
+})
+
+it('scrolls to the bottom for each new message', async () => {
+  const signedInUser = buildUser()
+  const interlocutor = buildUser()
+
+  const { container } = render(
+    <DiscussionMessageList
+      signedInUser={signedInUser}
+      interlocutor={interlocutor}
+      messages={[buildMessage({ userId: signedInUser._id })]}
+      discussionId="0"
+      isModalOpen
+    />,
+  )
+
+  await act(async () => {
+    mockUsePusher.mock.calls[0][2](
+      buildMessage({ userId: interlocutor._id, seen: false }),
+    )
+  })
+
+  let msgList = container.firstElementChild!
+  expect(msgList.scroll).toHaveBeenCalledTimes(2)
+
+  await act(async () => {
+    mockUsePusher.mock.calls[0][2](
+      buildMessage({ userId: interlocutor._id, seen: false }),
+    )
+  })
+
+  expect(msgList.scroll).toHaveBeenCalledTimes(3)
 })

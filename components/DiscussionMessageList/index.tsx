@@ -10,6 +10,7 @@ export interface DiscussionMessageListProps {
   interlocutor: User | null
   messages: Discussion['messages']
   discussionId: string
+  isModalOpen?: boolean
 }
 
 export default function DiscussionMessageList({
@@ -17,16 +18,19 @@ export default function DiscussionMessageList({
   interlocutor,
   messages: propMessages,
   discussionId,
+  isModalOpen,
 }: DiscussionMessageListProps) {
   const [messages, setMessages] = useState(propMessages)
   const msgListRef = useRef<HTMLUListElement>(null)
 
   useEffect(() => {
+    if (!isModalOpen) return
+
     msgListRef.current?.scroll({
       top: msgListRef.current.scrollHeight,
       behavior: 'smooth',
     })
-  }, [])
+  }, [isModalOpen, messages])
 
   usePusher<UnArray<Discussion['messages']>>(
     'private-encrypted-' + discussionId,
