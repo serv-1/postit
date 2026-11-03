@@ -6,7 +6,7 @@ import {
 } from 'env/public'
 import type { LocationIQAutocompleteGetData } from 'app/api/locationIQ/autocomplete/types'
 import Autocomplete from 'components/Autocomplete'
-import Map from 'components/Map'
+import MapWrapper from 'components/MapWrapper'
 
 interface Option {
   id: string
@@ -83,7 +83,7 @@ export default function AddressField({
   }
 
   return (
-    <Map
+    <MapWrapper
       className={className}
       zoom={12}
       center={center}

@@ -100,7 +100,7 @@ it('renders the options correctly', async () => {
 
   render(<TestForm setLatLon={() => null} />)
 
-  const input = screen.getByRole('combobox')
+  const input = await screen.findByRole('combobox')
 
   await userEvent.type(input, 'a')
 

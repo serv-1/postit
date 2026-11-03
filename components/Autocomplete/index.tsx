@@ -9,6 +9,7 @@ type InputProps = Required<
     | 'onKeyDown'
     | 'onFocus'
     | 'role'
+    | 'aria-label'
     | 'aria-autocomplete'
     | 'aria-expanded'
     | 'aria-controls'
@@ -110,6 +111,7 @@ export default function Autocomplete<O extends Option>({
         onKeyDown: handleKeyDown,
         onFocus: handleFocus,
         role: 'combobox',
+        'aria-label': 'Address',
         'aria-autocomplete': 'list',
         'aria-expanded': showOptions,
         'aria-controls': 'optionList',

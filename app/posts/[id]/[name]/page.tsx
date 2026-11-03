@@ -12,7 +12,7 @@ import formatToUrl from 'functions/formatToUrl'
 import Link from 'next/link'
 import ContactModal from 'components/ContactModal'
 import addSpacesToNum from 'functions/addSpacesToNum'
-import Map from 'components/Map'
+import MapWrapper from 'components/MapWrapper'
 import PostList from 'components/PostList'
 import PreviousPageButton from 'components/PreviousPageButton'
 import PencilSvg from 'components/PencilSvg'
@@ -154,7 +154,7 @@ export default async function Page(props: { params: Params }) {
           {addSpacesToNum(post.price)}€
         </span>
         <p className="my-16 wrap-break-words">{post.description}</p>
-        <Map
+        <MapWrapper
           zoom={11}
           center={post.latLon}
           className="w-full h-200 lg:h-250 rounded-lg overflow-hidden"

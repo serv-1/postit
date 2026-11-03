@@ -62,7 +62,7 @@ it("disables the next button of the first step if the address isn't defined", as
 it('enables the next button of the first step if the address is defined', async () => {
   render(<CreatePostForm />)
 
-  const addressInput = screen.getAllByRole('combobox')[0]
+  const addressInput = await screen.findByRole('combobox', { name: /address/i })
 
   await userEvent.type(addressInput, 'a')
   await userEvent.tab()
