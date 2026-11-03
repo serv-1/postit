@@ -4,7 +4,7 @@ import Post, { type PostDoc } from 'models/Post'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
 import { NextRequest } from 'next/server'
-import { DELETE, GET, PUT } from './route'
+import { GET, PUT } from './route'
 import {
   CANNOT_SEND_MSG,
   CSRF_TOKEN_INVALID,
@@ -776,113 +776,5 @@ describe('PUT', () => {
       expect(messages[2].seen).toBe(true)
       expect(messages[3].seen).toBe(true)
     })
-  })
-})
-
-describe('DELETE', () => {
-  test('422 - invalid id', async () => {
-    const response = await DELETE(
-      new NextRequest('http://-', { method: 'DELETE' }),
-      { params: Promise.resolve({ id: 'invalid id' }) },
-    )
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: PARAMS_INVALID })
-  })
-
-  test('401 - unauthorized', async () => {
-    mockAuth.mockResolvedValue(null)
-
-    const response = await DELETE(
-      new NextRequest('http://-', { method: 'DELETE' }),
-      { params: Promise.resolve({ id: discussion._id.toString() }) },
-    )
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 401)
-    expect(data).toEqual({ message: UNAUTHORIZED })
-  })
-
-  test('422 - invalid csrf token', async () => {
-    mockAuth.mockResolvedValue({} as Session)
-    mockVerifyCsrfTokens.mockReturnValue(false)
-
-    const response = await DELETE(
-      new NextRequest('http://-', { method: 'DELETE' }),
-      { params: Promise.resolve({ id: discussion._id.toString() }) },
-    )
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 422)
-    expect(data).toEqual({ message: CSRF_TOKEN_INVALID })
-  })
-
-  test('500 - database connection failed', async () => {
-    mockAuth.mockResolvedValue({} as Session)
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockRejectedValue({})
-
-    const response = await DELETE(
-      new NextRequest('http://-', { method: 'DELETE' }),
-      { params: Promise.resolve({ id: discussion._id.toString() }) },
-    )
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 500)
-    expect(data).toEqual({ message: INTERNAL_SERVER_ERROR })
-  })
-
-  test('404 - discussion not found', async () => {
-    mockAuth.mockResolvedValue({} as Session)
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({} as Connection)
-
-    const response = await DELETE(
-      new NextRequest('http://-', { method: 'DELETE' }),
-      {
-        params: Promise.resolve({
-          id: new mongoose.Types.ObjectId().toString(),
-        }),
-      },
-    )
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 404)
-    expect(data).toEqual({ message: DISCUSSION_NOT_FOUND })
-  })
-
-  test('403 - forbidden', async () => {
-    mockAuth.mockResolvedValue({
-      id: new mongoose.Types.ObjectId().toString(),
-    } as Session)
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({} as Connection)
-
-    const response = await DELETE(
-      new NextRequest('http://-', { method: 'DELETE' }),
-      { params: Promise.resolve({ id: discussion._id.toString() }) },
-    )
-    const data = await response.json()
-
-    expect(response).toHaveProperty('status', 403)
-    expect(data).toEqual({ message: FORBIDDEN })
-  })
-
-  test('204 - discussion deleted', async () => {
-    mockAuth.mockResolvedValue({ id: buyer._id.toString() } as Session)
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({} as Connection)
-
-    const response = await DELETE(
-      new NextRequest('http://-', { method: 'DELETE' }),
-      { params: Promise.resolve({ id: discussion._id.toString() }) },
-    )
-
-    await resetEntities()
-
-    expect(response).toHaveProperty('status', 204)
-    expect(response.body).toBeNull()
-    expect(await Discussion.findById(discussion._id).lean().exec()).toBeNull()
   })
 })

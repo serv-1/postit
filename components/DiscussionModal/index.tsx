@@ -108,10 +108,7 @@ export default function DiscussionModal({
   return interlocutor !== undefined ? (
     <>
       <div className="relative w-full">
-        <DeleteDiscussionButton
-          discussionId={discussion._id}
-          interlocutorDiscussions={interlocutor?.discussions}
-        />
+        <DeleteDiscussionButton discussionId={discussion._id} />
         <DiscussionBadge isShown={hasNewMessage} />
         <OpenDiscussionModalButton
           onClick={handleOpen}

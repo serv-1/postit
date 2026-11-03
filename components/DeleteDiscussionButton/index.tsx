@@ -1,45 +1,20 @@
-import type { DiscussionsIdDeleteError } from 'app/api/discussions/[id]/types'
 import type { UserPutError } from 'app/api/user/types'
 import showToast from 'functions/showToast'
 import ajax from 'libs/ajax'
 import XSvg from 'components/XSvg'
-import type { User } from 'types'
 
 interface DeleteDiscussionButtonProps {
   discussionId: string
-  interlocutorDiscussions?: User['discussions']
 }
 
 export default function DeleteDiscussionButton({
   discussionId,
-  interlocutorDiscussions,
 }: DeleteDiscussionButtonProps) {
   async function deleteDiscussion() {
-    let response: Response | null = null
+    const response = await ajax.put('/user', { discussionId }, { csrf: true })
 
-    if (interlocutorDiscussions) {
-      for (const { id, hidden } of interlocutorDiscussions) {
-        if (discussionId === id) {
-          response = hidden
-            ? await ajax.delete('/discussions/' + discussionId, { csrf: true })
-            : await ajax.put(
-                '/user',
-                { discussionId: discussionId },
-                { csrf: true },
-              )
-
-          break
-        }
-      }
-    } else {
-      response = await ajax.delete('/discussions/' + discussionId, {
-        csrf: true,
-      })
-    }
-
-    if (!response!.ok) {
-      const { message }: DiscussionsIdDeleteError | UserPutError =
-        await response!.json()
+    if (!response.ok) {
+      const { message }: UserPutError = await response.json()
 
       showToast({ message, error: true })
 

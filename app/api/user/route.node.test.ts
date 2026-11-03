@@ -11,13 +11,15 @@ import {
   EMAIL_USED,
   UNAUTHORIZED,
   CSRF_TOKEN_INVALID,
+  DISCUSSION_NOT_FOUND,
 } from 'constants/errors'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import User, { type UserDoc } from 'models/User'
+import Discussion, { type DiscussionDoc } from 'models/Discussion'
 import type { Session } from 'next-auth'
 
 vi.mock('libs/pusher/server', () => ({
-  default: {},
+  default: { trigger: vi.fn() },
 }))
 
 vi.mock('functions/dbConnect', () => ({
@@ -46,7 +48,9 @@ const mockVerifyCsrfTokens = vi.mocked(verifyCsrfTokens)
 const mockDeleteImage = vi.mocked(deleteImage)
 
 let mongoServer: MongoMemoryServer
-let user: UserDoc
+let user: mongoose.HydratedDocument<UserDoc>
+let partner: mongoose.HydratedDocument<UserDoc>
+let discussion: mongoose.HydratedDocument<DiscussionDoc>
 
 async function populateDb() {
   user = await new User({
@@ -55,7 +59,23 @@ async function populateDb() {
     password: '0123456789',
     postIds: [],
     favPostIds: [],
-    discussionIds: [],
+    discussions: [],
+  }).save()
+
+  partner = await new User({
+    name: 'jane',
+    email: 'jane@test.com',
+    password: '0123456789',
+    postIds: [],
+    favPostIds: [],
+    discussions: [],
+  }).save()
+
+  discussion = await new Discussion({
+    messages: [],
+    buyerId: user._id,
+    sellerId: partner._id,
+    postId: new mongoose.Types.ObjectId(),
   }).save()
 }
 
@@ -259,22 +279,22 @@ describe('PUT', () => {
   })
 
   test('422 - email taken', async () => {
-    const signedInUser = await new User({
-      name: 'jane',
-      email: 'jane@test.com',
+    const otherUser = await new User({
+      name: 'bob',
+      email: 'bob@test.com',
       password: '0123456789',
       postIds: [],
       favPostIds: [],
-      discussionIds: [],
+      discussions: [],
     }).save()
 
-    mockAuth.mockResolvedValue({ id: signedInUser._id.toString() } as Session)
+    mockAuth.mockResolvedValue({ id: user._id.toString() } as Session)
     mockVerifyCsrfTokens.mockReturnValue(true)
     mockDbConnect.mockResolvedValue({} as Connection)
 
     const request = new NextRequest('http://-', {
       method: 'PUT',
-      body: JSON.stringify({ email: user.email }),
+      body: JSON.stringify({ email: otherUser.email }),
     })
 
     const response = await PUT(request)
@@ -441,62 +461,105 @@ describe('PUT', () => {
     await resetDb()
   })
 
-  test('204 - hide a discussion', async () => {
-    const discussionId = new mongoose.Types.ObjectId()
+  describe('hide a discussion', () => {
+    test('404 - discussion not found', async () => {
+      mockAuth.mockResolvedValue({ id: user._id.toString() } as Session)
+      mockVerifyCsrfTokens.mockReturnValue(true)
+      mockDbConnect.mockResolvedValue({} as Connection)
 
-    await User.updateOne(
-      { _id: user._id },
-      { $push: { discussions: { id: discussionId, hidden: false } } },
-    )
-      .lean()
-      .exec()
+      const request = new NextRequest('http://-', {
+        method: 'PUT',
+        body: JSON.stringify({ discussionId: new mongoose.Types.ObjectId() }),
+      })
 
-    mockAuth.mockResolvedValue({ id: user._id.toString() } as Session)
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({} as Connection)
+      const response = await PUT(request)
+      const data = await response.json()
 
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-      body: JSON.stringify({ discussionId }),
+      expect(response.status).toBe(404)
+      expect(data).toEqual({ message: DISCUSSION_NOT_FOUND })
     })
 
-    const response = await PUT(request)
-    const updatedUser = (await User.findById(user._id).lean().exec())!
+    test('204 - delete the discussion if its hidden by both users', async () => {
+      await User.updateOne(
+        { _id: partner._id, 'discussions.id': discussion._id },
+        { $set: { 'discussions.$.hidden': true } },
+      )
 
-    expect(response).toHaveProperty('status', 204)
-    expect(response.body).toBeNull()
-    expect(updatedUser.discussions[0].hidden).toBe(true)
+      mockAuth.mockResolvedValue({ id: user._id.toString() } as Session)
+      mockVerifyCsrfTokens.mockReturnValue(true)
+      mockDbConnect.mockResolvedValue({} as Connection)
 
-    await resetDb()
-  })
+      const request = new NextRequest('http://-', {
+        method: 'PUT',
+        body: JSON.stringify({ discussionId: discussion._id }),
+      })
 
-  test('204 - unhide a discussion', async () => {
-    const discussionId = new mongoose.Types.ObjectId()
+      const response = await PUT(request)
+      const d = await Discussion.findById(discussion._id).lean().exec()
+      const u = (await User.findById(user._id).lean().exec())!
+      const p = (await User.findById(user._id).lean().exec())!
 
-    await User.updateOne(
-      { _id: user._id },
-      { $push: { discussions: { id: discussionId, hidden: true } } },
-    )
-      .lean()
-      .exec()
+      expect(response).toHaveProperty('status', 204)
+      expect(response.body).toBeNull()
+      expect(d).toBeNull()
+      expect(u.discussions).toHaveLength(0)
+      expect(p.discussions).toHaveLength(0)
 
-    mockAuth.mockResolvedValue({ id: user._id.toString() } as Session)
-    mockVerifyCsrfTokens.mockReturnValue(true)
-    mockDbConnect.mockResolvedValue({} as Connection)
-
-    const request = new NextRequest('http://-', {
-      method: 'PUT',
-      body: JSON.stringify({ discussionId }),
+      await resetDb()
     })
 
-    const response = await PUT(request)
-    const updatedUser = (await User.findById(user._id).lean().exec())!
+    test('204 - delete the discussion if the other user has delete its account', async () => {
+      await User.deleteOne({ _id: partner._id }).exec()
 
-    expect(response).toHaveProperty('status', 204)
-    expect(response.body).toBeNull()
-    expect(updatedUser.discussions[0].hidden).toBe(false)
+      mockAuth.mockResolvedValue({ id: user._id.toString() } as Session)
+      mockVerifyCsrfTokens.mockReturnValue(true)
+      mockDbConnect.mockResolvedValue({} as Connection)
 
-    await resetDb()
+      const request = new NextRequest('http://-', {
+        method: 'PUT',
+        body: JSON.stringify({ discussionId: discussion._id }),
+      })
+
+      const response = await PUT(request)
+      const d = await Discussion.findById(discussion._id).lean().exec()
+      const u = (await User.findById(user._id).lean().exec())!
+
+      expect(response).toHaveProperty('status', 204)
+      expect(response.body).toBeNull()
+      expect(d).toBeNull()
+      expect(u.discussions).toHaveLength(0)
+
+      await resetDb()
+    })
+
+    test('204 - hide a discussion', async () => {
+      const discussionId = discussion._id
+
+      await User.updateOne(
+        { _id: user._id },
+        { $push: { discussions: { id: discussionId, hidden: false } } },
+      )
+        .lean()
+        .exec()
+
+      mockAuth.mockResolvedValue({ id: user._id.toString() } as Session)
+      mockVerifyCsrfTokens.mockReturnValue(true)
+      mockDbConnect.mockResolvedValue({} as Connection)
+
+      const request = new NextRequest('http://-', {
+        method: 'PUT',
+        body: JSON.stringify({ discussionId }),
+      })
+
+      const response = await PUT(request)
+      const updatedUser = (await User.findById(user._id).lean().exec())!
+
+      expect(response).toHaveProperty('status', 204)
+      expect(response.body).toBeNull()
+      expect(updatedUser.discussions[0].hidden).toBe(true)
+
+      await resetDb()
+    })
   })
 })
 

@@ -1,4 +1,5 @@
 import User, { type UserDoc } from 'models/User'
+import Discussion from 'models/Discussion'
 import { MongoServerError } from 'mongoose/node_modules/mongodb'
 import type { UpdateQuery } from 'mongoose'
 import { auth } from 'libs/auth'
@@ -16,6 +17,7 @@ import {
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
   CSRF_TOKEN_INVALID,
+  DISCUSSION_NOT_FOUND,
 } from 'constants/errors'
 
 export async function POST(request: Request) {
@@ -32,7 +34,7 @@ export async function POST(request: Request) {
   if ('message' in result) {
     return NextResponse.json(
       { name: result.name, message: result.message },
-      { status: 422 }
+      { status: 422 },
     )
   }
 
@@ -46,19 +48,19 @@ export async function POST(request: Request) {
       {
         status: 201,
         headers: { Location: '/profile' },
-      }
+      },
     )
   } catch (e) {
     if (e instanceof MongoServerError && e.code === 11000) {
       return NextResponse.json(
         { message: EMAIL_USED, name: 'email' },
-        { status: 422 }
+        { status: 422 },
       )
     }
 
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -122,20 +124,41 @@ export async function PUT(request: NextRequest) {
 
         update[action] = { favPostIds: data.favPostId }
       } else if ('discussionId' in data) {
-        let isHidden = false
+        const { discussionId } = data
+        const discussion = await Discussion.findById(discussionId).lean().exec()
 
-        for (const { id, hidden } of user.discussions) {
-          if (id.toString() === data.discussionId) {
-            isHidden = !hidden
-          }
+        if (!discussion) {
+          return NextResponse.json(
+            { message: DISCUSSION_NOT_FOUND },
+            { status: 404 },
+          )
         }
 
-        await User.updateOne(
-          { _id: session.id, 'discussions.id': data.discussionId },
-          { $set: { 'discussions.$.hidden': isHidden } }
+        const { buyerId, sellerId } = discussion
+        const partner = await User.findById(
+          buyerId?.toString() === session.id ? sellerId : buyerId,
         )
           .lean()
           .exec()
+
+        if (!partner) {
+          await Discussion.deleteOne({ _id: discussionId }).exec()
+        } else {
+          const hasPartnerHiddenDiscussion = partner.discussions.find(
+            (d) => d.id.toString() === discussionId,
+          )!.hidden
+
+          if (hasPartnerHiddenDiscussion) {
+            await Discussion.deleteOne({ _id: discussionId }).exec()
+          } else {
+            await User.updateOne(
+              { _id: user._id, 'discussions.id': discussionId },
+              { $set: { 'discussions.$.hidden': true } },
+            )
+              .lean()
+              .exec()
+          }
+        }
 
         return new Response(null, { status: 204 })
       }
@@ -149,7 +172,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 
@@ -174,7 +197,7 @@ export async function DELETE(request: NextRequest) {
   } catch (e) {
     return NextResponse.json(
       { message: INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     )
   }
 
